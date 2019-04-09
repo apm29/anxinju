@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:dio/dio.dart';
 
 var dio = Dio();
@@ -23,7 +20,9 @@ class _InterfacePageState extends State<InterfacePage> {
     dio.options.responseType = ResponseType.json;
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("接口测试"),
+      ),
       body: Stack(
         children: <Widget>[
           loading
