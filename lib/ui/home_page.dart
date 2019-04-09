@@ -164,14 +164,13 @@ class _MyHomePageState extends State<MyHomePage> {
           child: PageView.builder(
             itemBuilder: (context, index) {
               return CachedNetworkImage(
-                imageUrl: "http://lorempixel.com/900/420",
+                imageUrl: "http://lorempixel.com/900/425",
                 imageBuilder: (context,provider){
-                  return Image(image: provider);
+                  return Image(image: provider,fit: BoxFit.fill,);
                 },
-//                placeholder: (_, __) {
-//                  return Center(child: CircularProgressIndicator());
-//                },
-                fit: BoxFit.fill,
+                placeholder: (_, __) {
+                  return Center(child: CircularProgressIndicator());
+                },
               );
             },
             itemCount: 3,
