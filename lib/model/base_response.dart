@@ -22,7 +22,7 @@ class BaseResponse{
   Map<String,dynamic> data;
   String token;
   String text;
-
+  BaseResponse();
   factory BaseResponse.fromJson(Map<String,dynamic> json){
     return _$BaseResponseFromJson(json);
   }
