@@ -11,6 +11,7 @@ class DioApplication {
   static SpUtil spUtil;
 
   static Future<int> init() async {
+    print('---------------dioInstance init------------------');
     spUtil = await SpUtil.getInstance();
     _dioInstance = Dio(BaseOptions(
       method: "POST",
