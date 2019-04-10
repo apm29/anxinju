@@ -1,4 +1,7 @@
 import 'dart:math';
+import 'package:ease_life/bloc/bloc_provider.dart';
+import 'package:ease_life/bloc/user_bloc.dart';
+import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/remote//dio_net.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,6 +26,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static int _currentIndex = 0;
   static DateTime _lastPressedAt;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,26 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(
             "安心居",
           ),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              itemBuilder: (context) => <PopupMenuItem<String>>[
-                    new PopupMenuItem<String>(
-                        value: 'login', child: new Text("Login")),
-                    new PopupMenuItem<String>(
-                        value: 'login', child: new Text("Login")),
-                    new PopupMenuItem<String>(
-                        value: 'login', child: new Text("Login")),
-                    new PopupMenuItem<String>(
-                        value: 'login', child: new Text("Login")),
-                  ],
-              onSelected: (value) {
-                switch (value) {
-                  case "login":
-                    Navigator.of(context).pushNamed("/login");
-                }
-              },
-            )
-          ],
+          actions: <Widget>[buildActions(context)],
         ),
         body: buildBody(context),
         bottomNavigationBar: BottomNavigationBar(
@@ -123,6 +112,75 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget buildActions(BuildContext context) {
+    Function onSelect = (value) {
+      switch (value) {
+        case 1:
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text("登出"),
+                  content: Text("确认退出登录?"),
+                  actions: <Widget>[
+                    OutlineButton(
+                      onPressed: () {
+                        BlocProvider.of(context).logout();
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("退出"),
+                    )
+                  ],
+                );
+              });
+          break;
+        case 2:
+          Navigator.of(context).pushNamed("/login");
+          break;
+        case 3:
+          Navigator.of(context).pushNamed("/personal");
+          break;
+      }
+    };
+    var logout = PopupMenuButton(
+      itemBuilder: (context) {
+        return <PopupMenuItem>[
+          PopupMenuItem(value: 1, child: Text("登出")),
+          PopupMenuItem(
+            child: Text("个人信息"),
+            value: 3,
+          )
+        ];
+      },
+      onSelected: onSelect,
+    );
+    var login = PopupMenuButton(
+      itemBuilder: (context) {
+        return <PopupMenuItem>[PopupMenuItem(value: 2, child: Text("登录"))];
+      },
+      onSelected: onSelect,
+    );
+    return StreamBuilder<BlocData<BaseResponse<UserInfoData>>>(
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data.success()) {
+          if (snapshot.data.data is UserInfoData &&
+              snapshot.data.data != null) {
+            return logout;
+          } else {
+            return login;
+          }
+        } else if (snapshot.data.loading()) {
+          return login;
+        } else {
+          return login;
+        }
+      },
+      initialData: BlocData.success(
+          BaseResponse.success(null, data: UserBloc.userInfoData)),
+      stream: BlocProvider.of(context).loginStream,
+    );
+  }
+
   PageController _pageController = PageController(initialPage: _currentIndex);
 
   Widget buildBody(BuildContext context) {
@@ -143,8 +201,6 @@ class _MyHomePageState extends State<MyHomePage> {
           child: RaisedButton(
             onPressed: () async {
               Navigator.of(context).pushNamed("/test");
-              var res = await DioApplication.login("apm29", "123456");
-              print('${res.data}');
             },
             child: Text("test"),
           ),
@@ -164,9 +220,12 @@ class _MyHomePageState extends State<MyHomePage> {
           child: PageView.builder(
             itemBuilder: (context, index) {
               return CachedNetworkImage(
-                imageUrl: "http://lorempixel.com/900/425",
-                imageBuilder: (context,provider){
-                  return Image(image: provider,fit: BoxFit.fill,);
+                imageUrl: "http://lorempixel.com/${800 + index * 20}/420",
+                imageBuilder: (context, provider) {
+                  return Image(
+                    image: provider,
+                    fit: BoxFit.fill,
+                  );
                 },
                 placeholder: (_, __) {
                   return Center(child: CircularProgressIndicator());

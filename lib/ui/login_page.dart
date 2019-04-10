@@ -1,8 +1,9 @@
-import 'package:ease_life/persistance/shared_preference_keys.dart';
-import 'package:ease_life/persistance/shared_preferences.dart';
-import 'package:ease_life/remote/dio_net.dart';
+import 'package:ease_life/bloc/bloc_provider.dart';
+import 'package:ease_life/bloc/user_bloc.dart';
+import 'package:ease_life/model/base_response.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:rxdart/rxdart.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -17,8 +18,20 @@ class _LoginPageState extends State<LoginPage> {
   bool _passReady = false;
   bool _fastLogin = false;
 
+  final Subject<int> smsController = BehaviorSubject();
+
   @override
   Widget build(BuildContext context) {
+    return buildLogin();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    smsController.close();
+  }
+
+  Widget buildLogin() {
     return Scaffold(
       appBar: AppBar(
         title: Text("登录"),
@@ -110,17 +123,41 @@ class _LoginPageState extends State<LoginPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    _fastLogin?FlatButton(
-                      child: Text(
-                        "发送短信",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                      onPressed: sendSms,
-                    ):Container(),
-                    OutlineButton(
-                      onPressed: login,
-                      child: Text("登录"),
-                    ),
+                    _fastLogin ? buildSmsButton() : Container(),
+                    StreamBuilder<BlocData<BaseResponse<UserInfoData>>>(
+                        stream: BlocProvider.of(context).loginStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData && !snapshot.data.loading()) {
+                            if (snapshot.data.error()) {
+                              Fluttertoast.showToast(msg: snapshot.data.data.text);
+                            } else if (snapshot.data.success()) {
+                              Fluttertoast.showToast(msg: "登录成功");
+                              if (snapshot.data.data.data.userInfo.isCertification >
+                                  0) {
+                                Navigator.of(context).popUntil((r) {
+                                  return r.settings.name == "/";
+                                });
+                              } else {
+                                Navigator.of(context).popAndPushNamed("/verify",
+                                    arguments: snapshot.data.data.data);
+                              }
+                            }
+                            return OutlineButton(
+                              onPressed: login,
+                              child: Text("登录"),
+                            );
+                          } else if (!snapshot.hasData) {
+                            return OutlineButton(
+                              onPressed: login,
+                              child: Text("登录"),
+                            );
+                          } else {
+                            return OutlineButton(
+                              onPressed: login,
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        }),
                   ],
                 ),
               ),
@@ -131,20 +168,53 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget buildSmsButton() {
+    return StreamBuilder<int>(
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data <= 0) {
+          return FlatButton(
+            child: Text(
+              "发送短信",
+              style: TextStyle(color: Colors.blue),
+            ),
+            onPressed: sendSms,
+          );
+        } else {
+          return FlatButton(
+            onPressed: () {},
+            child: Text(
+              "(${snapshot.data})S",
+              style: TextStyle(color: Colors.blue),
+            ),
+          );
+        }
+      },
+      stream: smsController.stream,
+    );
+  }
+
   void sendSms() async {
     if (!_nameReady) {
       Fluttertoast.showToast(msg: "请填写${_fastLogin ? "电话" : "用户名"}");
       return;
     }
-    var response =
-        await DioApplication.sendSms(controllerMobile.text, onError: (e) {
-      Fluttertoast.showToast(msg: "请求失败:${e.message}");
+    BlocProvider.of(context).sendSms(
+      controllerMobile.text,
+    );
+
+    BlocProvider.of(context).smsStream.listen((BlocData data) {
+      if (data.success()) {
+        Fluttertoast.showToast(msg: "发送成功");
+        Observable.periodic(Duration(seconds: 1), (i) => (30 - i))
+            .take(31)
+            .listen((time) {
+          print(time);
+          if (!smsController.isClosed) smsController.add(time);
+        });
+      }
+    }, onError: (err) {
+      Fluttertoast.showToast(msg: err);
     });
-    if (response.data != null && response.data["status"] == "1") {
-      Fluttertoast.showToast(msg: "发送成功");
-    } else {
-      Fluttertoast.showToast(msg: "请求失败:${response.data["data"]}");
-    }
   }
 
   void login() async {
@@ -160,22 +230,26 @@ class _LoginPageState extends State<LoginPage> {
       Fluttertoast.showToast(msg: "请输入${_fastLogin ? "验证码" : "密码"}");
       return;
     }
-    var onError = (e) {
-      Fluttertoast.showToast(msg: "请求失败:${e.message}");
-    };
-    var response = _fastLogin
-        ? await DioApplication.fastLogin(
-            controllerMobile.text, controllerPassword.text, onError: onError)
-        : await DioApplication.login(
-            controllerMobile.text, controllerPassword.text,
-            onError: onError);
-    if (response.data["status"] == "1") {
-      var spUtil = await SpUtil.getInstance();
-      spUtil.putString(PreferenceKeys.keyAuthorization, response.data["token"]);
-      Fluttertoast.showToast(msg: "登录成功");
-      Navigator.of(context).pop();
-    } else {
-      Fluttertoast.showToast(msg: "请求失败:${response.data["data"]}");
-    }
+    _fastLogin
+        ? BlocProvider.of(context).fastLogin(
+            controllerMobile.text,
+            controllerPassword.text,
+          )
+        : BlocProvider.of(context).login(
+            controllerMobile.text,
+            controllerPassword.text,
+          );
+//    BlocProvider.of(context).loginStream.listen((userInfo) {
+//      Fluttertoast.showToast(msg: "登陆成功");
+//      if (userInfo.userInfo.isCertification > 0) {
+//        Navigator.of(context).popUntil((r) {
+//          return r.settings.name == "/";
+//        });
+//      } else {
+//        Navigator.of(context).popAndPushNamed("/verify", arguments: userInfo);
+//      }
+//    }, onError: (err) {
+//      Fluttertoast.showToast(msg: err);
+//    });
   }
 }
