@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
-import 'package:ease_life/persistance/shared_preferences.dart';
+import 'package:ease_life/ui/style.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:ease_life/remote//dio_net.dart';
@@ -13,9 +13,9 @@ enum BlocState { LOADING, INIT, SUCCESS, ERROR }
 
 class BlocData<T> {
   BlocState state;
-  T data;
+  T response;
 
-  BlocData(this.state, this.data);
+  BlocData(this.state, this.response);
 
   factory BlocData.success(T data) {
     return BlocData(BlocState.SUCCESS, data);
@@ -47,36 +47,42 @@ class UserBloc {
     _loginController = PublishSubject();
     _smsController = PublishSubject();
     _verifyController = PublishSubject();
+    _themeController = PublishSubject();
   }
 
-  PublishSubject<BlocData<BaseResponse<UserInfoData>>> _loginController;
+  PublishSubject<BlocData<UserInfoModel>> _loginController;
 
-  Observable<BlocData<BaseResponse<UserInfoData>>> get loginStream => _loginController.stream;
+  Observable<BlocData<UserInfoModel>> get loginStream =>
+      _loginController.stream;
 
   void login(String userName, String password) async {
-    DioApplication.postSync<UserInfoData>(
-        "/login", {"userName": userName, "password": password}, (BaseResponse<UserInfoData> data) {
+    DioApplication.postSync<UserInfoModel>(
+        "/login", {"userName": userName, "password": password},
+        (UserInfoModel data) {
       saveUserInfoData(data.data);
       _loginController.add(BlocData.success(data));
     }, (String errMsg) {
-      _loginController.add(BlocData.error(BaseResponse.error(errMsg)));
+      _loginController.add(BlocData.error(UserInfoModel.error(errMsg)));
     }, () {
-      _loginController.add(BlocData.error(BaseResponse.error("空结果")));
+      _loginController.add(BlocData.error(UserInfoModel.error("空结果")));
+    }, (json) {
+      return UserInfoModel.fromJson(json);
     });
   }
 
-  static UserInfoData userInfoData;
 
   void fastLogin<UserInfoData>(String mobile, String verifyCode) {
     DioApplication.postSync(
         "/fastLogin", {"mobile": mobile, "verifyCode": verifyCode},
-        (BaseResponse data) {
+        (UserInfoModel data) {
       saveUserInfoData(data.data);
       _loginController.add(BlocData.success(data));
     }, (String errMsg) {
-      _loginController.add(BlocData.error(BaseResponse.error(errMsg)));
+      _loginController.add(BlocData.error(UserInfoModel.error(errMsg)));
     }, () {
-      _loginController.add(BlocData.error(BaseResponse.error("空结果")));
+      _loginController.add(BlocData.error(UserInfoModel.error("空结果")));
+    }, (json) {
+      return UserInfoModel.fromJson(json);
     });
   }
 
@@ -88,37 +94,7 @@ class UserBloc {
     _loginController.close();
     _smsController.close();
     _verifyController.close();
-  }
-
-  static const _EMPTY = "没有返回数据";
-
-  Widget streamBuilder<T>(Stream<T> stream,
-      {T initialData,
-      Function success,
-      Function error,
-      Function empty,
-      Function loading,
-      Function finished}) {
-    return StreamBuilder(
-        stream: stream,
-        initialData: initialData,
-        builder: (context, AsyncSnapshot snapshot) {
-          if (finished != null) {
-            finished();
-          }
-          if (snapshot.hasData) {
-            if (success != null) return success(snapshot.data);
-          } else if (snapshot.hasError) {
-            final errorStr = snapshot.error;
-            if (errorStr == _EMPTY) {
-              if (empty != null) return empty();
-            } else {
-              if (error != null) return error(errorStr);
-            }
-          } else {
-            if (loading != null) return loading();
-          }
-        });
+    _themeController.close();
   }
 
   PublishSubject<BlocData> _smsController;
@@ -134,6 +110,8 @@ class UserBloc {
       _verifyController.add(BlocData.error(errMsg));
     }, () {
       _verifyController.add(BlocData.error("空结果"));
+    }, (json) {
+      return UserInfoModel.fromJson(json);
     });
   }
 
@@ -149,7 +127,7 @@ class UserBloc {
     });
   }
 
-  void saveUserInfoData(UserInfoData data) {
+  void saveUserInfoData(UserInfoWrapper data) {
     String encode = json.encode(data.toJson());
     SharedPreferences.getInstance().then((sp) {
       return sp.setString(PreferenceKeys.keyUserInfo, encode);
@@ -158,12 +136,11 @@ class UserBloc {
     });
   }
 
-  Future<UserInfoData> getUserInfoData() async {
+  Future<UserInfoWrapper> getUserInfoData() async {
     String userInfoString = (await SharedPreferences.getInstance())
         .getString(PreferenceKeys.keyUserInfo);
-    print('$userInfoString');
     Map userInfoMap = json.decode(userInfoString);
-    var userInfoData = UserInfoData.fromJson(userInfoMap);
+    var userInfoData = UserInfoWrapper.fromJson(userInfoMap);
     return userInfoData;
   }
 
@@ -182,6 +159,15 @@ class UserBloc {
       _verifyController.add(BlocData.error(errMsg));
     }, () {
       _verifyController.add(BlocData.error("空结果"));
+    }, (json) {
+      return UserInfoModel.fromJson(json);
     });
+  }
+
+  PublishSubject<ThemeData> _themeController;
+  Observable<ThemeData> get themeStream => _themeController.stream;
+
+  void changeTheme(){
+    _themeController.add(defaultThemeData);
   }
 }

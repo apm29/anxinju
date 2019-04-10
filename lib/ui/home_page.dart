@@ -6,6 +6,7 @@ import 'package:ease_life/remote//dio_net.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:rxdart/rxdart.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -160,24 +161,27 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       onSelected: onSelect,
     );
-    return StreamBuilder<BlocData<BaseResponse<UserInfoData>>>(
+    return StreamBuilder<BlocData<UserInfoModel>>(
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data.success()) {
-          if (snapshot.data.data is UserInfoData &&
-              snapshot.data.data != null) {
+          if (snapshot.data.response is UserInfoModel &&
+              snapshot.data.response != null) {
             return logout;
           } else {
             return login;
           }
-        } else if (snapshot.data.loading()) {
-          return login;
         } else {
           return login;
         }
       },
-      initialData: BlocData.success(
-          BaseResponse.success(null, data: UserBloc.userInfoData)),
-      stream: BlocProvider.of(context).loginStream,
+      initialData: null,
+      stream: Observable.merge([
+        Stream.fromFuture(
+            BlocProvider.of(context).getUserInfoData().then((wrapper) {
+          return BlocData.success(UserInfoModel.success(wrapper));
+        })),
+        BlocProvider.of(context).loginStream
+      ]),
     );
   }
 

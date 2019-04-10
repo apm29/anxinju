@@ -19,55 +19,67 @@
  *flutter packages pub run build_runner build --delete-conflicting-outputs
  */
 
-class BaseResponse<T> {
+class BaseResponse {
   String status;
-  T data;
   String token;
   String text;
-  String msg;
 
-  BaseResponse();
+  bool success() => status == "1";
+}
 
-  factory BaseResponse.fromJson(Map<String, dynamic> json) {
-    var baseResponse = BaseResponse()
-      ..status = json['status'] as String
-      ..token = json['token'] as String
-      ..text = json['text'] as String;
-    switch (T) {
-      case UserInfoData:
-        baseResponse.data = UserInfoData.fromJson(json['data']);
-    }
-    return baseResponse;
+class UserInfoModel extends BaseResponse {
+  String status;
+  UserInfoWrapper data;
+  String token;
+  String text;
+
+  UserInfoModel({this.status, this.data, this.token, this.text});
+
+  UserInfoModel.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    data = json['data'] != null ? new UserInfoWrapper.fromJson(json['data']) : null;
+    token = json['token'];
+    text = json['text'];
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{
-      'status': status,
-      'token': token,
-      'text': text
-    };
-    switch(T){
-      case UserInfoData:
-        map['data'] = (data as UserInfoData).toJson();
-        break;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status'] = this.status;
+    if (this.data != null) {
+      data['data'] = this.data.toJson();
     }
-    return map;
+    data['token'] = this.token;
+    data['text'] = this.text;
+    return data;
   }
 
-  factory BaseResponse.error(String msg) {
-    return BaseResponse()
-      ..msg = msg
-      ..status = "0";
+  factory UserInfoModel.error(String msg) {
+    return UserInfoModel(status: "0", text: msg);
   }
 
-  factory BaseResponse.success(String msg,{T data}) {
-    return BaseResponse()
-      ..msg = msg
-      ..data = data
-      ..status = "1";
+  factory UserInfoModel.success(UserInfoWrapper data){
+    return UserInfoModel(status: "1",data: data);
+  }
+}
+
+class UserInfoWrapper {
+  UserInfo userInfo;
+
+  UserInfoWrapper({this.userInfo});
+
+  UserInfoWrapper.fromJson(Map<String, dynamic> json) {
+    userInfo = json['userInfo'] != null
+        ? new UserInfo.fromJson(json['userInfo'])
+        : null;
   }
 
-  bool requestSuccess() => status == "1";
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.userInfo != null) {
+      data['userInfo'] = this.userInfo.toJson();
+    }
+    return data;
+  }
 }
 
 class UserInfo {
@@ -76,39 +88,21 @@ class UserInfo {
   String mobile;
   int isCertification;
 
-  UserInfo();
+  UserInfo({this.userId, this.userName, this.mobile, this.isCertification});
 
-  factory UserInfo.fromJson(Map<String, dynamic> json) {
-    return UserInfo()
-      ..userId = json['userId'] as String
-      ..userName = json['userName'] as String
-      ..mobile = json['mobile'] as String
-      ..isCertification = json['isCertification'] as int;
+  UserInfo.fromJson(Map<String, dynamic> json) {
+    userId = json['userId'];
+    userName = json['userName'];
+    mobile = json['mobile'];
+    isCertification = json['isCertification'];
   }
 
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'userId': userId,
-      'userName': userName,
-      'mobile': mobile,
-      'isCertification': isCertification
-    };
-  }
-}
-
-class UserInfoData {
-  UserInfo userInfo;
-
-  UserInfoData();
-
-  factory UserInfoData.fromJson(Map<String, dynamic> json) {
-    return UserInfoData()
-      ..userInfo = json['userInfo'] == null
-          ? null
-          : UserInfo.fromJson(json['userInfo'] as Map<String, dynamic>);
-  }
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'userInfo': userInfo.toJson()};
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['userId'] = this.userId;
+    data['userName'] = this.userName;
+    data['mobile'] = this.mobile;
+    data['isCertification'] = this.isCertification;
+    return data;
   }
 }

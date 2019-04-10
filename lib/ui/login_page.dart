@@ -124,22 +124,22 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     _fastLogin ? buildSmsButton() : Container(),
-                    StreamBuilder<BlocData<BaseResponse<UserInfoData>>>(
+                    StreamBuilder<BlocData<UserInfoModel>>(
                         stream: BlocProvider.of(context).loginStream,
                         builder: (context, snapshot) {
                           if (snapshot.hasData && !snapshot.data.loading()) {
                             if (snapshot.data.error()) {
-                              Fluttertoast.showToast(msg: snapshot.data.data.text);
+                              Fluttertoast.showToast(msg: snapshot.data.response.text);
                             } else if (snapshot.data.success()) {
                               Fluttertoast.showToast(msg: "登录成功");
-                              if (snapshot.data.data.data.userInfo.isCertification >
+                              if (snapshot.data.response.data.userInfo.isCertification >
                                   0) {
                                 Navigator.of(context).popUntil((r) {
                                   return r.settings.name == "/";
                                 });
                               } else {
                                 Navigator.of(context).popAndPushNamed("/verify",
-                                    arguments: snapshot.data.data.data);
+                                    arguments: snapshot.data.response.data);
                               }
                             }
                             return OutlineButton(

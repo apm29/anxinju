@@ -1,13 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 typedef DioErrorCallback = dynamic Function(DioError);
-typedef BaseResponseCallback<T> = void Function(BaseResponse<T>);
+typedef ResponseCallback<T> = void Function(T);
 typedef ValueCallback<T> = void Function(T value);
+typedef ProcessRawJson<T> = T Function(Map<String, dynamic>);
 
 class DioApplication {
   static Dio _dioInstance;
@@ -101,12 +104,13 @@ class DioApplication {
     }
   }
 
-  static void postSync<T>(
+  static void postSync<T extends BaseResponse>(
       String path,
       Map<String, String> data,
-      BaseResponseCallback<T> success,
+      ResponseCallback<T> success,
       ValueCallback<String> error,
       VoidCallback empty,
+      ProcessRawJson<T> processor,
       {VoidCallback onComplete}) {
     _dioInstance
         .post(
@@ -125,8 +129,8 @@ class DioApplication {
         if (data == null) {
           empty();
         } else {
-          BaseResponse<T> baseResponse = BaseResponse.fromJson(json);
-          if (baseResponse.requestSuccess()) {
+          T baseResponse = processor(json);
+          if (baseResponse.success()) {
             if (baseResponse.token != null && baseResponse.token.isNotEmpty) {
               spUtil
                   .setString(
@@ -137,16 +141,18 @@ class DioApplication {
             }
             success(baseResponse);
           } else {
-            error((baseResponse.data is String)
-                ? baseResponse.data
-                : baseResponse.text);
+            error(baseResponse.text);
           }
         }
       } else {
         error("请求失败:$code");
       }
-    }).catchError((Error err) {
-      error(err.toString());
+    }).catchError((Object err,StackTrace track) {
+      if(err is DioError){
+        error(err.message);
+      }else{
+        error(err.toString());
+      }
     }).whenComplete(() {
       if (onComplete != null) {
         onComplete();

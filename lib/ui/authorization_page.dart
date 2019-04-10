@@ -44,7 +44,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
           );
         } else if (snapshot.data.success()) {
           return OutlineButton(
-            child: Text("认证结果:${snapshot.data.data}"),
+            child: Text("认证结果:${snapshot.data.response}"),
             onPressed: () {
               BlocProvider.of(context)
                   .verify("3323424234234", "http://www.baidu.com");

@@ -7,7 +7,7 @@ class PersonalInfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("个人信息"),),
-      body: StreamBuilder<UserInfoData>(
+      body: StreamBuilder<UserInfoWrapper>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Center(
