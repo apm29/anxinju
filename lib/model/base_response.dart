@@ -19,70 +19,54 @@
  *flutter packages pub run build_runner build --delete-conflicting-outputs
  */
 
-class BaseResponse {
+class BaseResponse<T> {
   String status;
   String token;
   String text;
+  T data;
 
   bool success() => status == "1";
-}
 
-class UserInfoModel extends BaseResponse {
-  String status;
-  UserInfoWrapper data;
-  String token;
-  String text;
+  BaseResponse(this.status, this.token, this.text, this.data);
 
-  UserInfoModel({this.status, this.data, this.token, this.text});
-
-  UserInfoModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    data = json['data'] != null ? new UserInfoWrapper.fromJson(json['data']) : null;
-    token = json['token'];
-    text = json['text'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    if (this.data != null) {
-      data['data'] = this.data.toJson();
-    }
-    data['token'] = this.token;
-    data['text'] = this.text;
-    return data;
-  }
-
-  factory UserInfoModel.error(String msg) {
-    return UserInfoModel(status: "0", text: msg);
-  }
-
-  factory UserInfoModel.success(UserInfoWrapper data){
-    return UserInfoModel(status: "1",data: data);
+  @override
+  String toString() {
+    StringBuffer sb = new StringBuffer('{');
+    sb.write("\"status\":\"$status\"");
+    sb.write(",\"token\":$token");
+    sb.write(",\"text\":\"$text\"");
+    sb.write(",\"data\":\"$data\"");
+    sb.write('}');
+    return sb.toString();
   }
 }
 
-class UserInfoWrapper {
+class DataWrapper {
   UserInfo userInfo;
 
-  UserInfoWrapper({this.userInfo});
+  DataWrapper(this.userInfo);
 
-  UserInfoWrapper.fromJson(Map<String, dynamic> json) {
-    userInfo = json['userInfo'] != null
-        ? new UserInfo.fromJson(json['userInfo'])
-        : null;
+  @override
+  String toString() {
+    return "{\"userInfo\":\"$userInfo\"}";
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.userInfo != null) {
-      data['userInfo'] = this.userInfo.toJson();
-    }
-    return data;
+  DataWrapper.fromJson(Map<String, dynamic> json) {
+    userInfo =
+        UserInfo.fromJson(json["userInfo"] is Map ? json["userInfo"] : {});
   }
 }
+enum ActionState{
+  LOADING,ERROR,NORMAL
+}
+class StateData {
+  ActionState state = ActionState.NORMAL;
+  bool loading()=>state == ActionState.LOADING;
+  bool error()=>state == ActionState.ERROR;
+  bool normal()=>state == ActionState.NORMAL;
+}
 
-class UserInfo {
+class UserInfo extends StateData {
   String userId;
   String userName;
   String mobile;
@@ -90,11 +74,16 @@ class UserInfo {
 
   UserInfo({this.userId, this.userName, this.mobile, this.isCertification});
 
+  @override
+  String toString() {
+    return '{\"userId\": \"$userId\", \"userName\": \"$userName\", \"mobile\": \"$mobile\", \"isCertification\": \"$isCertification\"}';
+  }
+
   UserInfo.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     userName = json['userName'];
     mobile = json['mobile'];
-    isCertification = json['isCertification'];
+    isCertification = json['isCertification'] as int;
   }
 
   Map<String, dynamic> toJson() {

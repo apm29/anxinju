@@ -12,27 +12,39 @@ typedef ResponseCallback<T> = void Function(T);
 typedef ValueCallback<T> = void Function(T value);
 typedef ProcessRawJson<T> = T Function(Map<String, dynamic>);
 
-class DioApplication {
-  static Dio _dioInstance;
-  static bool inDebug = true;
-  static SharedPreferences spUtil;
+const KEY_HEADER_TOKEN = "Authorization";
+const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
 
-  static Future<int> init() async {
+class DioUtil {
+  Dio _dioInstance;
+  bool inDebug = true;
+  static SharedPreferences sp;
+
+  DioUtil._() {
+    init();
+  }
+
+  static DioUtil _dioApplication;
+
+  static Future<DioUtil> getInstance() async {
+    if (_dioApplication == null) {
+      sp = await SharedPreferences.getInstance();
+      _dioApplication = DioUtil._();
+    }
+    return _dioApplication;
+  }
+
+  Future<DioUtil> init() async {
     print('---------------dioInstance init------------------');
-    spUtil = await SharedPreferences.getInstance();
     _dioInstance = Dio(BaseOptions(
       method: "POST",
       connectTimeout: 5000,
       receiveTimeout: 6000,
       baseUrl: inDebug ? "http://192.168.0.140:8080/permission/" : "",
-//      headers: {
-//        "Authorization": spUtil.getString(PreferenceKeys.keyAuthorization),
-//        "content-type": "application/x-www-form-urlencoded"
-//      },
     ));
     _dioInstance.interceptors.add(InterceptorsWrapper(onRequest: (req) {
       req.headers.update("Authorization", (old) {
-        return spUtil.getString(PreferenceKeys.keyAuthorization);
+        return sp.getString(PreferenceKeys.keyAuthorization);
       });
       print("""REQUEST:
         ===========================================
@@ -69,42 +81,10 @@ class DioApplication {
         ===========================================
         """);
     }));
-
-    return 1;
+    return this;
   }
 
-  static Future<Response<Map>> post(Map<String, String> formData, String path,
-      {CancelToken cancelToken,
-      ProgressCallback sendProgress,
-      receiveProgress,
-      DioErrorCallback onError,
-      VoidCallback onComplete}) async {
-    if (_dioInstance == null) {
-      await init();
-    }
-    try {
-      return await _dioInstance.post(path,
-          data: formData,
-          options: RequestOptions(
-            contentType: ContentType.parse("application/x-www-form-urlencoded"),
-          ),
-          cancelToken: cancelToken,
-          onSendProgress: sendProgress,
-          onReceiveProgress: receiveProgress);
-    } on DioError catch (e) {
-      print(e);
-      if (onError != null) {
-        onError(e);
-      }
-      throw e;
-    } finally {
-      if (onComplete != null) {
-        onComplete();
-      }
-    }
-  }
-
-  static void postSync<T extends BaseResponse>(
+  void postSync<T extends BaseResponse>(
       String path,
       Map<String, String> data,
       ResponseCallback<T> success,
@@ -117,9 +97,9 @@ class DioApplication {
       path,
       data: data,
       options: RequestOptions(
-          contentType: ContentType.parse("application/x-www-form-urlencoded"),
+          contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
           headers: {
-            "Authorization": spUtil.getString(PreferenceKeys.keyAuthorization),
+            KEY_HEADER_TOKEN: sp.getString(PreferenceKeys.keyAuthorization),
           }),
     )
         .then((response) {
@@ -132,7 +112,7 @@ class DioApplication {
           T baseResponse = processor(json);
           if (baseResponse.success()) {
             if (baseResponse.token != null && baseResponse.token.isNotEmpty) {
-              spUtil
+              sp
                   .setString(
                       PreferenceKeys.keyAuthorization, baseResponse.token)
                   .then((success) {
@@ -147,10 +127,10 @@ class DioApplication {
       } else {
         error("请求失败:$code");
       }
-    }).catchError((Object err,StackTrace track) {
-      if(err is DioError){
+    }).catchError((Object err, StackTrace track) {
+      if (err is DioError) {
         error(err.message);
-      }else{
+      } else {
         error(err.toString());
       }
     }).whenComplete(() {
@@ -175,5 +155,39 @@ class DioApplication {
   /// "text": ""
   /// }
   ///
+  ///
 
+  Future<BaseResponse<T>> postAsync<T>(
+      {String path,
+      ProcessRawJson stringProcessor,
+      Map<String, String> data}) async {
+    final Response<Map<String, dynamic>> response = await _dioInstance.post(
+      path,
+      data: data,
+      options: RequestOptions(
+          contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+          headers: {
+            KEY_HEADER_TOKEN: sp.getString(PreferenceKeys.keyAuthorization),
+          }),
+    );
+    String _status, _text, _token;
+    Map<String, dynamic> _data;
+    if (response.statusCode == HttpStatus.ok ||
+        response.statusCode == HttpStatus.created) {
+      _status = response.data["status"];
+      _text = response.data["text"];
+      _data = response.data['data'] is String
+          ? json.decode(response.data['data'])
+          : response.data['data'];
+      return BaseResponse(_status, _token, _text,
+          stringProcessor == null ? null : stringProcessor(_data));
+    } else {
+      return Future.error(DioError(
+          response: response,
+          message: "后台响应异常:code-${response.statusCode}",
+          type: DioErrorType.RESPONSE));
+    }
+  }
 }
+
+SharedPreferences spInstance;

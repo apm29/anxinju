@@ -8,8 +8,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rxdart/rxdart.dart';
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -21,17 +21,12 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   static int _currentIndex = 0;
   static DateTime _lastPressedAt;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,57 +58,62 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: <Widget>[buildActions(context)],
         ),
         body: buildBody(context),
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  "images/mine.png",
-                  width: 24,
-                  height: 24,
-                  color: _currentIndex == 0 ? Colors.blueAccent : Colors.grey,
-                ),
-                title: Text("我的")),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  "images/society.png",
-                  width: 24,
-                  height: 24,
-                  color: _currentIndex == 1 ? Colors.blueAccent : Colors.grey,
-                ),
-                title: Text("圈子")),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  "images/search.png",
-                  width: 24,
-                  height: 24,
-                  color: _currentIndex == 2 ? Colors.blueAccent : Colors.grey,
-                ),
-                title: Text("搜索")),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  "images/help.png",
-                  width: 24,
-                  height: 24,
-                  color: _currentIndex == 3 ? Colors.blueAccent : Colors.grey,
-                ),
-                title: Text("帮助")),
-          ],
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-              _pageController.animateToPage(index,
-                  duration: Duration(milliseconds: 200), curve: Curves.ease);
-            });
-          },
-          currentIndex: _currentIndex,
-          fixedColor: Colors.blue,
-          type: BottomNavigationBarType.fixed,
-        ),
+        bottomNavigationBar: buildBottomNavigationBar(),
       ),
     );
   }
 
+  BottomNavigationBar buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      items: [
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/mine.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == 0 ? Colors.blueAccent : Colors.grey,
+            ),
+            title: Text("我的")),
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/society.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == 1 ? Colors.blueAccent : Colors.grey,
+            ),
+            title: Text("圈子")),
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/search.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == 2 ? Colors.blueAccent : Colors.grey,
+            ),
+            title: Text("搜索")),
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/help.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == 3 ? Colors.blueAccent : Colors.grey,
+            ),
+            title: Text("帮助")),
+      ],
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+          _pageController.animateToPage(index,
+              duration: Duration(milliseconds: 200), curve: Curves.ease);
+        });
+      },
+      currentIndex: _currentIndex,
+      fixedColor: Colors.blue,
+      type: BottomNavigationBarType.fixed,
+    );
+  }
+
   Widget buildActions(BuildContext context) {
+    var applicationBloc = BlocProviders.of<ApplicationBloc>(context);
     Function onSelect = (value) {
       switch (value) {
         case 1:
@@ -126,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   actions: <Widget>[
                     OutlineButton(
                       onPressed: () {
-                        BlocProvider.of(context).logout();
+                        applicationBloc.logout();
                         Navigator.of(context).pop();
                       },
                       child: Text("退出"),
@@ -143,45 +143,20 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
       }
     };
-    var logout = PopupMenuButton(
-      itemBuilder: (context) {
-        return <PopupMenuItem>[
-          PopupMenuItem(value: 1, child: Text("登出")),
-          PopupMenuItem(
-            child: Text("个人信息"),
-            value: 3,
-          )
-        ];
-      },
-      onSelected: onSelect,
-    );
-    var login = PopupMenuButton(
-      itemBuilder: (context) {
-        return <PopupMenuItem>[PopupMenuItem(value: 2, child: Text("登录"))];
-      },
-      onSelected: onSelect,
-    );
-    return StreamBuilder<BlocData<UserInfoModel>>(
+    return StreamBuilder<UserInfo>(
+      stream: applicationBloc.currentUser,
       builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data.success()) {
-          if (snapshot.data.response is UserInfoModel &&
-              snapshot.data.response != null) {
-            return logout;
-          } else {
-            return login;
-          }
-        } else {
-          return login;
-        }
+        return PopupMenuButton(
+            onSelected: onSelect,
+            itemBuilder: (context) {
+              return snapshot.hasData && snapshot.data != null
+                  ? [
+                      PopupMenuItem(child: Text("登出"),value: 1,),
+                      PopupMenuItem(child: Text("信息"),value: 3,)
+                    ]
+                  : [PopupMenuItem(child: Text("登录"),value: 2,)];
+            });
       },
-      initialData: null,
-      stream: Observable.merge([
-        Stream.fromFuture(
-            BlocProvider.of(context).getUserInfoData().then((wrapper) {
-          return BlocData.success(UserInfoModel.success(wrapper));
-        })),
-        BlocProvider.of(context).loginStream
-      ]),
     );
   }
 
@@ -217,99 +192,103 @@ class _MyHomePageState extends State<MyHomePage> {
     return ListView(
       key: PageStorageKey("123"),
       children: <Widget>[
-        Container(
-          height: 200,
-          margin: EdgeInsets.fromLTRB(18, 18, 18, 0),
-          color: Colors.grey,
-          child: PageView.builder(
-            itemBuilder: (context, index) {
-              return CachedNetworkImage(
-                imageUrl: "http://lorempixel.com/${800 + index * 20}/420",
-                imageBuilder: (context, provider) {
-                  return Image(
-                    image: provider,
-                    fit: BoxFit.fill,
+        Card(
+          margin: EdgeInsets.all(12),
+          child: Column(children: <Widget>[
+            Container(
+              height: 200,
+              color: Colors.grey,
+              child: PageView.builder(
+                itemBuilder: (context, index) {
+                  return CachedNetworkImage(
+                    imageUrl: "http://lorempixel.com/${800 + index * 20}/420",
+                    imageBuilder: (context, provider) {
+                      return Image(
+                        image: provider,
+                        fit: BoxFit.fill,
+                      );
+                    },
+                    placeholder: (_, __) {
+                      return Center(child: CircularProgressIndicator());
+                    },
                   );
                 },
-                placeholder: (_, __) {
-                  return Center(child: CircularProgressIndicator());
-                },
-              );
-            },
-            itemCount: 3,
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.fromLTRB(18, 0, 18, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: <Widget>[
-                      CircleAvatar(
-                          backgroundColor: Colors.redAccent,
-                          child: Icon(
-                            Icons.people,
-                            color: Colors.white,
-                          )),
-                      Text("访客管理")
-                    ],
-                  ),
-                ),
+                itemCount: 3,
               ),
-              GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: <Widget>[
-                      CircleAvatar(
-                          backgroundColor: Colors.blueAccent,
-                          child: Icon(
-                            Icons.people,
-                            color: Colors.white,
-                          )),
-                      Text("访客管理")
-                    ],
+            ),
+            Container(
+              margin: EdgeInsets.only(bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: <Widget>[
+                          CircleAvatar(
+                              backgroundColor: Colors.redAccent,
+                              child: Icon(
+                                Icons.people,
+                                color: Colors.white,
+                              )),
+                          Text("访客管理")
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: <Widget>[
-                      CircleAvatar(
-                          backgroundColor: Colors.greenAccent,
-                          child: Icon(
-                            Icons.people,
-                            color: Colors.white,
-                          )),
-                      Text("访客管理")
-                    ],
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: <Widget>[
+                          CircleAvatar(
+                              backgroundColor: Colors.blueAccent,
+                              child: Icon(
+                                Icons.people,
+                                color: Colors.white,
+                              )),
+                          Text("访客管理")
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: <Widget>[
-                      CircleAvatar(
-                          backgroundColor: Colors.yellowAccent,
-                          child: Icon(
-                            Icons.people,
-                            color: Colors.white,
-                          )),
-                      Text("访客管理")
-                    ],
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: <Widget>[
+                          CircleAvatar(
+                              backgroundColor: Colors.greenAccent,
+                              child: Icon(
+                                Icons.people,
+                                color: Colors.white,
+                              )),
+                          Text("访客管理")
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: <Widget>[
+                          CircleAvatar(
+                              backgroundColor: Colors.yellowAccent,
+                              child: Icon(
+                                Icons.people,
+                                color: Colors.white,
+                              )),
+                          Text("访客管理")
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],),
         ),
         Container(
           margin: EdgeInsets.all(18),
@@ -332,6 +311,10 @@ class _MyHomePageState extends State<MyHomePage> {
               )
             ],
           ),
+        ),
+        Container(
+          height: 2000,
+          color: Colors.blueGrey,
         )
       ],
     );
