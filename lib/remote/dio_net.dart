@@ -46,40 +46,36 @@ class DioUtil {
       req.headers.update("Authorization", (old) {
         return sp.getString(PreferenceKeys.keyAuthorization);
       });
-      print("""REQUEST:
-        ===========================================
-          Method:${req.method},Url:${req.baseUrl + req.path}
-          Headers:${req.headers}
-          QueryParams:${req.queryParameters}
-          Data:${req.data}
-        ===========================================
-        """);
+      print("REQUEST:");
+        print("===========================================");
+        print("  Method:${req.method},Url:${req.baseUrl + req.path}");
+        print("  Headers:${req.headers}");
+        print("  QueryParams:${req.queryParameters}");
+        print("  Data:${req.data}");
+        print("===========================================");
     }, onResponse: (resp) {
-      print("""REQUEST:
-        ===========================================
-          Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}
-          Headers:${resp.request.headers}
-          QueryParams:${resp.request.queryParameters}
-          Data:${resp.request.data}
-          -------------------------
-          RESULT:
-            Headers:${resp.headers}
-            Data:${resp.data}
-            Redirect:${resp.redirects}
-            StatusCode:${resp.statusCode}
-            Extras:${resp.extra}
-         ===========================================   
-            
-        """);
+      print("REQUEST:");
+        print("===========================================");
+        print("  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
+        print("  Headers:${resp.request.headers}");
+        print("  QueryParams:${resp.request.queryParameters}");
+        print("  Data:${resp.request.data}");
+        print("  -------------------------");
+        print("  RESULT:");
+        print("    Headers:${resp.headers}");
+        print("    Data:${resp.data}");
+        print("    Redirect:${resp.redirects}");
+        print("    StatusCode:${resp.statusCode}");
+        print("    Extras:${resp.extra}");
+        print(" ===========================================");
     }, onError: (err) {
-      print("""ERROR:
-        ===========================================
-        Message:${err.message}
-        Error:${err.error}
-        Type:${err.type}
-        Trace:${err.stackTrace}
-        ===========================================
-        """);
+      print("ERROR:");
+        print("===========================================");
+        print("Message:${err.message}");
+        print("Error:${err.error}");
+        print("Type:${err.type}");
+        print("Trace:${err.stackTrace}");
+        print("===========================================");
     }));
     return this;
   }
@@ -177,7 +173,7 @@ class DioUtil {
       _status = response.data["status"];
       _text = response.data["text"];
       _data = response.data['data'] is String
-          ? json.decode(response.data['data'])
+          ? {}
           : response.data['data'];
       return BaseResponse(_status, _token, _text,
           stringProcessor == null ? null : stringProcessor(_data));
@@ -190,4 +186,4 @@ class DioUtil {
   }
 }
 
-SharedPreferences spInstance;
+

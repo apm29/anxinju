@@ -76,14 +76,14 @@ class UserInfo extends StateData {
 
   @override
   String toString() {
-    return '{\"userId\": \"$userId\", \"userName\": \"$userName\", \"mobile\": \"$mobile\", \"isCertification\": \"$isCertification\"}';
+    return '{\"userId\": \"$userId\", \"userName\": \"$userName\", \"mobile\": \"$mobile\", \"isCertification\": $isCertification}';
   }
 
   UserInfo.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     userName = json['userName'];
     mobile = json['mobile'];
-    isCertification = json['isCertification'] as int;
+    isCertification = json['isCertification'];
   }
 
   Map<String, dynamic> toJson() {

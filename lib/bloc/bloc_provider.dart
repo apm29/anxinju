@@ -98,10 +98,12 @@ class ApplicationBloc extends BlocBase {
             "userName": userName,
             "password": password
           }).then((BaseResponse<DataWrapper> baseResponse) {
-        spInstance.setString(
-            PreferenceKeys.keyUserInfo, baseResponse.data.userInfo.toString());
         if (baseResponse.success() && baseResponse.data != null) {
+          DioUtil.sp.setString(
+              PreferenceKeys.keyUserInfo, baseResponse.data.userInfo.toString());
           Fluttertoast.showToast(msg: "登录成功");
+        }else {
+          Fluttertoast.showToast(msg: baseResponse.text);
         }
         _getCurrentUserAndNotify();
       });
@@ -112,7 +114,7 @@ class ApplicationBloc extends BlocBase {
     });
   }
 
-  PublishSubject<UserInfo> _userInfoController = PublishSubject();
+  BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
 
   Stream<UserInfo> get currentUser => _userInfoController.stream;
 
@@ -134,10 +136,12 @@ class ApplicationBloc extends BlocBase {
             "mobile": mobile,
             "verifyCode": verifyCode
           }).then((BaseResponse<DataWrapper> baseResponse) {
-        spInstance.setString(
-            PreferenceKeys.keyUserInfo, baseResponse.data.userInfo.toString());
         if (baseResponse.success() && baseResponse.data != null) {
+          DioUtil.sp.setString(
+              PreferenceKeys.keyUserInfo, baseResponse.data.userInfo.toString());
           Fluttertoast.showToast(msg: "登录成功");
+        } else {
+          Fluttertoast.showToast(msg: baseResponse.text);
         }
         _getCurrentUserAndNotify();
       });
@@ -149,11 +153,6 @@ class ApplicationBloc extends BlocBase {
   }
 }
 
-class CheckData {
-  bool checked;
-
-  CheckData(this.checked);
-}
 
 class LoginBloc extends BlocBase {
   //-1 loading
@@ -163,31 +162,8 @@ class LoginBloc extends BlocBase {
 
   Observable<int> get smsStream => _smsController.stream;
 
-  PublishSubject<bool> _typeController = PublishSubject();
 
-  Observable<bool> get typeStream => _typeController.stream;
-
-  PublishSubject<CheckData> _serviceController = PublishSubject();
-
-  Observable<CheckData> get serviceStream => _serviceController.stream;
-
-  bool typeFast = false;
-  bool serviceAgree = true;
-
-  void switchType(bool on) {
-    typeFast = on;
-    _typeController.add(typeFast);
-  }
-
-  void switchService(bool on) {
-    serviceAgree = on;
-    _serviceController.add(CheckData(serviceAgree));
-  }
-
-  LoginBloc() {
-    _typeController.add(typeFast);
-    _serviceController.add(CheckData(serviceAgree));
-  }
+  LoginBloc();
 
   void sendSms(String mobile) {
     _smsController.add(-1); //loading
@@ -204,6 +180,7 @@ class LoginBloc extends BlocBase {
           _smsController.add(time);
         });
       } else {
+        Fluttertoast.showToast(msg: baseResp.text);
         _smsController.addError(baseResp.text);
       }
     }).catchError((Object error) {
@@ -216,7 +193,5 @@ class LoginBloc extends BlocBase {
   @override
   void dispose() {
     _smsController.close();
-    _typeController.close();
-    _serviceController.close();
   }
 }

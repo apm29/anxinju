@@ -8,10 +8,12 @@ import 'package:ease_life/ui/style.dart';
 import 'package:ease_life/ui/test_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
-  spInstance = await SharedPreferences.getInstance();
-  spInstance.setString("app", "app");
+  DioUtil.sp = await SharedPreferences.getInstance();
+  DioUtil.sp.setString("app", "app");
+
   runApp(MyApp());
 }
 
