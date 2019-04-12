@@ -3,6 +3,7 @@ import 'package:ease_life/ui/authorization_page.dart';
 import 'package:ease_life/ui/home_page.dart';
 import 'package:ease_life/remote//dio_net.dart';
 import 'package:ease_life/ui/login_page.dart';
+import 'package:ease_life/ui/login_page_v2.dart';
 import 'package:ease_life/ui/personal_info_page.dart';
 import 'package:ease_life/ui/style.dart';
 import 'package:ease_life/ui/test_page.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         routes: {
           "/": (_) => HomePage(),
           "/login": (_) => BlocProviders<LoginBloc>(
-                child: LoginPage(),
+                child: LoginPageV2(),
                 bloc: LoginBloc(),
               ),
           "/personal": (_) => PersonalInfoPage(),

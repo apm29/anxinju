@@ -365,88 +365,89 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        SizedBox(
-          height: ScreenUtil().setHeight(545),
-          child: Stack(
-            alignment: AlignmentDirectional.center,
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      HomeCardWithIcon(
-                        "安全管家",
-                        "SecurityManager",
-                        "images/ic_safe_manager.png",
-                        false,
-                      ),
-                      HomeCardWithIcon(
-                        "智慧物业",
-                        "Intelligent Property",
-                        "images/ic_intelli_prop.png",
-                        true,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      HomeCardWithIcon(
-                        "共建共享",
-                        "Co-Construction",
-                        "images/ic_co_construction.png",
-                        false,
-                      ),
-                      HomeCardWithIcon(
-                        "商业服务",
-                        "Business Service",
-                        "images/ic_business_service.png",
-                        true,
-                      ),
-                    ],
-                  ),
-                ],
+        Stack(
+          alignment: AlignmentDirectional.center,
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    HomeCardWithIcon(
+                      "安全管家",
+                      "SecurityManager",
+                      "images/ic_safe_manager.png",
+                      false,
+                    ),
+                    HomeCardWithIcon(
+                      "智慧物业",
+                      "Intelligent Property",
+                      "images/ic_intelli_prop.png",
+                      true,
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    HomeCardWithIcon(
+                      "共建共享",
+                      "Co-Construction",
+                      "images/ic_co_construction.png",
+                      false,
+                    ),
+                    HomeCardWithIcon(
+                      "商业服务",
+                      "Business Service",
+                      "images/ic_business_service.png",
+                      true,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Positioned(
+                child: Container(
+              width: ScreenUtil().setWidth(266),
+              height: ScreenUtil().setWidth(266),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey[200],
               ),
-              Positioned(
-                  child: Container(
-                height: ScreenUtil().setHeight(266),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey[200],
-                ),
-              )),
-              Positioned(
-                  child: Container(
-                height: ScreenUtil().setHeight(220),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-              )),
-              Positioned(
-                  child: Container(
-                height: ScreenUtil().setHeight(180),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey[200],
-                ),
-              )),
-              Positioned(
-                  child: Container(
-                height: ScreenUtil().setHeight(120),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-              )),
-              Positioned(
-                  child: Image.asset(
-                "images/ic_mic.png",
-                height: ScreenUtil().setHeight(77),
-              )),
-            ],
-          ),
+            )),
+            Positioned(
+                child: Container(
+              width: ScreenUtil().setWidth(220),
+              height: ScreenUtil().setWidth(220),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+            )),
+            Positioned(
+                child: Container(
+              width: ScreenUtil().setWidth(180),
+              height: ScreenUtil().setWidth(180),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey[200],
+              ),
+            )),
+            Positioned(
+                child: Container(
+              width: ScreenUtil().setWidth(120),
+              height: ScreenUtil().setWidth(120),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+            )),
+            Positioned(
+                child: Image.asset(
+              "images/ic_mic.png",
+              width: ScreenUtil().setWidth(77),
+            )),
+          ],
         ),
         Divider(),
         HomeTitleSliver(

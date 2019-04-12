@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 final ThemeData defaultThemeData = ThemeData(
   brightness: Brightness.light,
-  primaryColor: Colors.blueGrey,
+  primaryColor: Colors.blue,
   primaryColorBrightness: Brightness.light,
   appBarTheme: AppBarTheme(
     brightness: Brightness.light,

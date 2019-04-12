@@ -17,7 +17,6 @@ class HomeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(ScreenUtil().setWidth(4)),
-      height: ScreenUtil().setHeight(83),
       width: ScreenUtil().setWidth(221),
       child: Chip(
         avatar: Image.asset(

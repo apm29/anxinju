@@ -22,19 +22,19 @@ class HomeCardWithIcon extends StatelessWidget {
             mainTitle,
             style: TextStyle(fontSize: 14),
           ),
-          SizedBox(height: ScreenUtil().setHeight(10),),
-          Text(
-            subTitle,
-            style: TextStyle(
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+          Text(subTitle,
+              style: TextStyle(
                 fontSize: 10,
                 color: Colors.grey[400],
-            )
-          ),
+              )),
         ],
       ),
       Image.asset(
         imagePath,
-        height: ScreenUtil().setHeight(90),
+        width: ScreenUtil().setWidth(90),
       ),
       SizedBox(
         width: ScreenUtil().setWidth(10),
@@ -46,7 +46,9 @@ class HomeCardWithIcon extends StatelessWidget {
     }
     return Container(
       width: ScreenUtil().setWidth(506),
-      height: ScreenUtil().setHeight(252),
+      constraints: BoxConstraints.tightFor(
+        height: ScreenUtil().setHeight(252),
+      ),
       margin: EdgeInsets.only(
           left: (!rightAlign)
               ? ScreenUtil().setWidth(0)
