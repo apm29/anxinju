@@ -52,10 +52,10 @@ class HomeCardWithIcon extends StatelessWidget {
       margin: EdgeInsets.only(
           left: (!rightAlign)
               ? ScreenUtil().setWidth(0)
-              : ScreenUtil().setWidth(10),
+              : ScreenUtil().setWidth(17),
           right: (rightAlign)
               ? ScreenUtil().setWidth(0)
-              : ScreenUtil().setWidth(10),
+              : ScreenUtil().setWidth(17),
           top: ScreenUtil().setWidth(8),
           bottom: ScreenUtil().setWidth(8)),
       decoration: BoxDecoration(

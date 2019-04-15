@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:ease_life/bloc/user_bloc.dart';
+import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 import 'package:ease_life/remote/dio_net.dart';
@@ -76,8 +77,7 @@ class ApplicationBloc extends BlocBase {
   }
 
   void _getCurrentUserAndNotify() async {
-    final sp = await SharedPreferences.getInstance();
-    var userInfoStr = sp.getString(PreferenceKeys.keyUserInfo);
+    var userInfoStr = sharedPreferences.getString(PreferenceKeys.keyUserInfo);
     if (userInfoStr?.isNotEmpty == true) {
       _userInfoController.add(UserInfo.fromJson(json.decode(userInfoStr)));
     } else {
@@ -85,33 +85,8 @@ class ApplicationBloc extends BlocBase {
     }
   }
 
-  void login(String userName, String password) async {
-    //final sp = await SharedPreferences.getInstance();
-    _userInfoController.add(UserInfo()..state = ActionState.LOADING);
-    DioUtil.getInstance().then((dio) {
-      return dio.postAsync<DataWrapper>(
-          path: "/login",
-          stringProcessor: (Map<String, dynamic> json) {
-            return DataWrapper.fromJson(json);
-          },
-          data: {
-            "userName": userName,
-            "password": password
-          }).then((BaseResponse<DataWrapper> baseResponse) {
-        if (baseResponse.success() && baseResponse.data != null) {
-          DioUtil.sp.setString(
-              PreferenceKeys.keyUserInfo, baseResponse.data.userInfo.toString());
-          Fluttertoast.showToast(msg: "登录成功");
-        }else {
-          Fluttertoast.showToast(msg: baseResponse.text);
-        }
-        _getCurrentUserAndNotify();
-      });
-    }).catchError((Object error) {
-      var msg = error is DioError ? error.message : error.toString();
-      Fluttertoast.showToast(msg: msg);
-      _userInfoController.addError(msg);
-    });
+  void login(UserInfo userInfo) async {
+    _userInfoController.add(userInfo);
   }
 
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
@@ -119,79 +94,16 @@ class ApplicationBloc extends BlocBase {
   Stream<UserInfo> get currentUser => _userInfoController.stream;
 
   void logout() async {
-    final sp = await SharedPreferences.getInstance();
-    sp.setString(PreferenceKeys.keyUserInfo, null);
-    _getCurrentUserAndNotify();
-  }
-
-  fastLogin(String mobile, String verifyCode) async {
-    _userInfoController.add(UserInfo()..state = ActionState.LOADING);
-    DioUtil.getInstance().then((dio) {
-      return dio.postAsync<DataWrapper>(
-          path: "/fastLogin",
-          stringProcessor: (Map<String, dynamic> json) {
-            return DataWrapper.fromJson(json);
-          },
-          data: {
-            "mobile": mobile,
-            "verifyCode": verifyCode
-          }).then((BaseResponse<DataWrapper> baseResponse) {
-        if (baseResponse.success() && baseResponse.data != null) {
-          DioUtil.sp.setString(
-              PreferenceKeys.keyUserInfo, baseResponse.data.userInfo.toString());
-          Fluttertoast.showToast(msg: "登录成功");
-        } else {
-          Fluttertoast.showToast(msg: baseResponse.text);
-        }
-        _getCurrentUserAndNotify();
-      });
-    }).catchError((Object error) {
-      var msg = error is DioError ? error.message : error.toString();
-      Fluttertoast.showToast(msg: msg);
-      _userInfoController.addError(msg);
-    });
+    sharedPreferences.setString(PreferenceKeys.keyUserInfo, null);
+    sharedPreferences.setString(PreferenceKeys.keyAuthorization, null);
+    _userInfoController.add(null);
   }
 }
 
-
 class LoginBloc extends BlocBase {
-  //-1 loading
-  // 0 normal
-  // 1-30 count down
-  PublishSubject<int> _smsController = PublishSubject();
 
-  Observable<int> get smsStream => _smsController.stream;
-
-
-  LoginBloc();
-
-  void sendSms(String mobile) {
-    _smsController.add(-1); //loading
-    DioUtil.getInstance().then((dio) {
-      return dio
-          .postAsync(path: "/user/getVerifyCode", data: {"mobile": mobile});
-    }).then((BaseResponse<dynamic> baseResp) {
-      if (baseResp.success()) {
-        Fluttertoast.showToast(msg: "短信发送成功");
-        Observable.periodic(Duration(seconds: 1), (i) => 29 - i)
-            .take(30)
-            .listen((time) {
-          print('$time');
-          _smsController.add(time);
-        });
-      } else {
-        Fluttertoast.showToast(msg: baseResp.text);
-        _smsController.addError(baseResp.text);
-      }
-    }).catchError((Object error) {
-      var msg = error is DioError ? error.message : error.toString();
-      Fluttertoast.showToast(msg: msg);
-      _smsController.addError(msg);
-    });
-  }
 
   @override
   void dispose() {
-    _smsController.close();
   }
 }

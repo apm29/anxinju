@@ -9,8 +9,8 @@ class HomeTitleSliver extends StatelessWidget {
   final String subTitle;
   final String tailText;
   final VoidCallback onPressed;
-
-  HomeTitleSliver({this.indicatorColor = const Color(0xFF000078),@required this.mainTitle,@required this.subTitle,
+  final Widget leadingIcon;
+  HomeTitleSliver({this.leadingIcon,this.indicatorColor = const Color(0xFF000078),@required this.mainTitle,@required this.subTitle,
     this.tailText = "更多" ,this.onPressed});
 
   @override
@@ -18,7 +18,7 @@ class HomeTitleSliver extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Container(
+        leadingIcon??Container(
           height: ScreenUtil().setHeight(70),
           width: ScreenUtil().setWidth(10),
           color: indicatorColor,

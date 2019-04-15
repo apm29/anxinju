@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
@@ -18,17 +19,19 @@ const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
 class DioUtil {
   Dio _dioInstance;
   bool inDebug = true;
-  static SharedPreferences sp;
-
   DioUtil._() {
     init();
   }
 
+  factory DioUtil() {
+    return DioUtil.getInstance();
+  }
+
   static DioUtil _dioApplication;
 
-  static Future<DioUtil> getInstance() async {
+  static DioUtil getInstance() {
     if (_dioApplication == null) {
-      sp = await SharedPreferences.getInstance();
+//      sp = await SharedPreferences.getInstance();
       _dioApplication = DioUtil._();
     }
     return _dioApplication;
@@ -44,38 +47,39 @@ class DioUtil {
     ));
     _dioInstance.interceptors.add(InterceptorsWrapper(onRequest: (req) {
       req.headers.update("Authorization", (old) {
-        return sp.getString(PreferenceKeys.keyAuthorization);
+        return sharedPreferences.getString(PreferenceKeys.keyAuthorization);
       });
       print("REQUEST:");
-        print("===========================================");
-        print("  Method:${req.method},Url:${req.baseUrl + req.path}");
-        print("  Headers:${req.headers}");
-        print("  QueryParams:${req.queryParameters}");
-        print("  Data:${req.data}");
-        print("===========================================");
+      print("===========================================");
+      print("  Method:${req.method},Url:${req.baseUrl + req.path}");
+      print("  Headers:${req.headers}");
+      print("  QueryParams:${req.queryParameters}");
+      print("  Data:${req.data}");
+      print("===========================================");
     }, onResponse: (resp) {
       print("REQUEST:");
-        print("===========================================");
-        print("  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
-        print("  Headers:${resp.request.headers}");
-        print("  QueryParams:${resp.request.queryParameters}");
-        print("  Data:${resp.request.data}");
-        print("  -------------------------");
-        print("  RESULT:");
-        print("    Headers:${resp.headers}");
-        print("    Data:${resp.data}");
-        print("    Redirect:${resp.redirects}");
-        print("    StatusCode:${resp.statusCode}");
-        print("    Extras:${resp.extra}");
-        print(" ===========================================");
+      print("===========================================");
+      print(
+          "  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
+      print("  Headers:${resp.request.headers}");
+      print("  QueryParams:${resp.request.queryParameters}");
+      print("  Data:${resp.request.data}");
+      print("  -------------------------");
+      print("  RESULT:");
+      print("    Headers:${resp.headers}");
+      print("    Data:${resp.data}");
+      print("    Redirect:${resp.redirects}");
+      print("    StatusCode:${resp.statusCode}");
+      print("    Extras:${resp.extra}");
+      print(" ===========================================");
     }, onError: (err) {
       print("ERROR:");
-        print("===========================================");
-        print("Message:${err.message}");
-        print("Error:${err.error}");
-        print("Type:${err.type}");
-        print("Trace:${err.stackTrace}");
-        print("===========================================");
+      print("===========================================");
+      print("Message:${err.message}");
+      print("Error:${err.error}");
+      print("Type:${err.type}");
+      print("Trace:${err.stackTrace}");
+      print("===========================================");
     }));
     return this;
   }
@@ -95,7 +99,7 @@ class DioUtil {
       options: RequestOptions(
           contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
           headers: {
-            KEY_HEADER_TOKEN: sp.getString(PreferenceKeys.keyAuthorization),
+            KEY_HEADER_TOKEN: sharedPreferences.getString(PreferenceKeys.keyAuthorization),
           }),
     )
         .then((response) {
@@ -108,7 +112,7 @@ class DioUtil {
           T baseResponse = processor(json);
           if (baseResponse.success()) {
             if (baseResponse.token != null && baseResponse.token.isNotEmpty) {
-              sp
+              sharedPreferences
                   .setString(
                       PreferenceKeys.keyAuthorization, baseResponse.token)
                   .then((success) {
@@ -163,7 +167,7 @@ class DioUtil {
       options: RequestOptions(
           contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
           headers: {
-            KEY_HEADER_TOKEN: sp.getString(PreferenceKeys.keyAuthorization),
+            KEY_HEADER_TOKEN: sharedPreferences.getString(PreferenceKeys.keyAuthorization),
           }),
     );
     String _status, _text, _token;
@@ -172,9 +176,7 @@ class DioUtil {
         response.statusCode == HttpStatus.created) {
       _status = response.data["status"];
       _text = response.data["text"];
-      _data = response.data['data'] is String
-          ? {}
-          : response.data['data'];
+      _data = response.data['data'] is String ? {} : response.data['data'];
       return BaseResponse(_status, _token, _text,
           stringProcessor == null ? null : stringProcessor(_data));
     } else {
@@ -185,5 +187,3 @@ class DioUtil {
     }
   }
 }
-
-

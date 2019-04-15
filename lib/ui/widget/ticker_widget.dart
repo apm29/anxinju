@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TickerWidget extends StatefulWidget {
@@ -11,9 +11,10 @@ class TickerWidget extends StatefulWidget {
 
   TickerWidget(
       {@required this.key,
-      this.tickTimes = 30,
+      this.tickTimes = 29,
       this.textInitial = "发送短信",
-      this.onPressed}):super(key:key);
+      this.onPressed})
+      : super(key: key);
 
   @override
   TickerWidgetState createState() =>
@@ -21,7 +22,7 @@ class TickerWidget extends StatefulWidget {
 }
 
 class TickerWidgetState extends State<TickerWidget> {
-  int currentTime = -1;
+  int currentTime = 0;
   final GlobalKey<TickerWidgetState> key;
   final int tickTimes;
   final String textInitial;
@@ -36,20 +37,32 @@ class TickerWidgetState extends State<TickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-        onPressed: currentTime > 0 ? null : onPressed,
-        child: currentTime <= 0 ? Text(textInitial) : Text("$currentTime(s)"));
+    return GestureDetector(
+        onTap: currentTime > 0 ? null : onPressed,
+        child: currentTime <= 0
+            ? Text(
+                textInitial,
+                style: TextStyle(color: CupertinoColors.activeBlue),
+              )
+            : Text(
+                "$currentTime(s)",
+                style: TextStyle(color: CupertinoColors.inactiveGray),
+              ));
   }
 
   StreamSubscription<int> subscription;
 
   void startTick() {
     print('tick');
-    subscription = Observable.periodic(Duration(seconds: tickTimes), (i) => i)
-        .listen((time) {
-      print('$time');
+    setState(() {
+      currentTime = tickTimes + 1;
+    });
+    subscription =
+        Observable.periodic(Duration(seconds: 1), (i) => tickTimes - i)
+            .take(tickTimes + 1)
+            .listen((time) {
       setState(() {
-        currentTime = tickTimes - time;
+        currentTime = time;
       });
     });
   }

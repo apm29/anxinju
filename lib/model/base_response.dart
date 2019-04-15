@@ -59,14 +59,8 @@ class DataWrapper {
 enum ActionState{
   LOADING,ERROR,NORMAL
 }
-class StateData {
-  ActionState state = ActionState.NORMAL;
-  bool loading()=>state == ActionState.LOADING;
-  bool error()=>state == ActionState.ERROR;
-  bool normal()=>state == ActionState.NORMAL;
-}
 
-class UserInfo extends StateData {
+class UserInfo{
   String userId;
   String userName;
   String mobile;
@@ -76,7 +70,7 @@ class UserInfo extends StateData {
 
   @override
   String toString() {
-    return '{\"userId\": \"$userId\", \"userName\": \"$userName\", \"mobile\": \"$mobile\", \"isCertification\": $isCertification}';
+    return '{"userId": "$userId", "userName": "$userName", "mobile": "$mobile", "isCertification": $isCertification}';
   }
 
   UserInfo.fromJson(Map<String, dynamic> json) {
