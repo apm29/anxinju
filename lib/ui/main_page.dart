@@ -1,19 +1,10 @@
-import 'dart:math';
-import 'package:ease_life/bloc/bloc_provider.dart';
-import 'package:ease_life/bloc/user_bloc.dart';
-import 'package:ease_life/model/base_response.dart';
-import 'package:ease_life/remote//dio_net.dart';
+import 'package:ease_life/ui/camera_page.dart';
 import 'package:ease_life/ui/home_page.dart';
 import 'package:ease_life/ui/message_page.dart';
 import 'package:ease_life/ui/mine_page.dart';
-import 'package:ease_life/ui/widget/home_card_with_icon.dart';
-import 'package:ease_life/ui/widget/home_chip.dart';
-import 'package:ease_life/ui/widget/home_title_sliver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:rxdart/rxdart.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
@@ -126,7 +117,7 @@ class _MainPageState extends State<MainPage> {
         },
         children: <Widget>[
           HomePage(),
-          Container(),
+          CameraPage(),
           MessagePage(),
           MinePage(),
         ],

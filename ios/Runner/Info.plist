@@ -57,5 +57,9 @@
 	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+    <string>安心居请求访问相机</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>安心居请求访问麦克风</string>
 </dict>
 </plist>
