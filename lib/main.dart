@@ -1,22 +1,25 @@
+import 'dart:io';
+
 import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 import 'package:ease_life/ui/authorization_page.dart';
 import 'package:ease_life/ui/main_page.dart';
-import 'package:ease_life/remote//dio_net.dart';
 import 'package:ease_life/ui/login_page.dart';
+import 'package:ease_life/ui/map_locate_page.dart';
 import 'package:ease_life/ui/personal_info_page.dart';
 import 'package:ease_life/ui/register_page.dart';
 import 'package:ease_life/ui/splash_page.dart';
 import 'package:ease_life/ui/style.dart';
-import 'package:ease_life/ui/test_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:amap_base/amap_base.dart';
 
 SharedPreferences sharedPreferences;
 
 void main() async {
+  //sp初始化
   sharedPreferences = await SharedPreferences.getInstance();
+  await AMap.init("96169736f17c9c6a458012f744167f00");
   sharedPreferences.setString(PreferenceKeys.keyAuthorization,
       "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
   sharedPreferences.setString(PreferenceKeys.keyUserInfo,
@@ -46,6 +49,7 @@ class MyApp extends StatelessWidget {
           "/register":(_)=>RegisterPage(),
           "/personal": (_) => PersonalInfoPage(),
           "/verify": (_) => AuthorizationPage(),
+          "/map": (_) => MapAndLocatePage(),
         },
       ),
     );

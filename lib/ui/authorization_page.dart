@@ -103,7 +103,9 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                     ],
                   ),
                   OutlineButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed("/map");
+                    },
                     child: Text("获取位置"),
                   )
                 ],

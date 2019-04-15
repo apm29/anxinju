@@ -40,10 +40,10 @@ dependencies:
   sqflite: ^1.1.0
   json_annotation: ^2.1.0
   flutter_screenutil: ^0.5.1
-  amap_base: ^0.3.4
-  amap_base_map: ^0.3.4 # 仅地图
-  amap_base_search: ^0.3.4 # 仅搜索
-  amap_base_location: ^0.3.4 # 仅定位
+  amap_base: 0.3.5
+#  amap_base_map: 0.3.4 # 仅地图
+#  amap_base_search: 0.3.4 # 仅搜索
+#  amap_base_location: 0.3.4 # 仅定位
 
 dev_dependencies:
   flutter_test:

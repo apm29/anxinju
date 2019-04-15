@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+//import 'package:amap_base_location/amap_base_location.dart';
+import 'package:amap_base/amap_base.dart';
 import 'package:dio/dio.dart';
 import 'package:ease_life/bloc/user_bloc.dart';
 import 'package:ease_life/main.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 //class BlocProvider extends InheritedWidget {
 //  final UserBloc bloc = UserBloc();
@@ -70,10 +73,12 @@ class ApplicationBloc extends BlocBase {
   @override
   void dispose() {
     _userInfoController.close();
+    _locationController.close();
   }
 
   ApplicationBloc() {
     _getCurrentUserAndNotify();
+    getCurrentLocationAndNotify();
   }
 
   void _getCurrentUserAndNotify() async {
@@ -98,12 +103,31 @@ class ApplicationBloc extends BlocBase {
     sharedPreferences.setString(PreferenceKeys.keyAuthorization, null);
     _userInfoController.add(null);
   }
+
+  BehaviorSubject<Location> _locationController = BehaviorSubject();
+
+  Observable<Location> get locationStream => _locationController.stream;
+
+  void getCurrentLocationAndNotify() async {
+    var map = await PermissionHandler()
+        .requestPermissions([PermissionGroup.location]);
+    if (map[PermissionGroup.location] == PermissionStatus.granted) {
+      AMapLocation()
+          .getLocation(LocationClientOptions(
+        isOnceLocation: true,
+        locationMode: LocationMode.Hight_Accuracy,
+      ))
+          .then((Location location) {
+        print('location => ${location.address}');
+        _locationController.add(location);
+      }).catchError((e) {
+        print(e);
+      });
+    }
+  }
 }
 
 class LoginBloc extends BlocBase {
-
-
   @override
-  void dispose() {
-  }
+  void dispose() {}
 }
