@@ -496,6 +496,9 @@ class _HomePageState extends State<HomePage> {
         case 3:
           Navigator.of(context).pushNamed("/personal");
           break;
+        case 4:
+          Navigator.of(context).pushNamed("/contacts");
+          break;
       }
     };
     return StreamBuilder<UserInfo>(
@@ -513,6 +516,10 @@ class _HomePageState extends State<HomePage> {
                       PopupMenuItem(
                         child: Text("信息"),
                         value: 3,
+                      ),
+                      PopupMenuItem(
+                        child: Text("推荐给好友"),
+                        value: 4,
                       )
                     ]
                   : [

@@ -41,24 +41,22 @@ class BaseResponse<T> {
   }
 }
 
-class DataWrapper {
+class UserInfoWrapper {
   UserInfo userInfo;
 
-  DataWrapper(this.userInfo);
+  UserInfoWrapper(this.userInfo);
 
   @override
   String toString() {
     return "{\"userInfo\":\"$userInfo\"}";
   }
 
-  DataWrapper.fromJson(Map<String, dynamic> json) {
+  UserInfoWrapper.fromJson(Map<String, dynamic> json) {
     userInfo =
         UserInfo.fromJson(json["userInfo"] is Map ? json["userInfo"] : {});
   }
 }
-enum ActionState{
-  LOADING,ERROR,NORMAL
-}
+
 
 class UserInfo{
   String userId;

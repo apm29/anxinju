@@ -59,7 +59,7 @@ class _MainPageState extends State<MainPage> {
         BottomNavigationBarItem(
             icon: Icon(
               Icons.home,
-              size:24,
+              size: 24,
               color: _currentIndex == 0 ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("主页")),
@@ -74,7 +74,7 @@ class _MainPageState extends State<MainPage> {
         BottomNavigationBarItem(
             icon: Icon(
               Icons.message,
-              size:24,
+              size: 24,
               color: _currentIndex == 2 ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("消息")),
@@ -117,7 +117,16 @@ class _MainPageState extends State<MainPage> {
         },
         children: <Widget>[
           HomePage(),
-          CameraPage(),
+          Container(
+            child: Center(
+              child: OutlineButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed("/camera");
+                },
+                child: Text("人脸识别界面"),
+              ),
+            ),
+          ),
           MessagePage(),
           MinePage(),
         ],

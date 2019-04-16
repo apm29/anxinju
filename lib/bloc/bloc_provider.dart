@@ -8,12 +8,13 @@ import 'package:ease_life/bloc/user_bloc.dart';
 import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
-import 'package:ease_life/remote/dio_net.dart';
+import 'package:ease_life/remote/dio_util.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:contacts_service/contacts_service.dart';
 
 //class BlocProvider extends InheritedWidget {
 //  final UserBloc bloc = UserBloc();
@@ -91,7 +92,9 @@ class ApplicationBloc extends BlocBase {
   }
 
   void login(UserInfo userInfo) async {
-    _userInfoController.add(userInfo);
+    sharedPreferences.setString(
+        PreferenceKeys.keyUserInfo, userInfo.toString());
+    _getCurrentUserAndNotify();
   }
 
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
@@ -130,4 +133,30 @@ class ApplicationBloc extends BlocBase {
 class LoginBloc extends BlocBase {
   @override
   void dispose() {}
+}
+
+class ContactsBloc extends BlocBase {
+  BehaviorSubject<List<Contact>> _contactsController = BehaviorSubject();
+
+  Observable<List<Contact>> get contactsStream => _contactsController.stream;
+
+  @override
+  void dispose() {
+    _contactsController.close();
+  }
+
+  ContactsBloc() {
+    getContactsAndNotify();
+  }
+
+  Future<void> getContactsAndNotify() async {
+    var map = await PermissionHandler()
+        .requestPermissions([PermissionGroup.contacts]);
+    if (map[PermissionGroup.contacts] == PermissionStatus.granted) {
+      var contacts = await ContactsService.getContacts();
+      _contactsController.add(contacts.toList());
+    }
+    await Future.delayed(Duration(seconds: 2));
+    return null;
+  }
 }

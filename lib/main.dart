@@ -4,6 +4,7 @@ import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 import 'package:ease_life/ui/authorization_page.dart';
 import 'package:ease_life/ui/camera_page.dart';
+import 'package:ease_life/ui/contacts_select_page.dart';
 import 'package:ease_life/ui/main_page.dart';
 import 'package:ease_life/ui/login_page.dart';
 import 'package:ease_life/ui/map_locate_page.dart';
@@ -15,20 +16,24 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amap_base/amap_base.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_bugly/flutter_bugly.dart';
 
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 
-void main() async {
-  //sp初始化
-  sharedPreferences = await SharedPreferences.getInstance();
-  await AMap.init("96169736f17c9c6a458012f744167f00");
-  cameras = await availableCameras();
-  sharedPreferences.setString(PreferenceKeys.keyAuthorization,
-      "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
-  sharedPreferences.setString(PreferenceKeys.keyUserInfo,
-      '{"userId": "723672", "userName": "应佳伟", "mobile": "17376508275", "isCertification": 0}');
-  runApp(MyApp());
+void main() {
+  FlutterBugly.postCatchedException(() async {
+    //sp初始化
+    sharedPreferences = await SharedPreferences.getInstance();
+    await AMap.init("96169736f17c9c6a458012f744167f00");
+    cameras = await availableCameras();
+    sharedPreferences.setString(PreferenceKeys.keyAuthorization,
+        "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
+    sharedPreferences.setString(PreferenceKeys.keyUserInfo,
+        '{"userId": "723672", "userName": "应佳伟", "mobile": "17376508275", "isCertification": 0}');
+    runApp(MyApp());
+  });
+  FlutterBugly.init(androidAppId: "89b908154e", iOSAppId: "0d1433b494");
 }
 
 class MyApp extends StatelessWidget {
@@ -57,6 +62,10 @@ class MyApp extends StatelessWidget {
           "/verify": (_) => AuthorizationPage(),
           "/map": (_) => MapAndLocatePage(),
           "/camera": (_) => CameraPage(),
+          "/contacts": (_) => BlocProviders<ContactsBloc>(
+                child: ContactsSelectPage(),
+                bloc: ContactsBloc(),
+              ),
         },
       ),
     );

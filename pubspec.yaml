@@ -41,10 +41,13 @@ dependencies:
   json_annotation: ^2.1.0
   flutter_screenutil: ^0.5.1
   amap_base: 0.3.5
+  flutter_bugly: ^0.2.0
+  contacts_service: ^0.2.4
 #  amap_base_map: 0.3.4 # 仅地图
 #  amap_base_search: 0.3.4 # 仅搜索
 #  amap_base_location: 0.3.4 # 仅定位
-  
+#  flutter_sms: ^0.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

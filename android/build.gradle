@@ -27,3 +27,35 @@ subprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            def group = details.requested.group
+            if (group==('androidx.core:core')) {
+                details.useVersion "1.0.0"
+            }
+            if (group==('androidx.viewpager')) {
+                details.useVersion "1.0.0"
+            }
+            if (group==('androidx.drawerlayout')) {
+                details.useVersion "1.0.0"
+            }
+            if (group==('androidx.swiperefreshlayout')) {
+                details.useVersion "1.0.0"
+            }
+            if (group==('androidx.slidingpanelayout')) {
+                details.useVersion "1.0.0"
+            }
+            if (group==('androidx.asynclayoutinflater')) {
+                details.useVersion "1.0.0"
+            }
+            if (group==('androidx.legacy')) {
+                details.useVersion "1.0.0"
+            }
+            if (group==('androidx.fragment')) {
+                details.useVersion "1.0.0"
+            }
+        }
+    }
+}
