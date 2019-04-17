@@ -12,9 +12,6 @@ final ThemeData defaultThemeData = ThemeData(
       color: Colors.blue,
       size: 12
     ),
-    actionsIconTheme: IconThemeData(
-      color: Colors.blue
-    ),
     textTheme: TextTheme(
       body1: TextStyle(fontSize: 11 ,color: Colors.grey),
       body2: TextStyle(fontSize: 11),

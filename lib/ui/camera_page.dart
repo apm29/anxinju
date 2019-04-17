@@ -12,6 +12,9 @@ class _CameraPageState extends State<CameraPage> {
   @override
   void initState() {
     super.initState();
+    if(cameras.length==0){
+      return;
+    }
     var cameraFront = cameras[0];
     cameras.forEach((c) {
       if (c.lensDirection == CameraLensDirection.front) {
@@ -23,9 +26,6 @@ class _CameraPageState extends State<CameraPage> {
       if (!mounted) {
         return;
       }
-//      controller.startImageStream((image){
-//        print('$image');
-//      });
       setState(() {});
     });
   }
@@ -40,8 +40,14 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) {
-      return Container();
+    if (controller==null||!controller.value.isInitialized) {
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text("人脸录入"),
+        ),
+        body: Center(child: Text("没有检测到相机设备"),),
+      );
     }
     return Scaffold(
       appBar: AppBar(

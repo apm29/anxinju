@@ -32,7 +32,7 @@ subprojects {
     project.configurations.all {
         resolutionStrategy.eachDependency { details ->
             def group = details.requested.group
-            if (group==('androidx.core:core')) {
+            if (group==('androidx.core')) {
                 details.useVersion "1.0.0"
             }
             if (group==('androidx.viewpager')) {

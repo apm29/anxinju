@@ -65,23 +65,6 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                           var contact = contactsSnap.data[index];
                           var avatar = contact.avatar;
                           var phones = contact.phones.toList() ?? [];
-                          var phone = "";
-                          if (phones == null || phones.length == 0) {
-                            phone = "--";
-                          } else {
-                            var item = phones.firstWhere((i) {
-                              return i.label == "mobile" || i.label == "other";
-                            }, orElse: () => null);
-                            if (item == null) {
-                              phone = "--";
-                            } else {
-                              phone = item.value;
-                            }
-                          }
-                          phones.forEach((i) {
-                            print('${i.label}');
-                            print('${i.value}');
-                          });
                           return Container(
                             color: Colors.white,
                             margin: EdgeInsets.all(3),
@@ -90,14 +73,19 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                 children: <Widget>[
                                   SizedBox(
                                     width: 50,
-                                    child: avatar.isNotEmpty
+                                    child: avatar?.isNotEmpty??false
                                         ? Image.memory(avatar)
                                         : CircleAvatar(
                                             child: Text(contact.displayName
                                                 .substring(0, 1)),
                                           ),
                                   ),
-                                  Text(contact.displayName),
+                                  Expanded(
+                                      child: Text(
+                                    contact.displayName,
+                                    maxLines: 10,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                 ],
                               ),
                               children: contact.phones.map((i) {

@@ -28,7 +28,6 @@ class HomeChip extends StatelessWidget {
             borderRadius:
                 BorderRadius.all(Radius.circular(ScreenUtil().setWidth(15))),
             side: BorderSide(color: textColor, width: 0.1)),
-        shadowColor: Colors.black,
         label: Text(
           title,
           style: TextStyle(
