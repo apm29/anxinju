@@ -9,6 +9,8 @@ class ContactsSelectPage extends StatefulWidget {
 
 class _ContactsSelectPageState extends State<ContactsSelectPage> {
   GlobalKey<RefreshIndicatorState> refresh = GlobalKey();
+  String keyWord;
+  TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,13 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                     child: TextField(
                       decoration:
                           InputDecoration.collapsed(hintText: "搜索名字/手机"),
+                      textInputAction: TextInputAction.search,
+                      controller: _controller,
+                      onChanged: (s) {
+                        setState(() {
+                          keyWord = s;
+                        });
+                      },
                     ),
                   )
                 ],
@@ -60,9 +69,14 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                         child: Text("未获取到联系人信息"),
                       );
                     } else {
+                      var list = contactsSnap.data.where((i) {
+                        if (keyWord == null) return true;
+                        return i.displayName.contains(keyWord) ||
+                            i.phones.any((i) => i.value.contains(keyWord));
+                      }).toList();
                       return ListView.builder(
                         itemBuilder: (context, index) {
-                          var contact = contactsSnap.data[index];
+                          var contact = list[index];
                           var avatar = contact.avatar;
                           var phones = contact.phones.toList() ?? [];
                           return Container(
@@ -73,7 +87,7 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                 children: <Widget>[
                                   SizedBox(
                                     width: 50,
-                                    child: avatar?.isNotEmpty??false
+                                    child: avatar?.isNotEmpty ?? false
                                         ? Image.memory(avatar)
                                         : CircleAvatar(
                                             child: Text(contact.displayName
@@ -92,11 +106,6 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                 return ListTile(
                                     title: Text(i.value),
                                     onTap: () {
-//                                FlutterSms.sendSMS(message: "我小区已使用门禁，输入我家庭通行码123456即可进入小区，如您有车辆需进入请点击链接登记车牌.http://xxx.cn", recipients: [
-//                                  contact.phones
-//                                      .firstWhere((item) => item.label == "mobile")
-//                                      .value
-//                                ]);
                                       if (phones.isEmpty) {
                                         return;
                                       }
@@ -113,7 +122,7 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                             ),
                           );
                         },
-                        itemCount: contactsSnap.data.length,
+                        itemCount: list.length,
                       );
                     }
                   },
