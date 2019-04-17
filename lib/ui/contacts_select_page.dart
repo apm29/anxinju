@@ -87,6 +87,7 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                 children: <Widget>[
                                   SizedBox(
                                     width: 50,
+                                    height: 50,
                                     child: avatar?.isNotEmpty ?? false
                                         ? Image.memory(avatar)
                                         : CircleAvatar(
@@ -98,13 +99,20 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                       child: Text(
                                     contact.displayName,
                                     maxLines: 10,
+                                    textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
                                   )),
                                 ],
                               ),
                               children: contact.phones.map((i) {
-                                return ListTile(
-                                    title: Text(i.value),
+                                return Container(
+                                  margin: EdgeInsets.all(8),
+                                  color: Colors.grey[200],
+                                  child: ListTile(
+                                    title: Text(
+                                      '${i.value}',
+                                      textAlign: TextAlign.center,
+                                    ),
                                     onTap: () {
                                       if (phones.isEmpty) {
                                         return;
@@ -117,7 +125,10 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                                 "我小区已使用门禁，输入我家庭通行码123456即可进入小区，如您有车辆需进入请点击链接登记车牌."
                                           });
                                       androidIntent.launch();
-                                    });
+                                    },
+                                    trailing: Icon(Icons.arrow_forward),
+                                  ),
+                                );
                               }).toList(),
                             ),
                           );

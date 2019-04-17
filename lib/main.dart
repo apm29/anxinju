@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
+import 'package:ease_life/ui/audio_record_page.dart';
 import 'package:ease_life/ui/authorization_page.dart';
 import 'package:ease_life/ui/camera_page.dart';
 import 'package:ease_life/ui/contacts_select_page.dart';
@@ -25,7 +26,7 @@ void main() {
   FlutterBugly.postCatchedException(() async {
     //sp初始化
     sharedPreferences = await SharedPreferences.getInstance();
-    await AMap.init("96169736f17c9c6a458012f744167f00");
+    await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
     cameras = await availableCameras();
     sharedPreferences.setString(PreferenceKeys.keyAuthorization,
         "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
@@ -62,6 +63,7 @@ class MyApp extends StatelessWidget {
           "/verify": (_) => AuthorizationPage(),
           "/map": (_) => MapAndLocatePage(),
           "/camera": (_) => CameraPage(),
+          "/audio": (_) => AudioRecordPage(),
           "/contacts": (_) => BlocProviders<ContactsBloc>(
                 child: ContactsSelectPage(),
                 bloc: ContactsBloc(),

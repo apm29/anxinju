@@ -119,11 +119,22 @@ class _MainPageState extends State<MainPage> {
           HomePage(),
           Container(
             child: Center(
-              child: OutlineButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed("/camera");
-                },
-                child: Text("人脸识别界面"),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  OutlineButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed("/camera");
+                    },
+                    child: Text("人脸识别界面"),
+                  ),
+                  OutlineButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed("/audio");
+                    },
+                    child: Text("语音录入界面"),
+                  ),
+                ],
               ),
             ),
           ),
