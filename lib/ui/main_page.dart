@@ -124,6 +124,12 @@ class _MainPageState extends State<MainPage> {
                 children: <Widget>[
                   OutlineButton(
                     onPressed: () {
+                      Navigator.of(context).pushNamed("/test");
+                    },
+                    child: Text("测试界面"),
+                  ),
+                  OutlineButton(
+                    onPressed: () {
                       Navigator.of(context).pushNamed("/camera");
                     },
                     child: Text("人脸识别界面"),
@@ -133,6 +139,12 @@ class _MainPageState extends State<MainPage> {
                       Navigator.of(context).pushNamed("/audio");
                     },
                     child: Text("语音录入界面"),
+                  ),
+                  OutlineButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed("/webview");
+                    },
+                    child: Text("WebView界面"),
                   ),
                 ],
               ),

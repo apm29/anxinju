@@ -13,6 +13,8 @@ import 'package:ease_life/ui/personal_info_page.dart';
 import 'package:ease_life/ui/register_page.dart';
 import 'package:ease_life/ui/splash_page.dart';
 import 'package:ease_life/ui/style.dart';
+import 'package:ease_life/ui/test_page.dart';
+import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amap_base/amap_base.dart';
@@ -63,7 +65,9 @@ class MyApp extends StatelessWidget {
           "/verify": (_) => AuthorizationPage(),
           "/map": (_) => MapAndLocatePage(),
           "/camera": (_) => CameraPage(),
+          "/webview": (_) => WebViewExample(),
           "/audio": (_) => AudioRecordPage(),
+          "/test": (_) => TestPage(),
           "/contacts": (_) => BlocProviders<ContactsBloc>(
                 child: ContactsSelectPage(),
                 bloc: ContactsBloc(),

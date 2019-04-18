@@ -5,6 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ease_life/model/base_response.dart';
@@ -31,5 +32,17 @@ void main() {
 //    expect(find.text('0'), findsNothing);
 //    expect(find.text('1'), findsOneWidget);
 //  });
-  
+  Completer<String> completer = Completer();
+  Future.delayed(Duration(seconds: 0),).then((s){
+    completer.complete("ssss");
+  });
+  runApp(
+    FutureBuilder<String>(
+      builder: (context, snap) {
+        print('$snap');
+        return Container();
+      },
+      future: completer.future,
+    ),
+  );
 }
