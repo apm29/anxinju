@@ -3,15 +3,10 @@ import 'dart:convert';
 
 //import 'package:amap_base_location/amap_base_location.dart';
 import 'package:amap_base/amap_base.dart';
-import 'package:dio/dio.dart';
-import 'package:ease_life/bloc/user_bloc.dart';
 import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
-import 'package:ease_life/remote/dio_util.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:contacts_service/contacts_service.dart';

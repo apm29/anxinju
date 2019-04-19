@@ -24,8 +24,8 @@ import 'package:flutter_bugly/flutter_bugly.dart';
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 
-void main() {
-  FlutterBugly.postCatchedException(() async {
+void main() async{
+//  FlutterBugly.postCatchedException(() async {
     //sp初始化
     sharedPreferences = await SharedPreferences.getInstance();
     await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
@@ -35,8 +35,8 @@ void main() {
     sharedPreferences.setString(PreferenceKeys.keyUserInfo,
         '{"userId": "723672", "userName": "应佳伟", "mobile": "17376508275", "isCertification": 0}');
     runApp(MyApp());
-  });
-  FlutterBugly.init(androidAppId: "89b908154e", iOSAppId: "0d1433b494");
+//  });
+//  FlutterBugly.init(androidAppId: "89b908154e", iOSAppId: "0d1433b494");
 }
 
 class MyApp extends StatelessWidget {
