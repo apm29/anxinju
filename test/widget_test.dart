@@ -6,14 +6,10 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:ease_life/model/base_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ease_life/main.dart';
-import 'package:rxdart/rxdart.dart';
 
 void main() {
 //  testWidgets('Counter increments smoke test', (WidgetTester tester) async {

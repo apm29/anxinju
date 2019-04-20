@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
@@ -19,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amap_base/amap_base.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter_bugly/flutter_bugly.dart';
 
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;

@@ -29,6 +29,9 @@ class _WebViewPageState extends State<WebViewPage> {
           return NavigationDecision.navigate;//允许跳转
         },
       ),
+      floatingActionButton: FloatingActionButton(onPressed: (){
+        _webViewController.loadUrl("http://www.baidu.com");
+      }),
     );
   }
 }

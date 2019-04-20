@@ -4,7 +4,6 @@ import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/ui/widget/ticker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:rxdart/rxdart.dart';
 
 class LoginPage extends StatefulWidget {
   @override

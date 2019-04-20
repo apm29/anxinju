@@ -45,421 +45,446 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(17)),
-        child: ListView(
+        child: CustomScrollView(
           key: PageStorageKey("home_body"),
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(top: 10),
-              decoration: BoxDecoration(color: Colors.white),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    height: ScreenUtil().setWidth(450),
-                    color: Colors.grey,
-                    child: PageView.builder(
-                      itemBuilder: (context, index) {
-                        return Image.asset(
-                          "images/banner_home.jpg",
-                          fit: BoxFit.fill,
-                        );
-                      },
-                      itemCount: 3,
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        GestureDetector(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                    width: ScreenUtil().setWidth(100),
-                                    height: ScreenUtil().setWidth(100),
-                                    child: Image.asset(
-                                      "images/ic_visitor_manager.png",
-                                    )),
-                                Text("访客管理")
-                              ],
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                    width: ScreenUtil().setWidth(100),
-                                    height: ScreenUtil().setWidth(100),
-                                    child: Image.asset(
-                                      "images/ic_property_manager.png",
-                                    )),
-                                Text("找物业")
-                              ],
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                    width: ScreenUtil().setWidth(100),
-                                    height: ScreenUtil().setWidth(100),
-                                    child: Image.asset(
-                                      "images/ic_society_manage.png",
-                                    )),
-                                Text("找社区")
-                              ],
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                    width: ScreenUtil().setWidth(100),
-                                    height: ScreenUtil().setWidth(100),
-                                    child: Image.asset(
-                                      "images/ic_police_manage.png",
-                                    )),
-                                Text("找警察")
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(color: Colors.white),
-              margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: Container(
+                margin: EdgeInsets.only(top: 10),
+                decoration: BoxDecoration(color: Colors.white),
+                child: Column(
                   children: <Widget>[
-                    Image.asset(
-                      "images/ic_loud_speaker.png",
-                      width: ScreenUtil().setWidth(100),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: Text(
-                        "诸暨市公安局发布电信网络新型犯罪案例" * 3,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
+                    Container(
+                      height: ScreenUtil().setWidth(450),
+                      color: Colors.grey,
+                      child: PageView.builder(
+                        itemBuilder: (context, index) {
+                          return Image.asset(
+                            "images/banner_home.jpg",
+                            fit: BoxFit.fill,
+                          );
+                        },
+                        itemCount: 3,
                       ),
                     ),
                     Container(
-                      decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius:
-                              BorderRadius.circular(ScreenUtil().setWidth(5))),
-                      height: ScreenUtil().setHeight(50),
-                      width: ScreenUtil().setWidth(10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          GestureDetector(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                      width: ScreenUtil().setWidth(100),
+                                      height: ScreenUtil().setWidth(100),
+                                      child: Image.asset(
+                                        "images/ic_visitor_manager.png",
+                                      )),
+                                  Text("访客管理")
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                      width: ScreenUtil().setWidth(100),
+                                      height: ScreenUtil().setWidth(100),
+                                      child: Image.asset(
+                                        "images/ic_property_manager.png",
+                                      )),
+                                  Text("找物业")
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                      width: ScreenUtil().setWidth(100),
+                                      height: ScreenUtil().setWidth(100),
+                                      child: Image.asset(
+                                        "images/ic_society_manage.png",
+                                      )),
+                                  Text("找社区")
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                      width: ScreenUtil().setWidth(100),
+                                      height: ScreenUtil().setWidth(100),
+                                      child: Image.asset(
+                                        "images/ic_police_manage.png",
+                                      )),
+                                  Text("找警察")
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            Stack(
-              alignment: AlignmentDirectional.center,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        HomeCardWithIcon(
-                          "安全管家",
-                          "SecurityManager",
-                          "images/ic_safe_manager.png",
-                          false,
-                        ),
-                        HomeCardWithIcon(
-                          "智慧物业",
-                          "Intelligent Property",
-                          "images/ic_intelli_prop.png",
-                          true,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        HomeCardWithIcon(
-                          "共建共享",
-                          "Co-Construction",
-                          "images/ic_co_construction.png",
-                          false,
-                        ),
-                        HomeCardWithIcon(
-                          "商业服务",
-                          "Business Service",
-                          "images/ic_business_service.png",
-                          true,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Positioned(
-                    child: Container(
-                  width: ScreenUtil().setWidth(266),
-                  height: ScreenUtil().setWidth(266),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey[200],
-                  ),
-                )),
-                Positioned(
-                    child: Container(
-                  width: ScreenUtil().setWidth(220),
-                  height: ScreenUtil().setWidth(220),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                )),
-                Positioned(
-                    child: Container(
-                  width: ScreenUtil().setWidth(180),
-                  height: ScreenUtil().setWidth(180),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey[200],
-                  ),
-                )),
-                Positioned(
-                    child: Container(
-                  width: ScreenUtil().setWidth(120),
-                  height: ScreenUtil().setWidth(120),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                )),
-                Positioned(
-                    child: Image.asset(
-                  "images/ic_mic.png",
-                  width: ScreenUtil().setWidth(77),
-                )),
-              ],
-            ),
-            Divider(),
-            HomeTitleSliver(
-              mainTitle: "安全管家",
-              subTitle: "Security Manager",
-              onPressed: () {},
-            ),
-            Material(
-              type: MaterialType.card,
-              elevation: 1,
+            SliverToBoxAdapter(
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: ScreenUtil().setHeight(58),
-                  horizontal: ScreenUtil().setWidth(58),
-                ),
-                color: Colors.white,
-                child: Wrap(
-                  children: <Widget>[
-                    HomeChip(color: const Color(0xFF000078), title: "网上警署"),
-                    HomeChip(title: "暨阳警方"),
-                    HomeChip(title: "网上办事"),
-                    HomeChip(title: "违法举报"),
-                    HomeChip(title: "小区保安"),
-                    HomeChip(title: "纠纷化解"),
-                    HomeChip(title: "视频监控"),
-                    HomeChip(title: "巡更管理"),
-                    Container(
-                      height: 12,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: list1.map((s) {
-                            return Text(
-                              s,
-                              style: TextStyle(fontSize: ScreenUtil().setSp(30)),
-                            );
-                          }).toList(),
+                decoration: BoxDecoration(color: Colors.white),
+                margin:
+                    EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Image.asset(
+                        "images/ic_loud_speaker.png",
+                        width: ScreenUtil().setWidth(100),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: Text(
+                          "诸暨市公安局发布电信网络新型犯罪案例" * 3,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        Image.asset(
-                          "images/ic_safe_manager.png",
-                          color: Colors.blue[300],
-                          width: ScreenUtil().setWidth(185),
-                        ),
-                      ],
-                    )
-                  ],
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.circular(
+                                ScreenUtil().setWidth(5))),
+                        height: ScreenUtil().setHeight(50),
+                        width: ScreenUtil().setWidth(10),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            HomeTitleSliver(
-              indicatorColor: const Color(0xFF16A702),
-              mainTitle: "智慧物业",
-              subTitle: "Intelligent Property",
-              onPressed: () {},
+            SliverToBoxAdapter(
+              child: Stack(
+                alignment: AlignmentDirectional.center,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          HomeCardWithIcon(
+                            "安全管家",
+                            "SecurityManager",
+                            "images/ic_safe_manager.png",
+                            false,
+                          ),
+                          HomeCardWithIcon(
+                            "智慧物业",
+                            "Intelligent Property",
+                            "images/ic_intelli_prop.png",
+                            true,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          HomeCardWithIcon(
+                            "共建共享",
+                            "Co-Construction",
+                            "images/ic_co_construction.png",
+                            false,
+                          ),
+                          HomeCardWithIcon(
+                            "商业服务",
+                            "Business Service",
+                            "images/ic_business_service.png",
+                            true,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                      child: Container(
+                    width: ScreenUtil().setWidth(266),
+                    height: ScreenUtil().setWidth(266),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[200],
+                    ),
+                  )),
+                  Positioned(
+                      child: Container(
+                    width: ScreenUtil().setWidth(220),
+                    height: ScreenUtil().setWidth(220),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  )),
+                  Positioned(
+                      child: Container(
+                    width: ScreenUtil().setWidth(180),
+                    height: ScreenUtil().setWidth(180),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[200],
+                    ),
+                  )),
+                  Positioned(
+                      child: Container(
+                    width: ScreenUtil().setWidth(120),
+                    height: ScreenUtil().setWidth(120),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  )),
+                  Positioned(
+                      child: Image.asset(
+                    "images/ic_mic.png",
+                    width: ScreenUtil().setWidth(77),
+                  )),
+                ],
+              ),
             ),
-            Material(
-              type: MaterialType.card,
-              elevation: 1,
+            SliverToBoxAdapter(child: Divider()),
+            SliverToBoxAdapter(
+              child: HomeTitleSliver(
+                mainTitle: "安全管家",
+                subTitle: "Security Manager",
+                onPressed: () {},
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Material(
+                type: MaterialType.card,
+                elevation: 1,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: ScreenUtil().setHeight(58),
+                    horizontal: ScreenUtil().setWidth(58),
+                  ),
+                  color: Colors.white,
+                  child: Wrap(
+                    children: <Widget>[
+                      HomeChip(color: const Color(0xFF000078), title: "网上警署"),
+                      HomeChip(title: "暨阳警方"),
+                      HomeChip(title: "网上办事"),
+                      HomeChip(title: "违法举报"),
+                      HomeChip(title: "小区保安"),
+                      HomeChip(title: "纠纷化解"),
+                      HomeChip(title: "视频监控"),
+                      HomeChip(title: "巡更管理"),
+                      Container(
+                        height: 12,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: list1.map((s) {
+                              return Text(
+                                s,
+                                style: TextStyle(fontSize: ScreenUtil().setSp(30)),
+                              );
+                            }).toList(),
+                          ),
+                          Image.asset(
+                            "images/ic_safe_manager.png",
+                            color: Colors.blue[300],
+                            width: ScreenUtil().setWidth(185),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: HomeTitleSliver(
+                indicatorColor: const Color(0xFF16A702),
+                mainTitle: "智慧物业",
+                subTitle: "Intelligent Property",
+                onPressed: () {},
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Material(
+                type: MaterialType.card,
+                elevation: 1,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: ScreenUtil().setHeight(58),
+                    horizontal: ScreenUtil().setWidth(58),
+                  ),
+                  color: Colors.white,
+                  child: Wrap(
+                    children: <Widget>[
+                      HomeChip(color: const Color(0xFF16A702), title: "通知公告"),
+                      HomeChip(title: "访客系统"),
+                      HomeChip(title: "在线缴费"),
+                      HomeChip(title: "物品寄存"),
+                      HomeChip(title: "租房申报"),
+                      HomeChip(title: "赞助申报"),
+                      HomeChip(title: "车位管理"),
+                      HomeChip(title: "消防设施"),
+                      Container(
+                        height: 12,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: list2.map((s) {
+                              return Text(
+                                s,
+                                style: TextStyle(fontSize: ScreenUtil().setSp(30)),
+                              );
+                            }).toList(),
+                          ),
+                          Image.asset(
+                            "images/ic_intelli_prop.png",
+                            color: Color(0xFF8BFF87),
+                            width: ScreenUtil().setWidth(185),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: HomeTitleSliver(
+                indicatorColor: const Color(0xFFCD0004),
+                mainTitle: "共建共享",
+                subTitle: "Co-construction & Sharing",
+                onPressed: () {},
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Material(
+                type: MaterialType.card,
+                elevation: 1,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: ScreenUtil().setHeight(58),
+                    horizontal: ScreenUtil().setWidth(58),
+                  ),
+                  color: Colors.white,
+                  child: Wrap(
+                    children: <Widget>[
+                      HomeChip(color: const Color(0xFFCD0004), title: "业主问政"),
+                      HomeChip(title: "表扬批评"),
+                      HomeChip(title: "邻里互动"),
+                      HomeChip(title: "闲置交换"),
+                      Container(
+                        height: 12,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: list3.map((s) {
+                              return Text(
+                                s,
+                                style: TextStyle(fontSize: ScreenUtil().setSp(30)),
+                              );
+                            }).toList(),
+                          ),
+                          Image.asset(
+                            "images/ic_co_construction.png",
+                            color: Color(0xFFFEAFB2),
+                            width: ScreenUtil().setWidth(185),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: HomeTitleSliver(
+                indicatorColor: const Color(0xFFFD6B07),
+                mainTitle: "商业服务",
+                subTitle: "Business Service",
+                onPressed: () {},
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Material(
+                type: MaterialType.card,
+                elevation: 1,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: ScreenUtil().setHeight(58),
+                    horizontal: ScreenUtil().setWidth(58),
+                  ),
+                  color: Colors.white,
+                  child: Wrap(
+                    children: <Widget>[
+                      HomeChip(color: const Color(0xFFFD6B07), title: "附近商家"),
+                      HomeChip(title: "专业商家"),
+                      HomeChip(title: "促销活动"),
+                      HomeChip(title: "保安公司"),
+                      Container(
+                        height: 12,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: list4.map((s) {
+                              return Text(
+                                s,
+                                style: TextStyle(fontSize: ScreenUtil().setSp(30)),
+                              );
+                            }).toList(),
+                          ),
+                          Image.asset(
+                            "images/ic_business_service.png",
+                            color: const Color(0xFFFEE087),
+                            width: ScreenUtil().setWidth(185),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: ScreenUtil().setHeight(58),
-                  horizontal: ScreenUtil().setWidth(58),
-                ),
-                color: Colors.white,
-                child: Wrap(
-                  children: <Widget>[
-                    HomeChip(color: const Color(0xFF16A702), title: "通知公告"),
-                    HomeChip(title: "访客系统"),
-                    HomeChip(title: "在线缴费"),
-                    HomeChip(title: "物品寄存"),
-                    HomeChip(title: "租房申报"),
-                    HomeChip(title: "赞助申报"),
-                    HomeChip(title: "车位管理"),
-                    HomeChip(title: "消防设施"),
-                    Container(
-                      height: 12,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: list2.map((s) {
-                            return Text(
-                              s,
-                              style: TextStyle(fontSize: ScreenUtil().setSp(30)),
-                            );
-                          }).toList(),
-                        ),
-                        Image.asset(
-                          "images/ic_intelli_prop.png",
-                          color: Color(0xFF8BFF87),
-                          width: ScreenUtil().setWidth(185),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+                height: 10,
               ),
-            ),
-            HomeTitleSliver(
-              indicatorColor: const Color(0xFFCD0004),
-              mainTitle: "共建共享",
-              subTitle: "Co-construction & Sharing",
-              onPressed: () {},
-            ),
-            Material(
-              type: MaterialType.card,
-              elevation: 1,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: ScreenUtil().setHeight(58),
-                  horizontal: ScreenUtil().setWidth(58),
-                ),
-                color: Colors.white,
-                child: Wrap(
-                  children: <Widget>[
-                    HomeChip(color: const Color(0xFFCD0004), title: "业主问政"),
-                    HomeChip(title: "表扬批评"),
-                    HomeChip(title: "邻里互动"),
-                    HomeChip(title: "闲置交换"),
-                    Container(
-                      height: 12,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: list3.map((s) {
-                            return Text(
-                              s,
-                              style: TextStyle(fontSize: ScreenUtil().setSp(30)),
-                            );
-                          }).toList(),
-                        ),
-                        Image.asset(
-                          "images/ic_co_construction.png",
-                          color: Color(0xFFFEAFB2),
-                          width: ScreenUtil().setWidth(185),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            HomeTitleSliver(
-              indicatorColor: const Color(0xFFFD6B07),
-              mainTitle: "商业服务",
-              subTitle: "Business Service",
-              onPressed: () {},
-            ),
-            Material(
-              type: MaterialType.card,
-              elevation: 1,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: ScreenUtil().setHeight(58),
-                  horizontal: ScreenUtil().setWidth(58),
-                ),
-                color: Colors.white,
-                child: Wrap(
-                  children: <Widget>[
-                    HomeChip(color: const Color(0xFFFD6B07), title: "附近商家"),
-                    HomeChip(title: "专业商家"),
-                    HomeChip(title: "促销活动"),
-                    HomeChip(title: "保安公司"),
-                    Container(
-                      height: 12,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: list4.map((s) {
-                            return Text(
-                              s,
-                              style: TextStyle(fontSize: ScreenUtil().setSp(30)),
-                            );
-                          }).toList(),
-                        ),
-                        Image.asset(
-                          "images/ic_business_service.png",
-                          color: const Color(0xFFFEE087),
-                          width: ScreenUtil().setWidth(185),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              height: 10,
             ),
           ],
         ),

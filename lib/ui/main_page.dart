@@ -1,7 +1,6 @@
-import 'package:ease_life/ui/camera_page.dart';
-import 'package:ease_life/ui/home_page.dart';
-import 'package:ease_life/ui/message_page.dart';
-import 'package:ease_life/ui/mine_page.dart';
+import '../ui/home_page.dart';
+import '../ui/message_page.dart';
+import '../ui/mine_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
