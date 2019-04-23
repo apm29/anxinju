@@ -37,6 +37,15 @@ PODS:
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
+  - fzxing (0.2.0):
+    - Flutter
+    - LBXScan/LBXZXing (~> 2.3)
+    - LBXScan/UI (~> 2.3)
+  - LBXScan/LBXZXing (2.3):
+    - LBXScan/Types (~> 2.2)
+  - LBXScan/Types (2.3)
+  - LBXScan/UI (2.3):
+    - LBXScan/Types (~> 2.2)
   - MJExtension (3.0.16)
   - package_info (0.0.1):
     - Flutter
@@ -65,6 +74,7 @@ DEPENDENCIES:
   - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
   - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - fzxing (from `.symlinks/plugins/fzxing/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
@@ -82,6 +92,7 @@ SPEC REPOS:
     - AMapSearch
     - Bugly
     - FMDB
+    - LBXScan
     - MJExtension
 
 EXTERNAL SOURCES:
@@ -105,6 +116,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_webview_plugin/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  fzxing:
+    :path: ".symlinks/plugins/fzxing/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
   path_provider:
@@ -138,6 +151,8 @@ SPEC CHECKSUMS:
   flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  fzxing: 60ba1aa12efdaf420cc7ea8150e1ef85e8e0efeb
+  LBXScan: e51449f0832d1fe17da632af0d22adeb3cfa3543
   MJExtension: 54dbbf6ee728f1a88e9aad904353d007831c7847
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259

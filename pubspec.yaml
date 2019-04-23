@@ -48,6 +48,7 @@ dependencies:
 #  amap_base_location: 0.3.4 # 仅定位
 #  flutter_sms: ^0.2.0
   flutter_sound: ^1.0.6
+  fzxing: ^0.3.0
 
 dev_dependencies:
   flutter_test:

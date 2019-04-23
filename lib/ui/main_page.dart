@@ -4,6 +4,7 @@ import '../ui/mine_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fzxing/fzxing.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
@@ -46,7 +47,9 @@ class _MainPageState extends State<MainPage> {
         return true;
       },
       child: Scaffold(
-        body: buildBody(context),
+        body: Builder(builder: (context){
+          return buildBody(context);
+        }),
         bottomNavigationBar: buildBottomNavigationBar(),
       ),
     );
@@ -144,6 +147,20 @@ class _MainPageState extends State<MainPage> {
                       Navigator.of(context).pushNamed("/webview");
                     },
                     child: Text("WebView界面"),
+                  ),
+                  OutlineButton(
+                    onPressed: () {
+                      Fzxing.scan().then((res) {
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(content: Text(res.join(",")))
+                        );
+                      }).catchError((e) {
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text(e))
+                        );
+                      });
+                    },
+                    child: Text("QRCode"),
                   ),
                 ],
               ),

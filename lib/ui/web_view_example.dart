@@ -89,12 +89,13 @@ class _WebViewExampleState extends State<WebViewExample> {
           if (controller.hasData) {
             return FloatingActionButton(
               onPressed: () async {
-                final String url = await controller.data.currentUrl();
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(content: Text('Favorited $url')),
-                );
+//                final String url = await controller.data.currentUrl();
+//                Scaffold.of(context).showSnackBar(
+//                  SnackBar(content: Text('Favorited $url')),
+//                );
+                controller.data.evaluateJavascript("Toaster.postMessage('123')");
               },
-              child: const Icon(Icons.favorite),
+              child: const Icon(Icons.message),
             );
           }
           return Container();
