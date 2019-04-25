@@ -14,7 +14,6 @@ class _AudioRecordPageState extends State<AudioRecordPage> {
   AudioController controller = AudioController();
 
   List<String> paths = [
-    'http://m10.music.126.net/20190418102135/da8a8670b181a38eebc7c48f3d0dfd27/ymusic/e5da/e49a/0e6b/5e7e3d12d3d37eea00c6357e328bef15.mp3'
   ];
   String currentRecordingPath;
 

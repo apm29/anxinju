@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
           "/verify": (_) => AuthorizationPage(),
           "/map": (_) => MapAndLocatePage(),
           "/camera": (_) => CameraPage(),
-          "/webview": (_) => WebViewExample(),
+//          "/webview": (_) => WebViewExample(),
           "/audio": (_) => AudioRecordPage(),
           "/test": (_) => TestPage(),
           "/contacts": (_) => BlocProviders<ContactsBloc>(

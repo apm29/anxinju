@@ -118,18 +118,18 @@ class DioUtil {
   Future<BaseResponse<T>> postAsync<T>(
       {String path,
       ProcessRawJson jsonProcessor,
-      Map<String, String> data}) async {
+      Map<String, String> data,
+      CancelToken cancelToken}) async {
     return _dioInstance
-        .post<Map<String, dynamic>>(
-      path,
-      data: data,
-      options: RequestOptions(
-          contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
-          headers: {
-            KEY_HEADER_TOKEN:
-                sharedPreferences.getString(PreferenceKeys.keyAuthorization),
-          }),
-    )
+        .post<Map<String, dynamic>>(path,
+            data: data,
+            options: RequestOptions(
+                contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+                headers: {
+                  KEY_HEADER_TOKEN: sharedPreferences
+                      .getString(PreferenceKeys.keyAuthorization),
+                }),
+            cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       String _status, _text, _token;
       Map<String, dynamic> _data;
@@ -137,7 +137,9 @@ class DioUtil {
           response.statusCode == HttpStatus.created) {
         _status = response.data["status"];
         _text = response.data["text"];
-        _data = response.data['data'] is String ? {} : response.data['data'];
+        _data =
+            response.data['data'] is String ? {} : response.data['data'] ?? {};
+        print('data:$data');
         return BaseResponse<T>(_status, _token, _text,
             jsonProcessor == null ? null : jsonProcessor(_data));
       } else {

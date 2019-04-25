@@ -1,16 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/base_response.dart';
+import 'package:ease_life/ui/widget/loading_state_widget.dart';
 import 'package:ease_life/ui/widget/ticker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'widget/lifecycle_widget.dart';
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends LifecycleWidgetState<LoginPage> {
   final TextEditingController controllerMobile = TextEditingController();
 
   final TextEditingController controllerPassword = TextEditingController();
@@ -19,6 +21,22 @@ class _LoginPageState extends State<LoginPage> {
   bool _passReady = false;
   bool _fastLogin = false;
   bool _protocolChecked = true;
+  bool _loading = false;
+  GlobalKey<TickerWidgetState> tickSmsKey = GlobalKey();
+  GlobalKey<LoadingStateWidgetState> loadingLoginKey = GlobalKey();
+  final cancelToken = CancelToken();
+
+  @override
+  void initState(){
+    super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    cancelToken.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
         });
   }
 
-  bool _loading = false;
+
 
   Scaffold buildLogin(BuildContext context, Widget loginButton) {
     return Scaffold(
@@ -241,40 +259,28 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget buildLoginButton(
       AsyncSnapshot<UserInfo> userSnap, BuildContext context, bool _fastLogin) {
-    return OutlineButton(
-      onPressed: () {
-        login(context, _fastLogin);
-      },
-      child: Text("登录"),
+    return LoadingStateWidget(
+      key:loadingLoginKey,
+      child: OutlineButton(
+        onPressed: () {
+          login(context, _fastLogin);
+        },
+        child: Text("登录"),
+      ),
     );
   }
 
-  GlobalKey<TickerWidgetState> tickSmsKey = GlobalKey();
 
   Widget buildSmsButton(BuildContext context, bool fastLogin) {
-    return FlatButton(
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 12),
       child: TickerWidget(
         key: tickSmsKey,
+        onPressed: (){
+          sendSms(context, fastLogin);
+        },
       ),
-      onPressed: () {
-        sendSms(context, fastLogin);
-      },
     );
-  }
-
-  void sendSms(BuildContext context, bool fastLogin) async {
-    if (!_nameReady) {
-      Fluttertoast.showToast(msg: "请填写${fastLogin ? "电话" : "用户名"}");
-      return;
-    }
-    showLoading();
-    BaseResponse<Object> baseResp = await Api.sendSms(controllerMobile.text);
-    hideLoading();
-    Fluttertoast.showToast(msg: baseResp.text);
-    if (baseResp.success()) {
-      //发送短信成功
-      tickSmsKey.currentState.startTick();
-    }
   }
 
   void hideLoading() {
@@ -287,6 +293,21 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _loading = true;
     });
+  }
+
+  void sendSms(BuildContext context, bool fastLogin) async {
+    if (!_nameReady) {
+      Fluttertoast.showToast(msg: "请填写${fastLogin ? "电话" : "用户名"}");
+      return;
+    }
+    tickSmsKey.currentState?.startLoading();
+    BaseResponse<Object> baseResp = await Api.sendSms(controllerMobile.text,cancelToken: cancelToken);
+    Fluttertoast.showToast(msg: baseResp.text);
+    tickSmsKey.currentState?.stopLoading();
+    if (baseResp.success()) {
+      //发送短信成功
+      tickSmsKey.currentState.startTick();
+    }
   }
 
   void login(BuildContext context, bool fastLogin) async {
@@ -303,12 +324,13 @@ class _LoginPageState extends State<LoginPage> {
       Fluttertoast.showToast(msg: "请输入${_fastLogin ? "验证码" : "密码"}");
       return;
     }
-    showLoading();
+    loadingLoginKey.currentState?.startLoading();
+
     BaseResponse<UserInfoWrapper> baseResp = _fastLogin
-        ? await Api.fastLogin(controllerMobile.text, controllerPassword.text)
-        : await Api.login(controllerMobile.text, controllerPassword.text);
-    hideLoading();
+        ? await Api.fastLogin(controllerMobile.text, controllerPassword.text,cancelToken: cancelToken)
+        : await Api.login(controllerMobile.text, controllerPassword.text,cancelToken: cancelToken);
     print('${baseResp.text}');
+    loadingLoginKey.currentState?.stopLoading();
     Fluttertoast.showToast(msg: baseResp.text);
     if (baseResp.success()) {
       applicationBloc.login(baseResp.data.userInfo);

@@ -88,7 +88,7 @@ class ApplicationBloc extends BlocBase {
 
   void login(UserInfo userInfo) async {
     sharedPreferences.setString(
-        PreferenceKeys.keyUserInfo, userInfo.toString());
+        PreferenceKeys.keyUserInfo, userInfo?.toString());
     _getCurrentUserAndNotify();
   }
 

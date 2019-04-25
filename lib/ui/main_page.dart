@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fzxing/fzxing.dart';
+import 'web_view_example.dart';
+import 'package:ease_life/main.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
@@ -28,7 +30,8 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil(width: 1080, height: 2160)..init(context);
+    ScreenUtil(width: 1080, height: 2160)
+      ..init(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -47,7 +50,7 @@ class _MainPageState extends State<MainPage> {
         return true;
       },
       child: Scaffold(
-        body: Builder(builder: (context){
+        body: Builder(builder: (context) {
           return buildBody(context);
         }),
         bottomNavigationBar: buildBottomNavigationBar(),
@@ -103,6 +106,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   PageController _pageController = PageController(initialPage: _currentIndex);
+  TextEditingController controller = TextEditingController(
+      text: sharedPreferences.getString("lastUrl") ?? "https://flutter.dev");
 
   Widget buildBody(BuildContext context) {
     return Container(
@@ -144,7 +149,22 @@ class _MainPageState extends State<MainPage> {
                   ),
                   OutlineButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed("/webview");
+                      showDialog(context: context, builder: (context) {
+                        return AlertDialog(
+                          title: Text("选择初始页面"),
+                          content: TextField(controller: controller,),
+                          actions: <Widget>[
+                            FlatButton(onPressed: () {
+                              sharedPreferences.setString(
+                                  "lastUrl", controller.text);
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) {
+                                    return WebViewExample(controller.text);
+                                  }));
+                            }, child: Text("启动"))
+                          ],
+                        );
+                      });
                     },
                     child: Text("WebView界面"),
                   ),
@@ -152,7 +172,7 @@ class _MainPageState extends State<MainPage> {
                     onPressed: () {
                       Fzxing.scan().then((res) {
                         Scaffold.of(context).showSnackBar(
-                          SnackBar(content: Text(res.join(",")))
+                            SnackBar(content: Text(res.join(",")))
                         );
                       }).catchError((e) {
                         Scaffold.of(context).showSnackBar(

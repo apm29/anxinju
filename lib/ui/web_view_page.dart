@@ -23,7 +23,11 @@ class _WebViewPageState extends State<WebViewPage> {
         },
         initialUrl: "http://www.baidu.com",
         javascriptMode: JavascriptMode.unrestricted,
-        javascriptChannels: Set.of([]),
+        javascriptChannels: Set.of([
+          JavascriptChannel(name: "Snackbar", onMessageReceived: (JavascriptMessage msg){
+            
+          })
+        ]),
         navigationDelegate: (NavigationRequest navigationRequest){
           //return NavigationDecision.prevent;//阻止跳转
           return NavigationDecision.navigate;//允许跳转

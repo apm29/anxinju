@@ -2,25 +2,40 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:convert/convert.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-void main() => runApp(MaterialApp(home: WebViewExample()));
+//void main() => runApp(MaterialApp(home: WebViewExample()));
 
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
-<head><title>Navigation Delegate Example</title></head>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Navigation Delegate Example</title>
+</head>
 <body>
-<p>
-The navigation delegate is set to block navigation to the youtube website.
-</p>
-<ul>
-<ul><a href="https://www.youtube.com/">https://www.youtube.com/</a></ul>
-<ul><a href="https://www.google.com/">https://www.google.com/</a></ul>
-</ul>
+<script type="text/javascript">
+    function showToast() {
+        Toaster.postMessage("1234");
+    }
+    
+    function showSimpleDialog() {
+        DialogMaker.postMessage('{"title":"标题","content":"内容"}');
+    }
+
+</script>
+
+<button  onClick = "showToast()">Toast</button>
+<button  onClick = "showSimpleDialog()">Dialog</button>
 </body>
 </html>
 ''';
 
 class WebViewExample extends StatefulWidget {
+  final String initUrl;
+
+  WebViewExample(this.initUrl);
+
   @override
   _WebViewExampleState createState() => _WebViewExampleState();
 }
@@ -33,7 +48,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter WebView example'),
+        title: const Text('WebView example'),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
           NavigationControls(_controller.future),
@@ -44,7 +59,7 @@ class _WebViewExampleState extends State<WebViewExample> {
       // to allow calling Scaffold.of(context) so we can show a snackbar.
       body: Builder(builder: (BuildContext context) {
         return WebView(
-          initialUrl: 'https://flutter.dev',
+          initialUrl: widget.initUrl??'https://flutter.dev',
           javascriptMode: JavascriptMode.unrestricted,
           onWebViewCreated: (WebViewController webViewController) {
             _controller.complete(webViewController);
@@ -53,12 +68,13 @@ class _WebViewExampleState extends State<WebViewExample> {
           // ignore: prefer_collection_literals
           javascriptChannels: <JavascriptChannel>[
             _toasterJavascriptChannel(context),
+            _dialogJavascriptChannel(context),
           ].toSet(),
           navigationDelegate: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              print('blocking navigation to $request}');
-              return NavigationDecision.prevent;
-            }
+//            if (request.url.startsWith('https://www.youtube.com/')) {
+//              print('blocking navigation to $request}');
+//              return NavigationDecision.prevent;
+//            }
             print('allowing navigation to $request');
             return NavigationDecision.navigate;
           },
@@ -81,6 +97,20 @@ class _WebViewExampleState extends State<WebViewExample> {
         });
   }
 
+  JavascriptChannel _dialogJavascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+        name: 'DialogMaker',
+        onMessageReceived: (JavascriptMessage message) {
+          Map<String,dynamic> map = json.decode(message.message,);
+          showDialog(context: context,builder: (context){
+            return AlertDialog(
+              content: Text(map['content']),
+              title: Text(map['title']),
+            );
+          });
+        });
+  }
+
   Widget favoriteButton() {
     return FutureBuilder<WebViewController>(
         future: _controller.future,
@@ -89,11 +119,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           if (controller.hasData) {
             return FloatingActionButton(
               onPressed: () async {
-//                final String url = await controller.data.currentUrl();
-//                Scaffold.of(context).showSnackBar(
-//                  SnackBar(content: Text('Favorited $url')),
-//                );
-                controller.data.evaluateJavascript("Toaster.postMessage('123')");
+                controller.data.evaluateJavascript("Toaster.postMessage('${await controller.data.currentUrl()}')");
               },
               child: const Icon(Icons.message),
             );

@@ -48,58 +48,86 @@ class _MinePageState extends State<MinePage> {
         child: ListView(
           key: PageStorageKey("mine"),
           children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: Placeholder(
-                    color: Colors.white,
+            DefaultTextStyle(
+              style: TextStyle(
+                color: Colors.white
+              ),
+              child: Stack(
+                children: <Widget>[
+                  Positioned.fill(
+                    child: Image.asset("images/ic_banner_mine.png",fit: BoxFit.fill,height: ScreenUtil().setHeight(350),),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IntrinsicWidth(
+                      child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: FlutterLogo(size: 40,),
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('${data.userName}'),
+                            Text("天马花园"),
+                            Icon(
+                              Icons.location_on,
+                              size: 12,
+                              color: Colors.white,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('天马花园15-2-1202'),
-                            ),
+
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.location_on,
-                        color: Colors.blue,
-                      ),
-                      Text("天马花园"),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Icon(
-                            Icons.autorenew,
-                            color: Colors.blue,
-                          ),
-                          Text("切换")
-                        ],
-                      )
-                    ],
+                    ),
                   ),
-                )
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            child: Icon(Icons.person_outline),
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text('${data.userName}',style: TextStyle(
+                                        fontSize: 15
+                                    ),),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 4),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 0.5
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(100))
+                                    ),
+                                    child: Text("切换用户",style: TextStyle(
+                                        fontSize: 8
+                                    )),
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('天马花园15-2-1202'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
             Row(
               children: <Widget>[
@@ -110,10 +138,7 @@ class _MinePageState extends State<MinePage> {
                     margin: EdgeInsets.only(right: 8),
                     child: Column(
                       children: <Widget>[
-                        Icon(
-                          Icons.home,
-                          color: Colors.blue,
-                        ),
+                        Image.asset("images/ic_home_mine.png"),
                         Text("我的房屋")
                       ],
                     ),
@@ -303,7 +328,7 @@ class _MinePageState extends State<MinePage> {
                 TableRow(
                   children: <Widget>[
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         BlocProviders.of<ApplicationBloc>(context).logout();
                       },
                       child: Container(
