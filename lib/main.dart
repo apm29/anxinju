@@ -16,7 +16,7 @@ import 'package:ease_life/ui/test_page.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:amap_base/amap_base.dart';
+//import 'package:amap_base/amap_base.dart';
 import 'package:camera/camera.dart';
 
 SharedPreferences sharedPreferences;
@@ -26,7 +26,7 @@ void main() async{
 //  FlutterBugly.postCatchedException(() async {
     //sp初始化
     sharedPreferences = await SharedPreferences.getInstance();
-    await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
+//    await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
     cameras = await availableCameras();
     sharedPreferences.setString(PreferenceKeys.keyAuthorization,
         "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");

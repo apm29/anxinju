@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:convert/convert.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-//void main() => runApp(MaterialApp(home: WebViewExample()));
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:ease_life/index.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
 
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
@@ -16,17 +21,32 @@ const String kNavigationExamplePage = '''
 <body>
 <script type="text/javascript">
     function showToast() {
-        Toaster.postMessage("1234");
+        Toaster.postMessage(false);
     }
     
     function showSimpleDialog() {
-        DialogMaker.postMessage('{"title":"标题","content":"内容"}');
+        DialogMaker.postMessage(JSON.stringify({"title":"标题","content":"内容"}));
     }
+    
+    function selectFile(){
+      Filer.postMessage('showToastMessage');
+    }
+    
+    function showToastMessage(message){
+      Toaster.postMessage(message);
+    }
+    
+    function invokeNative(jsonObject){
+      
+    }
+
+    
 
 </script>
 
 <button  onClick = "showToast()">Toast</button>
 <button  onClick = "showSimpleDialog()">Dialog</button>
+<button  onClick = "selectFile()">File</button>
 </body>
 </html>
 ''';
@@ -42,13 +62,26 @@ class WebViewExample extends StatefulWidget {
 
 class _WebViewExampleState extends State<WebViewExample> {
   final Completer<WebViewController> _controller =
-  Completer<WebViewController>();
+      Completer<WebViewController>();
+  WebViewController controller;
+
+  final PublishSubject<String> titleController = PublishSubject();
+
+  @override
+  void dispose() {
+    super.dispose();
+    titleController.close();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WebView example'),
+        title: StreamBuilder<Object>(
+            stream: titleController.stream,
+            builder: (context, snapshot) {
+              return Text(snapshot.data ?? "");
+            }),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
           NavigationControls(_controller.future),
@@ -59,16 +92,17 @@ class _WebViewExampleState extends State<WebViewExample> {
       // to allow calling Scaffold.of(context) so we can show a snackbar.
       body: Builder(builder: (BuildContext context) {
         return WebView(
-          initialUrl: widget.initUrl??'https://flutter.dev',
+          initialUrl: widget.initUrl ?? 'https://flutter.dev',
           javascriptMode: JavascriptMode.unrestricted,
           onWebViewCreated: (WebViewController webViewController) {
             _controller.complete(webViewController);
+            controller = webViewController;
           },
-          // TODO(iskakaushik): Remove this when collection literals makes it to stable.
           // ignore: prefer_collection_literals
           javascriptChannels: <JavascriptChannel>[
             _toasterJavascriptChannel(context),
             _dialogJavascriptChannel(context),
+            _filerJavascriptChannel(context),
           ].toSet(),
           navigationDelegate: (NavigationRequest request) {
 //            if (request.url.startsWith('https://www.youtube.com/')) {
@@ -80,11 +114,42 @@ class _WebViewExampleState extends State<WebViewExample> {
           },
           onPageFinished: (String url) {
             print('Page finished loading: $url');
+            controller
+                .evaluateJavascript(
+                    'document.getElementsByTagName("title")[0].innerText')
+                .then((title) {
+              print('$title');
+              titleController.add(title.replaceAll('"', ""));
+            });
           },
         );
       }),
       floatingActionButton: favoriteButton(),
     );
+  }
+
+  JavascriptChannel _axjJavascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+        name: 'axj',
+        onMessageReceived: (JavascriptMessage message) {
+          Map<String, dynamic> jsonMap = json.decode(message.message);
+          switch (jsonMap['funcName']) {
+            case "fileUpload":
+              //compress upload
+             Map<String,dynamic> res =  {
+               "callbackId":jsonMap["callbackId"],
+                "data":{
+                  "url":"..."
+                }
+             };
+              controller.evaluateJavascript('invokeJs(${res.toString()})');
+              break;
+            case "showDialog":
+              break;
+            default:
+              break;
+          }
+        });
   }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
@@ -97,17 +162,52 @@ class _WebViewExampleState extends State<WebViewExample> {
         });
   }
 
+  JavascriptChannel _filerJavascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+        name: 'Filer',
+        onMessageReceived: (JavascriptMessage message) {
+          compressAndUpload(message);
+        });
+  }
+
+  void compressAndUpload(JavascriptMessage message) async {
+    var directory = await getTemporaryDirectory();
+    ImagePicker.pickImage(source: ImageSource.gallery).then((file) {
+      return FlutterImageCompress.compressWithFile(file.path,
+          minWidth: 1080, minHeight: 768, quality: 60);
+    }).then((listInt) {
+      var file = File(directory.path + "/compressed.jpg");
+      print('${file.absolute.path}');
+      file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
+      return file;
+    }).then((compressed) {
+      print('${message.message}');
+      DioUtil().uploadFile("upfile", compressed.absolute.path).then((resp) {
+        var data = resp.data;
+        Map<String, dynamic> jsonMap = json.decode(data);
+        print('$data');
+        controller.evaluateJavascript(
+            '${message.message}("${jsonMap["data"]["url"]}")');
+        controller.loadUrl(jsonMap["data"]["url"]);
+      });
+    });
+  }
+
   JavascriptChannel _dialogJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
         name: 'DialogMaker',
         onMessageReceived: (JavascriptMessage message) {
-          Map<String,dynamic> map = json.decode(message.message,);
-          showDialog(context: context,builder: (context){
-            return AlertDialog(
-              content: Text(map['content']),
-              title: Text(map['title']),
-            );
-          });
+          Map<String, dynamic> map = json.decode(
+            message.message,
+          );
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Text(map['content']),
+                  title: Text(map['title']),
+                );
+              });
         });
   }
 
@@ -119,7 +219,8 @@ class _WebViewExampleState extends State<WebViewExample> {
           if (controller.hasData) {
             return FloatingActionButton(
               onPressed: () async {
-                controller.data.evaluateJavascript("Toaster.postMessage('${await controller.data.currentUrl()}')");
+                controller.data.evaluateJavascript(
+                    "Toaster.postMessage('${await controller.data.currentUrl()}')");
               },
               child: const Icon(Icons.message),
             );
@@ -178,36 +279,36 @@ class SampleMenu extends StatelessWidget {
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuItem<MenuOptions>>[
-            PopupMenuItem<MenuOptions>(
-              value: MenuOptions.showUserAgent,
-              child: const Text('Show user agent'),
-              enabled: controller.hasData,
-            ),
-            const PopupMenuItem<MenuOptions>(
-              value: MenuOptions.listCookies,
-              child: Text('List cookies'),
-            ),
-            const PopupMenuItem<MenuOptions>(
-              value: MenuOptions.clearCookies,
-              child: Text('Clear cookies'),
-            ),
-            const PopupMenuItem<MenuOptions>(
-              value: MenuOptions.addToCache,
-              child: Text('Add to cache'),
-            ),
-            const PopupMenuItem<MenuOptions>(
-              value: MenuOptions.listCache,
-              child: Text('List cache'),
-            ),
-            const PopupMenuItem<MenuOptions>(
-              value: MenuOptions.clearCache,
-              child: Text('Clear cache'),
-            ),
-            const PopupMenuItem<MenuOptions>(
-              value: MenuOptions.navigationDelegate,
-              child: Text('Navigation Delegate example'),
-            ),
-          ],
+                PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.showUserAgent,
+                  child: const Text('Show user agent'),
+                  enabled: controller.hasData,
+                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.listCookies,
+                  child: Text('List cookies'),
+                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.clearCookies,
+                  child: Text('Clear cookies'),
+                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.addToCache,
+                  child: Text('Add to cache'),
+                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.listCache,
+                  child: Text('List cache'),
+                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.clearCache,
+                  child: Text('Clear cache'),
+                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.navigationDelegate,
+                  child: Text('Example'),
+                ),
+              ],
         );
       },
     );
@@ -224,7 +325,7 @@ class SampleMenu extends StatelessWidget {
   void _onListCookies(
       WebViewController controller, BuildContext context) async {
     final String cookies =
-    await controller.evaluateJavascript('document.cookie');
+        await controller.evaluateJavascript('document.cookie');
     Scaffold.of(context).showSnackBar(SnackBar(
       content: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -272,8 +373,12 @@ class SampleMenu extends StatelessWidget {
   void _onNavigationDelegateExample(
       WebViewController controller, BuildContext context) async {
     final String contentBase64 =
-    base64Encode(const Utf8Encoder().convert(kNavigationExamplePage));
+        base64Encode(const Utf8Encoder().convert(kNavigationExamplePage));
     controller.loadUrl('data:text/html;base64,$contentBase64');
+//    var loadString = await rootBundle.loadString("images/example.html");
+//    controller.loadUrl(Uri.dataFromString(loadString,
+//            mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
+//        .toString());
   }
 
   Widget _getCookieList(String cookies) {
@@ -282,7 +387,7 @@ class SampleMenu extends StatelessWidget {
     }
     final List<String> cookieList = cookies.split(';');
     final Iterable<Text> cookieWidgets =
-    cookieList.map((String cookie) => Text(cookie));
+        cookieList.map((String cookie) => Text(cookie));
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
@@ -313,39 +418,39 @@ class NavigationControls extends StatelessWidget {
               onPressed: !webViewReady
                   ? null
                   : () async {
-                if (await controller.canGoBack()) {
-                  controller.goBack();
-                } else {
-                  Scaffold.of(context).showSnackBar(
-                    const SnackBar(content: Text("No back history item")),
-                  );
-                  return;
-                }
-              },
+                      if (await controller.canGoBack()) {
+                        controller.goBack();
+                      } else {
+                        Scaffold.of(context).showSnackBar(
+                          const SnackBar(content: Text("No back history item")),
+                        );
+                        return;
+                      }
+                    },
             ),
             IconButton(
               icon: const Icon(Icons.arrow_forward_ios),
               onPressed: !webViewReady
                   ? null
                   : () async {
-                if (await controller.canGoForward()) {
-                  controller.goForward();
-                } else {
-                  Scaffold.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("No forward history item")),
-                  );
-                  return;
-                }
-              },
+                      if (await controller.canGoForward()) {
+                        controller.goForward();
+                      } else {
+                        Scaffold.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("No forward history item")),
+                        );
+                        return;
+                      }
+                    },
             ),
             IconButton(
               icon: const Icon(Icons.replay),
               onPressed: !webViewReady
                   ? null
                   : () {
-                controller.reload();
-              },
+                      controller.reload();
+                    },
             ),
           ],
         );

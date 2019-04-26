@@ -4,7 +4,7 @@ import '../ui/mine_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:fzxing/fzxing.dart';
+//import 'package:fzxing/fzxing.dart';
 import 'web_view_example.dart';
 import 'package:ease_life/main.dart';
 
@@ -107,7 +107,7 @@ class _MainPageState extends State<MainPage> {
 
   PageController _pageController = PageController(initialPage: _currentIndex);
   TextEditingController controller = TextEditingController(
-      text: sharedPreferences.getString("lastUrl") ?? "https://flutter.dev");
+      text: sharedPreferences.getString("lastUrl") ?? "http://axj.ciih.net/#/");
 
   Widget buildBody(BuildContext context) {
     return Container(
@@ -149,39 +149,44 @@ class _MainPageState extends State<MainPage> {
                   ),
                   OutlineButton(
                     onPressed: () {
-                      showDialog(context: context, builder: (context) {
-                        return AlertDialog(
-                          title: Text("选择初始页面"),
-                          content: TextField(controller: controller,),
-                          actions: <Widget>[
-                            FlatButton(onPressed: () {
-                              sharedPreferences.setString(
-                                  "lastUrl", controller.text);
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(builder: (context) {
-                                    return WebViewExample(controller.text);
-                                  }));
-                            }, child: Text("启动"))
-                          ],
-                        );
-                      });
+//                      showDialog(context: context, builder: (context) {
+//                        return AlertDialog(
+//                          title: Text("选择初始页面"),
+//                          content: TextField(controller: controller,),
+//                          actions: <Widget>[
+//                            FlatButton(onPressed: () {
+//                              sharedPreferences.setString(
+//                                  "lastUrl", controller.text);
+//                              Navigator.of(context).pushReplacement(
+//                                  MaterialPageRoute(builder: (context) {
+//                                    return WebViewExample(controller.text);
+//                                  }));
+//                            }, child: Text("启动"))
+//                          ],
+//                        );
+//                      });
+
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) {
+                            return WebViewExample(controller.text);
+                          }));
                     },
                     child: Text("WebView界面"),
                   ),
-                  OutlineButton(
-                    onPressed: () {
-                      Fzxing.scan().then((res) {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(content: Text(res.join(",")))
-                        );
-                      }).catchError((e) {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(content: Text(e))
-                        );
-                      });
-                    },
-                    child: Text("QRCode"),
-                  ),
+//                  OutlineButton(
+//                    onPressed: () {
+//                      Fzxing.scan().then((res) {
+//                        Scaffold.of(context).showSnackBar(
+//                            SnackBar(content: Text(res.join(",")))
+//                        );
+//                      }).catchError((e) {
+//                        Scaffold.of(context).showSnackBar(
+//                            SnackBar(content: Text(e))
+//                        );
+//                      });
+//                    },
+//                    child: Text("QRCode"),
+//                  ),
                 ],
               ),
             ),

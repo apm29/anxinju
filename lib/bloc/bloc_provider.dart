@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 //import 'package:amap_base_location/amap_base_location.dart';
-import 'package:amap_base/amap_base.dart';
+//import 'package:amap_base/amap_base.dart';
 import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
@@ -69,12 +69,12 @@ class ApplicationBloc extends BlocBase {
   @override
   void dispose() {
     _userInfoController.close();
-    _locationController.close();
+//    _locationController.close();
   }
 
   ApplicationBloc() {
     _getCurrentUserAndNotify();
-    getCurrentLocationAndNotify();
+//    getCurrentLocationAndNotify();
   }
 
   void _getCurrentUserAndNotify() async {
@@ -102,27 +102,27 @@ class ApplicationBloc extends BlocBase {
     _userInfoController.add(null);
   }
 
-  BehaviorSubject<Location> _locationController = BehaviorSubject();
-
-  Observable<Location> get locationStream => _locationController.stream;
-
-  void getCurrentLocationAndNotify() async {
-    var map = await PermissionHandler()
-        .requestPermissions([PermissionGroup.location]);
-    if (map[PermissionGroup.location] == PermissionStatus.granted) {
-      AMapLocation()
-          .getLocation(LocationClientOptions(
-        isOnceLocation: true,
-        locationMode: LocationMode.Hight_Accuracy,
-      ))
-          .then((Location location) {
-        print('location => ${location.address}');
-        _locationController.add(location);
-      }).catchError((e) {
-        print(e);
-      });
-    }
-  }
+//  BehaviorSubject<Location> _locationController = BehaviorSubject();
+//
+//  Observable<Location> get locationStream => _locationController.stream;
+//
+//  void getCurrentLocationAndNotify() async {
+//    var map = await PermissionHandler()
+//        .requestPermissions([PermissionGroup.location]);
+//    if (map[PermissionGroup.location] == PermissionStatus.granted) {
+//      AMapLocation()
+//          .getLocation(LocationClientOptions(
+//        isOnceLocation: true,
+//        locationMode: LocationMode.Hight_Accuracy,
+//      ))
+//          .then((Location location) {
+//        print('location => ${location.address}');
+//        _locationController.add(location);
+//      }).catchError((e) {
+//        print(e);
+//      });
+//    }
+//  }
 }
 
 class LoginBloc extends BlocBase {

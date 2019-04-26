@@ -36,7 +36,7 @@ class DioUtil {
     return _dioApplication;
   }
 
-  Future<DioUtil> init() async {
+  init()  {
     print('---------------dioInstance init------------------');
     _dioInstance = Dio(BaseOptions(
       method: "POST",
@@ -95,7 +95,6 @@ class DioUtil {
       print("Trace:${err.stackTrace}");
       print("===========================================");
     }));
-    return this;
   }
 
   ///
@@ -149,5 +148,18 @@ class DioUtil {
       return BaseResponse<T>("0", null,
           "请求失败:${error is DioError ? error.message : error.toString()}", null);
     });
+  }
+
+  Future<Response<String>> uploadFile(String key, String path) {
+    var dio = Dio(BaseOptions(
+      method: "POST",
+      baseUrl: "http://zhdj.ciih.net/index.php",
+    ));
+
+    var data = FormData.from({
+      "upfile":
+          UploadFileInfo(File(path), path.substring(path.lastIndexOf("/")))
+    });
+    return dio.post<String>("/UploadFile/UploadFile/upFileAjax", data: data);
   }
 }
