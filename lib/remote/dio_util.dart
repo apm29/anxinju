@@ -16,7 +16,7 @@ class DioUtil {
   Dio _dioInstance;
   bool inDebug = false;
 
-  bool proxyHttp = true;
+  bool proxyHttp = false;
 
   DioUtil._() {
     init();
@@ -42,9 +42,7 @@ class DioUtil {
       method: "POST",
       connectTimeout: 5000,
       receiveTimeout: 15000,
-      baseUrl: inDebug
-          ? "http://api.junleizg.com.cn"
-          : "http://192.168.0.140:8080/permission/",
+      baseUrl: "http://axj.ciih.net/permission/",
     ));
     //设置代理
     if (proxyHttp)
@@ -138,6 +136,7 @@ class DioUtil {
         _text = response.data["text"];
         _data =
             response.data['data'] is String ? {} : response.data['data'] ?? {};
+        _token = response.data['token'];
         print('data:$data');
         return BaseResponse<T>(_status, _token, _text,
             jsonProcessor == null ? null : jsonProcessor(_data));

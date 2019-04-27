@@ -168,7 +168,7 @@ class _MainPageState extends State<MainPage> {
 
                       Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) {
-                            return WebViewExample(controller.text);
+                            return WebViewExample("http://axj.ciih.net/#/");
                           }));
                     },
                     child: Text("WebView界面"),

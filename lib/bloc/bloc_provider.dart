@@ -86,17 +86,22 @@ class ApplicationBloc extends BlocBase {
     }
   }
 
-  void login(UserInfo userInfo) async {
+  void login(UserInfo userInfo)  {
     sharedPreferences.setString(
         PreferenceKeys.keyUserInfo, userInfo?.toString());
     _getCurrentUserAndNotify();
+  }
+
+  void saveToken(String token)  {
+    sharedPreferences.setString(
+        PreferenceKeys.keyAuthorization, token?.toString());
   }
 
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
 
   Stream<UserInfo> get currentUser => _userInfoController.stream;
 
-  void logout() async {
+  void logout() {
     sharedPreferences.setString(PreferenceKeys.keyUserInfo, null);
     sharedPreferences.setString(PreferenceKeys.keyAuthorization, null);
     _userInfoController.add(null);

@@ -41,21 +41,25 @@ class _MinePageState extends State<MinePage> {
     return DefaultTextStyle(
       style: TextStyle(color: Colors.grey[800]),
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(15)),
-        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(15)),
+        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(24)),
         color: Colors.grey[200],
         alignment: Alignment.center,
         child: ListView(
           key: PageStorageKey("mine"),
           children: <Widget>[
+            SizedBox(
+              height: 12,
+            ),
             DefaultTextStyle(
-              style: TextStyle(
-                color: Colors.white
-              ),
+              style: TextStyle(color: Colors.white),
               child: Stack(
                 children: <Widget>[
                   Positioned.fill(
-                    child: Image.asset("images/ic_banner_mine.png",fit: BoxFit.fill,height: ScreenUtil().setHeight(350),),
+                    child: Image.asset(
+                      "images/ic_banner_mine.png",
+                      fit: BoxFit.fill,
+                      height: ScreenUtil().setHeight(350),
+                    ),
                   ),
                   Align(
                     alignment: Alignment.topRight,
@@ -70,7 +74,6 @@ class _MinePageState extends State<MinePage> {
                               size: 12,
                               color: Colors.white,
                             ),
-
                           ],
                         ),
                       ),
@@ -85,7 +88,7 @@ class _MinePageState extends State<MinePage> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CircleAvatar(
-                            child: Icon(Icons.person_outline),
+                            child: FlutterLogo(),
                           ),
                         ),
                         Expanded(
@@ -97,22 +100,21 @@ class _MinePageState extends State<MinePage> {
                                 children: <Widget>[
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text('${data.userName}',style: TextStyle(
-                                        fontSize: 15
-                                    ),),
+                                    child: Text(
+                                      '${data.userName}',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
                                   ),
                                   Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 4),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4),
                                     decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 0.5
-                                      ),
-                                      borderRadius: BorderRadius.all(Radius.circular(100))
-                                    ),
-                                    child: Text("切换用户",style: TextStyle(
-                                        fontSize: 8
-                                    )),
+                                        border: Border.all(
+                                            color: Colors.white, width: 0.5),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(100))),
+                                    child: Text("切换用户",
+                                        style: TextStyle(fontSize: 8)),
                                   )
                                 ],
                               ),
@@ -129,227 +131,173 @@ class _MinePageState extends State<MinePage> {
                 ],
               ),
             ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    margin: EdgeInsets.only(right: 8),
-                    child: Column(
-                      children: <Widget>[
-                        Image.asset("images/ic_home_mine.png"),
-                        Text("我的房屋")
-                      ],
-                    ),
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.only(top: 12, bottom: 16),
+              margin: EdgeInsets.only(bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Image.asset(
+                        "images/ic_home_mine.png",
+                        width: ScreenUtil().setWidth(96),
+                      ),
+                      Text("我的房屋")
+                    ],
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    margin: EdgeInsets.all(8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.people,
-                          color: Colors.blue,
-                        ),
-                        Text("住所成员")
-                      ],
-                    ),
+                  Column(
+                    children: <Widget>[
+                      Image.asset(
+                        "images/ic_member_mine.png",
+                        width: ScreenUtil().setWidth(96),
+                      ),
+                      Text("住所成员")
+                    ],
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    margin: EdgeInsets.only(left: 8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.directions_car,
-                          color: Colors.blue,
-                        ),
-                        Text("我的爱车")
-                      ],
-                    ),
+                  Column(
+                    children: <Widget>[
+                      Image.asset(
+                        "images/ic_car_mine.png",
+                        width: ScreenUtil().setWidth(96),
+                      ),
+                      Text("我的爱车")
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Container(
               color: Colors.white,
               padding: EdgeInsets.only(left: 15),
               child: HomeTitleSliver(
-                leadingIcon: Icon(
-                  Icons.fiber_pin,
-                  color: Colors.blue,
-                ),
+                leadingIcon: Image.asset('images/ic_qrcode_mini.png',
+                    width: ScreenUtil().setWidth(50)),
                 mainTitle: "家庭通行码",
                 subTitle: "",
                 tailText: "",
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "社区记录",
-                style: TextStyle(color: Colors.black, fontSize: 16),
+            SizedBox(
+              height: 12,
+            ),
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.only(left: 15),
+              child: HomeTitleSliver(
+                leadingIcon: Image.asset('images/ic_face_id.png',
+                    width: ScreenUtil().setWidth(50)),
+                mainTitle: "出入管理",
+                subTitle: "",
+                tailText: "",
               ),
             ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.perm_contact_calendar,
-                          color: Colors.blue,
-                        ),
-                        Text("访客记录")
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.assignment_late,
-                          color: Colors.blue,
-                        ),
-                        Text("投诉维修")
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.playlist_add,
-                          color: Colors.blue,
-                        ),
-                        Text("缴费记录")
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            HomeTitleSliver(
+              leadingIcon: Container(
+                height: ScreenUtil().setHeight(70),
+                width: ScreenUtil().setWidth(10),
+                color: Color(0xff00007c),
+              ),
+              mainTitle: "社区记录",
+              subTitle: "Society Records",
+              tailText: "更多",
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "商业服务",
-                style: TextStyle(color: Colors.black, fontSize: 16),
+            Material(
+              type: MaterialType.card,
+              elevation: 1,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  vertical: ScreenUtil().setHeight(42),
+                  horizontal: ScreenUtil().setWidth(42),
+                ),
+                color: Colors.white,
+                child: Wrap(
+                  alignment: WrapAlignment.start,
+                  children: <Widget>[
+                    HomeChip(color: const Color(0xff00007c), title: "访客记录"),
+                    HomeChip(title: "投诉记录"),
+                    HomeChip(title: "缴费记录"),
+                    HomeChip(title: "调解档案"),
+                    HomeChip(title: "网上110记录"),
+                    HomeChip(title: "巡逻记录"),
+                    HomeChip(title: "小区保修记录"),
+                  ],
+                ),
               ),
             ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.view_list,
-                          color: Colors.blue,
-                        ),
-                        Text("我的订单")
-                      ],
-                    ),
-                  ),
+
+            HomeTitleSliver(
+              leadingIcon: Container(
+                height: ScreenUtil().setHeight(70),
+                width: ScreenUtil().setWidth(10),
+                color: Color(0xffff6b00),
+              ),
+              mainTitle: "商业服务",
+              subTitle: "Business Service",
+              tailText: "更多",
+            ),
+            Material(
+              type: MaterialType.card,
+              elevation: 1,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  vertical: ScreenUtil().setHeight(42),
+                  horizontal: ScreenUtil().setWidth(42),
                 ),
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.shopping_cart,
-                          color: Colors.blue,
-                        ),
-                        Text("购物车")
-                      ],
-                    ),
-                  ),
+                color: Colors.white,
+                child: Wrap(
+                  children: <Widget>[
+                    HomeChip(color: const Color(0xffff6b00), title: "我的订单"),
+                    HomeChip(title: "购物车"),
+                    HomeChip(title: "我的收藏"),
+                  ],
                 ),
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.favorite,
-                          color: Colors.blue,
-                        ),
-                        Text("我的收藏")
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
             SizedBox(
               height: 10,
             ),
-            Table(
-              border: TableBorder.all(color: Colors.grey[400]),
-              children: <TableRow>[
-                TableRow(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(18),
-                      color: Colors.white,
-                      child: Text("我的设置"),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(18),
-                      color: Colors.white,
-                      child: Text("关于我们"),
-                    )
-                  ],
-                ),
-                TableRow(
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        BlocProviders.of<ApplicationBloc>(context).logout();
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(18),
-                        color: Colors.white,
-                        child: Text("退出登录"),
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.all(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Icon(
+                        Icons.person_outline,
+                        color: Colors.blue,
                       ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      color: Colors.white,
-                      padding: EdgeInsets.all(18),
-                      child: Text(
-                        '空',
-                        style: TextStyle(color: Colors.white),
+                      Text("我的设置")
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Icon(
+                        Icons.help_outline,
+                        color: Colors.green,
                       ),
+                      Text("关于我们")
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      BlocProviders.of<ApplicationBloc>(context).logout();
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Icon(
+                          Icons.exit_to_app,
+                          color: Colors.red,
+                        ),
+                        Text("退出登录")
+                      ],
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               height: 50,

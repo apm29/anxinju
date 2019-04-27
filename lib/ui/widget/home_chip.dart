@@ -16,33 +16,38 @@ class HomeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.all(ScreenUtil().setWidth(4)),
-        width: ScreenUtil().setWidth(211),
-        height: ScreenUtil().setHeight(83),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius:
-              BorderRadius.all(Radius.circular(ScreenUtil().setWidth(15))),
-          border: Border.all(
-            color: Colors.grey,
-            width: 0.5
-          )
+        margin: EdgeInsets.all(ScreenUtil().setWidth(8)),
+        constraints: BoxConstraints.tightForFinite(
+          width: ScreenUtil().setWidth(211),
+          height: ScreenUtil().setHeight(83),
         ),
+        decoration: BoxDecoration(
+            color: color,
+            borderRadius:
+                BorderRadius.all(Radius.circular(ScreenUtil().setWidth(15))),
+            border: Border.all(color: Colors.grey, width: 0.5)),
         child: IntrinsicWidth(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Image.asset(
-                "images/ic_shadowed_hole.png",
-                height: ScreenUtil().setWidth(26),
-                width: ScreenUtil().setWidth(26),
-                fit: BoxFit.fill,
+              Container(
+                margin: EdgeInsets.only(left: ScreenUtil().setWidth(26)),
+                child: Image.asset(
+                  "images/ic_shadowed_hole.png",
+                  height: ScreenUtil().setWidth(26),
+                  width: ScreenUtil().setWidth(26),
+                  fit: BoxFit.fill,
+                ),
               ),
-              Text(
-                title,
-                style: TextStyle(
-                    color: color != Colors.white ? Colors.white : Colors.black,
-                    fontSize: ScreenUtil().setSp(26)),
+              Expanded(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: color != Colors.white ? Colors.white : Colors.black,
+                      fontSize: ScreenUtil().setSp(30)),
+                      maxLines: 3,
+                ),
               ),
             ],
           ),

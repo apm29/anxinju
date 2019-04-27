@@ -8,6 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'widget/lifecycle_widget.dart';
 class LoginPage extends StatefulWidget {
+
+  final String backRoute;
+
+
+  LoginPage({this.backRoute});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -178,6 +184,11 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
   Widget buildLoginSuccess(bool isCertificated) {
     var colorFaceButton = Colors.blue;
     var colorHomeButton = Colors.blueGrey;
+    if(widget.backRoute!=null){
+      Future.delayed(Duration(seconds: 1)).then((v){
+        Navigator.of(context).pop(widget.backRoute);
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -332,7 +343,9 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     print('${baseResp.text}');
     loadingLoginKey.currentState?.stopLoading();
     Fluttertoast.showToast(msg: baseResp.text);
+    print('$baseResp');
     if (baseResp.success()) {
+      applicationBloc.saveToken(baseResp.token);
       applicationBloc.login(baseResp.data.userInfo);
     } else {
       applicationBloc.login(null);

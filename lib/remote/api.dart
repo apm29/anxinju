@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:ease_life/model/base_response.dart';
+import 'package:flutter/src/widgets/editable_text.dart';
 import 'dio_util.dart';
 
 class Api {
@@ -41,5 +42,20 @@ class Api {
         jsonProcessor: (Map<String, dynamic> json) => null,
         data: {"mobile": mobile},
         cancelToken: cancelToken);
+  }
+
+  static register(
+      String mobile, String smsCode, String password, String userName) async {
+    await Future.delayed(Duration(seconds: 2));
+    return DioUtil().postAsync<Object>(
+      path: "/user/register",
+      jsonProcessor: (Map<String, dynamic> json) => null,
+      data: {
+        "userName":userName,
+        "mobile": mobile,
+        "password": password,
+        "code": smsCode,
+      },
+    );
   }
 }

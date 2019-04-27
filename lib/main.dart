@@ -28,10 +28,10 @@ void main() async{
     sharedPreferences = await SharedPreferences.getInstance();
 //    await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
     cameras = await availableCameras();
-    sharedPreferences.setString(PreferenceKeys.keyAuthorization,
-        "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
-    sharedPreferences.setString(PreferenceKeys.keyUserInfo,
-        '{"userId": "723672", "userName": "应佳伟", "mobile": "17376508275", "isCertification": 0}');
+//    sharedPreferences.setString(PreferenceKeys.keyAuthorization,
+//        "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
+//    sharedPreferences.setString(PreferenceKeys.keyUserInfo,
+//        '{"userId": "723672", "userName": "应佳伟", "mobile": "17376508275", "isCertification": 0}');
     runApp(MyApp());
 //  });
 //  FlutterBugly.init(androidAppId: "89b908154e", iOSAppId: "0d1433b494");

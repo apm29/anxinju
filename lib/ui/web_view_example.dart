@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:convert/convert.dart';
@@ -12,6 +13,8 @@ import 'package:ease_life/index.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'login_page.dart';
+
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
 <head>
@@ -21,7 +24,7 @@ const String kNavigationExamplePage = '''
 <body>
 <script type="text/javascript">
     function showToast() {
-        Toaster.postMessage(false);
+        Toaster.postMessage(123);
     }
     
     function showSimpleDialog() {
@@ -36,17 +39,114 @@ const String kNavigationExamplePage = '''
       Toaster.postMessage(message);
     }
     
-    function invokeNative(jsonObject){
+    function funcThreeParams(message1,message2,message3){
+      Toaster.postMessage(message1+message2+message3);
+    }
+    
+    function funcTwoParams(message1,message2){
+      Toaster.postMessage(message1+message2);
+    }
+    
+    function funcOneParams(message1){
+      Toaster.postMessage(typeof message1);
+      document.getElementsByTagName("button")[4].innerText = message1.field1
+    }
+    
+    function getNativeToken(){
       
+      var json = {
+        "funcName":"getToken",
+        "data":{
+           "callbackName": "funcThreeParams",
+            "backRoute":"/home" 
+        }
+      };
+      
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+    function showNativeDialog(){
+      
+      var json = {
+        "funcName":"showDialog",
+        "data":{
+            "content":"内容",
+            "title":"标题",
+            "callbackName": "funcOneParams",//一个String参数的callback, 回调返回参数
+            "callbackParam":{
+              "field1":"123",
+              "field2":"123"
+              //....
+            } //返回参数,任意指定
+        }
+      };
+      
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+    function showNativeToast(){
+      
+      var json = {
+        "funcName":"showToast",
+        "data":{
+            "content":"内容",
+        }
+      };
+      
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+    function showNativeSnackbar(){
+      
+      var json = {
+        "funcName":"showSnackbar",
+        "data":{
+            "content":"内容",
+        }
+      };
+      
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+    function callNativeUploadImage(){
+      var json = {
+        "funcName":"uploadImage",
+        "data":{
+            "callbackName": "funcTwoParams",//2个String参数的callback, 回调 url 和 原图片本地路径
+        }
+      };
+      
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
     }
 
-    
-
 </script>
+<h>------------------</h></br>
+<button  onClick = "showToast()">Snackbar</button>
 
-<button  onClick = "showToast()">Toast</button>
 <button  onClick = "showSimpleDialog()">Dialog</button>
+
 <button  onClick = "selectFile()">File</button>
+
+<button  onClick = "getNativeToken()">Token</button>
+
+<button  onClick = "showNativeDialog()">Dialog</button>
+
+<button  onClick = "showNativeToast()">Toast</button>
+
+<button  onClick = "showNativeSnackbar()">Snackbar</button>
+
+<button  onClick = "callNativeUploadImage()">ImageUpload</button>
+
 </body>
 </html>
 ''';
@@ -88,8 +188,6 @@ class _WebViewExampleState extends State<WebViewExample> {
           SampleMenu(_controller.future),
         ],
       ),
-      // We're using a Builder here so we have a context that is below the Scaffold
-      // to allow calling Scaffold.of(context) so we can show a snackbar.
       body: Builder(builder: (BuildContext context) {
         return WebView(
           initialUrl: widget.initUrl ?? 'https://flutter.dev',
@@ -103,13 +201,13 @@ class _WebViewExampleState extends State<WebViewExample> {
             _toasterJavascriptChannel(context),
             _dialogJavascriptChannel(context),
             _filerJavascriptChannel(context),
+            _userJavascriptChannel(context)
           ].toSet(),
           navigationDelegate: (NavigationRequest request) {
-//            if (request.url.startsWith('https://www.youtube.com/')) {
-//              print('blocking navigation to $request}');
+            print('allowing navigation to $request');
+//            if(!request.url.startsWith("http")){
 //              return NavigationDecision.prevent;
 //            }
-            print('allowing navigation to $request');
             return NavigationDecision.navigate;
           },
           onPageFinished: (String url) {
@@ -128,37 +226,75 @@ class _WebViewExampleState extends State<WebViewExample> {
     );
   }
 
-  JavascriptChannel _axjJavascriptChannel(BuildContext context) {
-    return JavascriptChannel(
-        name: 'axj',
-        onMessageReceived: (JavascriptMessage message) {
-          Map<String, dynamic> jsonMap = json.decode(message.message);
-          switch (jsonMap['funcName']) {
-            case "fileUpload":
-              //compress upload
-             Map<String,dynamic> res =  {
-               "callbackId":jsonMap["callbackId"],
-                "data":{
-                  "url":"..."
-                }
-             };
-              controller.evaluateJavascript('invokeJs(${res.toString()})');
-              break;
-            case "showDialog":
-              break;
-            default:
-              break;
-          }
-        });
-  }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
         name: 'Toaster',
         onMessageReceived: (JavascriptMessage message) {
           Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text(message.message)),
+            SnackBar(
+                content: Text(
+              message.message,
+              maxLines: 100,
+            )),
           );
+        });
+  }
+
+  /*
+      {
+        "funcName":"getToken",
+        "data":{
+           "callbackName": "funcThreeParams",//3个String参数的callback, token,当前小区 , 登录返回路由
+            "backRoute":"http://www.baidu.com" //登录返回路由
+        }
+      }
+
+       {
+        "funcName":"showDialog",
+        "data":{
+            "content":"内容",
+            "title":"标题",
+            "callbackName": "funcOneParams",//一个String参数的callback, 回调返回参数
+            "callBackParam":"xxx" //返回参数
+        }
+       }
+
+       {
+        "funcName":"uploadImage",
+        "data":{
+            "callbackName": "funcTwoParams",//2个String参数的callback, 回调缩略图url,原图local path
+        }
+       }
+   */
+  JavascriptChannel _userJavascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+        name: 'UserState',
+        onMessageReceived: (JavascriptMessage message) {
+          Map<String, dynamic> jsonMap = json.decode(message.message);
+          switch (jsonMap['funcName']) {
+            case "getToken":
+              doGetToken(jsonMap["data"]);
+              break;
+            case "showDialog":
+              doShowSimpleDialog(jsonMap["data"]);
+              break;
+            case "showToast":
+              Fluttertoast.showToast(msg: jsonMap["data"]["content"]);
+              break;
+            case "showSnackbar":
+              Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text(
+                jsonMap["data"]["content"],
+                maxLines: 100,
+              )));
+              break;
+            case "uploadImage":
+              doUploadImage(jsonMap['data']);
+              break;
+            default:
+              break;
+          }
         });
   }
 
@@ -227,6 +363,90 @@ class _WebViewExampleState extends State<WebViewExample> {
           }
           return Container();
         });
+  }
+
+  void doGetToken(dynamic data) {
+    if (isLogin()) {
+      var javascriptString =
+          '${data["callbackName"]}("${getToken()}","${getCurrentSocietyId()}","${data["backRoute"]}")';
+      print('$javascriptString');
+      controller.evaluateJavascript(javascriptString);
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return LoginPage(
+          backRoute: data["backRoute"],
+        );
+      })).then((backRoute) {
+        var javascriptString =
+            '${data["callbackName"]}("${getToken()}","${getCurrentSocietyId()}","${data["backRoute"]}")';
+
+        controller.evaluateJavascript(javascriptString);
+      });
+    }
+  }
+
+  void doShowSimpleDialog(dynamic data) {
+    String content = data['content'];
+    String title = data['title'];
+    String callbackName = data['callbackName'];
+    dynamic callbackParam = data['callbackParam'];
+    print('${callbackParam.runtimeType}');
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: <Widget>[
+              OutlineButton(
+                onPressed: () {
+                  Navigator.of(context).pop(callbackParam);
+                },
+                child: Text("确定"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(null);
+                },
+                child: Text("取消"),
+              )
+            ],
+          );
+        }).then((param) {
+      controller.evaluateJavascript('$callbackName($param)');
+    });
+  }
+
+  /*
+   * {
+      "callbackName": "funcOneParams",//一个String参数的callback, 回调返回参数
+      }
+   */
+  void doUploadImage(Map<String, dynamic> jsData) async {
+    var directory = await getTemporaryDirectory();
+    var localCompressedPath = directory.path + "/compressed.jpg";
+    String localPath;
+    ImagePicker.pickImage(source: ImageSource.gallery).then((file) {
+      localPath = file.absolute.path;
+      return FlutterImageCompress.compressWithFile(file.path,
+          minWidth: 1080, minHeight: 768, quality: 60);
+    }).then((listInt) {
+      var file = File(localCompressedPath);
+      print('${file.absolute.path}');
+      file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
+      return file;
+    }).then((compressed) {
+      DioUtil().uploadFile("upfile", compressed.absolute.path).then((resp) {
+        if (resp.statusCode == 200) {
+          var data = resp.data;
+          Map<String, dynamic> jsonMap = json.decode(data);
+          var javascriptString =
+              '${jsData['callbackName']}("${jsonMap['data']['url']}","$localPath")';
+          print('$javascriptString');
+          controller.evaluateJavascript(javascriptString);
+        }
+      });
+    });
   }
 }
 
