@@ -1,3 +1,6 @@
+import 'package:ease_life/interaction/simple_bridge.dart';
+import 'package:ease_life/remote/api.dart';
+
 import '../ui/home_page.dart';
 import '../ui/message_page.dart';
 import '../ui/mine_page.dart';
@@ -95,8 +98,7 @@ class _MainPageState extends State<MainPage> {
       onTap: (index) {
         setState(() {
           _currentIndex = index;
-          _pageController.animateToPage(index,
-              duration: Duration(milliseconds: 200), curve: Curves.ease);
+          _pageController.jumpToPage(index);
         });
       },
       currentIndex: _currentIndex,
@@ -131,7 +133,8 @@ class _MainPageState extends State<MainPage> {
                 children: <Widget>[
                   OutlineButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed("/test");
+                      Navigator.of(context).pushNamed("/preVerify");
+//                      showAndroidKeyboard();
                     },
                     child: Text("测试界面"),
                   ),
@@ -149,23 +152,6 @@ class _MainPageState extends State<MainPage> {
                   ),
                   OutlineButton(
                     onPressed: () {
-//                      showDialog(context: context, builder: (context) {
-//                        return AlertDialog(
-//                          title: Text("选择初始页面"),
-//                          content: TextField(controller: controller,),
-//                          actions: <Widget>[
-//                            FlatButton(onPressed: () {
-//                              sharedPreferences.setString(
-//                                  "lastUrl", controller.text);
-//                              Navigator.of(context).pushReplacement(
-//                                  MaterialPageRoute(builder: (context) {
-//                                    return WebViewExample(controller.text);
-//                                  }));
-//                            }, child: Text("启动"))
-//                          ],
-//                        );
-//                      });
-
                       Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) {
                             return WebViewExample("http://axj.ciih.net/#/");
@@ -173,20 +159,6 @@ class _MainPageState extends State<MainPage> {
                     },
                     child: Text("WebView界面"),
                   ),
-//                  OutlineButton(
-//                    onPressed: () {
-//                      Fzxing.scan().then((res) {
-//                        Scaffold.of(context).showSnackBar(
-//                            SnackBar(content: Text(res.join(",")))
-//                        );
-//                      }).catchError((e) {
-//                        Scaffold.of(context).showSnackBar(
-//                            SnackBar(content: Text(e))
-//                        );
-//                      });
-//                    },
-//                    child: Text("QRCode"),
-//                  ),
                 ],
               ),
             ),

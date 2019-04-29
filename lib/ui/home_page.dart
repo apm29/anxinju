@@ -1,4 +1,5 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/ui/web_view_example.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -40,457 +41,408 @@ class _HomePageState extends State<HomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: Text(
           "安心居",
         ),
         actions: <Widget>[buildActions(context)],
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(17)),
-        child: CustomScrollView(
-          key: PageStorageKey("home_body"),
-          slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: Container(
-                margin: EdgeInsets.only(top: 10),
-                decoration: BoxDecoration(color: Colors.white),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      height: ScreenUtil().setWidth(690),
-                      color: Colors.white,
-                      child: PageView.builder(
-                        onPageChanged: (index) {
-                          setState(() {
-                            topIndex = index;
-                          });
-                        },
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: <Widget>[
-                              Image.asset(
-                                "images/banner_home.jpg",
-                                fit: BoxFit.fill,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+      body: StreamBuilder<Index>(
+        stream: BlocProviders.of<ApplicationBloc>(context).homeIndex,
+        builder: (context, snapshot) {
+          var indexInfo = snapshot.data;
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(17)),
+            child: CustomScrollView(
+              key: PageStorageKey("home_body"),
+              slivers: <Widget>[
+                SliverToBoxAdapter(
+                  child: Container(
+                    margin: EdgeInsets.only(top: 10),
+                    decoration: BoxDecoration(color: Colors.white),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          height: ScreenUtil().setWidth(690),
+                          color: Colors.white,
+                          child: PageView.builder(
+                            onPageChanged: (index) {
+                              setState(() {
+                                topIndex = index;
+                              });
+                            },
+                            itemBuilder: (context, index) {
+                              return Column(
                                 children: <Widget>[
-                                  GestureDetector(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          SizedBox(
-                                              width: ScreenUtil().setWidth(100),
-                                              height:
-                                                  ScreenUtil().setWidth(100),
-                                              child: Image.asset(
-                                                "images/ic_visitor_manager.png",
-                                              )),
-                                          Text("访客管理")
-                                        ],
-                                      ),
-                                    ),
+                                  Image.asset(
+                                    "images/banner_home.jpg",
+                                    fit: BoxFit.fill,
                                   ),
-                                  GestureDetector(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          SizedBox(
-                                              width: ScreenUtil().setWidth(100),
-                                              height:
-                                                  ScreenUtil().setWidth(100),
-                                              child: Image.asset(
-                                                "images/ic_property_manager.png",
-                                              )),
-                                          Text("找物业")
-                                        ],
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      GestureDetector(
+                                        onTap:(){
+                                          routeToWeb("fkgl", indexInfo);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              SizedBox(
+                                                  width: ScreenUtil().setWidth(100),
+                                                  height:
+                                                      ScreenUtil().setWidth(100),
+                                                  child: Image.asset(
+                                                    "images/ic_visitor_manager.png",
+                                                  )),
+                                              Text("访客管理")
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          SizedBox(
-                                              width: ScreenUtil().setWidth(100),
-                                              height:
-                                                  ScreenUtil().setWidth(100),
-                                              child: Image.asset(
-                                                "images/ic_society_manage.png",
-                                              )),
-                                          Text("找社区")
-                                        ],
+                                      GestureDetector(
+                                        onTap:(){
+                                          routeToWeb("zwy", indexInfo);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              SizedBox(
+                                                  width: ScreenUtil().setWidth(100),
+                                                  height:
+                                                      ScreenUtil().setWidth(100),
+                                                  child: Image.asset(
+                                                    "images/ic_property_manager.png",
+                                                  )),
+                                              Text("找物业")
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          SizedBox(
-                                              width: ScreenUtil().setWidth(100),
-                                              height:
-                                                  ScreenUtil().setWidth(100),
-                                              child: Image.asset(
-                                                "images/ic_police_manage.png",
-                                              )),
-                                          Text("找警察")
-                                        ],
+                                      GestureDetector(
+                                        onTap:(){
+                                          routeToWeb("zsq", indexInfo);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              SizedBox(
+                                                  width: ScreenUtil().setWidth(100),
+                                                  height:
+                                                      ScreenUtil().setWidth(100),
+                                                  child: Image.asset(
+                                                    "images/ic_society_manage.png",
+                                                  )),
+                                              Text("找社区")
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      GestureDetector(
+                                        onTap:(){
+                                          routeToWeb("zjc", indexInfo);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              SizedBox(
+                                                  width: ScreenUtil().setWidth(100),
+                                                  height:
+                                                      ScreenUtil().setWidth(100),
+                                                  child: Image.asset(
+                                                    "images/ic_police_manage.png",
+                                                  )),
+                                              Text("找警察")
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ),
-                            ],
-                          );
-                        },
-                        itemCount: 4,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      color: Colors.white,
-                      child: IntrinsicWidth(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: buildPagerIndicator(),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Container(
-                decoration: BoxDecoration(color: Colors.white),
-                margin:
-                    EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          '社\n区\n头\n条',
-                          style: TextStyle(
-                            color: Color(0xff00007c),
-                            fontWeight: FontWeight.w800
+                              );
+                            },
+                            itemCount: 4,
                           ),
                         ),
-                      ),
-                      Container(
-                        color: Colors.blueAccent,
-                        height: ScreenUtil().setHeight(225),
-                        width: ScreenUtil().setWidth(1),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                    child: Text(
-                                      "物业通知",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff09aa00),
-                                      borderRadius: BorderRadius.all(Radius.circular(8))
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "物业费用缴纳通知——本季度物业费用可缴纳...",
-                                      style: TextStyle(fontSize: 12),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          color: Colors.white,
+                          child: IntrinsicWidth(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: buildPagerIndicator(),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                    child: Text(
-                                      "暨阳警方",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        color: Color(0xff00007c),
-                                        borderRadius: BorderRadius.all(Radius.circular(8))
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "扫黑除恶丨关于深入开展扫黑除恶专项斗争的通知",style: TextStyle(fontSize: 12),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                    child: Text(
-                                      "功德榜",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        color: Color(0xffd00000),
-                                        borderRadius: BorderRadius.all(Radius.circular(8))
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "热心社区公益，好人张大妈热心助人" ,style: TextStyle(fontSize: 12),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                    child: Text(
-                                      "业主问政",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        color: Color(0xffd00000),
-                                        borderRadius: BorderRadius.all(Radius.circular(8))
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "业主1：三、四号楼外墙渗水，希望能尽快处理" * 3,style: TextStyle(fontSize: 12),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        color: Colors.grey,
-                        height: ScreenUtil().setHeight(225),
-                        width: ScreenUtil().setWidth(1),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(left: 10),
-                        child: Column(
-                          children: <Widget>[
-                            Image.asset(
-                              "images/ic_loud_speaker.png",
-                              width: ScreenUtil().setWidth(100),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(top: 12),
-                              child: Text("更多..",style: TextStyle(fontSize: 11),),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-//            SliverToBoxAdapter(
-//              child: Stack(
-//                alignment: AlignmentDirectional.center,
-//                children: <Widget>[
-//                  Column(
-//                    children: <Widget>[
-//                      Row(
-//                        mainAxisSize: MainAxisSize.max,
-//                        children: <Widget>[
-//                          HomeCardWithIcon(
-//                            "安全管家",
-//                            "SecurityManager",
-//                            "images/ic_safe_manager.png",
-//                            false,
-//                          ),
-//                          HomeCardWithIcon(
-//                            "智慧物业",
-//                            "Intelligent Property",
-//                            "images/ic_intelli_prop.png",
-//                            true,
-//                          ),
-//                        ],
-//                      ),
-//                      Row(
-//                        mainAxisSize: MainAxisSize.max,
-//                        children: <Widget>[
-//                          HomeCardWithIcon(
-//                            "共建共享",
-//                            "Co-Construction",
-//                            "images/ic_co_construction.png",
-//                            false,
-//                          ),
-//                          HomeCardWithIcon(
-//                            "商业服务",
-//                            "Business Service",
-//                            "images/ic_business_service.png",
-//                            true,
-//                          ),
-//                        ],
-//                      ),
-//                    ],
-//                  ),
-//                  Positioned(
-//                      child: Container(
-//                    width: ScreenUtil().setWidth(266),
-//                    height: ScreenUtil().setWidth(266),
-//                    decoration: BoxDecoration(
-//                      shape: BoxShape.circle,
-//                      color: Colors.grey[200],
-//                    ),
-//                  )),
-//                  Positioned(
-//                      child: Container(
-//                    width: ScreenUtil().setWidth(220),
-//                    height: ScreenUtil().setWidth(220),
-//                    decoration: BoxDecoration(
-//                      shape: BoxShape.circle,
-//                      color: Colors.white,
-//                    ),
-//                  )),
-//                  Positioned(
-//                      child: Container(
-//                    width: ScreenUtil().setWidth(180),
-//                    height: ScreenUtil().setWidth(180),
-//                    decoration: BoxDecoration(
-//                      shape: BoxShape.circle,
-//                      color: Colors.grey[200],
-//                    ),
-//                  )),
-//                  Positioned(
-//                      child: Container(
-//                    width: ScreenUtil().setWidth(120),
-//                    height: ScreenUtil().setWidth(120),
-//                    decoration: BoxDecoration(
-//                      shape: BoxShape.circle,
-//                      color: Colors.white,
-//                    ),
-//                  )),
-//                  Positioned(
-//                      child: Image.asset(
-//                    "images/ic_mic.png",
-//                    width: ScreenUtil().setWidth(77),
-//                  )),
-//                ],
-//              ),
-//            ),
-            SliverToBoxAdapter(
-              child: Container(
-                color: Colors.white,
-                padding: EdgeInsets.all(12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Image.asset('images/ic_video.png',height: ScreenUtil().setHeight(86),width: ScreenUtil().setWidth(67),),
-                        Padding(
-                          padding: const EdgeInsets.only(top:8.0),
-                          child: Text("视频监控"),
-                        )
-                      ],
+                SliverToBoxAdapter(
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.white),
+                    margin:
+                        EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              '社\n区\n头\n条',
+                              style: TextStyle(
+                                color: Color(0xff00007c),
+                                fontWeight: FontWeight.w800
+                              ),
+                            ),
+                          ),
+                          Container(
+                            color: Colors.blueAccent,
+                            height: ScreenUtil().setHeight(225),
+                            width: ScreenUtil().setWidth(1),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(
+                                          "物业通知",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xff09aa00),
+                                          borderRadius: BorderRadius.all(Radius.circular(8))
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "物业费用缴纳通知——本季度物业费用可缴纳...",
+                                          style: TextStyle(fontSize: 12),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(
+                                          "暨阳警方",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                        decoration: BoxDecoration(
+                                            color: Color(0xff00007c),
+                                            borderRadius: BorderRadius.all(Radius.circular(8))
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "扫黑除恶丨关于深入开展扫黑除恶专项斗争的通知",style: TextStyle(fontSize: 12),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(
+                                          "功德榜",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                        decoration: BoxDecoration(
+                                            color: Color(0xffd00000),
+                                            borderRadius: BorderRadius.all(Radius.circular(8))
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "热心社区公益，好人张大妈热心助人" ,style: TextStyle(fontSize: 12),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(
+                                          "业主问政",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                        decoration: BoxDecoration(
+                                            color: Color(0xffd00000),
+                                            borderRadius: BorderRadius.all(Radius.circular(8))
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "业主1：三、四号楼外墙渗水，希望能尽快处理" * 3,style: TextStyle(fontSize: 12),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            color: Colors.grey,
+                            height: ScreenUtil().setHeight(225),
+                            width: ScreenUtil().setWidth(1),
+                          ),
+                          GestureDetector(
+                            onTap:(){
+                              routeToWeb("sqtt", indexInfo);
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(left: 10),
+                              child: Column(
+                                children: <Widget>[
+                                  Image.asset(
+                                    "images/ic_loud_speaker.png",
+                                    width: ScreenUtil().setWidth(100),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 12),
+                                    child: Text("更多..",style: TextStyle(fontSize: 11),),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    Column(
-                      children: <Widget>[
-                        Image.asset('images/ic_mic.png',color:Color(0xff00006e),height: ScreenUtil().setHeight(88),width: ScreenUtil().setWidth(62),),
-                        Padding(
-                          padding: const EdgeInsets.only(top:8.0),
-                          child: Text("视频监控"),
-                        )
-                      ],
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Image.asset('images/ic_co_construction.png',height: ScreenUtil().setHeight(89),width: ScreenUtil().setWidth(89),),
-                        Padding(
-                          padding: const EdgeInsets.only(top:8.0),
-                          child: Container(child: Text("视频监控")),
-                        )
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap:(){
+                            routeToWeb("spjk", indexInfo);
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              Image.asset('images/ic_video.png',height: ScreenUtil().setHeight(86),width: ScreenUtil().setWidth(67),),
+                              Padding(
+                                padding: const EdgeInsets.only(top:8.0),
+                                child: Text("视频监控"),
+                              )
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap:(){
+                            routeToWeb("jjhj", indexInfo);
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              Image.asset('images/ic_mic.png',color:Color(0xff00006e),height: ScreenUtil().setHeight(88),width: ScreenUtil().setWidth(62),),
+                              Padding(
+                                padding: const EdgeInsets.only(top:8.0),
+                                child: Text("紧急呼救"),
+                              )
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap:(){
+                            routeToWeb("llq", indexInfo);
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              Image.asset('images/ic_co_construction.png',height: ScreenUtil().setHeight(89),width: ScreenUtil().setWidth(89),),
+                              Padding(
+                                padding: const EdgeInsets.only(top:8.0),
+                                child: Container(child: Text("邻里圈")),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 //            SliverToBoxAdapter(child: Divider()),
 
-            SliverToBoxAdapter(
-              child: HomeTitleSliver(
-                indicatorColor: const Color(0xFF16A702),
-                mainTitle: "智慧物业",
-                subTitle: "Intelligent Property",
-                onPressed: () {},
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Material(
-                type: MaterialType.card,
-                elevation: 1,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: ScreenUtil().setHeight(58),
-                    horizontal: ScreenUtil().setWidth(58),
+                SliverToBoxAdapter(
+                  child: HomeTitleSliver(
+                    indicatorColor: const Color(0xFF16A702),
+                    mainTitle: "智慧物业",
+                    subTitle: "Intelligent Property",
+                    onPressed: () {},
                   ),
-                  color: Colors.white,
-                  child: Wrap(
-                    children: <Widget>[
-                      HomeChip(color: const Color(0xFF16A702), title: "通知公告"),
-                      HomeChip(title: "访客系统"),
-                      HomeChip(title: "在线缴费"),
-                      HomeChip(title: "车位管理"),
-                      HomeChip(title: "暂住申报"),
+                ),
+                SliverToBoxAdapter(
+                  child: Material(
+                    type: MaterialType.card,
+                    elevation: 1,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: ScreenUtil().setHeight(58),
+                        horizontal: ScreenUtil().setWidth(58),
+                      ),
+                      color: Colors.white,
+                      child: Wrap(
+                        children: <Widget>[
+                          HomeChip(color: const Color(0xFF16A702), title: "通知公告",indexId:"tztg",index:indexInfo),
+                          HomeChip(title: "访客系统",indexId:"fkxt",index:indexInfo),
+                          HomeChip(title: "在线缴费",indexId:"zxjf",index:indexInfo),
+                          HomeChip(title: "车位管理",indexId:"cwgl",index:indexInfo),
+                          HomeChip(title: "暂住申报",indexId:"zzsb",index:indexInfo),
 //                      Container(
 //                        height: 12,
 //                      ),
@@ -515,36 +467,36 @@ class _HomePageState extends State<HomePage> {
 //                          ),
 //                        ],
 //                      )
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-            SliverToBoxAdapter(
-              child: HomeTitleSliver(
-                indicatorColor: const Color(0xFFFD6B07),
-                mainTitle: "商业服务",
-                subTitle: "Business Service",
-                onPressed: () {},
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Material(
-                type: MaterialType.card,
-                elevation: 1,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: ScreenUtil().setHeight(58),
-                    horizontal: ScreenUtil().setWidth(58),
+                SliverToBoxAdapter(
+                  child: HomeTitleSliver(
+                    indicatorColor: const Color(0xFFFD6B07),
+                    mainTitle: "商业服务",
+                    subTitle: "Business Service",
+                    onPressed: () {},
                   ),
-                  color: Colors.white,
-                  child: Wrap(
-                    children: <Widget>[
-                      HomeChip(color: const Color(0xFFFD6B07), title: "附近商家"),
-                      HomeChip(title: "加盟商家"),
-                      HomeChip(title: "促销活动"),
-                      HomeChip(title: "保安公司"),
+                ),
+                SliverToBoxAdapter(
+                  child: Material(
+                    type: MaterialType.card,
+                    elevation: 1,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: ScreenUtil().setHeight(58),
+                        horizontal: ScreenUtil().setWidth(58),
+                      ),
+                      color: Colors.white,
+                      child: Wrap(
+                        children: <Widget>[
+                          HomeChip(color: const Color(0xFFFD6B07), title: "附近商家",indexId:"fjsj",index:indexInfo),
+                          HomeChip(title: "加盟商家",indexId:"jmsj",index:indexInfo),
+                          HomeChip(title: "促销活动",indexId:"cxhd",index:indexInfo),
+                          HomeChip(title: "保安公司",indexId:"bags",index:indexInfo),
 //                      Container(
 //                        height: 12,
 //                      ),
@@ -569,41 +521,41 @@ class _HomePageState extends State<HomePage> {
 //                          ),
 //                        ],
 //                      )
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
 
 
 
 
-            SliverToBoxAdapter(
-              child: HomeTitleSliver(
-                mainTitle: "安全管家",
-                subTitle: "Security Manager",
-                onPressed: () {},
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Material(
-                type: MaterialType.card,
-                elevation: 1,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: ScreenUtil().setHeight(58),
-                    horizontal: ScreenUtil().setWidth(58),
+                SliverToBoxAdapter(
+                  child: HomeTitleSliver(
+                    mainTitle: "安全管家",
+                    subTitle: "Security Manager",
+                    onPressed: () {},
                   ),
-                  color: Colors.white,
-                  child: Wrap(
-                    children: <Widget>[
-                      HomeChip(color: const Color(0xFF000078), title: "网上110"),
-                      HomeChip(title: "暨阳警方"),
-                      HomeChip(title: "越警管家"),
-                      HomeChip(title: "警务查询"),
-                      HomeChip(title: "便民地图"),
-                      HomeChip(title: "巡更管理"),
-                      HomeChip(title: "纠纷化解"),
+                ),
+                SliverToBoxAdapter(
+                  child: Material(
+                    type: MaterialType.card,
+                    elevation: 1,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: ScreenUtil().setHeight(58),
+                        horizontal: ScreenUtil().setWidth(58),
+                      ),
+                      color: Colors.white,
+                      child: Wrap(
+                        children: <Widget>[
+                          HomeChip(color: const Color(0xFF000078), title: "网上110",indexId:"ws110",index:indexInfo),
+                          HomeChip(title: "暨阳警方",indexId:"jyjf",index:indexInfo),
+                          HomeChip(title: "越警管家",indexId:"yjgj",index:indexInfo),
+                          HomeChip(title: "警务查询",indexId:"jwcx",index:indexInfo),
+                          HomeChip(title: "便民地图",indexId:"bmdt",index:indexInfo),
+                          HomeChip(title: "巡更管理",indexId:"xggl",index:indexInfo),
+                          HomeChip(title: "纠纷化解",indexId:"jfhj",index:indexInfo),
 //                      Container(
 //                        height: 12,
 //                      ),
@@ -628,39 +580,39 @@ class _HomePageState extends State<HomePage> {
 //                          ),
 //                        ],
 //                      )
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
 
 
-            SliverToBoxAdapter(
-              child: HomeTitleSliver(
-                indicatorColor: const Color(0xFFCD0004),
-                mainTitle: "共建共享",
-                subTitle: "Co-construction & Sharing",
-                onPressed: () {},
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Material(
-                type: MaterialType.card,
-                elevation: 1,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: ScreenUtil().setHeight(58),
-                    horizontal: ScreenUtil().setWidth(58),
+                SliverToBoxAdapter(
+                  child: HomeTitleSliver(
+                    indicatorColor: const Color(0xFFCD0004),
+                    mainTitle: "共建共享",
+                    subTitle: "Co-construction & Sharing",
+                    onPressed: () {},
                   ),
-                  color: Colors.white,
-                  child: Wrap(
-                    children: <Widget>[
-                      HomeChip(color: const Color(0xFFCD0004), title: "业主问政"),
-                      HomeChip(title: "功德栏"),
-                      HomeChip(title: "义警活动"),
-                      HomeChip(title: "闲置交换"),
-                      HomeChip(title: "慈善公益"),
-                      HomeChip(title: "小区活动"),
+                ),
+                SliverToBoxAdapter(
+                  child: Material(
+                    type: MaterialType.card,
+                    elevation: 1,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: ScreenUtil().setHeight(58),
+                        horizontal: ScreenUtil().setWidth(58),
+                      ),
+                      color: Colors.white,
+                      child: Wrap(
+                        children: <Widget>[
+                          HomeChip(color: const Color(0xFFCD0004), title: "业主问政",indexId:"yzwz",index:indexInfo),
+                          HomeChip(title: "功德栏",indexId:"gdl",index:indexInfo),
+                          HomeChip(title: "义警活动",indexId:"yjhd",index:indexInfo),
+                          HomeChip(title: "闲置交换",indexId:"xzjh",index:indexInfo),
+                          HomeChip(title: "慈善公益",indexId:"csgy",index:indexInfo),
+                          HomeChip(title: "小区活动",indexId:"xqhd",index:indexInfo),
 //                      Container(
 //                        height: 12,
 //                      ),
@@ -685,18 +637,20 @@ class _HomePageState extends State<HomePage> {
 //                          ),
 //                        ],
 //                      )
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 10,
+                  ),
+                ),
+              ],
             ),
-            SliverToBoxAdapter(
-              child: Container(
-                height: 10,
-              ),
-            ),
-          ],
-        ),
+          );
+        }
       ),
     );
   }
@@ -779,6 +733,18 @@ class _HomePageState extends State<HomePage> {
             });
       },
     );
+  }
+
+
+  void routeToWeb(String id,Index index){
+    var indexWhere = index.menu.indexWhere((i)=>i.id==id);
+    if(indexWhere<0){
+      return;
+    }
+    var url = index.menu[indexWhere].url;
+    Navigator.of(context).push(MaterialPageRoute(builder: (context){
+      return WebViewExample(url);
+    }));
   }
 }
 enum HomeAction{

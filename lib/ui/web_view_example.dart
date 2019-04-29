@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:ease_life/interaction/simple_bridge.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -13,6 +14,7 @@ import 'package:ease_life/index.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'camera_page.dart';
 import 'login_page.dart';
 
 const String kNavigationExamplePage = '''
@@ -48,8 +50,7 @@ const String kNavigationExamplePage = '''
     }
     
     function funcOneParams(message1){
-      Toaster.postMessage(typeof message1);
-      document.getElementsByTagName("button")[4].innerText = message1.field1
+      Toaster.postMessage(message1);
     }
     
     function getNativeToken(){
@@ -120,7 +121,7 @@ const String kNavigationExamplePage = '''
       var json = {
         "funcName":"uploadImage",
         "data":{
-            "callbackName": "funcTwoParams",//2个String参数的callback, 回调 url 和 原图片本地路径
+            "callbackName": "funcOneParams",//2个String参数的callback, 回调 url 和 原图片本地路径
         }
       };
       
@@ -128,7 +129,42 @@ const String kNavigationExamplePage = '''
       
       UserState.postMessage(param);
     }
-
+    
+    function push(){
+      var json = {
+        "funcName":"push",
+        "data":{
+            "routeName": "/login",//1个String参数的路由名称
+        }
+      };
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+    function pushReplace(){
+      var json = {
+        "funcName":"pushReplace",
+        "data":{
+            "routeName": "/",//1个String参数的路由名称
+        }
+      };
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+    function showKeyboard(){
+      var json = {
+        "funcName":"focus",
+        "data":{
+            "initText":"",
+            "inputId":"id",
+            "callBackName": "showToastMessage"
+        }
+      }
+    }
+    
 </script>
 <h>------------------</h></br>
 <button  onClick = "showToast()">Snackbar</button>
@@ -147,6 +183,12 @@ const String kNavigationExamplePage = '''
 
 <button  onClick = "callNativeUploadImage()">ImageUpload</button>
 
+<button  onClick = "push()">push home</button>
+<button  onClick = "pushReplace()">push replace home</button>
+
+<button onClick = "showKeyboard()"> show </button>
+<input id="textInput1" class="custom" size="32">
+<input id="textInput2" class="custom" size="32">
 </body>
 </html>
 ''';
@@ -164,7 +206,8 @@ class _WebViewExampleState extends State<WebViewExample> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
   WebViewController controller;
-
+  final _focusNode = FocusNode();
+  final TextEditingController textController = TextEditingController();
   final PublishSubject<String> titleController = PublishSubject();
 
   @override
@@ -176,11 +219,12 @@ class _WebViewExampleState extends State<WebViewExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: StreamBuilder<Object>(
             stream: titleController.stream,
             builder: (context, snapshot) {
-              return Text(snapshot.data ?? "");
+              return Text(snapshot.data ?? "安心居");
             }),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
@@ -189,43 +233,108 @@ class _WebViewExampleState extends State<WebViewExample> {
         ],
       ),
       body: Builder(builder: (BuildContext context) {
-        return WebView(
-          initialUrl: widget.initUrl ?? 'https://flutter.dev',
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.complete(webViewController);
-            controller = webViewController;
-          },
-          // ignore: prefer_collection_literals
-          javascriptChannels: <JavascriptChannel>[
-            _toasterJavascriptChannel(context),
-            _dialogJavascriptChannel(context),
-            _filerJavascriptChannel(context),
-            _userJavascriptChannel(context)
-          ].toSet(),
-          navigationDelegate: (NavigationRequest request) {
-            print('allowing navigation to $request');
+        return Stack(
+          children: <Widget>[
+            TextField(
+              focusNode: _focusNode,
+              controller: textController,
+              onChanged: (text){
+                print('$currentListName[$currentListIndex]');
+                controller.evaluateJavascript('''
+                  $currentListName[$currentListIndex].value = '${textController.text}'
+                ''');
+              },
+              onSubmitted: (text){
+                controller.evaluateJavascript('''
+                if(currentInput != null)
+                  currentInput.submit();
+                ''');
+                _focusNode.unfocus();
+              },
+            ),
+            WebView(
+              initialUrl: widget.initUrl ?? 'https://flutter.dev',
+              javascriptMode: JavascriptMode.unrestricted,
+              onWebViewCreated: (WebViewController webViewController) {
+                _controller.complete(webViewController);
+                controller = webViewController;
+              },
+              // ignore: prefer_collection_literals
+              javascriptChannels: <JavascriptChannel>[
+                _toasterJavascriptChannel(context),
+                _dialogJavascriptChannel(context),
+                _filerJavascriptChannel(context),
+                _userJavascriptChannel(context)
+              ].toSet(),
+              navigationDelegate: (NavigationRequest request) {
+                print('allowing navigation to $request');
 //            if(!request.url.startsWith("http")){
 //              return NavigationDecision.prevent;
 //            }
-            return NavigationDecision.navigate;
-          },
-          onPageFinished: (String url) {
-            print('Page finished loading: $url');
-            controller
-                .evaluateJavascript(
-                    'document.getElementsByTagName("title")[0].innerText')
-                .then((title) {
-              print('$title');
-              titleController.add(title.replaceAll('"', ""));
-            });
-          },
+                _focusNode.unfocus();
+                return NavigationDecision.navigate;
+              },
+              onPageFinished: (String url) {
+                print('Page finished loading: $url');
+                controller
+                    .evaluateJavascript(
+                        'document.getElementsByTagName("title")[0].innerText')
+                    .then((title) {
+                  print('$title');
+                  titleController.add(title.replaceAll('"', ""));
+                });
+
+                controller.evaluateJavascript('''
+                   var inputs = document.getElementsByTagName('input');
+                   var textArea = document.getElementsByTagName('textarea');
+                   for (var i = 0; i < inputs.length ; i++) {
+                      let tmp = inputs[i];
+                      console.log(i);
+                      inputs[i].addEventListener('focus',(_)=>{
+                        let index = i;
+                        var json = {
+                          "funcName":"requestFocus",
+                          "data":{
+                            "initText":tmp.value,
+                            "index":index,
+                            "listName":"inputs"
+                          }
+                        };
+                        
+                        var param = JSON.stringify(json);
+                        console.log(param);
+                        UserState.postMessage(param);
+                      })
+                      
+                    }
+                    for (var i = 0; i < textArea.length ; i++) {
+                      let tmp = textArea[i];
+                      console.log(i);
+                      textArea[i].addEventListener('focus', (_) => {
+                        let index = i;
+                        var json = {
+                          "funcName": "requestFocus",
+                          "data": {
+                            "initText": tmp.value,
+                            "index":index,
+                            "listName":"textArea"
+                          }
+                        };
+                       
+                        var param = JSON.stringify(json);
+                         console.log(param);
+                        UserState.postMessage(param);
+                      })
+                    };
+                ''');
+              },
+            ),
+          ],
         );
       }),
       floatingActionButton: favoriteButton(),
     );
   }
-
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
@@ -245,7 +354,7 @@ class _WebViewExampleState extends State<WebViewExample> {
       {
         "funcName":"getToken",
         "data":{
-           "callbackName": "funcThreeParams",//3个String参数的callback, token,当前小区 , 登录返回路由
+           "callbackName": "funcThreeParams",//3个String参数的callback, token,当前小区id , 登录返回路由
             "backRoute":"http://www.baidu.com" //登录返回路由
         }
       }
@@ -263,7 +372,21 @@ class _WebViewExampleState extends State<WebViewExample> {
        {
         "funcName":"uploadImage",
         "data":{
-            "callbackName": "funcTwoParams",//2个String参数的callback, 回调缩略图url,原图local path
+            "callbackName": "funcTwoParams",//1个String参数的callback, 回调缩略图url
+        }
+       }
+       
+       {
+        "funcName":"push",
+        "data":{
+            "routeName": "/home",//1个String参数的
+        }
+       }
+       
+       {
+        "funcName":"pushReplace",
+        "data":{
+            "routeName": "/home",//1个String参数的
         }
        }
    */
@@ -290,7 +413,21 @@ class _WebViewExampleState extends State<WebViewExample> {
               )));
               break;
             case "uploadImage":
-              doUploadImage(jsonMap['data']);
+              compressAndUpload(jsonMap['data']['callbackName']);
+              break;
+            case "push":
+              Navigator.of(context)
+                  .pushNamed("${jsonMap['data']['routeName']}");
+              break;
+            case "pushReplace":
+              Navigator.of(context)
+                  .pushReplacementNamed("${jsonMap['data']['routeName']}");
+              break;
+            case "requestFocus":
+              doOnTextEdit(jsonMap['data']);
+              break;
+            case "requestFocusout":
+              _focusNode.unfocus();
               break;
             default:
               break;
@@ -302,31 +439,8 @@ class _WebViewExampleState extends State<WebViewExample> {
     return JavascriptChannel(
         name: 'Filer',
         onMessageReceived: (JavascriptMessage message) {
-          compressAndUpload(message);
+          compressAndUpload(message.message);
         });
-  }
-
-  void compressAndUpload(JavascriptMessage message) async {
-    var directory = await getTemporaryDirectory();
-    ImagePicker.pickImage(source: ImageSource.gallery).then((file) {
-      return FlutterImageCompress.compressWithFile(file.path,
-          minWidth: 1080, minHeight: 768, quality: 60);
-    }).then((listInt) {
-      var file = File(directory.path + "/compressed.jpg");
-      print('${file.absolute.path}');
-      file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
-      return file;
-    }).then((compressed) {
-      print('${message.message}');
-      DioUtil().uploadFile("upfile", compressed.absolute.path).then((resp) {
-        var data = resp.data;
-        Map<String, dynamic> jsonMap = json.decode(data);
-        print('$data');
-        controller.evaluateJavascript(
-            '${message.message}("${jsonMap["data"]["url"]}")');
-        controller.loadUrl(jsonMap["data"]["url"]);
-      });
-    });
   }
 
   JavascriptChannel _dialogJavascriptChannel(BuildContext context) {
@@ -357,6 +471,7 @@ class _WebViewExampleState extends State<WebViewExample> {
               onPressed: () async {
                 controller.data.evaluateJavascript(
                     "Toaster.postMessage('${await controller.data.currentUrl()}')");
+                //showAndroidKeyboard();
               },
               child: const Icon(Icons.message),
             );
@@ -365,11 +480,114 @@ class _WebViewExampleState extends State<WebViewExample> {
         });
   }
 
+  var currentListName;
+  var currentListIndex;
+  void doOnTextEdit(Map<String,dynamic> data) {
+    print(_focusNode.hasFocus);
+    print('show keyboard');
+    var initText = data['initText'];
+    currentListIndex = data['index'];
+    currentListName = data['listName'];
+    textController.value = TextEditingValue(text: initText);
+    //显示键盘
+    FocusScope.of(context).requestFocus(_focusNode);
+  }
+
+  void compressAndUpload(String callbackName) async {
+    var directory = await getTemporaryDirectory();
+    var file = File(directory.path +
+        "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
+    showImageSourceDialog(file, callbackName);
+  }
+
+  void showImageSourceDialog(File file, String callbackName) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return BottomSheet(
+              onClosing: () {},
+              builder: (context) {
+                return IntrinsicHeight(
+                  child: Column(
+                    children: <Widget>[
+                      FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            showPicker(file, callbackName);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("相册"),
+                          )),
+                      FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            showCamera(file, callbackName);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("拍照"),
+                          )),
+                    ],
+                  ),
+                );
+              });
+        });
+  }
+
+  void showPicker(File file, String callbackName) {
+    var future = ImagePicker.pickImage(source: ImageSource.gallery);
+    processFileAndNotify(future, file, callbackName);
+  }
+
+  void showCamera(File file, String callbackName) {
+    var future =
+        Navigator.of(context).push<File>(MaterialPageRoute(builder: (context) {
+      return CameraPage(
+        capturedFile: file,
+      );
+    }));
+    processFileAndNotify(future, file, callbackName);
+  }
+
+  void processFileAndNotify(
+      Future<File> fileFuture, File localFile, String jsCallbackNam) {
+    fileFuture.then((file) {
+      if (file == null) {
+        return null;
+      }
+      return FlutterImageCompress.compressWithFile(file.path,
+          minWidth: 1080, minHeight: 768, quality: 60);
+    }).then((listInt) {
+      if (listInt == null) {
+        return null;
+      }
+      print('${localFile.absolute.path}');
+      localFile.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
+      return localFile;
+    }).then((compressed) {
+      if (compressed == null) {
+        return null;
+      }
+      Api.uploadPic(compressed.absolute.path)
+          .then((BaseResponse<ImageDetail> resp) {
+        if (resp.success()) {
+          controller.evaluateJavascript(
+              '$jsCallbackNam("${resp.data.thumbnailPath}")');
+        } else {
+          Fluttertoast.showToast(msg: resp.text);
+        }
+      });
+    });
+  }
+
   void doGetToken(dynamic data) {
     if (isLogin()) {
       var javascriptString =
           '${data["callbackName"]}("${getToken()}","${getCurrentSocietyId()}","${data["backRoute"]}")';
+
       print('$javascriptString');
+
       controller.evaluateJavascript(javascriptString);
     } else {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
@@ -424,7 +642,8 @@ class _WebViewExampleState extends State<WebViewExample> {
    */
   void doUploadImage(Map<String, dynamic> jsData) async {
     var directory = await getTemporaryDirectory();
-    var localCompressedPath = directory.path + "/compressed.jpg";
+    var localCompressedPath = directory.path +
+        "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg";
     String localPath;
     ImagePicker.pickImage(source: ImageSource.gallery).then((file) {
       localPath = file.absolute.path;
@@ -447,8 +666,12 @@ class _WebViewExampleState extends State<WebViewExample> {
         }
       });
     });
+
+    //showImageSourceDialog(File(path), callbackName)
   }
 }
+
+
 
 enum MenuOptions {
   showUserAgent,

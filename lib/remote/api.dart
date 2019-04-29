@@ -1,6 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:ease_life/model/base_response.dart';
-import 'package:flutter/src/widgets/editable_text.dart';
 import 'dio_util.dart';
 
 class Api {
@@ -9,9 +11,8 @@ class Api {
   static Future<BaseResponse<UserInfoWrapper>> login(
       String userName, String password,
       {CancelToken cancelToken}) async {
-    await Future.delayed(Duration(seconds: 2));
     return DioUtil().postAsync<UserInfoWrapper>(
-        path: "/login",
+        path: "permission/login",
         jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
         data: {
           "userName": userName,
@@ -23,9 +24,8 @@ class Api {
   static Future<BaseResponse<UserInfoWrapper>> fastLogin(
       String mobile, String verifyCode,
       {CancelToken cancelToken}) async {
-    await Future.delayed(Duration(seconds: 2));
     return DioUtil().postAsync<UserInfoWrapper>(
-        path: "/fastLogin",
+        path: "permission/fastLogin",
         jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
         data: {
           "mobile": mobile,
@@ -36,26 +36,127 @@ class Api {
 
   static Future<BaseResponse<Object>> sendSms(String mobile,
       {CancelToken cancelToken}) async {
-    await Future.delayed(Duration(seconds: 2));
     return DioUtil().postAsync<Object>(
-        path: "/user/getVerifyCode",
-        jsonProcessor: (Map<String, dynamic> json) => null,
+        path: "permission/user/getVerifyCode",
+        jsonProcessor: (dynamic json) => null,
         data: {"mobile": mobile},
         cancelToken: cancelToken);
   }
 
   static register(
       String mobile, String smsCode, String password, String userName) async {
-    await Future.delayed(Duration(seconds: 2));
     return DioUtil().postAsync<Object>(
-      path: "/user/register",
-      jsonProcessor: (Map<String, dynamic> json) => null,
+      path: "permission/user/register",
+      jsonProcessor: (dynamic json) => null,
       data: {
-        "userName":userName,
+        "userName": userName,
         "mobile": mobile,
         "password": password,
         "code": smsCode,
       },
     );
   }
+
+  static Future<BaseResponse<List<DistrictInfo>>> findAllDistrict() async {
+    BaseResponse<List<DistrictInfo>> baseResponse =
+        await DioUtil().postAsync<List<DistrictInfo>>(
+            path: "business/district/findDistrictInfo",
+            jsonProcessor: (dynamic json) {
+              if (json is List) {
+                return json.map((j) {
+                  return DistrictInfo.fromJson(j);
+                }).toList();
+              }
+              return null;
+            },
+            data: {},
+            dataType: DataType.LIST);
+
+    return baseResponse;
+  }
+
+  /*
+   *  前端发送photo、idCard，后端接收处理，返回错误时表示该用户已通过认证，不需要重新发起认证
+   */
+  static Future<BaseResponse> verifyUserFace(
+      String imageUrl, String idCard) async {
+    return await DioUtil().postAsync(
+        path: "/permission/userCertification/verify",
+        data: {"photo": imageUrl, "idCard": idCard});
+  }
+
+  /*
+   * 获取用户认证状态
+   * 返回的都为正确结果,显示text
+   */
+  static Future<BaseResponse> verifyUserVerify() async {
+    return await DioUtil()
+        .postAsync(path: "/permission/userCertification/getMyVerify");
+  }
+
+  /*
+   * 获取用户详情
+   */
+  static Future<BaseResponse<UserDetail>> getUserDetail() async {
+    return await DioUtil()
+        .postAsync<UserDetail>(path: "/userDetail/getUserDetail");
+  }
+
+  /*
+   * 保存用户详情
+   * userId,用户id:带上id为修改,不带id为新增详情
+   * myName
+   */
+  static Future<BaseResponse> saveUserDetail(
+      {String userId,
+      String myName,
+      String sex,
+      String phone,
+      String nickName,
+      String avatar,
+      String idCard}) async {
+    return await DioUtil().postAsync(path: "/userDetail/saveUserDetail", data: {
+      "userId": userId,
+      "myName": myName,
+      "sex": sex,
+      "phone": phone,
+      "nickName": nickName,
+      "avatar": avatar,
+      "idCard": idCard
+    });
+  }
+
+  static Future<BaseResponse<String>> uploadFile(String path) async {
+    var baseResponse = await DioUtil().postAsync<String>(
+        path: "/business/upload/uploadFile",
+        data: {"file": UploadFileInfo(File(path), "file")},
+        jsonProcessor: (s) => s.toString(),
+        dataType: DataType.STRING,
+        formData: true);
+    if(baseResponse.success()){
+      var jsonMap = json.decode(baseResponse.data);
+
+    }
+    return baseResponse;
+  }
+
+  static Future<BaseResponse<ImageDetail>> uploadPic(String path) async {
+    print('file path : $path');
+    var baseResponse = await DioUtil().postAsync<String>(
+        path: "/business/upload/uploadPic",
+        data: {"pic": UploadFileInfo(File(path), "pic")},
+        jsonProcessor: (s) => s,
+        dataType: DataType.STRING,
+        formData: true);
+    if (baseResponse.success()) {
+      var jsonMap = json.decode(baseResponse.data);
+      var imageDetail = ImageDetail.fromJson(jsonMap);
+      return BaseResponse<ImageDetail>(baseResponse.status, baseResponse.token,
+          baseResponse.text, imageDetail);
+    } else {
+      return BaseResponse<ImageDetail>(baseResponse.status, baseResponse.token,
+          baseResponse.text, null);
+    }
+  }
+
 }

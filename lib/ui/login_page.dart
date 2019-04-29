@@ -245,7 +245,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                         style: TextStyle(color: colorFaceButton)),
                     trailing: Icon(Icons.arrow_forward,color: colorFaceButton,),
                     onTap: () {
-                      Navigator.of(context).pushReplacementNamed("/camera");
+                      Navigator.of(context).pushReplacementNamed("/preVerify");
                     },
                   ),
                 ),

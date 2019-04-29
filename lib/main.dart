@@ -13,11 +13,11 @@ import 'package:ease_life/ui/register_page.dart';
 import 'package:ease_life/ui/splash_page.dart';
 import 'package:ease_life/ui/style.dart';
 import 'package:ease_life/ui/test_page.dart';
-import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:amap_base/amap_base.dart';
 import 'package:camera/camera.dart';
+import 'package:ease_life/ui/user_detail_auth_page.dart';
 
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
@@ -61,8 +61,9 @@ class MyApp extends StatelessWidget {
           "/register": (_) => RegisterPage(),
           "/personal": (_) => PersonalInfoPage(),
           "/verify": (_) => AuthorizationPage(),
+          "/preVerify": (_) => UserDetailAuthPage(),
           "/map": (_) => MapAndLocatePage(),
-          "/camera": (_) => CameraPage(),
+          "/camera": (_) => FaceIdPage(),
 //          "/webview": (_) => WebViewExample(),
           "/audio": (_) => AudioRecordPage(),
           "/test": (_) => TestPage(),

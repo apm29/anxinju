@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:ease_life/main.dart';
+import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 
 bool isLogin() {
@@ -10,9 +13,12 @@ String getToken(){
 }
 
 
-String getCurrentSocietyId(){
+int getCurrentSocietyId(){
   if(!isLogin()){
     return null;
   }
-  return sharedPreferences.getString(PreferenceKeys.keyCurrentSocietyID);
+  var jsonString = sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
+  var jsonMap = json.decode(jsonString);
+  var districtInfo = DistrictInfo.fromJson(jsonMap);
+  return districtInfo.districtId;
 }

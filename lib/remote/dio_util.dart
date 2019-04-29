@@ -1,16 +1,19 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
+import 'package:flutter/foundation.dart';
 
 typedef DioErrorCallback = dynamic Function(DioError);
 typedef ResponseCallback<T> = void Function(T);
 typedef ValueCallback<T> = void Function(T value);
-typedef ProcessRawJson<T> = T Function(Map<String, dynamic>);
+typedef ProcessRawJson<T> = T Function(dynamic);
 
 const KEY_HEADER_TOKEN = "Authorization";
 const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
+const VALUE_HEADER_CONTENT_TYPE_FORM = "multipart/form-data";
 
 class DioUtil {
   Dio _dioInstance;
@@ -36,13 +39,13 @@ class DioUtil {
     return _dioApplication;
   }
 
-  init()  {
+  init() {
     print('---------------dioInstance init------------------');
     _dioInstance = Dio(BaseOptions(
       method: "POST",
       connectTimeout: 5000,
       receiveTimeout: 15000,
-      baseUrl: "http://axj.ciih.net/permission/",
+      baseUrl: "http://axj.ciih.net/",
     ));
     //设置代理
     if (proxyHttp)
@@ -61,37 +64,43 @@ class DioUtil {
       req.headers.update("Authorization", (old) {
         return sharedPreferences.getString(PreferenceKeys.keyAuthorization);
       });
-      print("REQUEST:");
-      print("===========================================");
-      print("  Method:${req.method},Url:${req.baseUrl + req.path}");
-      print("  Headers:${req.headers}");
-      print("  QueryParams:${req.queryParameters}");
-      print("  Data:${req.data}");
-      print("===========================================");
+      debugPrint("REQUEST:");
+      debugPrint("===========================================");
+      debugPrint("  Method:${req.method},Url:${req.baseUrl + req.path}");
+      debugPrint("  Headers:${req.headers}");
+      debugPrint("  QueryParams:${req.queryParameters}");
+      print('=======>${req.data.runtimeType}');
+      if(req.data.runtimeType != FormData){
+        debugPrint("    Data:${req.data}");
+      }
+
+      debugPrint("===========================================");
     }, onResponse: (resp) {
-      print("REQUEST:");
-      print("===========================================");
-      print(
+      debugPrint("REQUEST:");
+      debugPrint("===========================================");
+      debugPrint(
           "  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
-      print("  Headers:${resp.request.headers}");
-      print("  QueryParams:${resp.request.queryParameters}");
-      print("  Data:${resp.request.data}");
-      print("  -------------------------");
-      print("  RESULT:");
-      print("    Headers:${resp.headers}");
-      print("    Data:${resp.data}");
-      print("    Redirect:${resp.redirects}");
-      print("    StatusCode:${resp.statusCode}");
-      print("    Extras:${resp.extra}");
-      print(" ===========================================");
+      debugPrint("  Headers:${resp.request.headers}");
+      debugPrint("  QueryParams:${resp.request.queryParameters}");
+      if(resp.request.data.runtimeType != FormData) {
+        debugPrint("  Data:${resp.request.data}");
+      }
+      debugPrint("  -------------------------");
+      debugPrint("  RESULT:");
+      debugPrint("    Headers:${resp.headers}");
+      debugPrint("  Data:${resp.data}");
+      debugPrint("    Redirect:${resp.redirects}");
+      debugPrint("    StatusCode:${resp.statusCode}");
+      debugPrint("    Extras:${resp.extra}");
+      debugPrint(" ===========================================");
     }, onError: (err) {
-      print("ERROR:");
-      print("===========================================");
-      print("Message:${err.message}");
-      print("Error:${err.error}");
-      print("Type:${err.type}");
-      print("Trace:${err.stackTrace}");
-      print("===========================================");
+      debugPrint("ERROR:");
+      debugPrint("===========================================");
+      debugPrint("Message:${err.message}");
+      debugPrint("Error:${err.error}");
+      debugPrint("Type:${err.type}");
+      debugPrint("Trace:${err.stackTrace}");
+      debugPrint("===========================================");
     }));
   }
 
@@ -112,16 +121,19 @@ class DioUtil {
   ///
   ///
 
-  Future<BaseResponse<T>> postAsync<T>(
-      {String path,
-      ProcessRawJson jsonProcessor,
-      Map<String, String> data,
-      CancelToken cancelToken}) async {
+  Future<BaseResponse<T>> postAsync<T>({
+    String path,
+    ProcessRawJson jsonProcessor,
+    Map<String, dynamic> data,
+    CancelToken cancelToken,
+    DataType dataType = DataType.JSON,
+    bool formData = false,
+  }) async {
     return _dioInstance
         .post<Map<String, dynamic>>(path,
-            data: data,
+            data: !formData ? data : FormData.from(data),
             options: RequestOptions(
-                contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+                contentType: formData?ContentType.parse(VALUE_HEADER_CONTENT_TYPE_FORM):ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
                 headers: {
                   KEY_HEADER_TOKEN: sharedPreferences
                       .getString(PreferenceKeys.keyAuthorization),
@@ -129,21 +141,41 @@ class DioUtil {
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       String _status, _text, _token;
-      Map<String, dynamic> _data;
+      dynamic _data;
       if (response.statusCode == HttpStatus.ok ||
           response.statusCode == HttpStatus.created) {
         _status = response.data["status"];
         _text = response.data["text"];
-        _data =
-            response.data['data'] is String ? {} : response.data['data'] ?? {};
+        var _rawData = response.data['data'];
+        if (dataType == DataType.LIST) {
+          _data = response.data['data'] is String
+              ? []
+              : response.data['data'] ?? [];
+        } else if (dataType == DataType.STRING) {
+          _data = response.data['data'] is String
+              ? response.data['data']
+              : response.data['data'].toString();
+        } else {
+          _data = response.data['data'] is String
+              ? <String,dynamic>{}
+              : response.data['data'] ?? <String,dynamic>{};
+        }
         _token = response.data['token'];
-        print('data:$data');
-        return BaseResponse<T>(_status, _token, _text,
+        BaseResponse<T> baseResponse = BaseResponse<T>(_status, _token, _text,
             jsonProcessor == null ? null : jsonProcessor(_data));
+        //当请求失败的时候,吧data的String交给text,对后端的兼容...
+        if (!baseResponse.success() && _rawData is String) {
+          baseResponse.text = _rawData;
+        } else if (baseResponse.success() && baseResponse.text.isEmpty) {
+          baseResponse.text = "成功";
+        }
+        return baseResponse;
       } else {
         return BaseResponse<T>("0", null, "请求失败:${response.statusCode}", null);
       }
-    }).catchError((Object error) {
+    }).catchError((Object error, StackTrace trace) {
+      print(error);
+      print(trace);
       return BaseResponse<T>("0", null,
           "请求失败:${error is DioError ? error.message : error.toString()}", null);
     });
@@ -161,4 +193,28 @@ class DioUtil {
     });
     return dio.post<String>("/UploadFile/UploadFile/upFileAjax", data: data);
   }
+
+  Future<List<Index>> getIndexJson() async {
+    Response<String> response = await _dioInstance.get<String>(
+      "/axj_menu.json",
+      options: RequestOptions(
+          contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+          headers: {
+            KEY_HEADER_TOKEN:
+                sharedPreferences.getString(PreferenceKeys.keyAuthorization),
+          }),
+    );
+    List<Index> res = [];
+    if (response.statusCode == 200) {
+      var jsonString = response.data;
+      List list = json.decode(jsonString);
+      var indexList = list.map((d) {
+        return Index.fromJson(d);
+      }).toList();
+      res.addAll(indexList);
+    }
+    return res;
+  }
 }
+
+enum DataType { STRING, LIST, JSON }

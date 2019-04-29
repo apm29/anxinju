@@ -14,3 +14,4 @@ export 'ui/widget/home_card_with_icon.dart';
 export 'package:ease_life/persistance/shared_preference_keys.dart';
 export 'ui/widget/loading_dialog.dart';
 export 'remote/api.dart';
+export 'package:path_provider/path_provider.dart';

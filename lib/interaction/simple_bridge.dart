@@ -1,5 +1,13 @@
-import 'package:webview_flutter/webview_flutter.dart';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
-var simpleBridge = JavascriptChannel(name: "nativeBridge", onMessageReceived: (message){
+const platformChannel = const MethodChannel("anxinju.keyboard");
 
-});
+Future<void> showAndroidKeyboard() async {
+  print('show keyboard');
+  if (Platform.isAndroid) {
+    int res = await platformChannel.invokeMethod("showKeyboard");
+    print('$res');
+  }
+
+}
