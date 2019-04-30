@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:ease_life/interaction/simple_bridge.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
+import 'package:ease_life/ui/widget/district_info_button.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:convert/convert.dart';
@@ -121,7 +122,7 @@ const String kNavigationExamplePage = '''
       var json = {
         "funcName":"uploadImage",
         "data":{
-            "callbackName": "funcOneParams",//2个String参数的callback, 回调 url 和 原图片本地路径
+            "callbackName": "funcTwoParams",//2个String参数的callback, 回调 url 和 原图片本地路径
         }
       };
       
@@ -183,12 +184,13 @@ const String kNavigationExamplePage = '''
 
 <button  onClick = "callNativeUploadImage()">ImageUpload</button>
 
-<button  onClick = "push()">push home</button>
+<button  onClick = "push()">push login</button>
 <button  onClick = "pushReplace()">push replace home</button>
 
 <button onClick = "showKeyboard()"> show </button>
 <input id="textInput1" class="custom" size="32">
 <input id="textInput2" class="custom" size="32">
+<textarea name="textarea" rows="10" cols="50">Write something here</textarea>
 </body>
 </html>
 ''';
@@ -209,6 +211,12 @@ class _WebViewExampleState extends State<WebViewExample> {
   final _focusNode = FocusNode();
   final TextEditingController textController = TextEditingController();
   final PublishSubject<String> titleController = PublishSubject();
+  final GlobalKey<EditableTextState> editKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -218,121 +226,170 @@ class _WebViewExampleState extends State<WebViewExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: StreamBuilder<Object>(
-            stream: titleController.stream,
-            builder: (context, snapshot) {
-              return Text(snapshot.data ?? "安心居");
-            }),
-        // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-        actions: <Widget>[
-          NavigationControls(_controller.future),
-          SampleMenu(_controller.future),
-        ],
-      ),
-      body: Builder(builder: (BuildContext context) {
-        return Stack(
-          children: <Widget>[
-            TextField(
-              focusNode: _focusNode,
-              controller: textController,
-              onChanged: (text){
-                print('$currentListName[$currentListIndex]');
-                controller.evaluateJavascript('''
-                  $currentListName[$currentListIndex].value = '${textController.text}'
-                ''');
-              },
-              onSubmitted: (text){
-                controller.evaluateJavascript('''
-                if(currentInput != null)
-                  currentInput.submit();
-                ''');
-                _focusNode.unfocus();
-              },
-            ),
-            WebView(
-              initialUrl: widget.initUrl ?? 'https://flutter.dev',
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (WebViewController webViewController) {
-                _controller.complete(webViewController);
-                controller = webViewController;
-              },
-              // ignore: prefer_collection_literals
-              javascriptChannels: <JavascriptChannel>[
-                _toasterJavascriptChannel(context),
-                _dialogJavascriptChannel(context),
-                _filerJavascriptChannel(context),
-                _userJavascriptChannel(context)
-              ].toSet(),
-              navigationDelegate: (NavigationRequest request) {
-                print('allowing navigation to $request');
+    return WillPopScope(
+      onWillPop: () async {
+        if (await controller.canGoBack()) {
+          controller.goBack();
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: StreamBuilder<Object>(
+              stream: titleController.stream,
+              builder: (context, snapshot) {
+                return Text(snapshot.data ?? "安心居");
+              }),
+          centerTitle: true,
+          // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
+          leading: FutureBuilder<WebViewController>(
+              future: _controller.future,
+              builder: (context, snapShot) {
+                bool webViewReady = snapShot.hasData && snapShot.data != null;
+                return IconButton(
+                  icon: const Icon(Icons.arrow_back_ios),
+                  onPressed: !webViewReady
+                      ? null
+                      : () async {
+                          if (await controller.canGoBack()) {
+                            controller.goBack();
+                          } else {
+                            Navigator.of(context).pop();
+                            return;
+                          }
+                        },
+                );
+              }),
+          actions: <Widget>[
+//          NavigationControls(_controller.future),
+            DistrictInfoButton(),
+            SampleMenu(_controller.future),
+          ],
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return Stack(
+            children: <Widget>[
+              TextField(
+                focusNode: _focusNode,
+                controller: textController,
+                onChanged: (text) {
+                  controller.evaluateJavascript('''
+                   if(current != null)
+                    current.value = '${textController.text}'
+                  ''');
+                },
+                onSubmitted: (text) {
+                  controller.evaluateJavascript('''
+                  if(current != null)
+                    current.submit();
+                  ''');
+                  _focusNode.unfocus();
+                },
+              ),
+              WebView(
+                initialUrl: widget.initUrl ?? 'https://flutter.dev',
+                javascriptMode: JavascriptMode.unrestricted,
+                onWebViewCreated: (WebViewController webViewController) {
+                  _controller.complete(webViewController);
+                  controller = webViewController;
+                },
+                // ignore: prefer_collection_literals
+                javascriptChannels: <JavascriptChannel>[
+                  _toasterJavascriptChannel(context),
+                  _dialogJavascriptChannel(context),
+                  _filerJavascriptChannel(context),
+                  _userJavascriptChannel(context)
+                ].toSet(),
+                navigationDelegate: (NavigationRequest request) {
+                  print('allowing navigation to $request');
 //            if(!request.url.startsWith("http")){
 //              return NavigationDecision.prevent;
 //            }
-                _focusNode.unfocus();
-                return NavigationDecision.navigate;
-              },
-              onPageFinished: (String url) {
-                print('Page finished loading: $url');
-                controller
-                    .evaluateJavascript(
-                        'document.getElementsByTagName("title")[0].innerText')
-                    .then((title) {
-                  print('$title');
-                  titleController.add(title.replaceAll('"', ""));
-                });
-
-                controller.evaluateJavascript('''
-                   var inputs = document.getElementsByTagName('input');
-                   var textArea = document.getElementsByTagName('textarea');
-                   for (var i = 0; i < inputs.length ; i++) {
-                      let tmp = inputs[i];
-                      console.log(i);
-                      inputs[i].addEventListener('focus',(_)=>{
-                        let index = i;
-                        var json = {
-                          "funcName":"requestFocus",
-                          "data":{
-                            "initText":tmp.value,
-                            "index":index,
-                            "listName":"inputs"
-                          }
-                        };
-                        
-                        var param = JSON.stringify(json);
-                        console.log(param);
-                        UserState.postMessage(param);
-                      })
-                      
+//                _focusNode.unfocus();
+                  return NavigationDecision.navigate;
+                },
+                onPageFinished: (String url) {
+                  print('Page finished loading: $url');
+                  controller
+                      .evaluateJavascript(
+                          'document.getElementsByTagName("title")[0].innerText')
+                      .then((title) {
+                    title = title.replaceAll('"', "");
+                    if (title == "null" || title == "undefined") {
+                      title = null;
                     }
-                    for (var i = 0; i < textArea.length ; i++) {
-                      let tmp = textArea[i];
-                      console.log(i);
-                      textArea[i].addEventListener('focus', (_) => {
-                        let index = i;
-                        var json = {
-                          "funcName": "requestFocus",
-                          "data": {
-                            "initText": tmp.value,
-                            "index":index,
-                            "listName":"textArea"
-                          }
-                        };
-                       
-                        var param = JSON.stringify(json);
-                         console.log(param);
-                        UserState.postMessage(param);
-                      })
-                    };
-                ''');
-              },
-            ),
-          ],
-        );
-      }),
-      floatingActionButton: favoriteButton(),
+                    titleController.add(title);
+                  });
+                  if (Platform.isAndroid) {
+                    controller.evaluateJavascript('''
+                     var inputs = document.getElementsByTagName('input');
+                     var textArea = document.getElementsByTagName('textarea');
+                     var current;
+                     for (var i = 0; i < inputs.length ; i++) {
+                        inputs[i].addEventListener('focus',(e)=>{
+                          var json = {
+                            "funcName":"requestFocus",
+                            "data":{
+                              "initText":e.target.value
+                            }
+                          };
+                          current = e.target;  
+                          var param = JSON.stringify(json);
+                          console.log(param);
+                          UserState.postMessage(param);
+                        })
+                        //inputs[i].addEventListener('blur',(e)=>{
+                        //  var json = {
+                        //    "funcName":"requestFocusout",
+                        //  };
+                        //  if(eq(current,e.target) ){
+                        //    var param = JSON.stringify(json);
+                        //    console.log(param);
+                        //    UserState.postMessage(param);
+                        //  }
+                        //})
+                      }
+                      for (var i = 0; i < textArea.length ; i++) {
+                        console.log(i);
+                        textArea[i].addEventListener('focus', (e) => {
+                          console.log('focus');
+                          var json = {
+                            "funcName": "requestFocus",
+                            "data": {
+                              "initText": e.target.value
+                            }
+                          };
+                          current = e.target;
+                          var param = JSON.stringify(json);
+                           console.log(param);
+                          UserState.postMessage(param);
+                        })
+                        
+                        //textArea[i].addEventListener('blur',(e)=>{
+                        //  console.log('textArea focusout');
+                        //  var json = {
+                        //    "funcName":"requestFocusout",
+                        //  };
+                        //  if(eq(current,e.target )  ){
+                        //    var param = JSON.stringify(json);
+                        //    console.log(param);
+                        //    UserState.postMessage(param);
+                        //  }
+                        //})
+                      };
+                       console.log('===JS CODE INJECTED INTO MY WEBVIEW===');
+                  ''');
+                  }
+                },
+              ),
+            ],
+          );
+        }),
+        floatingActionButton: favoriteButton(),
+      ),
     );
   }
 
@@ -469,27 +526,27 @@ class _WebViewExampleState extends State<WebViewExample> {
           if (controller.hasData) {
             return FloatingActionButton(
               onPressed: () async {
-                controller.data.evaluateJavascript(
-                    "Toaster.postMessage('${await controller.data.currentUrl()}')");
-                //showAndroidKeyboard();
+                Navigator.of(context).pop();
               },
-              child: const Icon(Icons.message),
+              child: const Icon(Icons.arrow_back),
             );
           }
           return Container();
         });
   }
 
-  var currentListName;
-  var currentListIndex;
-  void doOnTextEdit(Map<String,dynamic> data) {
-    print(_focusNode.hasFocus);
-    print('show keyboard');
-    var initText = data['initText'];
-    currentListIndex = data['index'];
-    currentListName = data['listName'];
-    textController.value = TextEditingValue(text: initText);
-    //显示键盘
+  void doOnTextEdit(Map<String, dynamic> data) {
+    if (_focusNode.hasFocus) {
+      //让隐藏TextField失去焦点
+      showAndroidKeyboard();
+    }
+    //把初始文本设置给隐藏TextField
+    String initText = data['initText'];
+    textController.value = TextEditingValue(
+        text: initText,
+        selection:
+            TextSelection.fromPosition(TextPosition(offset: initText.length)));
+    //TextField请求显示键盘
     FocusScope.of(context).requestFocus(_focusNode);
   }
 
@@ -557,7 +614,7 @@ class _WebViewExampleState extends State<WebViewExample> {
         return null;
       }
       return FlutterImageCompress.compressWithFile(file.path,
-          minWidth: 1080, minHeight: 768, quality: 60);
+          minWidth: 1080, minHeight: 768, quality: 80);
     }).then((listInt) {
       if (listInt == null) {
         return null;
@@ -573,7 +630,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           .then((BaseResponse<ImageDetail> resp) {
         if (resp.success()) {
           controller.evaluateJavascript(
-              '$jsCallbackNam("${resp.data.thumbnailPath}")');
+              '$jsCallbackNam("${resp.data.thumbnailPath}","${resp.data.orginPicPath}")');
         } else {
           Fluttertoast.showToast(msg: resp.text);
         }
@@ -670,8 +727,6 @@ class _WebViewExampleState extends State<WebViewExample> {
     //showImageSourceDialog(File(path), callbackName)
   }
 }
-
-
 
 enum MenuOptions {
   showUserAgent,

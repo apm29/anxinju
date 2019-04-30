@@ -1,28 +1,14 @@
-import 'package:ease_life/interaction/simple_bridge.dart';
-import 'package:ease_life/remote/api.dart';
-
 import '../ui/home_page.dart';
 import '../ui/message_page.dart';
 import '../ui/mine_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-//import 'package:fzxing/fzxing.dart';
 import 'web_view_example.dart';
 import 'package:ease_life/main.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -35,12 +21,6 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     ScreenUtil(width: 1080, height: 2160)
       ..init(context);
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return WillPopScope(
       onWillPop: () async {
         if (_lastPressedAt == null ||

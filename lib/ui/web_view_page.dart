@@ -1,38 +1,11 @@
 import 'package:ease_life/index.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+// ignore: duplicate_import
 import 'package:webview_flutter/webview_flutter.dart';
-
-class WebViewPage extends StatefulWidget {
-  @override
-  _WebViewPageState createState() => _WebViewPageState();
-}
-
-class _WebViewPageState extends State<WebViewPage> {
-
-
-  @override
-  Widget build(BuildContext context) {
-    var webviewPlugin = FlutterWebviewPlugin();
-    return WebviewScaffold(
-      url: "http://axj.ciih.net/#/",
-      appBar: AppBar(
-        title: Text("WebView"),
-      ),
-      withJavascript: true,
-      withZoom: false,
-      withLocalStorage: true,
-      withLocalUrl: true,
-      supportMultipleWindows: true,
-      appCacheEnabled: true,
-      allowFileURLs: true,
-    );
-  }
-}
 
 class MyApp extends StatelessWidget {
   @override

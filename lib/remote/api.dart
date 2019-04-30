@@ -126,37 +126,25 @@ class Api {
     });
   }
 
-  static Future<BaseResponse<String>> uploadFile(String path) async {
-    var baseResponse = await DioUtil().postAsync<String>(
+  static Future<BaseResponse<FileDetail>> uploadFile(String path) async {
+    var baseResponse = await DioUtil().postAsync<FileDetail>(
         path: "/business/upload/uploadFile",
         data: {"file": UploadFileInfo(File(path), "file")},
-        jsonProcessor: (s) => s.toString(),
-        dataType: DataType.STRING,
+        jsonProcessor: (s) => FileDetail.fromJson(s),
+        dataType: DataType.JSON,
         formData: true);
-    if(baseResponse.success()){
-      var jsonMap = json.decode(baseResponse.data);
-
-    }
     return baseResponse;
   }
 
   static Future<BaseResponse<ImageDetail>> uploadPic(String path) async {
     print('file path : $path');
-    var baseResponse = await DioUtil().postAsync<String>(
+    var baseResponse = await DioUtil().postAsync<ImageDetail>(
         path: "/business/upload/uploadPic",
         data: {"pic": UploadFileInfo(File(path), "pic")},
-        jsonProcessor: (s) => s,
-        dataType: DataType.STRING,
+        jsonProcessor: (s) => ImageDetail.fromJson(s),
+        dataType: DataType.JSON,
         formData: true);
-    if (baseResponse.success()) {
-      var jsonMap = json.decode(baseResponse.data);
-      var imageDetail = ImageDetail.fromJson(jsonMap);
-      return BaseResponse<ImageDetail>(baseResponse.status, baseResponse.token,
-          baseResponse.text, imageDetail);
-    } else {
-      return BaseResponse<ImageDetail>(baseResponse.status, baseResponse.token,
-          baseResponse.text, null);
-    }
+    return baseResponse;
   }
 
 }

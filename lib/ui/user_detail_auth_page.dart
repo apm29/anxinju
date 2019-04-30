@@ -6,6 +6,13 @@ class UserDetailAuthPage extends StatefulWidget {
 }
 
 class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
+
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _genderController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _avatarController = TextEditingController();
+  TextEditingController _idCardController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

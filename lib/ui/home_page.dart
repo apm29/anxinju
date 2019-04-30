@@ -441,7 +441,8 @@ class _HomePageState extends State<HomePage> {
                           HomeChip(color: const Color(0xFF16A702), title: "通知公告",indexId:"tztg",index:indexInfo),
                           HomeChip(title: "访客系统",indexId:"fkxt",index:indexInfo),
                           HomeChip(title: "在线缴费",indexId:"zxjf",index:indexInfo),
-                          HomeChip(title: "车位管理",indexId:"cwgl",index:indexInfo),
+                          HomeChip(title: "车辆管理",indexId:"clgl",index:indexInfo),
+                          HomeChip(title: "房屋出租",indexId:"fwcz",index:indexInfo),
                           HomeChip(title: "暂住申报",indexId:"zzsb",index:indexInfo),
 //                      Container(
 //                        height: 12,

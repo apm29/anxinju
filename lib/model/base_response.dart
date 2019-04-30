@@ -241,3 +241,19 @@ class ImageDetail {
     return data;
   }
 }
+
+class FileDetail {
+  String filePath;
+
+  FileDetail({this.filePath});
+
+  FileDetail.fromJson(Map<String, dynamic> json) {
+    filePath = json['filePath'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['filePath'] = this.filePath;
+    return data;
+  }
+}

@@ -163,6 +163,12 @@ class ApplicationBloc extends BlocBase {
     debugPrint("===----> inject index info");
   }
 
+  void setCurrentDistrict(DistrictInfo districtInfo) {
+    //将取到的小区信息存入sp缓存
+    sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, districtInfo.toString());
+    _districtInfoController.add(districtInfo);
+  }
+
 }
 
 class LoginBloc extends BlocBase {
