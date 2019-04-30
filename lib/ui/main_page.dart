@@ -113,8 +113,9 @@ class _MainPageState extends State<MainPage> {
                 children: <Widget>[
                   OutlineButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed("/preVerify");
+//                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
+                      Navigator.of(context).pushNamed("/preVerify");
                     },
                     child: Text("测试界面"),
                   ),

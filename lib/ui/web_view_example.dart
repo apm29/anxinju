@@ -265,7 +265,9 @@ class _WebViewExampleState extends State<WebViewExample> {
               }),
           actions: <Widget>[
 //          NavigationControls(_controller.future),
-            DistrictInfoButton(),
+            DistrictInfoButton(callback: (district){
+              controller?.reload();
+            },),
             SampleMenu(_controller.future),
           ],
         ),

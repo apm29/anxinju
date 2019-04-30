@@ -6,7 +6,6 @@ class UserDetailAuthPage extends StatefulWidget {
 }
 
 class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
-
   TextEditingController _nameController = TextEditingController();
   TextEditingController _genderController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
@@ -24,39 +23,70 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
         child: CustomScrollView(
           slivers: <Widget>[
             SliverToBoxAdapter(
-              child: Row(children: <Widget>[
-                Text("姓名"),
-                Expanded(child: TextField())
-              ],),
+              child: Row(
+                children: <Widget>[
+                  Text("姓名"),
+                  Expanded(
+                      child: TextField(
+                    controller: _nameController,
+                  ))
+                ],
+              ),
             ),
             SliverToBoxAdapter(
-              child: Row(children: <Widget>[
-                Text("性别"),
-                Expanded(child: TextField())
-              ],),
+              child: ListTile(
+                leading: Text("性别"),
+                title: TextField(
+                  decoration: InputDecoration(
+                    hintText: "请输入性别",
+                    border: OutlineInputBorder(
+                      gapPadding: 0
+                    )
+                  ),
+                  controller: _genderController,
+                ),
+              ),
             ),
             SliverToBoxAdapter(
-              child: Row(children: <Widget>[
-                Text("电话"),
-                Expanded(child: TextField())
-              ],),
+              child: Row(
+                children: <Widget>[
+                  Text("电话"),
+                  Expanded(
+                      child: TextField(
+                    controller: _phoneController,
+                  ))
+                ],
+              ),
             ),
             SliverToBoxAdapter(
-              child: Row(children: <Widget>[
-                Text("头像"),
-                Expanded(child: TextField())
-              ],),
+              child: Row(
+                children: <Widget>[
+                  Text("头像"),
+                  Expanded(
+                      child: TextField(
+                    controller: _avatarController,
+                  ))
+                ],
+              ),
             ),
             SliverToBoxAdapter(
-              child: Row(children: <Widget>[
-                Text("身份证"),
-                Expanded(child: TextField())
-              ],),
+              child: Row(
+                children: <Widget>[
+                  Text("身份证"),
+                  Expanded(
+                      child: TextField(
+                    controller: _idCardController,
+                  ))
+                ],
+              ),
             ),
             SliverToBoxAdapter(
-              child: OutlineButton(onPressed: (){
-                Navigator.of(context).pushNamed("/camera");
-              },child: Text("提交"),),
+              child: OutlineButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed("/camera");
+                },
+                child: Text("提交"),
+              ),
             )
           ],
         ),

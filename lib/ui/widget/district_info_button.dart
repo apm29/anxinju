@@ -2,9 +2,12 @@ import 'package:ease_life/index.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 
+typedef DistrictCallback = void Function(DistrictInfo);
+
 class DistrictInfoButton extends StatelessWidget {
+  final DistrictCallback callback;
   const DistrictInfoButton({
-    Key key,
+    Key key,this.callback
   }) : super(key: key);
 
   @override
@@ -16,7 +19,7 @@ class DistrictInfoButton extends StatelessWidget {
             isLogin() ? snapShot.data?.districtName ?? "无小区" : "未登录";
         return FlatButton.icon(
             onPressed: () {
-              showModalBottomSheet(
+              showModalBottomSheet<DistrictInfo>(
                   context: context,
                   builder: (context) {
                     return BottomSheet(
@@ -33,10 +36,11 @@ class DistrictInfoButton extends StatelessWidget {
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
                                     return FlatButton(
-                                      onPressed: (){
-                                        BlocProviders.of<ApplicationBloc>(context).setCurrentDistrict(
-                                            snapShot.data.data[index]
-                                        );
+                                      onPressed: () {
+                                        BlocProviders.of<ApplicationBloc>(
+                                                context)
+                                            .setCurrentDistrict(
+                                                snapShot.data.data[index]);
                                         Navigator.of(context).pop();
                                       },
                                       child: Text(
@@ -56,7 +60,10 @@ class DistrictInfoButton extends StatelessWidget {
                                       child: Column(
                                         children: <Widget>[
                                           CircularProgressIndicator(),
-                                          Text("获取小区列表..",textAlign: TextAlign.center,),
+                                          Text(
+                                            "获取小区列表..",
+                                            textAlign: TextAlign.center,
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -66,7 +73,11 @@ class DistrictInfoButton extends StatelessWidget {
                             },
                           );
                         });
-                  });
+                  }).then((district){
+                    if(callback!=null){
+                      callback(district);
+                    }
+              });
             },
             icon: Icon(
               Icons.location_on,
