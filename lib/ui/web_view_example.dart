@@ -14,7 +14,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:ease_life/index.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
-
+import 'package:file_picker/file_picker.dart';
 import 'camera_page.dart';
 import 'login_page.dart';
 
@@ -161,10 +161,32 @@ const String kNavigationExamplePage = '''
         "data":{
             "initText":"",
             "inputId":"id",
-            "callBackName": "showToastMessage"
+            "callbackName": "showToastMessage"
         }
       }
     }
+    
+    function uploadFile(){
+      var json = {
+        "funcName":"uploadFile",
+        "data":{
+            "callbackName": "showToastMessage" //一个参数的callback,返回文件url
+        }
+      }
+      var param = JSON.stringify(json);
+      UserState.postMessage(param);
+    }
+    
+    function sendSMS(){
+      var json = {
+        "funcName":"sendSMS",
+        "data":{
+          "callbackName":"showToastMessage" //一个参数,未定
+        }
+      }
+    }
+    
+    
     
 </script>
 <h>------------------</h></br>
@@ -187,7 +209,7 @@ const String kNavigationExamplePage = '''
 <button  onClick = "push()">push login</button>
 <button  onClick = "pushReplace()">push replace home</button>
 
-<button onClick = "showKeyboard()"> show </button>
+<button onClick = "uploadFile()"> choose file </button>
 <input id="textInput1" class="custom" size="32">
 <input id="textInput2" class="custom" size="32">
 <textarea name="textarea" rows="10" cols="50">Write something here</textarea>
@@ -488,6 +510,9 @@ class _WebViewExampleState extends State<WebViewExample> {
             case "requestFocusout":
               _focusNode.unfocus();
               break;
+            case "uploadFile":
+              doUploadFile(jsonMap['data']['callbackName']);
+              break;
             default:
               break;
           }
@@ -727,6 +752,23 @@ class _WebViewExampleState extends State<WebViewExample> {
     });
 
     //showImageSourceDialog(File(path), callbackName)
+  }
+  //文件上传
+  void doUploadFile(String callbackName) {
+    //显示选择器
+    FilePicker.getFile(type: FileType.ANY).then((file){
+        return file;
+    }).then((f){
+        //文件上传
+        return Api.uploadFile(f.path);
+    }).then((resp){
+      if(resp.success()){
+        //callback文件地址
+        controller.evaluateJavascript('$callbackName("${resp.data.filePath}")');
+      }else{
+        Fluttertoast.showToast(msg: resp.text);
+      }
+    });
   }
 }
 

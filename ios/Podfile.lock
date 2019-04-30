@@ -8,17 +8,15 @@ PODS:
     - Flutter
   - device_info (0.0.1):
     - Flutter
+  - file_picker (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - flutter_bugly (0.0.1):
     - Bugly
     - Flutter
   - flutter_image_compress (0.0.1):
     - Flutter
-  - flutter_inappbrowser (0.0.1):
-    - Flutter
   - flutter_sound (0.0.1):
-    - Flutter
-  - flutter_webview_plugin (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
     - Flutter
@@ -48,12 +46,11 @@ DEPENDENCIES:
   - camera (from `.symlinks/plugins/camera/ios`)
   - contacts_service (from `.symlinks/plugins/contacts_service/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
+  - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `.symlinks/flutter/ios`)
   - flutter_bugly (from `.symlinks/plugins/flutter_bugly/ios`)
   - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
-  - flutter_inappbrowser (from `.symlinks/plugins/flutter_inappbrowser/ios`)
   - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
-  - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
@@ -78,18 +75,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/contacts_service/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
+  file_picker:
+    :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: ".symlinks/flutter/ios"
   flutter_bugly:
     :path: ".symlinks/plugins/flutter_bugly/ios"
   flutter_image_compress:
     :path: ".symlinks/plugins/flutter_image_compress/ios"
-  flutter_inappbrowser:
-    :path: ".symlinks/plugins/flutter_inappbrowser/ios"
   flutter_sound:
     :path: ".symlinks/plugins/flutter_sound/ios"
-  flutter_webview_plugin:
-    :path: ".symlinks/plugins/flutter_webview_plugin/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker:
@@ -115,12 +110,11 @@ SPEC CHECKSUMS:
   camera: d56ad165545ae5a0ffb892376033760a969c68c8
   contacts_service: 64ebf2a313b34bff0acf668efac52ae402ba9be0
   device_info: 3ebad48f726348f69abd802f3334a8d1ed795fbd
+  file_picker: 408623be2125b79a4539cf703be3d4b3abe5e245
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   flutter_bugly: c9800f4d5bc5bdc27ffdde3417a26ba44266e0c3
   flutter_image_compress: c29e818cdf6e4276875601a245b6bb18eb444157
-  flutter_inappbrowser: 93214ba3c0bc9db42e879f808d993b6d3be32379
   flutter_sound: 0e8163ceac1e00eb6d894e2ae4641ba726a2c479
-  flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
