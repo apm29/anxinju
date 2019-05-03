@@ -77,11 +77,8 @@ const String kNavigationExamplePage = '''
             "content":"内容",
             "title":"标题",
             "callbackName": "funcOneParams",//一个String参数的callback, 回调返回参数
-            "callbackParam":{
-              "field1":"123",
-              "field2":"123"
-              //....
-            } //返回参数,任意指定
+            "callbackCancel":"showToast",//0参数的callback, 回调返回参数
+            "callbackParam":"xxxx" //返回参数,String类型
         }
       };
       
@@ -287,9 +284,11 @@ class _WebViewExampleState extends State<WebViewExample> {
               }),
           actions: <Widget>[
 //          NavigationControls(_controller.future),
-            DistrictInfoButton(callback: (district){
-              controller?.reload();
-            },),
+            DistrictInfoButton(
+              callback: (district) {
+                controller?.reload();
+              },
+            ),
             SampleMenu(_controller.future),
           ],
         ),
@@ -392,8 +391,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                           UserState.postMessage(param);
                         })
                         
-                        //textArea[i].addEventListener('blur',(e)=>{
-                        //  console.log('textArea focusout');
+`~````                        //  console.log('textArea focusout');
                         //  var json = {
                         //    "funcName":"requestFocusout",
                         //  };
@@ -691,8 +689,8 @@ class _WebViewExampleState extends State<WebViewExample> {
     String content = data['content'];
     String title = data['title'];
     String callbackName = data['callbackName'];
+    String callbackCancel = data['callbackCancel'];
     dynamic callbackParam = data['callbackParam'];
-    print('${callbackParam.runtimeType}');
     showDialog(
         context: context,
         builder: (context) {
@@ -715,7 +713,11 @@ class _WebViewExampleState extends State<WebViewExample> {
             ],
           );
         }).then((param) {
-      controller.evaluateJavascript('$callbackName($param)');
+      if (param == null) {
+        controller.evaluateJavascript('$callbackCancel()');
+      } else {
+        controller.evaluateJavascript('$callbackName("$param")');
+      }
     });
   }
 
@@ -753,19 +755,20 @@ class _WebViewExampleState extends State<WebViewExample> {
 
     //showImageSourceDialog(File(path), callbackName)
   }
+
   //文件上传
   void doUploadFile(String callbackName) {
     //显示选择器
-    FilePicker.getFile(type: FileType.ANY).then((file){
-        return file;
-    }).then((f){
-        //文件上传
-        return Api.uploadFile(f.path);
-    }).then((resp){
-      if(resp.success()){
+    FilePicker.getFile(type: FileType.ANY).then((file) {
+      return file;
+    }).then((f) {
+      //文件上传
+      return Api.uploadFile(f.path);
+    }).then((resp) {
+      if (resp.success()) {
         //callback文件地址
         controller.evaluateJavascript('$callbackName("${resp.data.filePath}")');
-      }else{
+      } else {
         Fluttertoast.showToast(msg: resp.text);
       }
     });
