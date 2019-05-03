@@ -18,7 +18,6 @@ const VALUE_HEADER_CONTENT_TYPE_FORM = "multipart/form-data";
 class DioUtil {
   Dio _dioInstance;
   bool inDebug = false;
-
   bool proxyHttp = false;
 
   DioUtil._() {
@@ -43,7 +42,7 @@ class DioUtil {
     print('---------------dioInstance init------------------');
     _dioInstance = Dio(BaseOptions(
       method: "POST",
-      connectTimeout: 5000,
+      connectTimeout: 10000,
       receiveTimeout: 15000,
       baseUrl: "http://axj.ciih.net/",
     ));
