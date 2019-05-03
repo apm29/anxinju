@@ -15,6 +15,7 @@ import 'package:ease_life/index.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
+import '../utls.dart';
 import 'camera_page.dart';
 import 'login_page.dart';
 
@@ -619,61 +620,11 @@ class _WebViewExampleState extends State<WebViewExample> {
     var directory = await getTemporaryDirectory();
     var file = File(directory.path +
         "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
-    showImageSourceDialog(file, callbackName, context);
-  }
-
-  void showImageSourceDialog(
-      File file, String callbackName, BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return BottomSheet(
-              onClosing: () {},
-              builder: (context) {
-                return IntrinsicHeight(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            showPicker(file, callbackName);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("相册"),
-                          )),
-                      FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            showCamera(file, callbackName);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("拍照"),
-                          )),
-                    ],
-                  ),
-                );
-              });
-        }).then((v) {
+    showImageSourceDialog(file, context,(v){
       FocusScope.of(context).requestFocus(_focusNode);
+    },(futureFile,localFile){
+      processFileAndNotify(futureFile, localFile, callbackName);
     });
-  }
-
-  void showPicker(File file, String callbackName) {
-    var future = ImagePicker.pickImage(source: ImageSource.gallery);
-    processFileAndNotify(future, file, callbackName);
-  }
-
-  void showCamera(File file, String callbackName) {
-    var future =
-        Navigator.of(context).push<File>(MaterialPageRoute(builder: (context) {
-      return CameraPage(
-        capturedFile: file,
-      );
-    }));
-    processFileAndNotify(future, file, callbackName);
   }
 
   void processFileAndNotify(

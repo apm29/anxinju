@@ -98,8 +98,12 @@ class Api {
    * 获取用户详情
    */
   static Future<BaseResponse<UserDetail>> getUserDetail() async {
-    return await DioUtil()
-        .postAsync<UserDetail>(path: "/userDetail/getUserDetail");
+    return await DioUtil().postAsync<UserDetail>(
+      path: "/permission/userDetail/getUserDetail",
+      jsonProcessor: (jsonMap) {
+        return UserDetail.fromJson(jsonMap);
+      },
+    );
   }
 
   /*
@@ -115,15 +119,18 @@ class Api {
       String nickName,
       String avatar,
       String idCard}) async {
-    return await DioUtil().postAsync(path: "/userDetail/saveUserDetail", data: {
-      "userId": userId,
+    var dataMap = {
       "myName": myName,
       "sex": sex,
       "phone": phone,
       "nickName": nickName,
       "avatar": avatar,
       "idCard": idCard
-    });
+    };
+    if(userId!=null){
+      dataMap["userId"] = userId;
+    }
+    return await DioUtil().postAsync(path: "/permission/userDetail/saveUserDetail", data: dataMap);
   }
 
   static Future<BaseResponse<FileDetail>> uploadFile(String path) async {
@@ -146,5 +153,4 @@ class Api {
         formData: true);
     return baseResponse;
   }
-
 }

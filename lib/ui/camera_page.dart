@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:ease_life/index.dart';
 import 'package:camera/camera.dart';
 
+import 'widget/loading_state_widget.dart';
+
 class CameraPage extends StatefulWidget {
   final File capturedFile;
 
@@ -94,6 +96,8 @@ class FaceIdPage extends StatefulWidget {
 
 class _FaceIdPageState extends State<FaceIdPage> {
   CameraController controller;
+  GlobalKey<LoadingStateWidgetState> faceRecognizeKey =
+      GlobalKey(debugLabel: "faceIdSubmit");
 
   @override
   void initState() {
@@ -187,42 +191,47 @@ class _FaceIdPageState extends State<FaceIdPage> {
                   }),
                 ),
                 Align(
-                  alignment: Alignment.bottomCenter,
+                  alignment: Alignment(0,0.9),
                   child: LayoutBuilder(
                     builder: (_, constraint) {
-                      return SizedBox(
-                        width: constraint.biggest.width * 0.6,
-                        child: OutlineButton(
-                          color: Colors.white,
-                          shape: Border.all(color: Colors.greenAccent),
-                          borderSide: BorderSide(color: Colors.green),
-                          splashColor: Colors.greenAccent,
-                          child: Text(
-                            "匹配",
-                            style: TextStyle(color: Colors.green),
+                      return LoadingStateWidget(
+                        key: faceRecognizeKey,
+                        child: SizedBox(
+                          width:  constraint.biggest.width * 0.6,
+                          child: OutlineButton(
+                            color: Colors.white,
+                            shape: Border.all(color: Colors.greenAccent),
+                            borderSide: BorderSide(color: Colors.green),
+                            splashColor: Colors.greenAccent,
+                            child: Text(
+                              "匹配",
+                              style: TextStyle(color: Colors.green),
+                            ),
+                            highlightedBorderColor: Colors.greenAccent,
+                            onPressed: () {
+                              takePicture();
+                            },
                           ),
-                          highlightedBorderColor: Colors.greenAccent,
-                          onPressed: () {
-                            takePicture();
-                          },
                         ),
                       );
                     },
                   ),
                 ),
-
               ],
             ),
     );
   }
 
   void takePicture() async {
+    var idCard = ModalRoute.of(context).settings.arguments;
+    faceRecognizeKey.currentState.startLoading();
     Directory directory = await getTemporaryDirectory();
     var file = File(
         directory.path + "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
     await controller.takePicture(file.path);
     var resp = await Api.uploadPic(file.path);
-    var baseResponse = await Api.verifyUserFace(resp.data.orginPicPath, "111");
+    var baseResponse = await Api.verifyUserFace(resp.data.orginPicPath, idCard);
+    faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
   }
 }

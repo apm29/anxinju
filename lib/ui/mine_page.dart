@@ -257,7 +257,7 @@ class _MinePageState extends State<MinePage> {
                         HomeChip(color: const Color(0xff00007c), title: "访客记录",indexId: 'fkjl',index: indexInfo,),
                         HomeChip(title: "投诉记录",indexId: 'tsjl',index: indexInfo,),
                         HomeChip(title: "缴费记录",indexId: 'jfjl',index: indexInfo,),
-                        HomeChip(title: "调解档案"),
+                        HomeChip(title: "调解档案",indexId: 'tjda',index: indexInfo,),
                         HomeChip(title: "网上110记录",indexId: 'ws110jl',index: indexInfo,),
                         HomeChip(title: "巡逻记录",indexId: 'xljl',index: indexInfo,),
                         HomeChip(title: "小区保修记录",indexId: 'xqbxjl',index: indexInfo,),

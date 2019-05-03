@@ -140,6 +140,14 @@ class _MainPageState extends State<MainPage> {
                     },
                     child: Text("WebView界面"),
                   ),
+                  OutlineButton(
+                    onPressed: () {
+//                      Navigator.of(context).pushNamed("/preVerify");
+//                      showAndroidKeyboard();
+                      Navigator.of(context).pushNamed("/test/2");
+                    },
+                    child: Text("测试界面2"),
+                  ),
                 ],
               ),
             ),

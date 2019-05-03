@@ -16,25 +16,26 @@ class LoadingStateWidgetState extends State<LoadingStateWidget> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      alignment: Alignment.center,
-      children: <Widget>[
-        IgnorePointer(
-          ignoring: _loading,
-          child: Opacity(
-            child: widget.child,
-            opacity: _loading?0:1,
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.all(8),
           alignment: Alignment.center,
-          child: Visibility(
-            visible: _loading,
-            child: CircularProgressIndicator(),
-          ),
-        )
-      ],
-    );
+          children: <Widget>[
+            IgnorePointer(
+              ignoring: _loading,
+              child: Opacity(
+                child: widget.child,
+                opacity: _loading?0:1,
+              ),
+            ),
+            IntrinsicHeight(
+              child: Container(
+                alignment: Alignment.center,
+                child: Visibility(
+                  visible: _loading,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            )
+          ],
+        );
   }
 
   void startLoading() {
