@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
           "/audio": (_) => AudioRecordPage(),
           "/test": (_) => TestPage(),
           "/contacts": (_) => BlocProviders<ContactsBloc>(
-                child: ContactsSelectPage(),
+                child: ContactsSelectPage(null),
                 bloc: ContactsBloc(),
               ),
         },

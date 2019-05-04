@@ -80,6 +80,7 @@ class ApplicationBloc extends BlocBase {
     _getCurrentUserAndNotify();
     _getCurrentDistrictAndNotify();
     _getIndexInfo();
+    //_requestLocationPermission();
   }
 
   void _getCurrentUserAndNotify() async {
@@ -167,6 +168,13 @@ class ApplicationBloc extends BlocBase {
     //将取到的小区信息存入sp缓存
     sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, districtInfo.toString());
     _districtInfoController.add(districtInfo);
+  }
+
+  void _requestLocationPermission() async{
+    var permissionStatus =await  PermissionHandler().checkPermissionStatus(PermissionGroup.location);
+    if(permissionStatus != PermissionStatus.granted){
+      PermissionHandler().requestPermissions([PermissionGroup.location]);
+    }
   }
 
 }

@@ -226,6 +226,7 @@ const String kNavigationExamplePage = '''
 <button  onClick = "pushReplace()">push replace home</button>
 
 <button onClick = "uploadFile()"> choose file </button>
+<button onClick = "chooesContact()"> choose contact </button>
 <input id="textInput1" class="custom" size="32">
 <input id="textInput2" class="custom" size="32">
 <textarea name="textarea" rows="10" cols="50">Write something here</textarea>
@@ -261,6 +262,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     super.dispose();
     titleController.close();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -307,15 +309,20 @@ class _WebViewExampleState extends State<WebViewExample> {
             DistrictInfoButton(
               callback: (district) {
                 controller?.reload();
+                print('hasFocus:${_focusNode.hasFocus}');
+                FocusScope.of(context).requestFocus(_focusNode);
               },
             ),
-            SampleMenu(_controller.future),
+            SampleMenu(_controller.future,(){
+              FocusScope.of(context).requestFocus(_focusNode);
+            }),
           ],
         ),
         body: Builder(builder: (BuildContext context) {
           return Stack(
             children: <Widget>[
               TextField(
+                autofocus: false,
                 focusNode: _focusNode,
                 controller: textController,
                 onChanged: (text) {
@@ -324,6 +331,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                     current.value = '${textController.text}';
                     current.selectionStart = ${textController.selection.start};
                     current.selectionEnd = ${textController.selection.end};
+                    current.dispatchEvent(new Event('input'));
                    }
                   ''');
                 },
@@ -374,6 +382,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                     var inputs = document.getElementsByTagName('input');
                     var textArea = document.getElementsByTagName('textarea');
                     var current;
+                    var lastFocusElement = current;
                     for (var i = 0; i < inputs.length; i++) {
                       inputs[i].addEventListener('click', (e) => {
                         var json = {
@@ -384,9 +393,13 @@ class _WebViewExampleState extends State<WebViewExample> {
                             "selectionEnd":e.target.selectionEnd
                           }
                         };
+                        lastFocusElement = current;
                         current = e.target;
                         var param = JSON.stringify(json);
                         console.log(param);
+                        //if(lastFocusElement == current){
+                        //  return;
+                        //}
                         UserState.postMessage(param);
                       })
                       //inputs[i].addEventListener('blur',(e)=>{
@@ -411,9 +424,13 @@ class _WebViewExampleState extends State<WebViewExample> {
                             "selectionEnd":e.target.selectionEnd
                           }
                         };
+                        lastFocusElement = current;
                         current = e.target;
                         var param = JSON.stringify(json);
                         console.log(param);
+                        //if(lastFocusElement == current){
+                        //  return;
+                        //}
                         UserState.postMessage(param);
                       })
                     
@@ -433,6 +450,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                   }
                 },
               ),
+
             ],
           );
         }),
@@ -689,7 +707,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     String callbackName = data['callbackName'];
     String callbackCancel = data['callbackCancel'];
     dynamic callbackParam = data['callbackParam'];
-    showDialog(
+    showDialog<String>(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -698,7 +716,7 @@ class _WebViewExampleState extends State<WebViewExample> {
             actions: <Widget>[
               OutlineButton(
                 onPressed: () {
-                  Navigator.of(context).pop(callbackParam);
+                  Navigator.of(context).pop(callbackName);
                 },
                 child: Text("确定"),
               ),
@@ -711,6 +729,7 @@ class _WebViewExampleState extends State<WebViewExample> {
             ],
           );
         }).then((param) {
+      FocusScope.of(context).requestFocus(_focusNode);
       if (param == null) {
         controller.evaluateJavascript('$callbackCancel()');
       } else {
@@ -745,6 +764,7 @@ class _WebViewExampleState extends State<WebViewExample> {
             ],
           );
         }).then((param) {
+      FocusScope.of(context).requestFocus(_focusNode);
       if (param != null) {
         controller.evaluateJavascript('$callbackName("$param")');
       }
@@ -816,7 +836,8 @@ enum MenuOptions {
 }
 
 class SampleMenu extends StatelessWidget {
-  SampleMenu(this.controller);
+  final VoidCallback callback;
+  SampleMenu(this.controller,this.callback);
 
   final Future<WebViewController> controller;
   final CookieManager cookieManager = CookieManager();
@@ -852,6 +873,7 @@ class SampleMenu extends StatelessWidget {
                 _onNavigationDelegateExample(controller.data, context);
                 break;
             }
+            callback();
           },
           itemBuilder: (BuildContext context) => <PopupMenuItem<MenuOptions>>[
                 PopupMenuItem<MenuOptions>(

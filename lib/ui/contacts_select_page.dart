@@ -2,7 +2,22 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:ease_life/index.dart';
 import 'package:android_intent/android_intent.dart';
 
+typedef ContactCallback = Function(Contact);
+class ContactInfo{
+  String identifier, displayName, givenName, middleName, prefix, suffix, familyName, company, jobTitle, note;
+
+  ContactInfo.fromContact(Contact contact){
+    identifier = contact.identifier;
+    displayName = contact.displayName;
+  }
+
+}
 class ContactsSelectPage extends StatefulWidget {
+
+  final ContactCallback callback;
+
+  ContactsSelectPage(this.callback);
+
   @override
   _ContactsSelectPageState createState() => _ContactsSelectPageState();
 }
@@ -22,7 +37,6 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
       body: Container(
         margin: EdgeInsets.all(12),
         padding: EdgeInsets.all(12),
-        color: Colors.grey[200],
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -117,14 +131,20 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                       if (phones.isEmpty) {
                                         return;
                                       }
-                                      var androidIntent = AndroidIntent(
-                                          action: 'action_view',
-                                          data: "smsto:${i.value}",
-                                          arguments: {
-                                            "sms_body":
-                                                "我小区已使用门禁，输入我家庭通行码123456即可进入小区，如您有车辆需进入请点击链接登记车牌."
-                                          });
-                                      androidIntent.launch();
+
+                                      if(widget.callback!=null){
+                                        widget.callback(contact);
+                                      } else {
+//                                        var androidIntent = AndroidIntent(
+//                                            action: 'action_view',
+//                                            data: "smsto:${i.value}",
+//                                            arguments: {
+//                                              "sms_body":
+//                                              "我小区已使用门禁，输入我家庭通行码123456即可进入小区，如您有车辆需进入请点击链接登记车牌."
+//                                            });
+//                                        androidIntent.launch();
+                                        Navigator.of(context).pop(contact);
+                                      }
                                     },
                                     trailing: Icon(Icons.arrow_forward),
                                   ),
