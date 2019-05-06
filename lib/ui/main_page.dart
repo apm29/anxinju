@@ -34,7 +34,11 @@ class _MainPageState extends State<MainPage> {
       },
       child: Scaffold(
         body: Builder(builder: (context) {
-          return buildBody(context);
+          return Container(
+            color: Colors.grey[200],
+            padding: EdgeInsets.symmetric(),
+            child: buildContent(),
+          );
         }),
         bottomNavigationBar: buildBottomNavigationBar(),
       ),
@@ -78,7 +82,6 @@ class _MainPageState extends State<MainPage> {
       onTap: (index) {
         setState(() {
           _currentIndex = index;
-          _pageController.jumpToPage(index);
         });
       },
       currentIndex: _currentIndex,
@@ -87,75 +90,61 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  PageController _pageController = PageController(initialPage: _currentIndex);
-  TextEditingController controller = TextEditingController(
-      text: sharedPreferences.getString("lastUrl") ?? "http://axj.ciih.net/#/");
-
-  Widget buildBody(BuildContext context) {
-    return Container(
-      color: Colors.grey[200],
-      padding: EdgeInsets.symmetric(),
-      child: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            if (_currentIndex != index) {
-              _currentIndex = index;
-            }
-          });
-        },
-        children: <Widget>[
-          HomePage(),
-          Container(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  OutlineButton(
-                    onPressed: () {
+  buildContent() {
+    switch(_currentIndex){
+      case 0:
+        return HomePage();
+      case 1:
+        return Container(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                OutlineButton(
+                  onPressed: () {
 //                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
-                      Navigator.of(context).pushNamed("/preVerify");
-                    },
-                    child: Text("测试界面"),
-                  ),
-                  OutlineButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed("/camera");
-                    },
-                    child: Text("人脸识别界面"),
-                  ),
-                  OutlineButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed("/audio");
-                    },
-                    child: Text("语音录入界面"),
-                  ),
-                  OutlineButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) {
-                            return WebViewExample("http://axj.ciih.net/#/");
-                          }));
-                    },
-                    child: Text("WebView界面"),
-                  ),
-                  OutlineButton(
-                    onPressed: () {
+                    Navigator.of(context).pushNamed("/preVerify");
+                  },
+                  child: Text("测试界面"),
+                ),
+                OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed("/camera");
+                  },
+                  child: Text("人脸识别界面"),
+                ),
+                OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed("/audio");
+                  },
+                  child: Text("语音录入界面"),
+                ),
+                OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) {
+                          return WebViewExample("http://axj.ciih.net/#/");
+                        }));
+                  },
+                  child: Text("WebView界面"),
+                ),
+                OutlineButton(
+                  onPressed: () {
 //                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
-                      Navigator.of(context).pushNamed("/test/2");
-                    },
-                    child: Text("测试界面2"),
-                  ),
-                ],
-              ),
+                    Navigator.of(context).pushNamed("/test/2");
+                  },
+                  child: Text("测试界面2"),
+                ),
+              ],
             ),
           ),
-          MessagePage(),
-          MinePage(),
-        ],
-      ),
-    );
+        );
+      case 2:
+        return MessagePage();
+      case 3:
+        return MinePage();
+    }
   }
 }

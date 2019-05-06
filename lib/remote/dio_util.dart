@@ -60,16 +60,16 @@ class DioUtil {
       };
 
     _dioInstance.interceptors.add(InterceptorsWrapper(onRequest: (req) {
-      req.headers.update("Authorization", (old) {
-        return sharedPreferences.getString(PreferenceKeys.keyAuthorization);
-      });
+//      req.headers.update(KEY_HEADER_TOKEN, (old) {
+//        return sharedPreferences.getString(PreferenceKeys.keyAuthorization);
+//      });
       debugPrint("REQUEST:");
       debugPrint("===========================================");
       debugPrint("  Method:${req.method},Url:${req.baseUrl + req.path}");
       debugPrint("  Headers:${req.headers}");
       debugPrint("  QueryParams:${req.queryParameters}");
       print('=======>${req.data.runtimeType}');
-      if(req.data.runtimeType != FormData){
+      if (req.data.runtimeType != FormData) {
         debugPrint("    Data:${req.data}");
       }
 
@@ -81,7 +81,7 @@ class DioUtil {
           "  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
       debugPrint("  Headers:${resp.request.headers}");
       debugPrint("  QueryParams:${resp.request.queryParameters}");
-      if(resp.request.data.runtimeType != FormData) {
+      if (resp.request.data.runtimeType != FormData) {
         debugPrint("  Data:${resp.request.data}");
       }
       debugPrint("  -------------------------");
@@ -127,16 +127,21 @@ class DioUtil {
     CancelToken cancelToken,
     DataType dataType = DataType.JSON,
     bool formData = false,
+    bool addAuthorization = true,
   }) async {
     return _dioInstance
         .post<Map<String, dynamic>>(path,
             data: !formData ? data : FormData.from(data),
             options: RequestOptions(
-                contentType: formData?ContentType.parse(VALUE_HEADER_CONTENT_TYPE_FORM):ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
-                headers: {
-                  KEY_HEADER_TOKEN: sharedPreferences
-                      .getString(PreferenceKeys.keyAuthorization),
-                }),
+                contentType: formData
+                    ? ContentType.parse(VALUE_HEADER_CONTENT_TYPE_FORM)
+                    : ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+                headers: addAuthorization
+                    ? {
+                        KEY_HEADER_TOKEN: sharedPreferences
+                            .getString(PreferenceKeys.keyAuthorization),
+                      }
+                    : {}),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       String _status, _text, _token;
@@ -156,8 +161,8 @@ class DioUtil {
               : response.data['data'].toString();
         } else {
           _data = response.data['data'] is String
-              ? <String,dynamic>{}
-              : response.data['data'] ?? <String,dynamic>{};
+              ? <String, dynamic>{}
+              : response.data['data'] ?? <String, dynamic>{};
         }
         _token = response.data['token'];
         BaseResponse<T> baseResponse = BaseResponse<T>(_status, _token, _text,

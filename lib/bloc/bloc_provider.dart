@@ -74,12 +74,15 @@ class ApplicationBloc extends BlocBase {
     _districtInfoController.close();
     _homeIndexController.close();
     _mineIndexController.close();
+    _noticeController.close();
+    _noticeTypeController.close();
   }
 
   ApplicationBloc() {
     _getCurrentUserAndNotify();
     _getCurrentDistrictAndNotify();
     _getIndexInfo();
+    _getNoticeInfo();
     //_requestLocationPermission();
   }
 
@@ -118,6 +121,12 @@ class ApplicationBloc extends BlocBase {
 
   Observable<Index> get homeIndex => _homeIndexController.stream;
   Observable<Index> get mineIndex => _mineIndexController.stream;
+
+  BehaviorSubject<List<NoticeDetail>> _noticeController = BehaviorSubject();
+  BehaviorSubject<List<NoticeType>> _noticeTypeController = BehaviorSubject();
+
+  Observable<List<NoticeDetail>> get homeNoticeStream => _noticeController.stream;
+  Observable<List<NoticeType>> get noticeTypeStream => _noticeTypeController.stream;
 
   /*
    * 退出登录:
@@ -175,6 +184,21 @@ class ApplicationBloc extends BlocBase {
     if(permissionStatus != PermissionStatus.granted){
       PermissionHandler().requestPermissions([PermissionGroup.location]);
     }
+  }
+
+  void _getNoticeInfo() {
+    Api.getAllNoticeType()
+        .then((baseResp){
+          if(baseResp.success()){
+            _noticeTypeController.add(baseResp.data);
+            return Api.getNewNotice(baseResp.data);
+          }else{
+            throw Error();
+          }
+    }).then(( BaseResponse<List<NoticeDetail>> resp){
+      if(resp.success())
+        _noticeController.add(resp.data);
+    });
   }
 
 }

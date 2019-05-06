@@ -34,7 +34,7 @@ void showImageSourceDialog(
                         InkWell(
                             onTap: () {
                               Navigator.of(context).pop();
-                              showCamera(file, onFileProcess,context);
+                              showCameraPicker(file, onFileProcess);
                             },
                             child: Container(
                               width: constraint.biggest.width,
@@ -55,6 +55,10 @@ void showImageSourceDialog(
 
 void showPicker(File file, OnFileProcess onFileProcess) {
   var future = ImagePicker.pickImage(source: ImageSource.gallery);
+  onFileProcess(future,file);
+}
+void showCameraPicker(File file, OnFileProcess onFileProcess) {
+  var future = ImagePicker.pickImage(source: ImageSource.camera);
   onFileProcess(future,file);
 }
 

@@ -4,14 +4,20 @@ import 'package:flutter/cupertino.dart';
 
 typedef DistrictCallback = void Function(DistrictInfo);
 
-class DistrictInfoButton extends StatelessWidget {
+class DistrictInfoButton extends StatefulWidget {
   final DistrictCallback callback;
   const DistrictInfoButton({
     Key key,this.callback
   }) : super(key: key);
 
   @override
+  _DistrictInfoButtonState createState() => _DistrictInfoButtonState();
+}
+
+class _DistrictInfoButtonState extends State<DistrictInfoButton> {
+  @override
   Widget build(BuildContext context) {
+    var findAllDistrict = Api.findAllDistrict();
     return StreamBuilder<DistrictInfo>(
       stream: BlocProviders.of<ApplicationBloc>(context).currentDistrict,
       builder: (context, snapShot) {
@@ -27,11 +33,11 @@ class DistrictInfoButton extends StatelessWidget {
                         builder: (context) {
                           return FutureBuilder<
                               BaseResponse<List<DistrictInfo>>>(
-                            future: Api.findAllDistrict(),
-                            builder: (context, snapShot) {
-                              if (snapShot.hasData &&
-                                  !snapShot.hasError &&
-                                  snapShot.data.success()) {
+                            future: findAllDistrict,
+                            builder: (context, districtSnap) {
+                              if (districtSnap.hasData &&
+                                  !districtSnap.hasError &&
+                                  districtSnap.data.success()) {
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
@@ -40,16 +46,16 @@ class DistrictInfoButton extends StatelessWidget {
                                         BlocProviders.of<ApplicationBloc>(
                                                 context)
                                             .setCurrentDistrict(
-                                                snapShot.data.data[index]);
+                                                districtSnap.data.data[index]);
                                         Navigator.of(context).pop();
                                       },
                                       child: Text(
-                                        snapShot.data.data[index].districtName,
+                                        districtSnap.data.data[index].districtName,
                                         textAlign: TextAlign.center,
                                       ),
                                     );
                                   },
-                                  itemCount: snapShot.data.data.length,
+                                  itemCount: districtSnap.data.data.length,
                                 );
                               } else {
                                 return Wrap(
@@ -74,8 +80,8 @@ class DistrictInfoButton extends StatelessWidget {
                           );
                         });
                   }).then((district){
-                    if(callback!=null){
-                      callback(district);
+                    if(widget.callback!=null){
+                      widget.callback(district);
                     }
               });
             },

@@ -257,3 +257,90 @@ class FileDetail {
     return data;
   }
 }
+
+class NoticeType {
+  int typeId;
+  int typeUid;
+  String typeName;
+
+  NoticeType({this.typeId, this.typeUid, this.typeName});
+
+  NoticeType.fromJson(Map<String, dynamic> json) {
+    typeId = json['typeId'];
+    typeUid = json['typeUid'];
+    typeName = json['typeName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['typeId'] = this.typeId;
+    data['typeUid'] = this.typeUid;
+    data['typeName'] = this.typeName;
+    return data;
+  }
+}
+
+class NoticeDetail {
+  int noticeId;
+  String noticeTitle;
+  String noticeContent;
+  String noticeBanner;
+  int noticeType;
+  String noticeScope;
+  int districtId;
+  String userId;
+  int companyId;
+  String userName;
+  String companyName;
+  String createTime;
+  Null orderNo;
+
+  NoticeDetail(
+      {this.noticeId,
+        this.noticeTitle,
+        this.noticeContent,
+        this.noticeBanner,
+        this.noticeType,
+        this.noticeScope,
+        this.districtId,
+        this.userId,
+        this.companyId,
+        this.userName,
+        this.companyName,
+        this.createTime,
+        this.orderNo});
+
+  NoticeDetail.fromJson(Map<String, dynamic> json) {
+    noticeId = json['noticeId'];
+    noticeTitle = json['noticeTitle'];
+    noticeContent = json['noticeContent'];
+    noticeBanner = json['noticeBanner'];
+    noticeType = json['noticeType'];
+    noticeScope = json['noticeScope'];
+    districtId = json['districtId'];
+    userId = json['userId'];
+    companyId = json['companyId'];
+    userName = json['userName'];
+    companyName = json['companyName'];
+    createTime = json['createTime'];
+    orderNo = json['orderNo'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['noticeId'] = this.noticeId;
+    data['noticeTitle'] = this.noticeTitle;
+    data['noticeContent'] = this.noticeContent;
+    data['noticeBanner'] = this.noticeBanner;
+    data['noticeType'] = this.noticeType;
+    data['noticeScope'] = this.noticeScope;
+    data['districtId'] = this.districtId;
+    data['userId'] = this.userId;
+    data['companyId'] = this.companyId;
+    data['userName'] = this.userName;
+    data['companyName'] = this.companyName;
+    data['createTime'] = this.createTime;
+    data['orderNo'] = this.orderNo;
+    return data;
+  }
+}
