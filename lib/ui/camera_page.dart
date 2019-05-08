@@ -6,7 +6,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-import '../utls.dart';
+import '../utils.dart';
 import 'widget/loading_state_widget.dart';
 
 class CameraPage extends StatefulWidget {

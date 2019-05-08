@@ -1,6 +1,7 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 
+import '../utils.dart';
 import 'widget/district_info_button.dart';
 
 class MinePage extends StatefulWidget {
@@ -11,6 +12,12 @@ class MinePage extends StatefulWidget {
 class _MinePageState extends State<MinePage> {
   @override
   Widget build(BuildContext context) {
+    Api.getUserInfo().then((baseResp) {
+      print('baseResp:$baseResp');
+      if (baseResp.success()) {
+        BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text("我的"),
@@ -19,10 +26,15 @@ class _MinePageState extends State<MinePage> {
       ),
       body: StreamBuilder<UserInfo>(
         builder: (context, AsyncSnapshot<UserInfo> userSnap) {
+          print('userInfo:${userSnap.data}');
           if (userSnap.hasError || !userSnap.hasData) {
             return buildMineVisitor();
-          } else {
+          } else if (userSnap.data.isCertification == 1) {
             return _buildMine(context, userSnap.data);
+          } else if (userSnap.data.isCertification == 0) {
+            return _buildUnauthorized(context, userSnap.data);
+          } else {
+            return buildMineVisitor();
           }
         },
         stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
@@ -41,7 +53,7 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  Widget _buildMine(BuildContext context, UserInfo data) {
+  Widget _buildMine(BuildContext context, UserInfo userInfo) {
     return StreamBuilder<Index>(
         stream: BlocProviders.of<ApplicationBloc>(context).mineIndex,
         builder: (context, snapshot) {
@@ -101,57 +113,57 @@ class _MinePageState extends State<MinePage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(18.0),
-                          child: GestureDetector(
-                            onTap: (){
-                              Navigator.of(context).pushNamed("/preVerify");
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: CircleAvatar(
-                                    child: FlutterLogo(),
-                                  ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: CircleAvatar(
+                                  child: FlutterLogo(),
                                 ),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              '${data.userName}',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 4),
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.white,
-                                                    width: 0.5),
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(100))),
-                                            child: Text("切换用户",
-                                                style: TextStyle(fontSize: 8)),
-                                          )
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text('天马花园15-2-1202'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                              Text(
+                                '${userInfo.userName}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+//                              Expanded(
+//                                child: Column(
+//                                  mainAxisSize: MainAxisSize.min,
+//                                  crossAxisAlignment:
+//                                      CrossAxisAlignment.start,
+//                                  children: <Widget>[
+//                                    Row(
+//                                      children: <Widget>[
+//                                        Padding(
+//                                          padding: const EdgeInsets.all(8.0),
+//                                          child: Text(
+//                                            '${userInfo.userName}',
+//                                            style: TextStyle(fontSize: 15),
+//                                          ),
+//                                        ),
+//                                        Container(
+//                                          padding: EdgeInsets.symmetric(
+//                                              horizontal: 4),
+//                                          decoration: BoxDecoration(
+//                                              border: Border.all(
+//                                                  color: Colors.white,
+//                                                  width: 0.5),
+//                                              borderRadius: BorderRadius.all(
+//                                                  Radius.circular(100))),
+//                                          child: Text("切换用户",
+//                                              style: TextStyle(fontSize: 8)),
+//                                        )
+//                                      ],
+//                                    ),
+//                                    Padding(
+//                                      padding: const EdgeInsets.all(8.0),
+//                                      child: Text('天马花园15-2-1202'),
+//                                    ),
+//                                  ],
+//                                ),
+//                              ),
+                            ],
                           ),
                         )
                       ],
@@ -166,7 +178,7 @@ class _MinePageState extends State<MinePage> {
                       children: <Widget>[
                         GestureDetector(
                           onTap: () {
-                            routeToWeb('wdfw', indexInfo);
+                            routeToWeb(context, 'wdfw', indexInfo);
                           },
                           child: Column(
                             children: <Widget>[
@@ -180,7 +192,7 @@ class _MinePageState extends State<MinePage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            routeToWeb('zscy', indexInfo);
+                            routeToWeb(context, 'zscy', indexInfo);
                           },
                           child: Column(
                             children: <Widget>[
@@ -194,7 +206,7 @@ class _MinePageState extends State<MinePage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            routeToWeb('wdac', indexInfo);
+                            routeToWeb(context, 'wdac', indexInfo);
                           },
                           child: Column(
                             children: <Widget>[
@@ -211,7 +223,7 @@ class _MinePageState extends State<MinePage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      routeToWeb('jttxm', indexInfo);
+                      routeToWeb(context, 'jttxm', indexInfo);
                     },
                     child: Container(
                       color: Colors.white,
@@ -230,7 +242,7 @@ class _MinePageState extends State<MinePage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      routeToWeb('crgl', indexInfo);
+                      routeToWeb(context, 'crgl', indexInfo);
                     },
                     child: Container(
                       color: Colors.white,
@@ -407,14 +419,58 @@ class _MinePageState extends State<MinePage> {
     ];
   }
 
-  void routeToWeb(String id, Index index) {
-    var indexWhere = index.menu.indexWhere((i) => i.id == id);
-    if (indexWhere < 0) {
-      return;
-    }
-    var url = index.menu[indexWhere].url;
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return WebViewExample(url);
-    }));
+  Widget _buildUnauthorized(BuildContext context, UserInfo data) {
+    var colorFaceButton = Colors.blue;
+    return Stack(
+      children: <Widget>[
+        AbsorbPointer(
+          absorbing: true,
+          child: _buildMine(context, data),
+        ),
+        AlertDialog(
+          title: Text(
+            "您还未认证为业主",
+            style: TextStyle(color: colorFaceButton),
+          ),
+          content: Container(
+            margin: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              border: Border.all(color: colorFaceButton),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            child: ListTile(
+              leading: Icon(
+                Icons.fingerprint,
+                size: 40,
+                color: colorFaceButton,
+              ),
+              title: Text("录入人脸照片",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: colorFaceButton)),
+              subtitle:
+                  Text("一键录入,简单高效", style: TextStyle(color: colorFaceButton)),
+              trailing: Icon(
+                Icons.arrow_forward,
+                color: colorFaceButton,
+              ),
+              onTap: () {
+                Navigator.of(context).pushNamed("/preVerify").then((v) {
+                  //获取当前用户信息
+                  Future.delayed(Duration(milliseconds: 500), () {
+                    return Api.getUserInfo().then((baseResp) {
+                      print('baseResp:$baseResp');
+                      if (baseResp.success()) {
+                        BlocProviders.of<ApplicationBloc>(context)
+                            .login(baseResp.data);
+                      }
+                    });
+                  });
+                });
+              },
+            ),
+          ),
+        )
+      ],
+    );
   }
 }

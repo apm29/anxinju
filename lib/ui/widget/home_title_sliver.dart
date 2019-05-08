@@ -48,10 +48,10 @@ class HomeTitleSliver extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(width: 10,),
-              Text(tailText,style:const TextStyle(
+              Text("",style:const TextStyle(
                   fontSize: 16
               ),),
-              Icon(Icons.keyboard_arrow_right)
+              //Icon(Icons.keyboard_arrow_right)
             ],
           ),
           onPressed: onPressed,

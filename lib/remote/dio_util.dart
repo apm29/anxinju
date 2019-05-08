@@ -14,7 +14,7 @@ typedef ProcessRawJson<T> = T Function(dynamic);
 const KEY_HEADER_TOKEN = "Authorization";
 const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
 const VALUE_HEADER_CONTENT_TYPE_FORM = "multipart/form-data";
-
+const BASE_URL = "http://axj.ciih.net/";
 class DioUtil {
   Dio _dioInstance;
   bool inDebug = false;
@@ -45,7 +45,7 @@ class DioUtil {
       method: "POST",
       connectTimeout: 10000,
       receiveTimeout: 15000,
-      baseUrl: "http://axj.ciih.net/",
+      baseUrl: BASE_URL,
     ));
     //设置代理
     if (proxyHttp)

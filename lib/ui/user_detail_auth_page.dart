@@ -4,7 +4,7 @@ import 'package:ease_life/index.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../utls.dart';
+import '../utils.dart';
 import 'widget/loading_state_widget.dart';
 
 class UserDetailAuthPage extends StatefulWidget {
@@ -167,9 +167,15 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                                   showImageSourceDialog(file, context, (v) {},
                                       (futureFile, localFile) {
                                         futureFile.then((f){
+                                          if(f==null){
+                                            return null;
+                                          }
                                           uploadImageKey.currentState.startLoading();
                                           return Api.uploadPic(f.path);
                                         }).then((baseResp){
+                                          if(baseResp==null){
+                                            return null;
+                                          }
                                           if(baseResp.success()){
                                             _avatarUploadController.add(baseResp.data.thumbnailPath);
                                             _avatarController.text = baseResp.data.orginPicPath;

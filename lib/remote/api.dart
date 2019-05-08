@@ -8,8 +8,8 @@ import 'dio_util.dart';
 class Api {
   static CancelToken defaultToken = CancelToken();
 
-  static Future<BaseResponse<UserInfoWrapper>> login(String userName,
-      String password,
+  static Future<BaseResponse<UserInfoWrapper>> login(
+      String userName, String password,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
         path: "permission/login",
@@ -21,8 +21,8 @@ class Api {
         cancelToken: cancelToken);
   }
 
-  static Future<BaseResponse<UserInfoWrapper>> fastLogin(String mobile,
-      String verifyCode,
+  static Future<BaseResponse<UserInfoWrapper>> fastLogin(
+      String mobile, String verifyCode,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
         path: "permission/fastLogin",
@@ -31,6 +31,14 @@ class Api {
           "mobile": mobile,
           "verifyCode": verifyCode,
         },
+        cancelToken: cancelToken);
+  }
+
+  static Future<BaseResponse<UserInfo>> getUserInfo(
+      {CancelToken cancelToken}) async {
+    return DioUtil().postAsync<UserInfo>(
+        path: "permission/user/getUserInfo",
+        jsonProcessor: (json) => UserInfo.fromJson(json),
         cancelToken: cancelToken);
   }
 
@@ -43,8 +51,8 @@ class Api {
         cancelToken: cancelToken);
   }
 
-  static register(String mobile, String smsCode, String password,
-      String userName) async {
+  static register(
+      String mobile, String smsCode, String password, String userName) async {
     return DioUtil().postAsync<Object>(
       path: "permission/user/register",
       jsonProcessor: (dynamic json) => null,
@@ -59,18 +67,18 @@ class Api {
 
   static Future<BaseResponse<List<DistrictInfo>>> findAllDistrict() async {
     BaseResponse<List<DistrictInfo>> baseResponse =
-    await DioUtil().postAsync<List<DistrictInfo>>(
-        path: "business/district/findDistrictInfo",
-        jsonProcessor: (dynamic json) {
-          if (json is List) {
-            return json.map((j) {
-              return DistrictInfo.fromJson(j);
-            }).toList();
-          }
-          return null;
-        },
-        data: {},
-        dataType: DataType.LIST);
+        await DioUtil().postAsync<List<DistrictInfo>>(
+            path: "business/district/findDistrictInfo",
+            jsonProcessor: (dynamic json) {
+              if (json is List) {
+                return json.map((j) {
+                  return DistrictInfo.fromJson(j);
+                }).toList();
+              }
+              return null;
+            },
+            data: {},
+            dataType: DataType.LIST);
 
     return baseResponse;
   }
@@ -78,8 +86,8 @@ class Api {
   /*
    *  前端发送photo、idCard，后端接收处理，返回错误时表示该用户已通过认证，不需要重新发起认证
    */
-  static Future<BaseResponse> verifyUserFace(String imageUrl,
-      String idCard) async {
+  static Future<BaseResponse> verifyUserFace(
+      String imageUrl, String idCard) async {
     return await DioUtil().postAsync(
         path: "/permission/userCertification/verify",
         data: {"photo": imageUrl, "idCard": idCard});
@@ -111,13 +119,14 @@ class Api {
    * userId,用户id:带上id为修改,不带id为新增详情
    * myName
    */
-  static Future<BaseResponse> saveUserDetail({String userId,
-    String myName,
-    String sex,
-    String phone,
-    String nickName,
-    String avatar,
-    String idCard}) async {
+  static Future<BaseResponse> saveUserDetail(
+      {String userId,
+      String myName,
+      String sex,
+      String phone,
+      String nickName,
+      String avatar,
+      String idCard}) async {
     var dataMap = {
       "myName": myName,
       "sex": sex,
@@ -165,28 +174,30 @@ class Api {
           }
           return null;
         },
-        dataType: DataType.LIST
-    );
+        dataType: DataType.LIST);
   }
 
   static Future<BaseResponse<List<NoticeDetail>>> getNewNotice(
       List<NoticeType> list) {
     return DioUtil().postAsync(
-        path: "/business/notice/getAllNewNotice",
-        jsonProcessor: (json) {
-          if (json is List) {
-            return json.map((j) {
-              return NoticeDetail.fromJson(j);
-            }).toList();
-          }
-          return null;
-        },
-        data:{
-          "noticeType":list.map((notice){
-            return notice.typeId;
-          }).toList().join(",")
-        },
-        dataType: DataType.LIST,
+      path: "/business/notice/getAllNewNotice",
+      jsonProcessor: (json) {
+        if (json is List) {
+          return json.map((j) {
+            return NoticeDetail.fromJson(j);
+          }).toList();
+        }
+        return null;
+      },
+      data: {
+        "noticeType": list
+            .map((notice) {
+              return notice.typeId;
+            })
+            .toList()
+            .join(",")
+      },
+      dataType: DataType.LIST,
       addAuthorization: false,
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:ease_life/ui/camera_page.dart';
+import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,7 +31,7 @@ void showImageSourceDialog(
                             child: Container(
                               width: constraint.biggest.width,
                               alignment: Alignment.center,
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(18.0),
                               child: Text("相册"),
                             )),
                         InkWell(
@@ -41,7 +42,7 @@ void showImageSourceDialog(
                             child: Container(
                               width: constraint.biggest.width,
                               alignment: Alignment.center,
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(18.0),
                               child: Text("拍照"),
                             )),
                       ],
@@ -100,4 +101,15 @@ Future<File> rotateWithExifAndCompress(File file) async{
     file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
     return file;
   });
+}
+
+void routeToWeb(BuildContext context,String id, Index index) {
+  var indexWhere = index.menu.indexWhere((i) => i.id == id);
+  if (indexWhere < 0) {
+    return;
+  }
+  var url = index.menu[indexWhere].url;
+  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+    return WebViewExample(url);
+  }));
 }

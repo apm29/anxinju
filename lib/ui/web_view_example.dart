@@ -15,7 +15,7 @@ import 'package:ease_life/index.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
-import '../utls.dart';
+import '../utils.dart';
 import 'camera_page.dart';
 import 'contacts_select_page.dart';
 import 'login_page.dart';
@@ -711,6 +711,9 @@ class _WebViewExampleState extends State<WebViewExample> {
       //通过exif旋转图片
       return FlutterExifRotation.rotateImage(path: file.path);
     }).then((f) {
+      if (f == null) {
+        return null;
+      }
       //压缩图片
       return FlutterImageCompress.compressWithFile(
         f.path,

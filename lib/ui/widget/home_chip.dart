@@ -1,8 +1,8 @@
 import 'package:ease_life/model/base_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../web_view_example.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:ease_life/utils.dart';
 
 class HomeChip extends StatelessWidget {
   final String title;
@@ -11,37 +11,34 @@ class HomeChip extends StatelessWidget {
   final Color textColor;
   final String indexId;
   final Index index;
+  final bool intercept;
 
-  HomeChip({
-    @required this.title,
-    this.onPressed,
-    this.color = Colors.white,
-    this.textColor = const Color(0xFF616161),
-    this.indexId,
-    this.index
-  });
+  HomeChip(
+      {@required this.title,
+      this.onPressed,
+      this.color = Colors.white,
+      this.textColor = const Color(0xFF616161),
+      this.indexId,
+      this.index,
+      this.intercept});
 
-  void routeToWeb(String id, Index index, BuildContext context) {
-    print('$id');
-    var indexWhere = index.menu.indexWhere((i)=>i.id==id);
-    if(indexWhere<0){
+  void route(String id, Index index, BuildContext context) {
+    if (intercept==true) {
+      Fluttertoast.showToast(msg: "请先完成户主认证");
       return;
     }
-    var url = index.menu[indexWhere].url;
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return WebViewExample(url);
-    }));
+    routeToWeb(context,id, index);
   }
 
   @override
   Widget build(BuildContext context) {
-    if(index==null){
+    if (index == null) {
       return Container();
     }
 
     return GestureDetector(
       onTap: () {
-        routeToWeb(indexId, index, context);
+        route(indexId, index, context);
       },
       child: Container(
           margin: EdgeInsets.all(ScreenUtil().setWidth(8)),
@@ -85,9 +82,9 @@ class HomeChip extends StatelessWidget {
   }
 
   String getTitle() {
-    return index.menu.firstWhere((item){
+    return index.menu.firstWhere((item) {
       return item.id == indexId;
-    },orElse: (){
+    }, orElse: () {
       return MenuItem("", "未定义", "");
     }).remark;
   }
