@@ -205,7 +205,9 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                             SnackBar(content: Text(baseResponse.text)));
                         submitButtonKey.currentState.stopLoading();
                         if (baseResponse.success()) {
-                          Navigator.of(context).pushReplacementNamed("/camera",arguments: _idCardController.text);
+                          Navigator.of(context).pushReplacementNamed("/camera",arguments:{
+                            "idCard": _idCardController.text
+                          });
                         }
                       },
                       color: Colors.blue,

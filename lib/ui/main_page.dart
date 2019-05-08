@@ -9,6 +9,7 @@ import 'package:ease_life/main.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
+
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -19,8 +20,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil(width: 1080, height: 2160)
-      ..init(context);
+    ScreenUtil(width: 1080, height: 2160)..init(context);
     return WillPopScope(
       onWillPop: () async {
         if (_lastPressedAt == null ||
@@ -33,13 +33,10 @@ class _MainPageState extends State<MainPage> {
         return true;
       },
       child: Scaffold(
-        body: Builder(builder: (context) {
-          return Container(
+        body:  Container(
             color: Colors.grey[200],
-            padding: EdgeInsets.symmetric(),
             child: buildContent(),
-          );
-        }),
+          ),
         bottomNavigationBar: buildBottomNavigationBar(),
       ),
     );
@@ -80,9 +77,10 @@ class _MainPageState extends State<MainPage> {
             title: Text("我的")),
       ],
       onTap: (index) {
-        setState(() {
-          _currentIndex = index;
-        });
+        if (_currentIndex != index)
+          setState(() {
+            _currentIndex = index;
+          });
       },
       currentIndex: _currentIndex,
       fixedColor: Colors.blue,
@@ -91,7 +89,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   buildContent() {
-    switch(_currentIndex){
+    switch (_currentIndex) {
       case 0:
         return HomePage();
       case 1:
@@ -106,7 +104,7 @@ class _MainPageState extends State<MainPage> {
 //                      showAndroidKeyboard();
                     Navigator.of(context).pushNamed("/preVerify");
                   },
-                  child: Text("测试界面"),
+                  child: Text("业主认证"),
                 ),
                 OutlineButton(
                   onPressed: () {
@@ -122,10 +120,10 @@ class _MainPageState extends State<MainPage> {
                 ),
                 OutlineButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) {
-                          return WebViewExample("http://axj.ciih.net/#/");
-                        }));
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return WebViewExample("http://axj.ciih.net/#/");
+                    }));
                   },
                   child: Text("WebView界面"),
                 ),

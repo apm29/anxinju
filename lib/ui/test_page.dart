@@ -28,7 +28,7 @@ class _TestPageState extends State<TestPage> {
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text("test".toUpperCase(),style: TextStyle(color: Colors.white70),),
                   background: Image.asset(
-                    "images/banner_home.jpg",
+                    "images/banner_home.webp",
                     fit: BoxFit.cover,
                   ),
                 ),

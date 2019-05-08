@@ -7,10 +7,9 @@ import 'package:ease_life/ui/widget/ticker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'widget/lifecycle_widget.dart';
+
 class LoginPage extends StatefulWidget {
-
   final String backRoute;
-
 
   LoginPage({this.backRoute});
 
@@ -33,10 +32,9 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
   final cancelToken = CancelToken();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
   }
-
 
   @override
   void dispose() {
@@ -61,8 +59,6 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
           }
         });
   }
-
-
 
   Scaffold buildLogin(BuildContext context, Widget loginButton) {
     return Scaffold(
@@ -97,6 +93,8 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                         _nameReady = text.isNotEmpty;
                       },
                       decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: _fastLogin ? "电话号码" : "用户名",
                           hintText: "输入${_fastLogin ? "电话号码" : "用户名"}"),
                     ),
                   ),
@@ -109,9 +107,11 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                       onChanged: (text) {
                         _passReady = text.isNotEmpty;
                       },
-                      controller: controllerPassword,
                       decoration: InputDecoration(
-                          hintText: "输入${_fastLogin ? "验证码" : "密码"}"),
+                          hintText: "输入${_fastLogin ? "验证码" : "密码"}",
+                          labelText: "${_fastLogin ? "验证码" : "密码"}",
+                          border: OutlineInputBorder()),
+                      controller: controllerPassword,
                     ),
                   ),
                   Container(
@@ -144,7 +144,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                             _protocolChecked = value;
                           });
                         },
-                        activeColor: Colors.blueGrey,
+                        activeColor: Colors.blue,
                       ),
                       FlatButton(
                         child: Text("我已阅读并同意安心居服务平台服务相关条例"),
@@ -184,9 +184,13 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
   Widget buildLoginSuccess(bool isCertificated) {
     var colorFaceButton = Colors.blue;
     var colorHomeButton = Colors.blueGrey;
-    if(widget.backRoute!=null){
-      Future.delayed(Duration(seconds: 1)).then((v){
+    if (widget.backRoute != null) {
+      Future.delayed(Duration(seconds: 1)).then((v) {
         Navigator.of(context).pop(widget.backRoute);
+      });
+    }else{
+      Future.delayed(Duration(seconds: 1)).then((v) {
+        Navigator.of(context).pushReplacementNamed("/");
       });
     }
     return Scaffold(
@@ -196,74 +200,78 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
         ),
       ),
       body: Center(
-        child: Card(
-          elevation: 10,
-          margin: EdgeInsets.all(18),
-          child: Padding(
-            padding: const EdgeInsets.all(6.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  color: Colors.grey[200],
-                  margin: EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(Icons.check, size: 40, color: Colors.blue),
-                      Text(
-                        "登陆成功!",
-                        style: TextStyle(fontSize: 20, color: Colors.blue),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  "小区已采用智能门禁系统—刷脸出入\n录入脸部资料即可启用，也可在我的-人脸管理录入",
-                  textAlign: TextAlign.center,
-                ),
-                Divider(),
-                Container(
-                  margin: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: colorFaceButton),
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.fingerprint,
-                      size: 40,
-                      color: colorFaceButton,
-                    ),
-                    title: Text("录入人脸照片",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: colorFaceButton)),
-                    subtitle: Text("一键录入,简单高效",
-                        style: TextStyle(color: colorFaceButton)),
-                    trailing: Icon(Icons.arrow_forward,color: colorFaceButton,),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed("/preVerify");
-                    },
-                  ),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacementNamed("/");
-                  },
-                  padding: EdgeInsets.symmetric(horizontal: 80),
-                  textColor: colorHomeButton,
-                  child: Text(
-                    "放一放,先去首页",
-                    maxLines: 1,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
+//        child: Card(
+//          elevation: 10,
+//          margin: EdgeInsets.all(18),
+//          child: Padding(
+//            padding: const EdgeInsets.all(6.0),
+//            child: Column(
+//              mainAxisSize: MainAxisSize.min,
+//              mainAxisAlignment: MainAxisAlignment.center,
+//              crossAxisAlignment: CrossAxisAlignment.center,
+//              children: <Widget>[
+//                Container(
+//                  color: Colors.grey[200],
+//                  margin: EdgeInsets.only(bottom: 12),
+//                  child: Row(
+//                    mainAxisAlignment: MainAxisAlignment.center,
+//                    children: <Widget>[
+//                      Icon(Icons.check, size: 40, color: Colors.blue),
+//                      Text(
+//                        "登陆成功!",
+//                        style: TextStyle(fontSize: 20, color: Colors.blue),
+//                      ),
+//                    ],
+//                  ),
+//                ),
+//                Text(
+//                  "小区已采用智能门禁系统—刷脸出入\n录入脸部资料即可启用，也可在我的-人脸管理录入",
+//                  textAlign: TextAlign.center,
+//                ),
+//                Divider(),
+//                Container(
+//                  margin: EdgeInsets.all(8),
+//                  decoration: BoxDecoration(
+//                    border: Border.all(color: colorFaceButton),
+//                    borderRadius: BorderRadius.all(Radius.circular(10)),
+//                  ),
+//                  child: ListTile(
+//                    leading: Icon(
+//                      Icons.fingerprint,
+//                      size: 40,
+//                      color: colorFaceButton,
+//                    ),
+//                    title: Text("录入人脸照片",
+//                        style: TextStyle(
+//                            fontWeight: FontWeight.bold,
+//                            color: colorFaceButton)),
+//                    subtitle: Text("一键录入,简单高效",
+//                        style: TextStyle(color: colorFaceButton)),
+//                    trailing: Icon(
+//                      Icons.arrow_forward,
+//                      color: colorFaceButton,
+//                    ),
+//                    onTap: () {
+//                      Navigator.of(context).pushReplacementNamed("/preVerify");
+//                    },
+//                  ),
+//                ),
+//                FlatButton(
+//                  onPressed: () {
+//                    Navigator.of(context).pushReplacementNamed("/");
+//                  },
+//                  padding: EdgeInsets.symmetric(horizontal: 80),
+//                  textColor: colorHomeButton,
+//                  child: Text(
+//                    "放一放,先去首页",
+//                    maxLines: 1,
+//                  ),
+//                )
+//              ],
+//            ),
+//          ),
+//        ),
+        child: Text("即将跳转.."),
       ),
     );
   }
@@ -271,23 +279,26 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
   Widget buildLoginButton(
       AsyncSnapshot<UserInfo> userSnap, BuildContext context, bool _fastLogin) {
     return LoadingStateWidget(
-      key:loadingLoginKey,
-      child: OutlineButton(
+      key: loadingLoginKey,
+      child: RaisedButton(
         onPressed: () {
           login(context, _fastLogin);
         },
-        child: Text("登录"),
+        color: Colors.blue,
+        child: Text(
+          "登录",
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
-
 
   Widget buildSmsButton(BuildContext context, bool fastLogin) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 12),
       child: TickerWidget(
         key: tickSmsKey,
-        onPressed: (){
+        onPressed: () {
           sendSms(context, fastLogin);
         },
       ),
@@ -312,7 +323,8 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
       return;
     }
     tickSmsKey.currentState?.startLoading();
-    BaseResponse<Object> baseResp = await Api.sendSms(controllerMobile.text,cancelToken: cancelToken);
+    BaseResponse<Object> baseResp =
+        await Api.sendSms(controllerMobile.text, cancelToken: cancelToken);
     Fluttertoast.showToast(msg: baseResp.text);
     tickSmsKey.currentState?.stopLoading();
     if (baseResp.success()) {
@@ -338,8 +350,10 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     loadingLoginKey.currentState?.startLoading();
 
     BaseResponse<UserInfoWrapper> baseResp = _fastLogin
-        ? await Api.fastLogin(controllerMobile.text, controllerPassword.text,cancelToken: cancelToken)
-        : await Api.login(controllerMobile.text, controllerPassword.text,cancelToken: cancelToken);
+        ? await Api.fastLogin(controllerMobile.text, controllerPassword.text,
+            cancelToken: cancelToken)
+        : await Api.login(controllerMobile.text, controllerPassword.text,
+            cancelToken: cancelToken);
     print('${baseResp.text}');
     loadingLoginKey.currentState?.stopLoading();
     Fluttertoast.showToast(msg: baseResp.text);

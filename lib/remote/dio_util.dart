@@ -19,6 +19,7 @@ class DioUtil {
   Dio _dioInstance;
   bool inDebug = false;
   bool proxyHttp = false;
+  bool printLog = false;
 
   DioUtil._() {
     init();
@@ -58,49 +59,49 @@ class DioUtil {
         // you can also create a new HttpClient to dio
         // return new HttpClient();
       };
-
-    _dioInstance.interceptors.add(InterceptorsWrapper(onRequest: (req) {
+    if (printLog)
+      _dioInstance.interceptors.add(InterceptorsWrapper(onRequest: (req) {
 //      req.headers.update(KEY_HEADER_TOKEN, (old) {
 //        return sharedPreferences.getString(PreferenceKeys.keyAuthorization);
 //      });
-      debugPrint("REQUEST:");
-      debugPrint("===========================================");
-      debugPrint("  Method:${req.method},Url:${req.baseUrl + req.path}");
-      debugPrint("  Headers:${req.headers}");
-      debugPrint("  QueryParams:${req.queryParameters}");
-      print('=======>${req.data.runtimeType}');
-      if (req.data.runtimeType != FormData) {
-        debugPrint("    Data:${req.data}");
-      }
+        debugPrint("REQUEST:");
+        debugPrint("===========================================");
+        debugPrint("  Method:${req.method},Url:${req.baseUrl + req.path}");
+        debugPrint("  Headers:${req.headers}");
+        debugPrint("  QueryParams:${req.queryParameters}");
+        print('=======>${req.data.runtimeType}');
+        if (req.data.runtimeType != FormData) {
+          debugPrint("    Data:${req.data}");
+        }
 
-      debugPrint("===========================================");
-    }, onResponse: (resp) {
-      debugPrint("REQUEST:");
-      debugPrint("===========================================");
-      debugPrint(
-          "  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
-      debugPrint("  Headers:${resp.request.headers}");
-      debugPrint("  QueryParams:${resp.request.queryParameters}");
-      if (resp.request.data.runtimeType != FormData) {
-        debugPrint("  Data:${resp.request.data}");
-      }
-      debugPrint("  -------------------------");
-      debugPrint("  RESULT:");
-      debugPrint("    Headers:${resp.headers}");
-      debugPrint("  Data:${resp.data}");
-      debugPrint("    Redirect:${resp.redirects}");
-      debugPrint("    StatusCode:${resp.statusCode}");
-      debugPrint("    Extras:${resp.extra}");
-      debugPrint(" ===========================================");
-    }, onError: (err) {
-      debugPrint("ERROR:");
-      debugPrint("===========================================");
-      debugPrint("Message:${err.message}");
-      debugPrint("Error:${err.error}");
-      debugPrint("Type:${err.type}");
-      debugPrint("Trace:${err.stackTrace}");
-      debugPrint("===========================================");
-    }));
+        debugPrint("===========================================");
+      }, onResponse: (resp) {
+        debugPrint("REQUEST:");
+        debugPrint("===========================================");
+        debugPrint(
+            "  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
+        debugPrint("  Headers:${resp.request.headers}");
+        debugPrint("  QueryParams:${resp.request.queryParameters}");
+        if (resp.request.data.runtimeType != FormData) {
+          debugPrint("  Data:${resp.request.data}");
+        }
+        debugPrint("  -------------------------");
+        debugPrint("  RESULT:");
+        debugPrint("    Headers:${resp.headers}");
+        debugPrint("  Data:${resp.data}");
+        debugPrint("    Redirect:${resp.redirects}");
+        debugPrint("    StatusCode:${resp.statusCode}");
+        debugPrint("    Extras:${resp.extra}");
+        debugPrint(" ===========================================");
+      }, onError: (err) {
+        debugPrint("ERROR:");
+        debugPrint("===========================================");
+        debugPrint("Message:${err.message}");
+        debugPrint("Error:${err.error}");
+        debugPrint("Type:${err.type}");
+        debugPrint("Trace:${err.stackTrace}");
+        debugPrint("===========================================");
+      }));
   }
 
   ///

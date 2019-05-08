@@ -17,7 +17,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../utls.dart';
 import 'camera_page.dart';
+import 'contacts_select_page.dart';
 import 'login_page.dart';
+import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
@@ -201,6 +203,32 @@ const String kNavigationExamplePage = '''
       }
     }
     
+    function faceId(){
+      var json = {
+        "funcName":"faceId",
+        "data":{
+          "callbackName":"funcTwoParams", //2个String参数,
+          "callbackCancel":"showToast", //无参数,
+        }
+      }
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+    function selectContact(){
+      var json = {
+        "funcName":"selectContact",
+        "data":{
+          "callbackName":"funcTwoParams", //2个String参数,
+          "callbackCancel":"showToast", //无参数,
+        }
+      }
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
     
     
 </script>
@@ -227,6 +255,8 @@ const String kNavigationExamplePage = '''
 
 <button onClick = "uploadFile()"> choose file </button>
 <button onClick = "chooesContact()"> choose contact </button>
+<button onClick = "faceId()"> face ---- id </button>
+<button onClick = "selectContact()"> selectContact </button>
 <input id="textInput1" class="custom" size="32">
 <input id="textInput2" class="custom" size="32">
 <textarea name="textarea" rows="10" cols="50">Write something here</textarea>
@@ -263,10 +293,8 @@ class _WebViewExampleState extends State<WebViewExample> {
     titleController.close();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    print('build');
     return WillPopScope(
       onWillPop: () async {
         if (await controller.canGoBack()) {
@@ -313,7 +341,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                 FocusScope.of(context).requestFocus(_focusNode);
               },
             ),
-            SampleMenu(_controller.future,(){
+            SampleMenu(_controller.future, () {
               FocusScope.of(context).requestFocus(_focusNode);
             }),
           ],
@@ -450,11 +478,10 @@ class _WebViewExampleState extends State<WebViewExample> {
                   }
                 },
               ),
-
             ],
           );
         }),
-        floatingActionButton: favoriteButton(),
+//        floatingActionButton: favoriteButton(),
       ),
     );
   }
@@ -512,6 +539,14 @@ class _WebViewExampleState extends State<WebViewExample> {
             "routeName": "/home",//1个String参数的
         }
        }
+       
+       {
+        "funcName":"faceId",
+        "data":{
+            "callbackName":"back",
+            "callbackParam":"xxx"
+        }
+       }
    */
   JavascriptChannel _userJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
@@ -557,12 +592,34 @@ class _WebViewExampleState extends State<WebViewExample> {
               doUploadFile(jsonMap['data']['callbackName']);
               break;
             case "showAlert":
-              doShowAlertDialog(jsonMap['data'],context);
+              doShowAlertDialog(jsonMap['data'], context);
+              break;
+            case "faceId":
+              doFacePic(context, jsonMap['data']);
+              break;
+            case "selectContact":
+              doSelectContact(context, jsonMap['data']);
               break;
             default:
               break;
           }
         });
+  }
+
+  void doFacePic(BuildContext context, Map<String, dynamic> jsonMap) {
+    Navigator.of(context).pushNamed("/camera",
+        arguments: {"takePic": true}).then((v) {
+      if (v != null && v is ImageDetail) {
+        var javascriptString =
+            "${jsonMap['callbackName']}('${v.orginPicPath}','${v.thumbnailPath}')";
+        print("======>$javascriptString");
+        controller.evaluateJavascript(javascriptString);
+      } else {
+        var javascriptStringCancel =
+            "${jsonMap['callbackCancel']}()";
+        controller.evaluateJavascript(javascriptStringCancel);
+      }
+    });
   }
 
   JavascriptChannel _filerJavascriptChannel(BuildContext context) {
@@ -638,9 +695,9 @@ class _WebViewExampleState extends State<WebViewExample> {
     var directory = await getTemporaryDirectory();
     var file = File(directory.path +
         "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
-    showImageSourceDialog(file, context,(v){
+    showImageSourceDialog(file, context, (v) {
       FocusScope.of(context).requestFocus(_focusNode);
-    },(futureFile,localFile){
+    }, (futureFile, localFile) {
       processFileAndNotify(futureFile, localFile, callbackName);
     });
   }
@@ -651,19 +708,21 @@ class _WebViewExampleState extends State<WebViewExample> {
       if (file == null) {
         return null;
       }
-//      return FlutterImageCompress.compressWithFile(file.path,
-//           quality: 100);
-      return file;
-    })
-//        .then((listInt) {
-//      if (listInt == null) {
-//        return null;
-//      }
-//      print('${localFile.absolute.path}');
-//      localFile.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
-//      return localFile;
-//    })
-        .then((compressed) {
+      //通过exif旋转图片
+      return FlutterExifRotation.rotateImage(path: file.path);
+    }).then((f) {
+      //压缩图片
+      return FlutterImageCompress.compressWithFile(
+        f.path,
+        quality: 80,
+      );
+    }).then((listInt) {
+      if (listInt == null) {
+        return null;
+      }
+      localFile.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
+      return localFile;
+    }).then((compressed) {
       if (compressed == null) {
         return null;
       }
@@ -823,6 +882,20 @@ class _WebViewExampleState extends State<WebViewExample> {
       }
     });
   }
+
+  void doSelectContact(BuildContext context, jsonMap) {
+    Navigator.of(context).pushNamed("/contacts").then((contact){
+     if(contact!=null && contact is ContactInfo){
+       var javascriptString =
+           "${jsonMap['callbackName']}('${contact.displayName}','${contact.phone}')";
+       controller.evaluateJavascript(javascriptString);
+     } else {
+       var javascriptString =
+           "${jsonMap['callbackName']}()";
+       controller.evaluateJavascript(javascriptString);
+     }
+    });
+  }
 }
 
 enum MenuOptions {
@@ -837,7 +910,8 @@ enum MenuOptions {
 
 class SampleMenu extends StatelessWidget {
   final VoidCallback callback;
-  SampleMenu(this.controller,this.callback);
+
+  SampleMenu(this.controller, this.callback);
 
   final Future<WebViewController> controller;
   final CookieManager cookieManager = CookieManager();

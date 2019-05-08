@@ -35,16 +35,20 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Container(
-                    margin: EdgeInsets.all(16),
+                    margin: EdgeInsets.all(6),
                     padding: EdgeInsets.all(6),
                     child: TextField(
                       key: ValueKey("name"),
                       controller: _mobileController,
-                      decoration: InputDecoration(hintText: "输入电话号码"),
+                      decoration: InputDecoration(
+                        hintText: "输入电话号码",
+                        labelText: "电话号码",
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.all(16),
+                    margin: EdgeInsets.all(6),
                     padding: EdgeInsets.all(6),
                     child: Row(
                       children: <Widget>[
@@ -53,7 +57,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             key: ValueKey("sms"),
                             controller: _smsCodeController,
                             obscureText: true,
-                            decoration: InputDecoration(hintText: "输入验证码"),
+                            decoration: InputDecoration(
+                              hintText: "输入验证码",
+                              labelText: "验证码",
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
                         TickerWidget(
@@ -65,43 +73,64 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.all(16),
+                    margin: EdgeInsets.all(6),
                     padding: EdgeInsets.all(6),
                     child: TextField(
                       key: ValueKey("userName"),
                       controller: _userNameController,
-                      decoration: InputDecoration(hintText: "输入用户名"),
+                      decoration: InputDecoration(
+                        hintText: "输入用户名",
+                        labelText: "用户名",
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.all(16),
+                    margin: EdgeInsets.all(6),
                     padding: EdgeInsets.all(6),
                     child: TextField(
                       key: ValueKey("pass"),
                       controller: _passwordController,
-                      decoration: InputDecoration(hintText: "输入密码"),
+                      decoration: InputDecoration(
+                        hintText: "输入密码",
+                        labelText: "输入密码",
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.all(16),
+                    margin: EdgeInsets.all(6),
                     padding: EdgeInsets.all(6),
                     child: TextField(
                       key: ValueKey("paconfirm"),
                       obscureText: true,
                       controller: _confirmController,
-                      decoration: InputDecoration(hintText: "确认密码"),
+                      decoration: InputDecoration(
+                        hintText: "确认密码",
+                        labelText: "确认密码",
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            LoadingStateWidget(
-              key:register,
-              child: OutlineButton(
-                onPressed: () {
-                  doRegister();
-                },
-                child: Text("注册"),
+            Container(
+              margin: EdgeInsets.all(12),
+              child: LoadingStateWidget(
+                key: register,
+                child: RaisedButton(
+                  onPressed: () {
+                    doRegister();
+                  },
+                  color: Colors.blue,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal:18.0),
+                    child: Text("注册",style: TextStyle(
+                      color: Colors.white
+                    ),),
+                  ),
+                ),
               ),
             ),
           ],
@@ -156,7 +185,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
     register.currentState?.startLoading();
     BaseResponse<Object> baseResp = await Api.register(
-      _mobileController.text, _smsCodeController.text, _passwordController.text,
+        _mobileController.text,
+        _smsCodeController.text,
+        _passwordController.text,
         _userNameController.text);
     Fluttertoast.showToast(msg: baseResp.text.trim());
     register.currentState?.stopLoading();

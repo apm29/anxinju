@@ -4,12 +4,10 @@ import 'package:android_intent/android_intent.dart';
 
 typedef ContactCallback = Function(Contact);
 class ContactInfo{
-  String identifier, displayName, givenName, middleName, prefix, suffix, familyName, company, jobTitle, note;
+  String  displayName;
+  String phone;
 
-  ContactInfo.fromContact(Contact contact){
-    identifier = contact.identifier;
-    displayName = contact.displayName;
-  }
+  ContactInfo(this.displayName, this.phone);
 
 }
 class ContactsSelectPage extends StatefulWidget {
@@ -118,13 +116,13 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                                   )),
                                 ],
                               ),
-                              children: contact.phones.map((i) {
+                              children: contact.phones.map((phone) {
                                 return Container(
                                   margin: EdgeInsets.all(8),
                                   color: Colors.grey[200],
                                   child: ListTile(
                                     title: Text(
-                                      '${i.value}',
+                                      '${phone.value}',
                                       textAlign: TextAlign.center,
                                     ),
                                     onTap: () {
@@ -143,7 +141,7 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
 //                                              "我小区已使用门禁，输入我家庭通行码123456即可进入小区，如您有车辆需进入请点击链接登记车牌."
 //                                            });
 //                                        androidIntent.launch();
-                                        Navigator.of(context).pop(contact);
+                                        Navigator.of(context).pop(ContactInfo(contact.displayName, phone.value));
                                       }
                                     },
                                     trailing: Icon(Icons.arrow_forward),

@@ -3,7 +3,10 @@ import 'dart:io';
 
 import 'package:ease_life/index.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
+import '../utls.dart';
 import 'widget/loading_state_widget.dart';
 
 class CameraPage extends StatefulWidget {
@@ -191,13 +194,13 @@ class _FaceIdPageState extends State<FaceIdPage> {
                   }),
                 ),
                 Align(
-                  alignment: Alignment(0,0.9),
+                  alignment: Alignment(0, 0.9),
                   child: LayoutBuilder(
                     builder: (_, constraint) {
                       return LoadingStateWidget(
                         key: faceRecognizeKey,
                         child: SizedBox(
-                          width:  constraint.biggest.width * 0.6,
+                          width: constraint.biggest.width * 0.6,
                           child: OutlineButton(
                             color: Colors.white,
                             shape: Border.all(color: Colors.greenAccent),
@@ -223,16 +226,38 @@ class _FaceIdPageState extends State<FaceIdPage> {
   }
 
   void takePicture() async {
-    var idCard = ModalRoute.of(context).settings.arguments;
-    faceRecognizeKey.currentState.startLoading();
-    Directory directory = await getTemporaryDirectory();
-    var file = File(
-        directory.path + "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
-    await controller.takePicture(file.path);
-    var resp = await Api.uploadPic(file.path);
-    var baseResponse = await Api.verifyUserFace(resp.data.orginPicPath, idCard);
-    faceRecognizeKey.currentState.stopLoading();
-    Fluttertoast.showToast(msg: baseResponse.text);
+    var argument = ModalRoute.of(context).settings.arguments;
+    if (argument is Map) {
+      if (argument['idCard'] != null) {
+        faceRecognizeKey.currentState.startLoading();
+        Directory directory = await getTemporaryDirectory();
+        var file = File(directory.path +
+            "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
+        await controller.takePicture(file.path);
+        file = await rotateWithExifAndCompress(file);
+        var resp = await Api.uploadPic(file.path);
+        var baseResponse = await Api.verifyUserFace(
+            resp.data.orginPicPath, argument['idCard']);
+        faceRecognizeKey.currentState.stopLoading();
+        Fluttertoast.showToast(msg: baseResponse.text);
+        if (baseResponse.success()) {
+          //注册成功
+          print(baseResponse.text);
+          Navigator.of(context).pop(baseResponse.text);
+        }
+      } else if (argument['takePic'] == true) {
+        faceRecognizeKey.currentState.startLoading();
+        Directory directory = await getTemporaryDirectory();
+        var file = File(directory.path +
+            "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
+        await controller.takePicture(file.path);
+        file = await rotateWithExifAndCompress(file);
+        var resp = await Api.uploadPic(file.path);
+        faceRecognizeKey.currentState.stopLoading();
+        //注册成功
+        Navigator.of(context).pop(resp.data);
+      }
+    }
   }
 }
 

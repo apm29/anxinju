@@ -11,8 +11,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   var topIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     print('home rebuild');
@@ -27,14 +27,14 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: <Widget>[
           DistrictInfoButton(),
-          buildActions(context),
+//          buildActions(context),
         ],
       ),
       body: StreamBuilder<Index>(
           stream: BlocProviders.of<ApplicationBloc>(context).homeIndex,
           builder: (context, snapshot) {
             var indexInfo = snapshot.data;
-            if(indexInfo==null){
+            if (indexInfo == null) {
               return Center(
                 child: CircularProgressIndicator(),
               );
@@ -53,127 +53,148 @@ class _HomePageState extends State<HomePage> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Container(
-                            height: ScreenUtil().setWidth(690),
                             color: Colors.white,
-                            child: PageView.builder(
-                              onPageChanged: (index) {
-                                setState(() {
-                                  topIndex = index;
-                                });
-                              },
-                              itemBuilder: (context, index) {
-                                return Column(
+                            child: Column(
+                              children: <Widget>[
+                                Stack(
                                   children: <Widget>[
                                     Image.asset(
-                                      "images/banner_home.jpg",
+                                      "images/banner_home_back.webp",
                                       fit: BoxFit.fill,
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        GestureDetector(
-                                          onTap: () {
-                                            routeToWeb("fkgl", indexInfo);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              children: <Widget>[
-                                                SizedBox(
-                                                    width: ScreenUtil()
-                                                        .setWidth(100),
-                                                    height: ScreenUtil()
-                                                        .setWidth(100),
-                                                    child: Image.asset(
-                                                      "images/ic_visitor_manager.png",
-                                                    )),
-                                                Text("访客管理")
-                                              ],
-                                            ),
+                                    Positioned.fill(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Image.asset(
+                                            "images/ic_police.png",
+                                            height: ScreenUtil().setHeight(108),
                                           ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            routeToWeb("zwy", indexInfo);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              children: <Widget>[
-                                                SizedBox(
-                                                    width: ScreenUtil()
-                                                        .setWidth(100),
-                                                    height: ScreenUtil()
-                                                        .setWidth(100),
-                                                    child: Image.asset(
-                                                      "images/ic_property_manager.png",
-                                                    )),
-                                                Text("找物业")
-                                              ],
-                                            ),
+                                          SizedBox(
+                                            height: 6,
                                           ),
+                                          StreamBuilder<DistrictInfo>(
+                                              stream: BlocProviders.of<
+                                                      ApplicationBloc>(context)
+                                                  .currentDistrict,
+                                              builder: (context, snapshot) {
+                                                return Text(
+                                                  "${snapshot.data?.districtName ?? ""}安心居服务平台\n共建共享我们的家园",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 18),
+                                                );
+                                              }),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    GestureDetector(
+                                      onTap: () {
+                                        routeToWeb("fkgl", indexInfo);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            SizedBox(
+                                                width:
+                                                    ScreenUtil().setWidth(100),
+                                                height:
+                                                    ScreenUtil().setWidth(100),
+                                                child: Image.asset(
+                                                  "images/ic_visitor_manager.png",
+                                                )),
+                                            Text("访客管理")
+                                          ],
                                         ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            routeToWeb("zsq", indexInfo);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              children: <Widget>[
-                                                SizedBox(
-                                                    width: ScreenUtil()
-                                                        .setWidth(100),
-                                                    height: ScreenUtil()
-                                                        .setWidth(100),
-                                                    child: Image.asset(
-                                                      "images/ic_society_manage.png",
-                                                    )),
-                                                Text("找社区")
-                                              ],
-                                            ),
-                                          ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        routeToWeb("zwy", indexInfo);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            SizedBox(
+                                                width:
+                                                    ScreenUtil().setWidth(100),
+                                                height:
+                                                    ScreenUtil().setWidth(100),
+                                                child: Image.asset(
+                                                  "images/ic_property_manager.png",
+                                                )),
+                                            Text("找物业")
+                                          ],
                                         ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            routeToWeb("zjc", indexInfo);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              children: <Widget>[
-                                                SizedBox(
-                                                    width: ScreenUtil()
-                                                        .setWidth(100),
-                                                    height: ScreenUtil()
-                                                        .setWidth(100),
-                                                    child: Image.asset(
-                                                      "images/ic_police_manage.png",
-                                                    )),
-                                                Text("找警察")
-                                              ],
-                                            ),
-                                          ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        routeToWeb("zsq", indexInfo);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            SizedBox(
+                                                width:
+                                                    ScreenUtil().setWidth(100),
+                                                height:
+                                                    ScreenUtil().setWidth(100),
+                                                child: Image.asset(
+                                                  "images/ic_society_manage.png",
+                                                )),
+                                            Text("找社区")
+                                          ],
                                         ),
-                                      ],
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        routeToWeb("zjc", indexInfo);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            SizedBox(
+                                                width:
+                                                    ScreenUtil().setWidth(100),
+                                                height:
+                                                    ScreenUtil().setWidth(100),
+                                                child: Image.asset(
+                                                  "images/ic_police_manage.png",
+                                                )),
+                                            Text("找警察")
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
-                                );
-                              },
-                              itemCount: 4,
+                                ),
+                              ],
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            color: Colors.white,
-                            child: IntrinsicWidth(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: buildPagerIndicator(),
-                              ),
-                            ),
-                          )
+//                          Container(
+//                            padding: EdgeInsets.all(8),
+//                            color: Colors.white,
+//                            child: IntrinsicWidth(
+//                              child: Row(
+//                                mainAxisSize: MainAxisSize.min,
+//                                children: buildPagerIndicator(),
+//                              ),
+//                            ),
+//                          )
                         ],
                       ),
                     ),
@@ -212,11 +233,11 @@ class _HomePageState extends State<HomePage> {
                                       BlocProviders.of<ApplicationBloc>(context)
                                           .homeNoticeStream,
                                   builder: (context, snapshot) {
-                                    if(!snapshot.hasData){
+                                    if (!snapshot.hasData) {
                                       return Container();
                                     }
                                     return Column(
-                                      children: snapshot.data.map((detail){
+                                      children: snapshot.data.map((detail) {
                                         return Padding(
                                           padding: const EdgeInsets.all(2.0),
                                           child: Row(
@@ -224,29 +245,37 @@ class _HomePageState extends State<HomePage> {
                                               Container(
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal: 8),
-                                                child: StreamBuilder<List<NoticeType>>(
-                                                  stream: BlocProviders.of<ApplicationBloc>(context).noticeTypeStream,
-                                                  builder: (context, snapshot) {
-                                                    if(!snapshot.hasData){
-                                                      return Container();
-                                                    }
-                                                    return Text(
-                                                      snapshot.data.firstWhere((type){
-                                                        return type.typeId == detail.noticeType;
-                                                      }).typeName,
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 10,
-                                                      ),
-                                                    );
-                                                  }
-                                                ),
+                                                child: StreamBuilder<
+                                                        List<NoticeType>>(
+                                                    stream: BlocProviders.of<
+                                                                ApplicationBloc>(
+                                                            context)
+                                                        .noticeTypeStream,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (!snapshot.hasData) {
+                                                        return Container();
+                                                      }
+                                                      return Text(
+                                                        snapshot.data
+                                                            .firstWhere((type) {
+                                                          return type.typeId ==
+                                                              detail.noticeType;
+                                                        }).typeName,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 10,
+                                                        ),
+                                                      );
+                                                    }),
                                                 decoration: BoxDecoration(
-                                                    color: randomColor(),
+                                                    color: colors[
+                                                        detail.noticeType %
+                                                            colors.length],
                                                     borderRadius:
-                                                    BorderRadius.all(
-                                                        Radius.circular(
-                                                            8))),
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                8))),
                                               ),
                                               SizedBox(
                                                 width: 10,
@@ -255,17 +284,16 @@ class _HomePageState extends State<HomePage> {
                                                 child: Text(
                                                   detail.noticeTitle,
                                                   style:
-                                                  TextStyle(fontSize: 12),
+                                                      TextStyle(fontSize: 12),
                                                   textAlign: TextAlign.start,
                                                   overflow:
-                                                  TextOverflow.ellipsis,
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
                                           ),
                                         );
                                       }).toList(),
-
                                     );
                                   }),
                             ),
@@ -405,8 +433,8 @@ class _HomePageState extends State<HomePage> {
                                 indexId: "clgl",
                                 index: indexInfo),
                             HomeChip(
-                                title: "房屋出租",
-                                indexId: "fwcz",
+                                title: "维护报修",
+                                indexId: "whbx",
                                 index: indexInfo),
                             HomeChip(
                                 title: "暂住申报",
@@ -670,6 +698,7 @@ class _HomePageState extends State<HomePage> {
           }),
     );
   }
+
   List<Color> colors = [
     Color(0xfffb333d),
     Color(0xff3d5ffe),
@@ -677,6 +706,7 @@ class _HomePageState extends State<HomePage> {
     Color(0xfffebf1f),
   ];
   var random = Random();
+
   Color randomColor() {
     return colors[random.nextInt(colors.length)];
   }

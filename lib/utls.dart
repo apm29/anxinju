@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:ease_life/ui/camera_page.dart';
+import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'index.dart';
@@ -75,4 +77,27 @@ void showCamera(File file,OnFileProcess onFileProcess,BuildContext context) {
 
 void startAudioRecord(){
 
+}
+
+//只能作用于带exif的image
+Future<File> rotateWithExifAndCompress(File file) async{
+  return Future.value(file).then((file) {
+    if (file == null) {
+      return null;
+    }
+    //通过exif旋转图片
+    return FlutterExifRotation.rotateImage(path: file.path);
+  }).then((f) {
+    //压缩图片
+    return FlutterImageCompress.compressWithFile(
+      f.path,
+      quality: 80,
+    );
+  }).then((listInt) {
+    if (listInt == null) {
+      return null;
+    }
+    file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
+    return file;
+  });
 }

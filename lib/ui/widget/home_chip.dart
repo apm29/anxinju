@@ -35,6 +35,10 @@ class HomeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if(index==null){
+      return Container();
+    }
+
     return GestureDetector(
       onTap: () {
         routeToWeb(indexId, index, context);
@@ -65,7 +69,7 @@ class HomeChip extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    title,
+                    getTitle(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color:
@@ -78,5 +82,13 @@ class HomeChip extends StatelessWidget {
             ),
           )),
     );
+  }
+
+  String getTitle() {
+    return index.menu.firstWhere((item){
+      return item.id == indexId;
+    },orElse: (){
+      return MenuItem("", "未定义", "");
+    }).remark;
   }
 }
