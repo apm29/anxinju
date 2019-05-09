@@ -83,7 +83,7 @@ class ApplicationBloc extends BlocBase {
     _getCurrentDistrictAndNotify();
     getIndexInfo();
     _getNoticeInfo();
-    //_requestLocationPermission();
+    _requestLocationPermission();
   }
 
   void _getCurrentUserAndNotify() async {

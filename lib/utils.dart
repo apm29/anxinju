@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:ease_life/ui/camera_page.dart';
 import 'package:ease_life/ui/web_view_example.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'index.dart';
 import 'ui/login_page.dart';
-
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 
 List<Color> colors = [
   Color(0xfffb333d),
@@ -15,9 +17,11 @@ List<Color> colors = [
   Color(0xff16a723),
   Color(0xfffebf1f),
 ];
-typedef OnFileProcess = Function(Future<File>,File localFile);
-void showImageSourceDialog(
-    File file,BuildContext context,ValueCallback onValue,OnFileProcess onFileProcess) {
+
+typedef OnFileProcess = Function(Future<File>, File localFile);
+
+void showImageSourceDialog(File file, BuildContext context,
+    ValueCallback onValue, OnFileProcess onFileProcess) {
   FocusScope.of(context).requestFocus(FocusNode());
   showModalBottomSheet(
       context: context,
@@ -26,7 +30,7 @@ void showImageSourceDialog(
             onClosing: () {},
             builder: (context) {
               return LayoutBuilder(
-                builder: (context,constraint){
+                builder: (context, constraint) {
                   return IntrinsicHeight(
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
@@ -60,37 +64,35 @@ void showImageSourceDialog(
               );
             });
       }).then((v) {
-      onValue(v);
+    onValue(v);
   });
 }
 
 void showPicker(File file, OnFileProcess onFileProcess) {
   var future = ImagePicker.pickImage(source: ImageSource.gallery);
-  onFileProcess(future,file);
-}
-void showCameraPicker(File file, OnFileProcess onFileProcess) {
-  var future = ImagePicker.pickImage(source: ImageSource.camera);
-  onFileProcess(future,file);
+  onFileProcess(future, file);
 }
 
-void showCamera(File file,OnFileProcess onFileProcess,BuildContext context) {
+void showCameraPicker(File file, OnFileProcess onFileProcess) {
+  var future = ImagePicker.pickImage(source: ImageSource.camera);
+  onFileProcess(future, file);
+}
+
+void showCamera(File file, OnFileProcess onFileProcess, BuildContext context) {
   var future =
-  Navigator.of(context).push<File>(MaterialPageRoute(builder: (context) {
+      Navigator.of(context).push<File>(MaterialPageRoute(builder: (context) {
     return CameraPage(
       capturedFile: file,
     );
   }));
-  onFileProcess(future,file);
+  onFileProcess(future, file);
 }
 
-
-void startAudioRecord(){
-
-}
+void startAudioRecord() {}
 
 //只能作用于带exif的image
-Future<File> rotateWithExifAndCompress(File file) async{
-  if(!Platform.isAndroid){
+Future<File> rotateWithExifAndCompress(File file) async {
+  if (!Platform.isAndroid) {
     return FlutterImageCompress.compressWithFile(file.path).then((listInt) {
       if (listInt == null) {
         return null;
@@ -120,7 +122,7 @@ Future<File> rotateWithExifAndCompress(File file) async{
   });
 }
 
-void routeToWeb(BuildContext context,String id, Index index) {
+void routeToWeb(BuildContext context, String id, Index index) {
   var indexWhere = index.menu.indexWhere((i) => i.id == id);
   if (indexWhere < 0) {
     return;
@@ -140,15 +142,27 @@ Widget buildVisitor(BuildContext context) {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(Icons.sms_failed,color: Colors.blue,size: 40,),
-          SizedBox(height: 12,),
-          Text("未登录,点击登录",style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 17,
-              color: Colors.grey[700]
-          ),),
+          Icon(
+            Icons.sms_failed,
+            color: Colors.blue,
+            size: 40,
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          Text(
+            "未登录,点击登录",
+            style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 17,
+                color: Colors.grey[700]),
+          ),
         ],
       ),
     ),
   );
+}
+
+Future<Position> getLocation()async{
+  return Geolocator().getCurrentPosition();
 }

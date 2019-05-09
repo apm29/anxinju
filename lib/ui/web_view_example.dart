@@ -20,7 +20,7 @@ import 'camera_page.dart';
 import 'contacts_select_page.dart';
 import 'login_page.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
-
+//import 'package:geolocator/geolocator.dart';
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
 <head>
@@ -229,6 +229,20 @@ const String kNavigationExamplePage = '''
       UserState.postMessage(param);
     }
     
+     
+    function getGeolocation(){
+      var json = {
+        "funcName":"getLocation",
+        "data":{
+          "callbackName":"funcTwoParams", //2个String参数,
+          "callbackError":"showToast", //无参数,
+        }
+      }
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
     
     
 </script>
@@ -256,6 +270,7 @@ const String kNavigationExamplePage = '''
 <button onClick = "uploadFile()"> choose file </button>
 <button onClick = "faceId()"> face ---- id </button>
 <button onClick = "selectContact()"> selectContact </button>
+<button onClick = "getGeolocation()"> getGeolocation </button>
 <br/><input id="textInput1" class="custom" size="32">
 <input id="textInput2" class="custom" size="32">
 <textarea name="textarea" rows="10" cols="50">Write something here</textarea>
@@ -294,6 +309,9 @@ class _WebViewExampleState extends State<WebViewExample> {
 
   @override
   Widget build(BuildContext context) {
+    getLocation().then((p){
+      print('$p');
+    });
     return WillPopScope(
       onWillPop: () async {
         if (await controller.canGoBack()) {
@@ -599,6 +617,9 @@ class _WebViewExampleState extends State<WebViewExample> {
             case "selectContact":
               doSelectContact(context, jsonMap['data']);
               break;
+            case "getLocation":
+              doGetLocation(context, jsonMap['data']);
+              break;
             default:
               break;
           }
@@ -898,6 +919,18 @@ class _WebViewExampleState extends State<WebViewExample> {
            "${jsonMap['callbackName']}()";
        controller.evaluateJavascript(javascriptString);
      }
+    });
+  }
+
+  void doGetLocation(BuildContext context, jsonMap) {
+    getLocation().then((p){
+      var js = '${jsonMap['callbackName']}("${p.latitude}","${p.longitude}")';
+      controller.evaluateJavascript(js);
+    }).catchError((e,s){
+      var js = '${jsonMap['callbackError']}()';
+      controller.evaluateJavascript(js);
+      print('$e');
+      print('$s');
     });
   }
 }
