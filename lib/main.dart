@@ -20,18 +20,18 @@ import 'package:ease_life/ui/user_detail_auth_page.dart';
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 
-void main() async{
+void main() async {
 //  FlutterBugly.postCatchedException(() async {
-    //sp初始化
-    sharedPreferences = await SharedPreferences.getInstance();
+  //sp初始化
+  sharedPreferences = await SharedPreferences.getInstance();
 //    await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
-    //相机初始化
-    cameras = await availableCameras();
+  //相机初始化
+  cameras = await availableCameras();
 //    sharedPreferences.setString(PreferenceKeys.keyAuthorization,
 //        "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
 //    sharedPreferences.setString(PreferenceKeys.keyUserInfo,
 //        '{"userId": "723672", "userName": "应佳伟", "mobile": "17376508275", "isCertification": 0}');
-    runApp(MyApp());
+  runApp(MyApp());
 //  });
 //  FlutterBugly.init(androidAppId: "89b908154e", iOSAppId: "0d1433b494");
 }
@@ -46,12 +46,10 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: defaultThemeData,
         debugShowCheckedModeBanner: false,
-        onUnknownRoute: (settings){
-          return MaterialPageRoute(
-            builder: (context){
-              return NotFoundPage(routeName: settings.name);
-            }
-          );
+        onUnknownRoute: (settings) {
+          return MaterialPageRoute(builder: (context) {
+            return NotFoundPage(routeName: settings.name);
+          });
         },
         routes: {
           "/": (_) {
@@ -60,18 +58,18 @@ class MyApp extends StatelessWidget {
                     true;
             return firstEntry ? SplashPage() : MainPage();
           },
-          "/login": (_) => BlocProviders<LoginBloc>(
+          LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
                 child: LoginPage(),
                 bloc: LoginBloc(),
               ),
-          "/register": (_) => RegisterPage(),
-          "/personal": (_) => PersonalInfoPage(),
-          "/verify": (_) => AuthorizationPage(),
-          "/preVerify": (_) => UserDetailAuthPage(),
-          "/camera": (_) => FaceIdPage(),
-          "/audio": (_) => AudioRecordPage(),
-          "/test": (_) => TestPage(),
-          "/contacts": (_) => BlocProviders<ContactsBloc>(
+          RegisterPage.routeName: (_) => RegisterPage(),
+          PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
+          AuthorizationPage.routeName: (_) => AuthorizationPage(),
+          UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
+          FaceIdPage.routeName: (_) => FaceIdPage(),
+          AudioRecordPage.routeName: (_) => AudioRecordPage(),
+          TestPage.routeName: (_) => TestPage(),
+          ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
                 child: ContactsSelectPage(null),
                 bloc: ContactsBloc(),
               ),

@@ -2,7 +2,12 @@ import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:flutter/material.dart';
 
+import 'authorization_page.dart';
+
 class PersonalInfoPage extends StatelessWidget {
+
+  static String routeName = "/personal";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +18,7 @@ class PersonalInfoPage extends StatelessWidget {
             return Center(
               child: GestureDetector(
                 onTap: (){
-                  Navigator.of(context).pushNamed("/verify",arguments: snapshot.data);
+                  Navigator.of(context).pushNamed(AuthorizationPage.routeName,arguments: snapshot.data);
                 },
                 child: Text("""
                 用户名:${snapshot.data.userName}

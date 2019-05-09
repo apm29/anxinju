@@ -1,11 +1,18 @@
+import 'package:ease_life/remote/api.dart';
+
 import '../ui/home_page.dart';
 import '../ui/message_page.dart';
 import '../ui/mine_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'audio_record_page.dart';
+import 'camera_page.dart';
+import 'test_page.dart';
+import 'user_detail_auth_page.dart';
 import 'web_view_example.dart';
 import 'package:ease_life/main.dart';
+import 'package:ease_life/bloc/bloc_provider.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
@@ -17,7 +24,6 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   static int _currentIndex = 0;
   static DateTime _lastPressedAt;
-
   @override
   Widget build(BuildContext context) {
     ScreenUtil(width: 1080, height: 2160)..init(context);
@@ -33,10 +39,10 @@ class _MainPageState extends State<MainPage> {
         return true;
       },
       child: Scaffold(
-        body:  Container(
-            color: Colors.grey[200],
-            child: buildContent(),
-          ),
+        body: Container(
+          color: Colors.grey[200],
+          child: buildContent(),
+        ),
         bottomNavigationBar: buildBottomNavigationBar(),
       ),
     );
@@ -102,19 +108,19 @@ class _MainPageState extends State<MainPage> {
                   onPressed: () {
 //                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
-                    Navigator.of(context).pushNamed("/preVerify");
+                    Navigator.of(context).pushNamed(UserDetailAuthPage.routeName);
                   },
                   child: Text("业主认证"),
                 ),
                 OutlineButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed("/camera");
+                    Navigator.of(context).pushNamed(FaceIdPage.routeName);
                   },
                   child: Text("人脸识别界面"),
                 ),
                 OutlineButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed("/audio");
+                    Navigator.of(context).pushNamed(AudioRecordPage.routeName);
                   },
                   child: Text("语音录入界面"),
                 ),
@@ -131,7 +137,7 @@ class _MainPageState extends State<MainPage> {
                   onPressed: () {
 //                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
-                    Navigator.of(context).pushNamed("/test/2");
+                    Navigator.of(context).pushNamed(TestPage.routeName);
                   },
                   child: Text("测试界面2"),
                 ),

@@ -1,11 +1,17 @@
 import 'package:ease_life/index.dart';
 
+import '../utils.dart';
+import 'web_view_example.dart';
+
 class MessagePage extends StatefulWidget {
   @override
   _MessagePageState createState() => _MessagePageState();
 }
 
 class _MessagePageState extends State<MessagePage> {
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,42 +20,66 @@ class _MessagePageState extends State<MessagePage> {
         title: Text("消息"),
       ),
       body: StreamBuilder<UserInfo>(
-        stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
-        builder: (context, snapshot) {
-          if(snapshot.hasError||!snapshot.hasData){
-            return Center(
-              child: Text("未登录"),
-            );
-          }
-          return ListView.builder(
-            itemBuilder: (context, index) {
-              return Card(
-
-                child: Padding(
-                  padding: const EdgeInsets.all(14.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          FlutterLogo(),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("住户A"),
-                          ),
-                          Expanded(child: Text("你好！我是住在天马花园1509-1的住户1，诚邀你到我家做客",overflow: TextOverflow.ellipsis,maxLines: 20,))
-                        ],
-                      ),
-                      Text("2019/03/11 10:11")
-                    ],
-                  ),
-                ),
-              );
-            },
-            itemCount: 3,
-          );
-        }
-      ),
+          stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
+          builder: (context, snapshot) {
+            if (snapshot.hasError || !snapshot.hasData) {
+              return buildVisitor(context);
+            }
+            return StreamBuilder<List<NoticeDetail>>(
+                stream:
+                    BlocProviders.of<ApplicationBloc>(context).homeNoticeStream,
+                builder: (context, snapshot) {
+                  var list = snapshot.data ?? [];
+                  return StreamBuilder<List<NoticeType>>(
+                      stream: BlocProviders.of<ApplicationBloc>(context)
+                          .noticeTypeStream,
+                      builder: (context, snapshot) {
+                        var types = snapshot.data ?? [];
+                        return ListView.builder(
+                          itemBuilder: (context, index) {
+                            return Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: ExpansionTile(
+                                  leading: Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 6),
+                                    decoration: BoxDecoration(
+                                        color: colors[list[index].noticeType %
+                                            colors.length],
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8))),
+                                    child: Text(
+                                      types.firstWhere((type) {
+                                        return type.typeId ==
+                                            list[index].noticeType;
+                                      }).typeName,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                    ),
+                                  ),
+                                  title: Text(list[index].noticeTitle),
+                                  children: <Widget>[
+                                    GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                            return WebViewExample(
+                                                "$BASE_URL#/contentDetails?contentId=${list[index].noticeId}");
+                                          }));
+                                        },
+                                        child: Text(list[index].noticeContent)),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          itemCount: list.length,
+                        );
+                      });
+                });
+          }),
     );
   }
 }

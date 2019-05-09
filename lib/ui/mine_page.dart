@@ -2,6 +2,7 @@ import 'package:ease_life/index.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 
 import '../utils.dart';
+import 'user_detail_auth_page.dart';
 import 'widget/district_info_button.dart';
 
 class MinePage extends StatefulWidget {
@@ -22,33 +23,23 @@ class _MinePageState extends State<MinePage> {
       appBar: AppBar(
         title: Text("我的"),
         centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: buildActions(context),
       ),
       body: StreamBuilder<UserInfo>(
         builder: (context, AsyncSnapshot<UserInfo> userSnap) {
           print('userInfo:${userSnap.data}');
           if (userSnap.hasError || !userSnap.hasData) {
-            return buildMineVisitor();
+            return buildVisitor(context);
           } else if (userSnap.data.isCertification == 1) {
             return _buildMine(context, userSnap.data);
           } else if (userSnap.data.isCertification == 0) {
             return _buildUnauthorized(context, userSnap.data);
           } else {
-            return buildMineVisitor();
+            return buildVisitor(context);
           }
         },
         stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
-      ),
-    );
-  }
-
-  Widget buildMineVisitor() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushNamed("/login");
-      },
-      child: Center(
-        child: Text("未登录,点击登录"),
       ),
     );
   }
@@ -250,7 +241,7 @@ class _MinePageState extends State<MinePage> {
                       child: HomeTitleSliver(
                         leadingIcon: Image.asset('images/ic_face_id.png',
                             width: ScreenUtil().setWidth(50)),
-                        mainTitle: "出入管理",
+                        mainTitle: "出入记录",
                         subTitle: "",
                         tailText: "",
                       ),
@@ -284,11 +275,11 @@ class _MinePageState extends State<MinePage> {
                             indexId: 'fkjl',
                             index: indexInfo,
                           ),
-                          HomeChip(
-                            title: "投诉记录",
-                            indexId: 'tsjl',
-                            index: indexInfo,
-                          ),
+//                          HomeChip(
+//                            title: "投诉记录",
+//                            indexId: 'tsjl',
+//                            index: indexInfo,
+//                          ),
                           HomeChip(
                             title: "缴费记录",
                             indexId: 'jfjl',
@@ -310,7 +301,7 @@ class _MinePageState extends State<MinePage> {
                             index: indexInfo,
                           ),
                           HomeChip(
-                            title: "小区保修记录",
+                            title: "小区报修记录",
                             indexId: 'xqbxjl',
                             index: indexInfo,
                           ),
@@ -454,7 +445,7 @@ class _MinePageState extends State<MinePage> {
                 color: colorFaceButton,
               ),
               onTap: () {
-                Navigator.of(context).pushNamed("/preVerify").then((v) {
+                Navigator.of(context).pushNamed(UserDetailAuthPage.routeName).then((v) {
                   //获取当前用户信息
                   Future.delayed(Duration(milliseconds: 500), () {
                     return Api.getUserInfo().then((baseResp) {

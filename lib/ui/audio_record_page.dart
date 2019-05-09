@@ -6,6 +6,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AudioRecordPage extends StatefulWidget {
+  static String routeName = "/audio";
+
   @override
   _AudioRecordPageState createState() => _AudioRecordPageState();
 }

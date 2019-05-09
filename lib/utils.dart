@@ -5,8 +5,16 @@ import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'index.dart';
+import 'ui/login_page.dart';
+
+
+List<Color> colors = [
+  Color(0xfffb333d),
+  Color(0xff3d5ffe),
+  Color(0xff16a723),
+  Color(0xfffebf1f),
+];
 typedef OnFileProcess = Function(Future<File>,File localFile);
 void showImageSourceDialog(
     File file,BuildContext context,ValueCallback onValue,OnFileProcess onFileProcess) {
@@ -82,6 +90,15 @@ void startAudioRecord(){
 
 //只能作用于带exif的image
 Future<File> rotateWithExifAndCompress(File file) async{
+  if(!Platform.isAndroid){
+    return FlutterImageCompress.compressWithFile(file.path).then((listInt) {
+      if (listInt == null) {
+        return null;
+      }
+      file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
+      return file;
+    });
+  }
   return Future.value(file).then((file) {
     if (file == null) {
       return null;
@@ -112,4 +129,26 @@ void routeToWeb(BuildContext context,String id, Index index) {
   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
     return WebViewExample(url);
   }));
+}
+
+Widget buildVisitor(BuildContext context) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.of(context).pushNamed(LoginPage.routeName);
+    },
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.sms_failed,color: Colors.blue,size: 40,),
+          SizedBox(height: 12,),
+          Text("未登录,点击登录",style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 17,
+              color: Colors.grey[700]
+          ),),
+        ],
+      ),
+    ),
+  );
 }

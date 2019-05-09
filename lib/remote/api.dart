@@ -201,4 +201,9 @@ class Api {
       addAuthorization: false,
     );
   }
+
+  static Future<List<Index>> getIndex(){
+    return DioUtil().getIndexJson();
+  }
+
 }

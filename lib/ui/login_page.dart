@@ -6,11 +6,12 @@ import 'package:ease_life/ui/widget/loading_state_widget.dart';
 import 'package:ease_life/ui/widget/ticker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'register_page.dart';
 import 'widget/lifecycle_widget.dart';
 
 class LoginPage extends StatefulWidget {
   final String backRoute;
-
+  static String routeName = "/login";
   LoginPage({this.backRoute});
 
   @override
@@ -131,7 +132,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                   ),
                   FlatButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed("/register");
+                        Navigator.of(context).pushNamed(RegisterPage.routeName);
                       },
                       child: Text("注册")),
                   Row(

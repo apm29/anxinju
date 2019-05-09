@@ -3,6 +3,9 @@ import 'package:ease_life/index.dart';
 import 'widget/loading_state_widget.dart';
 
 class RegisterPage extends StatefulWidget {
+
+  static String routeName="/register";
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -90,6 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     padding: EdgeInsets.all(6),
                     child: TextField(
                       key: ValueKey("pass"),
+                      obscureText: true,
                       controller: _passwordController,
                       decoration: InputDecoration(
                         hintText: "输入密码",

@@ -11,7 +11,7 @@ class ContactInfo{
 
 }
 class ContactsSelectPage extends StatefulWidget {
-
+  static String routeName = "/contacts";
   final ContactCallback callback;
 
   ContactsSelectPage(this.callback);

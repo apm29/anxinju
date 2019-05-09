@@ -93,6 +93,8 @@ class _CameraPageState extends State<CameraPage> {
 }
 
 class FaceIdPage extends StatefulWidget {
+
+  static String routeName = "/faceId";
   @override
   _FaceIdPageState createState() => _FaceIdPageState();
 }

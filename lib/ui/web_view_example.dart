@@ -97,7 +97,7 @@ const String kNavigationExamplePage = '''
         "data":{
           "content":"内容",
           "title":"标题",
-          "callbackName":"funcOneParams", //一个String参数的callback
+          "callbackName":"showToast", //一个String参数的callback
           "callbackParam":"xxxx" //回调参数,回调给callbackName对应函数
         }
       }
@@ -254,10 +254,9 @@ const String kNavigationExamplePage = '''
 <button  onClick = "pushReplace()">push replace home</button>
 
 <button onClick = "uploadFile()"> choose file </button>
-<button onClick = "chooesContact()"> choose contact </button>
 <button onClick = "faceId()"> face ---- id </button>
 <button onClick = "selectContact()"> selectContact </button>
-<input id="textInput1" class="custom" size="32">
+<br/><input id="textInput1" class="custom" size="32">
 <input id="textInput2" class="custom" size="32">
 <textarea name="textarea" rows="10" cols="50">Write something here</textarea>
 </body>
@@ -338,11 +337,11 @@ class _WebViewExampleState extends State<WebViewExample> {
               callback: (district) {
                 controller?.reload();
                 print('hasFocus:${_focusNode.hasFocus}');
-                FocusScope.of(context).requestFocus(_focusNode);
+                FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
             SampleMenu(_controller.future, () {
-              FocusScope.of(context).requestFocus(_focusNode);
+              FocusScope.of(context).requestFocus(FocusNode());
             }),
           ],
         ),
@@ -525,21 +524,21 @@ class _WebViewExampleState extends State<WebViewExample> {
             "callbackName": "funcTwoParams",//1个String参数的callback, 回调缩略图url
         }
        }
-       
+
        {
         "funcName":"push",
         "data":{
             "routeName": "/home",//1个String参数的
         }
        }
-       
+
        {
         "funcName":"pushReplace",
         "data":{
             "routeName": "/home",//1个String参数的
         }
        }
-       
+
        {
         "funcName":"faceId",
         "data":{
@@ -607,7 +606,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void doFacePic(BuildContext context, Map<String, dynamic> jsonMap) {
-    Navigator.of(context).pushNamed("/camera",
+    Navigator.of(context).pushNamed(FaceIdPage.routeName,
         arguments: {"takePic": true}).then((v) {
       if (v != null && v is ImageDetail) {
         var javascriptString =
@@ -696,7 +695,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     var file = File(directory.path +
         "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
     showImageSourceDialog(file, context, (v) {
-      FocusScope.of(context).requestFocus(_focusNode);
+      FocusScope.of(context).requestFocus(FocusNode());
     }, (futureFile, localFile) {
       processFileAndNotify(futureFile, localFile, callbackName);
     });
@@ -704,9 +703,12 @@ class _WebViewExampleState extends State<WebViewExample> {
 
   void processFileAndNotify(
       Future<File> fileFuture, File localFile, String jsCallbackNam) {
-    fileFuture.then((file) {
+    fileFuture.then((File file) {
       if (file == null) {
         return null;
+      }
+      if(!Platform.isAndroid){
+          return Future.value(file);
       }
       //通过exif旋转图片
       return FlutterExifRotation.rotateImage(path: file.path);
@@ -791,7 +793,7 @@ class _WebViewExampleState extends State<WebViewExample> {
             ],
           );
         }).then((param) {
-      FocusScope.of(context).requestFocus(_focusNode);
+      FocusScope.of(context).requestFocus(FocusNode());
       if (param == null) {
         controller.evaluateJavascript('$callbackCancel()');
       } else {
@@ -809,7 +811,6 @@ class _WebViewExampleState extends State<WebViewExample> {
     String title = data['title'];
     String callbackName = data['callbackName'];
     String callbackParam = data['callbackParam'];
-    print('$data');
     showDialog(
         context: context,
         builder: (context) {
@@ -826,10 +827,10 @@ class _WebViewExampleState extends State<WebViewExample> {
             ],
           );
         }).then((param) {
-      FocusScope.of(context).requestFocus(_focusNode);
-      if (param != null) {
-        controller.evaluateJavascript('$callbackName("$param")');
-      }
+      FocusScope.of(context).requestFocus(FocusNode());
+        var javascriptString = '$callbackName("$param")';
+        print(javascriptString);
+        controller.evaluateJavascript(javascriptString);
     });
   }
 
@@ -887,7 +888,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void doSelectContact(BuildContext context, jsonMap) {
-    Navigator.of(context).pushNamed("/contacts").then((contact){
+    Navigator.of(context).pushNamed(ContactsSelectPage.routeName).then((contact){
      if(contact!=null && contact is ContactInfo){
        var javascriptString =
            "${jsonMap['callbackName']}('${contact.displayName}','${contact.phone}')";

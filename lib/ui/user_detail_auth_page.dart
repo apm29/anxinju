@@ -5,9 +5,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../utils.dart';
+import 'camera_page.dart';
 import 'widget/loading_state_widget.dart';
 
 class UserDetailAuthPage extends StatefulWidget {
+  static String routeName = "/preVerify";
+
   @override
   _UserDetailAuthPageState createState() => _UserDetailAuthPageState();
 }
@@ -20,9 +23,13 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
   TextEditingController _idCardController = TextEditingController();
   TextEditingController _nickNameController = TextEditingController();
   PublishSubject<String> _avatarUploadController = PublishSubject();
-  Observable<String> get _avatarStream  => _avatarUploadController.stream;
-  GlobalKey<LoadingStateWidgetState> submitButtonKey = GlobalKey(debugLabel:"sumbitUserDetail");
-  GlobalKey<LoadingStateWidgetState> uploadImageKey = GlobalKey(debugLabel:"uploadImageAvatar");
+
+  Observable<String> get _avatarStream => _avatarUploadController.stream;
+  GlobalKey<LoadingStateWidgetState> submitButtonKey =
+      GlobalKey(debugLabel: "sumbitUserDetail");
+  GlobalKey<LoadingStateWidgetState> uploadImageKey =
+      GlobalKey(debugLabel: "uploadImageAvatar");
+
   @override
   void dispose() {
     super.dispose();
@@ -134,16 +141,16 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                           width: ScreenUtil().setWidth(200),
                           height: ScreenUtil().setWidth(200),
                           child: StreamBuilder<String>(
-                            stream: _avatarStream,
-                            builder: (context, snapshot) {
-                              return CachedNetworkImage(
-                                imageUrl: snapshot.data??_avatarController.text,
-                                placeholder: (context, url) {
-                                  return CircleAvatar();
-                                },
-                              );
-                            }
-                          ),
+                              stream: _avatarStream,
+                              builder: (context, snapshot) {
+                                return CachedNetworkImage(
+                                  imageUrl:
+                                      snapshot.data ?? _avatarController.text,
+                                  placeholder: (context, url) {
+                                    return CircleAvatar();
+                                  },
+                                );
+                              }),
                         ),
                         Expanded(
                           child: LoadingStateWidget(
@@ -166,24 +173,36 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                                       "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
                                   showImageSourceDialog(file, context, (v) {},
                                       (futureFile, localFile) {
-                                        futureFile.then((f){
-                                          if(f==null){
-                                            return null;
-                                          }
-                                          uploadImageKey.currentState.startLoading();
-                                          return Api.uploadPic(f.path);
-                                        }).then((baseResp){
-                                          if(baseResp==null){
-                                            return null;
-                                          }
-                                          if(baseResp.success()){
-                                            _avatarUploadController.add(baseResp.data.thumbnailPath);
-                                            _avatarController.text = baseResp.data.orginPicPath;
-                                          }
-                                          uploadImageKey.currentState.stopLoading();
-                                          Scaffold.of(context).showSnackBar(SnackBar(content: Text(baseResp.text)));
-                                        });
-                                      });
+                                    futureFile.then((f) {
+                                      if (f == null) {
+                                        return null;
+                                      }
+                                      uploadImageKey.currentState
+                                          .startLoading();
+                                      return Api.uploadPic(f.path);
+                                    }).then((baseResp) {
+                                      if (baseResp == null) {
+                                        return null;
+                                      }
+                                      if (baseResp.success()) {
+                                        _avatarUploadController
+                                            .add(baseResp.data.thumbnailPath);
+                                        _avatarController.text =
+                                            baseResp.data.orginPicPath;
+                                      }
+                                      uploadImageKey.currentState
+                                          .stopLoading();
+                                      Scaffold.of(context).showSnackBar(
+                                          SnackBar(
+                                              content: Text(baseResp.text)));
+                                    }).catchError((Object e, StackTrace trace) {
+                                      uploadImageKey.currentState
+                                          .stopLoading();
+                                      Scaffold.of(context).showSnackBar(
+                                          SnackBar(
+                                              content: Text(e.toString())));
+                                    });
+                                  });
                                 }),
                           ),
                         )
@@ -211,15 +230,16 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                             SnackBar(content: Text(baseResponse.text)));
                         submitButtonKey.currentState.stopLoading();
                         if (baseResponse.success()) {
-                          Navigator.of(context).pushReplacementNamed("/camera",arguments:{
-                            "idCard": _idCardController.text
-                          });
+                          Navigator.of(context).pushReplacementNamed(
+                              FaceIdPage.routeName,
+                              arguments: {"idCard": _idCardController.text});
                         }
                       },
                       color: Colors.blue,
-                      child: Text("提交",style: TextStyle(
-                        color: Colors.white
-                      ),),
+                      child: Text(
+                        "提交",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 )

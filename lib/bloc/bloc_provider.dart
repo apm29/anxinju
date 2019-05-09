@@ -81,7 +81,7 @@ class ApplicationBloc extends BlocBase {
   ApplicationBloc() {
     _getCurrentUserAndNotify();
     _getCurrentDistrictAndNotify();
-    _getIndexInfo();
+    getIndexInfo();
     _getNoticeInfo();
     //_requestLocationPermission();
   }
@@ -105,6 +105,10 @@ class ApplicationBloc extends BlocBase {
   void saveToken(String token) {
     sharedPreferences.setString(
         PreferenceKeys.keyAuthorization, token?.toString());
+  }
+  
+  void refreshMenuIndex(List<Index> indexInfo){
+    
   }
 
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
@@ -166,8 +170,8 @@ class ApplicationBloc extends BlocBase {
   /*
    * 获取json map,标记主页按钮的去向url
    */
-  void _getIndexInfo() async{
-    List<Index> list = await DioUtil().getIndexJson();
+  void getIndexInfo() async{
+    List<Index> list = await Api.getIndex();
     _homeIndexController.add(list.firstWhere((index)=>index.area=="index"));
     _mineIndexController.add(list.firstWhere((index)=>index.area=="mine"));
     debugPrint("===----> inject index info");
@@ -229,7 +233,6 @@ class ContactsBloc extends BlocBase {
       var contacts = await ContactsService.getContacts();
       _contactsController.add(contacts.toList());
     }
-    await Future.delayed(Duration(seconds: 2));
     return null;
   }
 }

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AuthorizationPage extends StatefulWidget {
+
+  static String routeName = "/verify";
+
   @override
   _AuthorizationPageState createState() => _AuthorizationPageState();
 }
