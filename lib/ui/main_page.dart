@@ -11,9 +11,10 @@ import 'camera_page.dart';
 import 'test_page.dart';
 import 'user_detail_auth_page.dart';
 import 'web_view_example.dart';
-import 'package:ease_life/main.dart';
-import 'package:ease_life/bloc/bloc_provider.dart';
-
+const int PAGE_HOME=0;
+const int PAGE_SEARCH=11;
+const int PAGE_MESSAGE=21;
+const int PAGE_MINE=1;
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
 
@@ -55,30 +56,30 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(
               Icons.home,
               size: 24,
-              color: _currentIndex == 0 ? Colors.blueAccent : Colors.grey,
+              color: _currentIndex == PAGE_HOME ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("主页")),
-        BottomNavigationBarItem(
-            icon: Image.asset(
-              "images/search.png",
-              width: 24,
-              height: 24,
-              color: _currentIndex == 1 ? Colors.blueAccent : Colors.grey,
-            ),
-            title: Text("搜索")),
-        BottomNavigationBarItem(
-            icon: Icon(
-              Icons.message,
-              size: 24,
-              color: _currentIndex == 2 ? Colors.blueAccent : Colors.grey,
-            ),
-            title: Text("消息")),
+//        BottomNavigationBarItem(
+//            icon: Image.asset(
+//              "images/search.png",
+//              width: 24,
+//              height: 24,
+//              color: _currentIndex == 1 ? Colors.blueAccent : Colors.grey,
+//            ),
+//            title: Text("搜索")),
+//        BottomNavigationBarItem(
+//            icon: Icon(
+//              Icons.message,
+//              size: 24,
+//              color: _currentIndex == 2 ? Colors.blueAccent : Colors.grey,
+//            ),
+//            title: Text("消息")),
         BottomNavigationBarItem(
             icon: Image.asset(
               "images/mine.png",
               width: 24,
               height: 24,
-              color: _currentIndex == 3 ? Colors.blueAccent : Colors.grey,
+              color: _currentIndex == PAGE_MINE ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("我的")),
       ],
@@ -96,9 +97,9 @@ class _MainPageState extends State<MainPage> {
 
   buildContent() {
     switch (_currentIndex) {
-      case 0:
+      case PAGE_HOME:
         return HomePage();
-      case 1:
+      case PAGE_SEARCH:
         return Container(
           child: Center(
             child: Column(
@@ -145,9 +146,9 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
         );
-      case 2:
+      case PAGE_MESSAGE:
         return MessagePage();
-      case 3:
+      case PAGE_MINE:
         return MinePage();
     }
   }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:amap_base_location/amap_base_location.dart';
 import 'package:ease_life/ui/camera_page.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,8 +9,6 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'index.dart';
 import 'ui/login_page.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:geolocator/geolocator.dart';
 
 List<Color> colors = [
   Color(0xfffb333d),
@@ -163,6 +162,6 @@ Widget buildVisitor(BuildContext context) {
   );
 }
 
-Future<Position> getLocation()async{
-  return Geolocator().getCurrentPosition();
+Future<Location> getLocation()async{
+  return AMapLocation().getLocation(LocationClientOptions());
 }

@@ -309,9 +309,6 @@ class _WebViewExampleState extends State<WebViewExample> {
 
   @override
   Widget build(BuildContext context) {
-    getLocation().then((p){
-      print('$p');
-    });
     return WillPopScope(
       onWillPop: () async {
         if (await controller.canGoBack()) {

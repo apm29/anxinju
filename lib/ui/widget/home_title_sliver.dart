@@ -25,6 +25,7 @@ class HomeTitleSliver extends StatelessWidget {
         ),
         SizedBox(
           width: 10,
+          height: ScreenUtil().setHeight(140),
         ),
         Text(mainTitle,style:const TextStyle(
           fontSize: 16
@@ -40,22 +41,22 @@ class HomeTitleSliver extends StatelessWidget {
             color: Colors.transparent,
           ),
         ),
-        RawMaterialButton(
-          constraints: BoxConstraints(
-            minHeight: 0,minWidth: 0
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(width: 10,),
-              Text("",style:const TextStyle(
-                  fontSize: 16
-              ),),
-              //Icon(Icons.keyboard_arrow_right)
-            ],
-          ),
-          onPressed: onPressed,
-        )
+//        RawMaterialButton(
+//          constraints: BoxConstraints(
+//            minHeight: 0,minWidth: 0
+//          ),
+//          child: Row(
+//            mainAxisSize: MainAxisSize.min,
+//            children: <Widget>[
+//              Container(width: 10,),
+//              Text("",style:const TextStyle(
+//                  fontSize: 16
+//              ),),
+//              //Icon(Icons.keyboard_arrow_right)
+//            ],
+//          ),
+//          onPressed: onPressed,
+//        )
       ],
     );
   }

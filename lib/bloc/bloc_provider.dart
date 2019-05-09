@@ -3,6 +3,7 @@ import 'dart:convert';
 
 //import 'package:amap_base_location/amap_base_location.dart';
 //import 'package:amap_base/amap_base.dart';
+import 'package:amap_base_location/amap_base_location.dart';
 import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
@@ -106,10 +107,8 @@ class ApplicationBloc extends BlocBase {
     sharedPreferences.setString(
         PreferenceKeys.keyAuthorization, token?.toString());
   }
-  
-  void refreshMenuIndex(List<Index> indexInfo){
-    
-  }
+
+  void refreshMenuIndex(List<Index> indexInfo) {}
 
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
 
@@ -124,13 +123,17 @@ class ApplicationBloc extends BlocBase {
   BehaviorSubject<Index> _mineIndexController = BehaviorSubject();
 
   Observable<Index> get homeIndex => _homeIndexController.stream;
+
   Observable<Index> get mineIndex => _mineIndexController.stream;
 
   BehaviorSubject<List<NoticeDetail>> _noticeController = BehaviorSubject();
   BehaviorSubject<List<NoticeType>> _noticeTypeController = BehaviorSubject();
 
-  Observable<List<NoticeDetail>> get homeNoticeStream => _noticeController.stream;
-  Observable<List<NoticeType>> get noticeTypeStream => _noticeTypeController.stream;
+  Observable<List<NoticeDetail>> get homeNoticeStream =>
+      _noticeController.stream;
+
+  Observable<List<NoticeType>> get noticeTypeStream =>
+      _noticeTypeController.stream;
 
   /*
    * 退出登录:
@@ -152,59 +155,76 @@ class ApplicationBloc extends BlocBase {
     var source = sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
     DistrictInfo districtInfo =
         source == null ? null : DistrictInfo.fromJson(json.decode(source));
-    if(districtInfo == null) {
-      BaseResponse<List<DistrictInfo>> baseResponse = await Api
-          .findAllDistrict();
+    if (districtInfo == null) {
+      BaseResponse<List<DistrictInfo>> baseResponse =
+          await Api.findAllDistrict();
       //将取到的小区信息存入sp缓存
-      sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, baseResponse.data.first.toString());
+      sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict,
+          baseResponse.data.first.toString());
       _districtInfoController.add(baseResponse.data.first);
-    }else{
+    } else {
       _districtInfoController.add(districtInfo);
     }
     debugPrint("===----> inject district info");
   }
 
-
-
-
   /*
    * 获取json map,标记主页按钮的去向url
    */
-  void getIndexInfo() async{
+  void getIndexInfo() async {
     List<Index> list = await Api.getIndex();
-    _homeIndexController.add(list.firstWhere((index)=>index.area=="index"));
-    _mineIndexController.add(list.firstWhere((index)=>index.area=="mine"));
+    _homeIndexController.add(list.firstWhere((index) => index.area == "index"));
+    _mineIndexController.add(list.firstWhere((index) => index.area == "mine"));
     debugPrint("===----> inject index info");
   }
 
   void setCurrentDistrict(DistrictInfo districtInfo) {
     //将取到的小区信息存入sp缓存
-    sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, districtInfo.toString());
+    sharedPreferences.setString(
+        PreferenceKeys.keyCurrentDistrict, districtInfo.toString());
     _districtInfoController.add(districtInfo);
   }
 
-  void _requestLocationPermission() async{
-    var permissionStatus =await  PermissionHandler().checkPermissionStatus(PermissionGroup.location);
-    if(permissionStatus != PermissionStatus.granted){
-      PermissionHandler().requestPermissions([PermissionGroup.location]);
+  void _requestLocationPermission() async {
+    var permissionStatus = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.location);
+    if (permissionStatus != PermissionStatus.granted) {
+      var status = await PermissionHandler()
+          .requestPermissions([PermissionGroup.location]);
+      if (status[PermissionGroup.location] == PermissionStatus.granted) {
+        locationStream();
+      }
+    } else {
+      locationStream();
     }
   }
 
-  void _getNoticeInfo() {
-    Api.getAllNoticeType()
-        .then((baseResp){
-          if(baseResp.success()){
-            _noticeTypeController.add(baseResp.data);
-            return Api.getNewNotice(baseResp.data);
-          }else{
-            throw Error();
-          }
-    }).then(( BaseResponse<List<NoticeDetail>> resp){
-      if(resp.success())
-        _noticeController.add(resp.data);
+  void locationStream() {
+//    Geolocator().getPositionStream(
+//      LocationOptions(
+//        accuracy: LocationAccuracy.medium,
+//        timeInterval: 1000
+//      )
+//    ).listen((p){
+//      print(p.toString());
+//    });
+    AMapLocation().startLocate(LocationClientOptions()).listen((p) {
+      print(p.toString());
     });
   }
 
+  void _getNoticeInfo() {
+    Api.getAllNoticeType().then((baseResp) {
+      if (baseResp.success()) {
+        _noticeTypeController.add(baseResp.data);
+        return Api.getNewNotice(baseResp.data);
+      } else {
+        throw Error();
+      }
+    }).then((BaseResponse<List<NoticeDetail>> resp) {
+      if (resp.success()) _noticeController.add(resp.data);
+    });
+  }
 }
 
 class LoginBloc extends BlocBase {

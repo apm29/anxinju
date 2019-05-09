@@ -147,13 +147,15 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                         },
                         activeColor: Colors.blue,
                       ),
-                      FlatButton(
-                        child: Text("我已阅读并同意安心居服务平台服务相关条例"),
-                        onPressed: () {
-                          setState(() {
-                            _protocolChecked = !_protocolChecked;
-                          });
-                        },
+                      Expanded(
+                        child: FlatButton(
+                          child: Text("我已阅读并同意安心居服务平台服务相关条例"),
+                          onPressed: () {
+                            setState(() {
+                              _protocolChecked = !_protocolChecked;
+                            });
+                          },
+                        ),
                       )
                     ],
                   ),
