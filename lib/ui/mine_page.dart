@@ -2,6 +2,7 @@ import 'package:ease_life/index.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 
 import '../utils.dart';
+import 'main_page.dart';
 import 'user_detail_auth_page.dart';
 import 'widget/district_info_button.dart';
 
@@ -29,6 +30,12 @@ class _MinePageState extends State<MinePage> {
       body: StreamBuilder<UserInfo>(
         builder: (context, AsyncSnapshot<UserInfo> userSnap) {
           print('userInfo:${userSnap.data}');
+          print('state:${userSnap.connectionState}');
+          if(userSnap.connectionState == ConnectionState.waiting){
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           if (userSnap.hasError || !userSnap.hasData) {
             return buildVisitor(context);
           } else if (userSnap.data.isCertification == 1) {
@@ -420,9 +427,34 @@ class _MinePageState extends State<MinePage> {
         ),
         AlertDialog(
           title: Text(
-            "您还未认证为业主",
-            style: TextStyle(color: colorFaceButton),
+            "您还未通过认证,只能使用首页功能",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.blueGrey,
+            ),
           ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                BlocProviders.of<MainIndexBloc>(context).toIndex(PAGE_HOME);
+              },
+              textColor: Colors.blueGrey,
+              child: Text(
+                "暂不认证",
+                maxLines: 1,
+              ),
+            ),
+            FlatButton(
+              onPressed: () {
+                BlocProviders.of<ApplicationBloc>(context).logout();
+              },
+              textColor: Colors.blueGrey,
+              child: Text(
+                "退出登录",
+                maxLines: 1,
+              ),
+            )
+          ],
           content: Container(
             margin: EdgeInsets.all(8),
             decoration: BoxDecoration(

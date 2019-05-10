@@ -1,5 +1,6 @@
 import 'package:ease_life/remote/api.dart';
 
+import '../index.dart';
 import '../ui/home_page.dart';
 import '../ui/message_page.dart';
 import '../ui/mine_page.dart';
@@ -12,9 +13,9 @@ import 'test_page.dart';
 import 'user_detail_auth_page.dart';
 import 'web_view_example.dart';
 const int PAGE_HOME=0;
-const int PAGE_SEARCH=11;
+const int PAGE_SEARCH=1;
 const int PAGE_MESSAGE=21;
-const int PAGE_MINE=1;
+const int PAGE_MINE=2;
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
 
@@ -39,12 +40,20 @@ class _MainPageState extends State<MainPage> {
         }
         return true;
       },
-      child: Scaffold(
-        body: Container(
-          color: Colors.grey[200],
-          child: buildContent(),
-        ),
-        bottomNavigationBar: buildBottomNavigationBar(),
+      child: StreamBuilder<int>(
+        stream: BlocProviders.of<MainIndexBloc>(context).indexStream,
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+              _currentIndex = snapshot.data??0;
+          }
+          return Scaffold(
+            body: Container(
+              color: Colors.grey[200],
+              child: buildContent(),
+            ),
+            bottomNavigationBar: buildBottomNavigationBar(),
+          );
+        }
       ),
     );
   }
@@ -59,19 +68,19 @@ class _MainPageState extends State<MainPage> {
               color: _currentIndex == PAGE_HOME ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("主页")),
-//        BottomNavigationBarItem(
-//            icon: Image.asset(
-//              "images/search.png",
-//              width: 24,
-//              height: 24,
-//              color: _currentIndex == 1 ? Colors.blueAccent : Colors.grey,
-//            ),
-//            title: Text("搜索")),
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/search.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == PAGE_SEARCH ? Colors.blueAccent : Colors.grey,
+            ),
+            title: Text("搜索")),
 //        BottomNavigationBarItem(
 //            icon: Icon(
 //              Icons.message,
 //              size: 24,
-//              color: _currentIndex == 2 ? Colors.blueAccent : Colors.grey,
+//              color: _currentIndex == PAGE_MESSAGE ? Colors.blueAccent : Colors.grey,
 //            ),
 //            title: Text("消息")),
         BottomNavigationBarItem(
@@ -84,10 +93,10 @@ class _MainPageState extends State<MainPage> {
             title: Text("我的")),
       ],
       onTap: (index) {
-        if (_currentIndex != index)
-          setState(() {
-            _currentIndex = index;
-          });
+        if (_currentIndex != index){
+          _currentIndex = index;
+          BlocProviders.of<MainIndexBloc>(context).toIndex(_currentIndex);
+        }
       },
       currentIndex: _currentIndex,
       fixedColor: Colors.blue,

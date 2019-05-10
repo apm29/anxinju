@@ -297,18 +297,18 @@ class NoticeDetail {
 
   NoticeDetail(
       {this.noticeId,
-        this.noticeTitle,
-        this.noticeContent,
-        this.noticeBanner,
-        this.noticeType,
-        this.noticeScope,
-        this.districtId,
-        this.userId,
-        this.companyId,
-        this.userName,
-        this.companyName,
-        this.createTime,
-        this.orderNo});
+      this.noticeTitle,
+      this.noticeContent,
+      this.noticeBanner,
+      this.noticeType,
+      this.noticeScope,
+      this.districtId,
+      this.userId,
+      this.companyId,
+      this.userName,
+      this.companyName,
+      this.createTime,
+      this.orderNo});
 
   NoticeDetail.fromJson(Map<String, dynamic> json) {
     noticeId = json['noticeId'];
@@ -341,6 +341,51 @@ class NoticeDetail {
     data['companyName'] = this.companyName;
     data['createTime'] = this.createTime;
     data['orderNo'] = this.orderNo;
+    return data;
+  }
+}
+
+///
+///人脸认证/certification/userVerify 接口返回的结果信息
+///
+class UserVerifyInfo {
+  List<HouseInfo> rows;
+
+  UserVerifyInfo({this.rows});
+
+  UserVerifyInfo.fromJson(Map<String, dynamic> json) {
+    if (json['rows'] != null) {
+      rows = new List<HouseInfo>();
+      json['rows'].forEach((v) {
+        rows.add(new HouseInfo.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.rows != null) {
+      data['rows'] = this.rows.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class HouseInfo {
+  int isOwner;
+  String addr;
+
+  HouseInfo({this.isOwner, this.addr});
+  bool get isHouseOwner => isOwner !=0;
+  HouseInfo.fromJson(Map<String, dynamic> json) {
+    isOwner = json['isOwner'];
+    addr = json['addr'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['isOwner'] = this.isOwner;
+    data['addr'] = this.addr;
     return data;
   }
 }

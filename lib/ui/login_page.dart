@@ -54,7 +54,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
           Widget loginButton = buildLoginButton(userSnap, context, _fastLogin);
           print('userInfo:${userSnap.data}');
           if (userSnap.hasData && !userSnap.hasError) {
-            return buildLoginSuccess(userSnap.data.isCertification == 0);
+            return buildLoginSuccess(userSnap.data.isCertification == 0,context);
           } else {
             return buildLogin(context, loginButton);
           }
@@ -184,7 +184,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     );
   }
 
-  Widget buildLoginSuccess(bool isCertificated) {
+  Widget buildLoginSuccess(bool isCertificated, BuildContext context) {
     var colorFaceButton = Colors.blue;
     var colorHomeButton = Colors.blueGrey;
     if (widget.backRoute != null) {
@@ -203,77 +203,6 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
         ),
       ),
       body: Center(
-//        child: Card(
-//          elevation: 10,
-//          margin: EdgeInsets.all(18),
-//          child: Padding(
-//            padding: const EdgeInsets.all(6.0),
-//            child: Column(
-//              mainAxisSize: MainAxisSize.min,
-//              mainAxisAlignment: MainAxisAlignment.center,
-//              crossAxisAlignment: CrossAxisAlignment.center,
-//              children: <Widget>[
-//                Container(
-//                  color: Colors.grey[200],
-//                  margin: EdgeInsets.only(bottom: 12),
-//                  child: Row(
-//                    mainAxisAlignment: MainAxisAlignment.center,
-//                    children: <Widget>[
-//                      Icon(Icons.check, size: 40, color: Colors.blue),
-//                      Text(
-//                        "登陆成功!",
-//                        style: TextStyle(fontSize: 20, color: Colors.blue),
-//                      ),
-//                    ],
-//                  ),
-//                ),
-//                Text(
-//                  "小区已采用智能门禁系统—刷脸出入\n录入脸部资料即可启用，也可在我的-人脸管理录入",
-//                  textAlign: TextAlign.center,
-//                ),
-//                Divider(),
-//                Container(
-//                  margin: EdgeInsets.all(8),
-//                  decoration: BoxDecoration(
-//                    border: Border.all(color: colorFaceButton),
-//                    borderRadius: BorderRadius.all(Radius.circular(10)),
-//                  ),
-//                  child: ListTile(
-//                    leading: Icon(
-//                      Icons.fingerprint,
-//                      size: 40,
-//                      color: colorFaceButton,
-//                    ),
-//                    title: Text("录入人脸照片",
-//                        style: TextStyle(
-//                            fontWeight: FontWeight.bold,
-//                            color: colorFaceButton)),
-//                    subtitle: Text("一键录入,简单高效",
-//                        style: TextStyle(color: colorFaceButton)),
-//                    trailing: Icon(
-//                      Icons.arrow_forward,
-//                      color: colorFaceButton,
-//                    ),
-//                    onTap: () {
-//                      Navigator.of(context).pushReplacementNamed("/preVerify");
-//                    },
-//                  ),
-//                ),
-//                FlatButton(
-//                  onPressed: () {
-//                    Navigator.of(context).pushReplacementNamed("/");
-//                  },
-//                  padding: EdgeInsets.symmetric(horizontal: 80),
-//                  textColor: colorHomeButton,
-//                  child: Text(
-//                    "放一放,先去首页",
-//                    maxLines: 1,
-//                  ),
-//                )
-//              ],
-//            ),
-//          ),
-//        ),
         child: Text("即将跳转.."),
       ),
     );

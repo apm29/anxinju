@@ -121,17 +121,6 @@ Future<File> rotateWithExifAndCompress(File file) async {
   });
 }
 
-void routeToWeb(BuildContext context, String id, Index index) {
-  var indexWhere = index.menu.indexWhere((i) => i.id == id);
-  if (indexWhere < 0) {
-    return;
-  }
-  var url = index.menu[indexWhere].url;
-  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-    return WebViewExample(url);
-  }));
-}
-
 Widget buildVisitor(BuildContext context) {
   return GestureDetector(
     onTap: () {
@@ -162,6 +151,48 @@ Widget buildVisitor(BuildContext context) {
   );
 }
 
-Future<Location> getLocation()async{
+Future<Location> getLocation() async {
   return AMapLocation().getLocation(LocationClientOptions());
+}
+
+///
+/// 先获取index数据在导航到指定的webview
+///
+void routeToWebIndex(BuildContext context, String indexId,
+    {bool refresh = true}) {
+  getIndex(refresh).then((list) {
+    return list.firstWhere((index) {
+      return index.area == "mine";
+    }, orElse: () {
+      return null;
+    });
+  }).then((index) {
+    if (index == null) {
+      Fluttertoast.showToast(msg: "获取路由数据失败");
+    } else {
+      routeToWeb(context, indexId, index);
+    }
+  });
+}
+
+List<Index> indexInfo;
+
+Future<List<Index>> getIndex(bool refresh) {
+  return (refresh || indexInfo == null || indexInfo.length == 0)
+      ? Api.getIndex().then((v) {
+          indexInfo = v;
+          return v;
+        })
+      : Future.value(indexInfo);
+}
+
+void routeToWeb(BuildContext context, String id, Index index) {
+  var indexWhere = index.menu.indexWhere((i) => i.id == id);
+  if (indexWhere < 0) {
+    return;
+  }
+  var url = index.menu[indexWhere].url;
+  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+    return WebViewExample(url);
+  }));
 }

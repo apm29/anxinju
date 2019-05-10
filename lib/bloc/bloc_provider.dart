@@ -200,16 +200,10 @@ class ApplicationBloc extends BlocBase {
   }
 
   void locationStream() {
-//    Geolocator().getPositionStream(
-//      LocationOptions(
-//        accuracy: LocationAccuracy.medium,
-//        timeInterval: 1000
-//      )
-//    ).listen((p){
-//      print(p.toString());
-//    });
-    AMapLocation().startLocate(LocationClientOptions()).listen((p) {
-      print(p.toString());
+    AMapLocation()
+        .startLocate(LocationClientOptions(interval: 20000))
+        .listen((p) {
+      //print(p.toString());
     });
   }
 
@@ -254,5 +248,41 @@ class ContactsBloc extends BlocBase {
       _contactsController.add(contacts.toList());
     }
     return null;
+  }
+}
+
+class MainIndexBloc extends BlocBase {
+  PublishSubject<int> _indexController = PublishSubject();
+
+  Observable<int> get indexStream => _indexController.stream;
+
+  MainIndexBloc() {
+    _indexController.add(0);
+  }
+
+  @override
+  void dispose() {
+    _indexController.close();
+  }
+
+  void toIndex(int index) {
+    _indexController.add(index);
+  }
+}
+
+enum CAMERA_STATUS { PREVIEW, PICTURE_STILL, VIDEO_RECORD }
+
+class CameraBloc extends BlocBase {
+  PublishSubject<CAMERA_STATUS> _statusController = PublishSubject();
+
+  Observable<CAMERA_STATUS> get statusStream => _statusController.stream;
+
+  @override
+  void dispose() {
+    _statusController.close();
+  }
+
+  void changeStatus(CAMERA_STATUS status) {
+    _statusController.add(status);
   }
 }

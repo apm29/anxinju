@@ -9,6 +9,12 @@ import '../index.dart';
 import '../main.dart';
 import '../utils.dart';
 
+void main() {
+  runApp(MaterialApp(
+    home: TestPage(),
+  ));
+}
+
 class TestPage extends StatefulWidget {
   static String routeName = "/test";
 
@@ -18,95 +24,41 @@ class TestPage extends StatefulWidget {
 
 class _TestPageState extends State<TestPage> {
   ScrollController scrollController = ScrollController();
-  CameraController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    if (cameras.length == 0) {
-      return;
-    }
-    var cameraInstance = cameras[0];
-    //默认打开后置
-    cameras.forEach((c) {
-      if (c.lensDirection == CameraLensDirection.back) {
-        cameraInstance = c;
-      }
-    });
-    controller = CameraController(cameraInstance, ResolutionPreset.high);
-    controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null || !controller.value.isInitialized) {
-      return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("人脸录入"),
-        ),
-        body: Center(
-          child: Text("没有检测到相机设备"),
-        ),
-      );
-    }
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("相机"),
-        ),
-        body: Stack(
-          children: <Widget>[
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: AspectRatio(
-                aspectRatio: 1/3,
-                child: CameraPreview(controller),
-              ),
+      appBar: AppBar(),
+      body: ListView(
+        children: <Widget>[
+          Container(
+            constraints: BoxConstraints(maxHeight: 100),
+            child: FutureBuilder(
+              builder: (context, snapshot) {
+                if(snapshot.hasData){
+                  return Container(
+                    height: 200,
+                    color: Colors.blueGrey,
+                  );
+                }else{
+                  return Container(
+                    height: 100,
+                    color: Colors.blue,
+                  );
+                }
+              },
+              future: someFuture(),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: GestureDetector(
-                child: Container(
-                  height: 70,
-                  width: 70,
-                  margin: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(width: 1.5, color: Colors.grey[600])),
-                ),
-              ),
-            )
-          ],
-        ));
-//    return Scaffold(
-//      body: Center(
-//        child: RaisedButton(onPressed: ()async{
-//          var argument = ModalRoute.of(context).settings.arguments;
-//          Directory directory = await getTemporaryDirectory();
-//          var file = File(directory.path +
-//              "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
-//          await controller.takePicture(file.path);
-//          file = await rotateWithExifAndCompress(file);
-//          var resp = await Api.uploadPic(file.path);
-//          var baseResponse = await Api.verifyUserFace(
-//              resp.data.orginPicPath, argument['idCard']);
-//          Fluttertoast.showToast(msg: baseResponse.text);
-//          if (baseResponse.success()) {
-//            //注册成功
-//            print(baseResponse.text);
-//            Navigator.of(context).pop(baseResponse.text);
-//          }
-//        }),
-//      ),
-//    );
+          ),
+        ],
+      ),
+    );
   }
- 
+
+  Future<int> someFuture()async{
+    await Future.delayed(Duration(seconds: 2));
+    return 1;
+  }
 
   RefreshIndicator buildSliver() {
     return RefreshIndicator(

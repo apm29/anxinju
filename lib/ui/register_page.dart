@@ -69,6 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         TickerWidget(
                             key: ticker,
+                            textInitial: "发送验证码",
                             onPressed: () {
                               sendSms();
                             })

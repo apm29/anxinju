@@ -93,8 +93,8 @@ class _CameraPageState extends State<CameraPage> {
 }
 
 class FaceIdPage extends StatefulWidget {
-
   static String routeName = "/faceId";
+
   @override
   _FaceIdPageState createState() => _FaceIdPageState();
 }
@@ -151,14 +151,14 @@ class _FaceIdPageState extends State<FaceIdPage> {
         centerTitle: true,
         title: Text("人脸录入"),
         actions: <Widget>[
-          FlatButton.icon(
-              onPressed: () {
-                setState(() {
-                  fullScreen = !fullScreen;
-                });
-              },
-              icon: Icon(Icons.swap_horizontal_circle),
-              label: Text("切换全屏"))
+//          FlatButton.icon(
+//              onPressed: () {
+//                setState(() {
+//                  fullScreen = !fullScreen;
+//                });
+//              },
+//              icon: Icon(Icons.swap_horizontal_circle),
+//              label: Text("切换全屏"))
         ],
       ),
       body: fullScreen
@@ -189,7 +189,26 @@ class _FaceIdPageState extends State<FaceIdPage> {
                             controller.value.aspectRatio, constraint.biggest),
                         child: AspectRatio(
                           aspectRatio: controller.value.aspectRatio,
-                          child: CameraPreview(controller),
+                          child: StreamBuilder<CAMERA_STATUS>(
+                              stream: BlocProviders.of<CameraBloc>(context)
+                                  .statusStream,
+                              builder: (context, snapshot) {
+                                if (snapshot.data == null ||
+                                    snapshot.data == CAMERA_STATUS.PREVIEW) {
+                                  return CameraPreview(controller);
+                                } else {
+                                  //翻转照片
+                                  return Transform(
+                                    origin:
+                                        Offset(constraint.biggest.width / 2, 0),
+                                    transform: Matrix4.rotationY(3.14),
+                                    child: Image.file(
+                                      currentPic,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  );
+                                }
+                              }),
                         ),
                       ),
                     );
@@ -227,6 +246,8 @@ class _FaceIdPageState extends State<FaceIdPage> {
     );
   }
 
+  File currentPic;
+
   void takePicture() async {
     var argument = ModalRoute.of(context).settings.arguments;
     if (argument is Map) {
@@ -236,28 +257,78 @@ class _FaceIdPageState extends State<FaceIdPage> {
         var file = File(directory.path +
             "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
         await controller.takePicture(file.path);
-        file = await rotateWithExifAndCompress(file);
-        var resp = await Api.uploadPic(file.path);
-        var baseResponse = await Api.verifyUserFace(
-            resp.data.orginPicPath, argument['idCard']);
-        faceRecognizeKey.currentState.stopLoading();
-        Fluttertoast.showToast(msg: baseResponse.text);
-        if (baseResponse.success()) {
-          //注册成功
-          print(baseResponse.text);
-          Navigator.of(context).pop(baseResponse.text);
-        }
+        currentPic = file;
+        BlocProviders.of<CameraBloc>(context)
+            .changeStatus(CAMERA_STATUS.PICTURE_STILL);
+        await verify(file, argument);
       } else if (argument['takePic'] == true) {
         faceRecognizeKey.currentState.startLoading();
         Directory directory = await getTemporaryDirectory();
         var file = File(directory.path +
             "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
         await controller.takePicture(file.path);
+        currentPic = file;
+        BlocProviders.of<CameraBloc>(context)
+            .changeStatus(CAMERA_STATUS.PICTURE_STILL);
         file = await rotateWithExifAndCompress(file);
-        var resp = await Api.uploadPic(file.path);
+        BaseResponse<ImageDetail> resp = await Api.uploadPic(file.path);
         faceRecognizeKey.currentState.stopLoading();
         //注册成功
         Navigator.of(context).pop(resp.data);
+      }
+    }
+  }
+
+  Future verify(File file, Map argument) async {
+    file = await rotateWithExifAndCompress(file);
+    var resp = await Api.uploadPic(file.path);
+    BaseResponse<UserVerifyInfo> baseResponse =
+        await Api.verify(resp.data.orginPicPath, argument['idCard']);
+    faceRecognizeKey.currentState.stopLoading();
+    Fluttertoast.showToast(msg: baseResponse.text);
+    if (baseResponse.success()) {
+      //注册成功
+      print(baseResponse.text);
+      //Navigator.of(context).pop(baseResponse.text);
+      UserVerifyInfo userVerifyInfo = baseResponse.data;
+      if (userVerifyInfo.rows != null && userVerifyInfo.rows.length > 0) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return SimpleDialog(
+                contentPadding: EdgeInsets.all(12),
+                title: Text("恭喜"),
+                children: userVerifyInfo.rows.map((houseInfo) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "您已经成为${houseInfo.addr}的${houseInfo.isHouseOwner ? "业主" : "成员"}",
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }).toList(),
+              );
+            }).then((v) {
+          Navigator.of(context).pop(baseResponse.text);
+        });
+      } else {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text("没有数据"),
+                content: Text("您的名下没有的房屋"),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("好的"))
+                ],
+              );
+            }).then((v) {
+          Navigator.of(context).pop(baseResponse.text);
+        });
       }
     }
   }

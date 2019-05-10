@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:camera/camera.dart';
 import 'package:ease_life/ui/user_detail_auth_page.dart';
 import 'package:amap_base_location/amap_base_location.dart';
+
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 
@@ -24,7 +25,7 @@ void main() async {
 //  FlutterBugly.postCatchedException(() async {
   //sp初始化
   sharedPreferences = await SharedPreferences.getInstance();
-    await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
+  await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
   //相机初始化
   cameras = await availableCameras();
 //    sharedPreferences.setString(PreferenceKeys.keyAuthorization,
@@ -56,7 +57,10 @@ class MyApp extends StatelessWidget {
             bool firstEntry =
                 sharedPreferences.getBool(PreferenceKeys.keyFirstEntryTag) ??
                     true;
-            return firstEntry ? SplashPage() : MainPage();
+            return BlocProviders<MainIndexBloc>(
+              child: firstEntry ? SplashPage() : MainPage(),
+              bloc: MainIndexBloc(),
+            );
           },
           LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
                 child: LoginPage(),
@@ -66,7 +70,12 @@ class MyApp extends StatelessWidget {
           PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
           AuthorizationPage.routeName: (_) => AuthorizationPage(),
           UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
-          FaceIdPage.routeName: (_) => FaceIdPage(),
+          FaceIdPage.routeName: (_) {
+            return BlocProviders<CameraBloc>(
+              child: FaceIdPage(),
+              bloc: CameraBloc(),
+            );
+          },
           AudioRecordPage.routeName: (_) => AudioRecordPage(),
           TestPage.routeName: (_) => TestPage(),
           ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(

@@ -84,7 +84,7 @@ class Api {
   }
 
   /*
-   *  前端发送photo、idCard，后端接收处理，返回错误时表示该用户已通过认证，不需要重新发起认证
+   *  前端发送photo、idCard，
    */
   static Future<BaseResponse> verifyUserFace(
       String imageUrl, String idCard) async {
@@ -93,11 +93,21 @@ class Api {
         data: {"photo": imageUrl, "idCard": idCard});
   }
 
+  static Future<BaseResponse<UserVerifyInfo>> verify(
+      String imageUrl, String idCard) async {
+    return await DioUtil().postAsync(
+        path: "/permission/userCertification/verify",
+        jsonProcessor: (j){
+          return UserVerifyInfo.fromJson(j);
+        },
+        data: {"photo": imageUrl, "idCard": idCard});
+  }
+
   /*
    * 获取用户认证状态
    * 返回的都为正确结果,显示text
    */
-  static Future<BaseResponse> verifyUserVerify() async {
+  static Future<BaseResponse> getUserVerification() async {
     return await DioUtil()
         .postAsync(path: "/permission/userCertification/getMyVerify");
   }
@@ -202,8 +212,7 @@ class Api {
     );
   }
 
-  static Future<List<Index>> getIndex(){
+  static Future<List<Index>> getIndex() {
     return DioUtil().getIndexJson();
   }
-
 }
