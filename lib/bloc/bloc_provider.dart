@@ -286,3 +286,18 @@ class CameraBloc extends BlocBase {
     _statusController.add(status);
   }
 }
+
+class MemberApplyBloc extends BlocBase {
+  @override
+  void dispose() {
+    _districtController.close();
+  }
+
+  PublishSubject<DistrictInfo> _districtController = PublishSubject();
+
+  Observable<DistrictInfo> get districtInfo => _districtController.stream;
+
+  void selectDistrict(DistrictInfo district) {
+    _districtController.add(district);
+  }
+}

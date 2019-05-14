@@ -301,6 +301,7 @@ class _MinePageState extends State<MinePage> {
                             title: "网上110记录",
                             indexId: 'ws110jl',
                             index: indexInfo,
+                            wrap: true,
                           ),
                           HomeChip(
                             title: "巡逻记录",
@@ -311,6 +312,7 @@ class _MinePageState extends State<MinePage> {
                             title: "小区报修记录",
                             indexId: 'xqbxjl',
                             index: indexInfo,
+                            wrap: true,
                           ),
                         ],
                       ),

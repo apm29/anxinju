@@ -11,7 +11,8 @@ class HomeChip extends StatelessWidget {
   final Color textColor;
   final String indexId;
   final Index index;
-  final bool intercept;
+  final String intercept;
+  final bool wrap;
 
   HomeChip(
       {@required this.title,
@@ -20,14 +21,15 @@ class HomeChip extends StatelessWidget {
       this.textColor = const Color(0xFF616161),
       this.indexId,
       this.index,
-      this.intercept});
+      this.intercept,
+      this.wrap = false});
 
   void route(String id, Index index, BuildContext context) {
-    if (intercept==true) {
-      Fluttertoast.showToast(msg: "请先完成户主认证");
+    if (intercept !=null) {
+      Fluttertoast.showToast(msg: intercept);
       return;
     }
-    routeToWeb(context,id, index);
+    routeToWeb(context, id, index);
   }
 
   @override
@@ -43,9 +45,10 @@ class HomeChip extends StatelessWidget {
       child: Container(
           margin: EdgeInsets.all(ScreenUtil().setWidth(8)),
           constraints: BoxConstraints.tightForFinite(
-            width: ScreenUtil().setWidth(211),
+            width: wrap ? double.infinity : ScreenUtil().setWidth(211),
             height: ScreenUtil().setHeight(83),
           ),
+          padding: EdgeInsets.only(right: wrap ? 6.0 : 0.0),
           decoration: BoxDecoration(
               color: color,
               borderRadius:
