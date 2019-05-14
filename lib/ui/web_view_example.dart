@@ -355,9 +355,9 @@ class _WebViewExampleState extends State<WebViewExample> {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
-            SampleMenu(_controller.future, () {
-              FocusScope.of(context).requestFocus(FocusNode());
-            }),
+//            SampleMenu(_controller.future, () {
+//              FocusScope.of(context).requestFocus(FocusNode());
+//            }),
           ],
         ),
         body: Builder(builder: (BuildContext context) {
