@@ -15,69 +15,81 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
 
   @override
   Widget build(BuildContext context) {
+    return buildApply();
+  }
+
+  Scaffold buildApply() {
     return Scaffold(
       appBar: AppBar(
         title: Text("住所成员申请"),
         centerTitle: true,
       ),
-      body: Container(
-        padding: EdgeInsets.only(top: 12, left: 12, right: 12),
-        margin: EdgeInsets.only(top: 12, left: 12, right: 12),
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top -
-                    kToolbarHeight -
-                    30),
-            child: Column(
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (_) {
-                          return buildDistrictSelector(context);
-                        });
-                  },
-                  child: AbsorbPointer(
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "请选择小区", border: OutlineInputBorder()),
-                      controller: _districtTextController,
-                    ),
+      body: LayoutBuilder(
+        builder: (parentContext, _) {
+          return Container(
+            padding: EdgeInsets.only(top: 12, left: 12, right: 12),
+            margin: EdgeInsets.only(top: 12, left: 12, right: 12),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(parentContext).size.height -
+                          MediaQuery.of(parentContext).padding.top -
+                          kToolbarHeight -
+                          30),
+                  child: Column(
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: parentContext,
+                              builder: (_) {
+                                return buildDistrictSelector(parentContext);
+                              });
+                        },
+                        child: AbsorbPointer(
+                          child: TextField(
+                            decoration: InputDecoration(
+                                hintText: "请选择小区",
+                                border: OutlineInputBorder()),
+                            controller: _districtTextController,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: parentContext,
+                              builder: (context) {
+                                return buildRoomSelector(context);
+                              });
+                        },
+                        child: AbsorbPointer(
+                          child: TextField(
+                            decoration: InputDecoration(
+                                hintText: "请选择具体地址",
+                                border: OutlineInputBorder()),
+                            controller: _detailTextController,
+                          ),
+                        ),
+                      ),
+                      FlatButton(onPressed: () {}, child: Text("发送申请"))
+                    ],
                   ),
                 ),
-                SizedBox(
-                  height: 16,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return buildRoomSelector();
-                        });
-                  },
-                  child: AbsorbPointer(
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "请选择具体地址", border: OutlineInputBorder()),
-                      controller: _detailTextController,
-                    ),
-                  ),
-                ),
-                Expanded(child: SizedBox()),
-                FlatButton(onPressed: () {}, child: Text("发送申请"))
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget buildRoomSelector() {
+  Widget buildRoomSelector(BuildContext parentContext) {
     return SizedBox(
       height: ScreenUtil().setHeight(720),
       width: ScreenUtil().setWidth(1080),
@@ -87,35 +99,47 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
             return BottomSheet(
                 onClosing: () {},
                 builder: (context) {
-                  return FutureBuilder<DistrictInfo>(
-                    builder: (context, building) {
-                      return Stack(
-                        children: <Widget>[
-                          Table(
-                            children: [
-                              TableRow(
-                                decoration: BoxDecoration(
-                                  color: Colors.blueGrey
-                                ),
-                                children: [
-                                  Container(
-                                    color: Colors.blue,
-                                  ),
-                                  Container(
-                                    color: Colors.green,
-                                  ),
-                                  Container(
-                                    color: Colors.red,
-                                  ),
-                                ]
-                              )
-                            ],
-                          ),
-                          buildForeground()
-                        ],
-                      );
-                    },
-                    future: Future.value(null),
+                  return Column(
+                    children: <Widget>[
+                      Expanded(
+                        child: Row(
+                          children: <Widget>[
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 3,
+                              child: StreamBuilder<DistrictInfo>(
+                                stream: BlocProviders.of<MemberApplyBloc>(parentContext).districtInfo,
+                                builder: (context, snapshot) {
+                                  return ListWheelScrollView.useDelegate(
+                                    itemExtent: kItemExtend,
+                                    childDelegate:
+                                        ListWheelChildLoopingListDelegate(
+                                            children: []),
+                                  );
+                                }
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 3,
+                              child: ListView.builder(
+                                itemBuilder: (context, index) {
+                                  return Text(index.toString());
+                                },
+                                itemCount: 10,
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 3,
+                              child: ListView.builder(
+                                itemBuilder: (context, index) {
+                                  return Text(index.toString());
+                                },
+                                itemCount: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   );
                 });
           }),
@@ -134,23 +158,27 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                     building.data != null &&
                     building.data.success()) {
                   var list = building.data.data;
-                  return Padding(
-                    padding: const EdgeInsets.all(32.0),
+                  return Container(
+                    margin: const EdgeInsets.all(32.0),
                     child: Stack(
                       children: <Widget>[
                         ListWheelScrollView.useDelegate(
                           itemExtent: kItemExtend,
                           onSelectedItemChanged: (index) {
-                            BlocProviders.of<MemberApplyBloc>(parentContext)
-                                .selectDistrict(list[index]);
-                            _districtTextController.text =
-                                list[index].districtName;
+                            selectDistrict(parentContext, list, index);
                           },
+                          controller: new FixedExtentScrollController(),
                           childDelegate: ListWheelChildBuilderDelegate(
                             childCount: list.length,
                             builder: (context, index) {
-                              return Center(
-                                  child: Text(list[index].districtName));
+                              return InkWell(
+                                onTap: () {
+                                  print('tap');
+                                  selectDistrict(parentContext, list, index);
+                                },
+                                child: Center(
+                                    child: Text(list[index].districtName)),
+                              );
                             },
                           ),
                           physics: const FixedExtentScrollPhysics(),
@@ -169,6 +197,13 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
             ),
           );
         });
+  }
+
+  void selectDistrict(
+      BuildContext parentContext, List<DistrictInfo> list, int index) {
+    BlocProviders.of<MemberApplyBloc>(parentContext)
+        .selectDistrict(list[index]);
+    _districtTextController.text = list[index].districtName;
   }
 
   Future<BaseResponse<List<DistrictInfo>>> getAllDistrict() {
