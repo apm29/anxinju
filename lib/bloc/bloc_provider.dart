@@ -293,7 +293,7 @@ class MemberApplyBloc extends BlocBase {
     _districtController.close();
   }
 
-  PublishSubject<DistrictInfo> _districtController = PublishSubject();
+  BehaviorSubject<DistrictInfo> _districtController = BehaviorSubject();
 
   Observable<DistrictInfo> get districtInfo => _districtController.stream;
 

@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'audio_record_page.dart';
 import 'camera_page.dart';
+import 'member_apply_page.dart';
 import 'test_page.dart';
 import 'user_detail_auth_page.dart';
 import 'web_view_example.dart';
@@ -147,7 +148,7 @@ class _MainPageState extends State<MainPage> {
                   onPressed: () {
 //                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
-                    Navigator.of(context).pushNamed(TestPage.routeName);
+                    Navigator.of(context).pushNamed(MemberApplyPage.routeName);
                   },
                   child: Text("测试界面2"),
                 ),

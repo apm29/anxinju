@@ -19,7 +19,7 @@ class DioUtil {
   Dio _dioInstance;
   bool inDebug = false;
   bool proxyHttp = false;
-  bool printLog = true;
+  bool printLog = false;
 
   DioUtil._() {
     init();
