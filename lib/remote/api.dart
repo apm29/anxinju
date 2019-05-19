@@ -188,7 +188,7 @@ class Api {
   }
 
   static Future<BaseResponse<List<NoticeDetail>>> getNewNotice(
-      List<NoticeType> list) {
+      List<NoticeType> list) async{
     return DioUtil().postAsync(
       path: "/business/notice/getAllNewNotice",
       jsonProcessor: (json) {
@@ -212,7 +212,7 @@ class Api {
     );
   }
 
-  static Future<List<Index>> getIndex() {
+  static Future<List<Index>> getIndex() async{
     return DioUtil().getIndexJson();
   }
 }

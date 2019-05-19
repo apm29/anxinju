@@ -37,9 +37,19 @@ class _HomePageState extends State<HomePage> {
           stream: BlocProviders.of<ApplicationBloc>(context).homeIndex,
           builder: (context, snapshot) {
             var indexInfo = snapshot.data;
-            if (indexInfo == null) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
+              );
+            } else if(snapshot.data == null){
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(Icons.refresh),
+                    Text("点击重新获取"),
+                  ],
+                ),
               );
             }
             return StreamBuilder<UserInfo>(
