@@ -13,7 +13,6 @@ class HomeChip extends StatelessWidget {
   final Index index;
   final String intercept;
   final bool wrap;
-
   HomeChip(
       {@required this.title,
       this.onPressed,

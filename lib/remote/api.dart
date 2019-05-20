@@ -216,6 +216,25 @@ class Api {
     return DioUtil().getIndexJson();
   }
 
+  static Future<BaseResponse<List<UserType>>> getUserType(String userId){
+    return DioUtil().postAsync(
+      path:"/permission/UserRole/findUserRole",
+        jsonProcessor: (json) {
+          if (json is List) {
+            return json.map((j) {
+              return UserType.fromJson(j);
+            }).toList();
+          }
+          return [];
+        },
+      dataType: DataType.LIST,
+      data: {
+        "userId":userId
+      }
+    );
+  }
+
+
   static Future<BaseResponse<List<String>>> getBuildings(int districtId) async {
     return DioUtil().postAsync(
         path: "/business/housedictInfo1/getAllBuilding1",
@@ -229,4 +248,5 @@ class Api {
         dataType: DataType.LIST,
         data: {"districtId": districtId});
   }
+
 }

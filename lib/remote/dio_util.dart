@@ -44,8 +44,8 @@ class DioUtil {
     print('---------------dioInstance init------------------');
     _dioInstance = Dio(BaseOptions(
       method: "POST",
-      connectTimeout: 10000,
-      receiveTimeout: 15000,
+      connectTimeout: 20000,
+      receiveTimeout: 55000,
       baseUrl: BASE_URL,
     ));
 

@@ -389,3 +389,31 @@ class HouseInfo {
     return data;
   }
 }
+
+class UserType {
+  int id;
+  String userId;
+  ///物业人员 1
+  ///有房认证用户 2
+  ///民警 3
+  ///无房认证用户 4
+  ///家庭成员 5
+  ///无认证用户 6
+  String roleCode;
+
+  UserType({this.id, this.userId, this.roleCode});
+
+  UserType.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['userId'];
+    roleCode = json['roleCode'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['userId'] = this.userId;
+    data['roleCode'] = this.roleCode;
+    return data;
+  }
+}

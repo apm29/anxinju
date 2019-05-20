@@ -1,10 +1,7 @@
 import 'package:ease_life/index.dart';
-import 'package:ease_life/ui/web_view_example.dart';
-
 import '../utils.dart';
 import 'main_page.dart';
 import 'user_detail_auth_page.dart';
-import 'widget/district_info_button.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -13,13 +10,22 @@ class MinePage extends StatefulWidget {
 
 class _MinePageState extends State<MinePage> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    if (!mounted) {
+      return;
+    }
     Api.getUserInfo().then((baseResp) {
       print('baseResp:$baseResp');
       if (baseResp.success()) {
         BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
       }
     });
+    BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("我的"),
@@ -27,26 +33,29 @@ class _MinePageState extends State<MinePage> {
         automaticallyImplyLeading: false,
         actions: buildActions(context),
       ),
-      body: StreamBuilder<UserInfo>(
-        builder: (context, AsyncSnapshot<UserInfo> userSnap) {
-          print('userInfo:${userSnap.data}');
-          print('state:${userSnap.connectionState}');
-          if(userSnap.connectionState == ConnectionState.waiting){
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (userSnap.hasError || !userSnap.hasData) {
-            return buildVisitor(context);
-          } else if (userSnap.data.isCertification == 1) {
-            return _buildMine(context, userSnap.data);
-          } else if (userSnap.data.isCertification == 0) {
-            return _buildUnauthorized(context, userSnap.data);
-          } else {
-            return buildVisitor(context);
-          }
+      body: RefreshIndicator(
+        onRefresh: () async {
+          return BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
         },
-        stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
+        child: StreamBuilder<UserInfo>(
+          builder: (context, AsyncSnapshot<UserInfo> userSnap) {
+            if (userSnap.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (userSnap.hasError || !userSnap.hasData) {
+              return buildVisitor(context);
+            } else if (userSnap.data.isCertification == 1) {
+              return _buildMine(context, userSnap.data);
+            } else if (userSnap.data.isCertification == 0) {
+              return _buildUnauthorized(context, userSnap.data);
+            } else {
+              return buildVisitor(context);
+            }
+          },
+          stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
+        ),
       ),
     );
   }
@@ -254,111 +263,125 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                   ),
-                  HomeTitleSliver(
-                    leadingIcon: Container(
-                      height: ScreenUtil().setHeight(70),
-                      width: ScreenUtil().setWidth(10),
-                      color: Color(0xff00007c),
-                    ),
-                    mainTitle: "社区记录",
-                    subTitle: "Society Records",
-                    tailText: "更多",
-                  ),
-                  Material(
-                    type: MaterialType.card,
-                    elevation: 1,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: ScreenUtil().setHeight(42),
-                        horizontal: ScreenUtil().setWidth(42),
-                      ),
-                      color: Colors.white,
-                      child: Wrap(
-                        alignment: WrapAlignment.start,
-                        children: <Widget>[
-                          HomeChip(
-                            color: const Color(0xff00007c),
-                            title: "访客记录",
-                            indexId: 'fkjl',
-                            index: indexInfo,
+                  StreamBuilder<bool>(
+                      stream: hasSocietyRecordPermission(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.data != true) {
+                          return Container();
+                        }
+                        return HomeTitleSliver(
+                          leadingIcon: Container(
+                            height: ScreenUtil().setHeight(70),
+                            width: ScreenUtil().setWidth(10),
+                            color: Color(0xff00007c),
                           ),
+                          mainTitle: "社区记录",
+                          subTitle: "Society Records",
+                          tailText: "更多",
+                        );
+                      }),
+                  StreamBuilder<bool>(
+                      stream: hasSocietyRecordPermission(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.data != true) {
+                          return Container();
+                        }
+                        return Material(
+                          type: MaterialType.card,
+                          elevation: 1,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: ScreenUtil().setHeight(42),
+                              horizontal: ScreenUtil().setWidth(42),
+                            ),
+                            color: Colors.white,
+                            child: Wrap(
+                              alignment: WrapAlignment.start,
+                              children: <Widget>[
+                                HomeChip(
+                                  color: const Color(0xff00007c),
+                                  title: "访客记录",
+                                  indexId: 'fkjl',
+                                  index: indexInfo,
+                                ),
 //                          HomeChip(
 //                            title: "投诉记录",
 //                            indexId: 'tsjl',
 //                            index: indexInfo,
 //                          ),
-                          HomeChip(
-                            title: "缴费记录",
-                            indexId: 'jfjl',
-                            index: indexInfo,
+//                          HomeChip(
+//                            title: "缴费记录",
+//                            indexId: 'jfjl',
+//                            index: indexInfo,
+//                          ),
+//                          HomeChip(
+//                            title: "调解档案",
+//                            indexId: 'tjda',
+//                            index: indexInfo,
+//                          ),
+//                          HomeChip(
+//                            title: "网上110记录",
+//                            indexId: 'ws110jl',
+//                            wrap: true,
+//                            index: indexInfo,
+//                          ),
+                                HomeChip(
+                                  title: "巡逻记录",
+                                  indexId: 'xljl',
+                                  index: indexInfo,
+                                ),
+//                          HomeChip(
+//                            title: "小区报修记录",
+//                            indexId: 'xqbxjl',
+//                            index: indexInfo,
+//                            wrap: true,
+//                          ),
+                              ],
+                            ),
                           ),
-                          HomeChip(
-                            title: "调解档案",
-                            indexId: 'tjda',
-                            index: indexInfo,
-                          ),
-                          HomeChip(
-                            title: "网上110记录",
-                            indexId: 'ws110jl',
-                            index: indexInfo,
-                            wrap: true,
-                          ),
-                          HomeChip(
-                            title: "巡逻记录",
-                            indexId: 'xljl',
-                            index: indexInfo,
-                          ),
-                          HomeChip(
-                            title: "小区报修记录",
-                            indexId: 'xqbxjl',
-                            index: indexInfo,
-                            wrap: true,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  HomeTitleSliver(
-                    leadingIcon: Container(
-                      height: ScreenUtil().setHeight(70),
-                      width: ScreenUtil().setWidth(10),
-                      color: Color(0xffff6b00),
-                    ),
-                    mainTitle: "商业服务",
-                    subTitle: "Business Service",
-                    tailText: "更多",
-                  ),
-                  Material(
-                    type: MaterialType.card,
-                    elevation: 1,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: ScreenUtil().setHeight(42),
-                        horizontal: ScreenUtil().setWidth(42),
-                      ),
-                      color: Colors.white,
-                      child: Wrap(
-                        children: <Widget>[
-                          HomeChip(
-                            color: const Color(0xffff6b00),
-                            title: "我的订单",
-                            indexId: 'wddd',
-                            index: indexInfo,
-                          ),
-                          HomeChip(
-                            title: "购物车",
-                            indexId: 'gwc',
-                            index: indexInfo,
-                          ),
-                          HomeChip(
-                            title: "我的收藏",
-                            indexId: 'wdsc',
-                            index: indexInfo,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        );
+                      }),
+//                  HomeTitleSliver(
+//                    leadingIcon: Container(
+//                      height: ScreenUtil().setHeight(70),
+//                      width: ScreenUtil().setWidth(10),
+//                      color: Color(0xffff6b00),
+//                    ),
+//                    mainTitle: "商业服务",
+//                    subTitle: "Business Service",
+//                    tailText: "更多",
+//                  ),
+//                  Material(
+//                    type: MaterialType.card,
+//                    elevation: 1,
+//                    child: Container(
+//                      padding: EdgeInsets.symmetric(
+//                        vertical: ScreenUtil().setHeight(42),
+//                        horizontal: ScreenUtil().setWidth(42),
+//                      ),
+//                      color: Colors.white,
+//                      child: Wrap(
+//                        children: <Widget>[
+//                          HomeChip(
+//                            color: const Color(0xffff6b00),
+//                            title: "我的订单",
+//                            indexId: 'wddd',
+//                            index: indexInfo,
+//                          ),
+//                          HomeChip(
+//                            title: "购物车",
+//                            indexId: 'gwc',
+//                            index: indexInfo,
+//                          ),
+//                          HomeChip(
+//                            title: "我的收藏",
+//                            indexId: 'wdsc',
+//                            index: indexInfo,
+//                          ),
+//                        ],
+//                      ),
+//                    ),
+//                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -368,24 +391,24 @@ class _MinePageState extends State<MinePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Icon(
-                              Icons.person_outline,
-                              color: Colors.blue,
-                            ),
-                            Text("我的设置")
-                          ],
-                        ),
-                        Column(
-                          children: <Widget>[
-                            Icon(
-                              Icons.help_outline,
-                              color: Colors.green,
-                            ),
-                            Text("关于我们")
-                          ],
-                        ),
+//                        Column(
+//                          children: <Widget>[
+//                            Icon(
+//                              Icons.person_outline,
+//                              color: Colors.blue,
+//                            ),
+//                            Text("我的设置")
+//                          ],
+//                        ),
+//                        Column(
+//                          children: <Widget>[
+//                            Icon(
+//                              Icons.help_outline,
+//                              color: Colors.green,
+//                            ),
+//                            Text("关于我们")
+//                          ],
+//                        ),
                         GestureDetector(
                           onTap: () {
                             BlocProviders.of<ApplicationBloc>(context).logout();
@@ -413,9 +436,21 @@ class _MinePageState extends State<MinePage> {
         });
   }
 
+  ///民警 或者 物业可以看社区记录
+  Stream<bool> hasSocietyRecordPermission(BuildContext context) {
+    return BlocProviders.of<ApplicationBloc>(context)
+        .userTypeStream
+        .map((list) {
+      return list.firstWhere((e) {
+            return "1" == e.roleCode || "3" == e.roleCode;
+          }, orElse: null) !=
+          null;
+    });
+  }
+
   buildActions(BuildContext context) {
     return <Widget>[
-      DistrictInfoButton(),
+      //DistrictInfoButton(),
     ];
   }
 
@@ -479,7 +514,9 @@ class _MinePageState extends State<MinePage> {
                 color: colorFaceButton,
               ),
               onTap: () {
-                Navigator.of(context).pushNamed(UserDetailAuthPage.routeName).then((v) {
+                Navigator.of(context)
+                    .pushNamed(UserDetailAuthPage.routeName)
+                    .then((v) {
                   //获取当前用户信息
                   Future.delayed(Duration(milliseconds: 500), () {
                     return Api.getUserInfo().then((baseResp) {
