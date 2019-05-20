@@ -1,4 +1,6 @@
 import 'package:ease_life/index.dart';
+import 'package:flutter/cupertino.dart';
+import 'dart:async';
 
 const kItemExtend = 80.0;
 
@@ -11,6 +13,8 @@ class MemberApplyPage extends StatefulWidget {
 
 class _MemberApplyPageState extends State<MemberApplyPage> {
   TextEditingController _nameController = TextEditingController();
+  TextEditingController _detailController = TextEditingController();
+  int districtId;
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +34,55 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                     30),
             child: Column(
               children: <Widget>[
+                SizedBox(
+                  height: 12,
+                ),
                 GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
                         context: context,
                         builder: (context) {
-                          return buildDistrictSelector();
+                          //return buildDistrictSelector();
+                          return FutureBuilder<
+                              BaseResponse<List<DistrictInfo>>>(
+                            future: Api.findAllDistrict(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              } else if (!snapshot.data.success()) {
+                                return Text(snapshot.data.text);
+                              }
+
+                              var list = snapshot.data.data;
+                              return Column(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      FlatButton(
+                                          onPressed: () {}, child: Text("确定"))
+                                    ],
+                                  ),
+                                  Expanded(
+                                    child: CupertinoPicker.builder(
+                                      itemExtent: kItemExtend,
+                                      onSelectedItemChanged: (index) {
+                                        _nameController.text =
+                                            list[index].districtName;
+                                        districtId = list[index].districtId;
+                                      },
+                                      itemBuilder: (context, index) {
+                                        return Center(
+                                            child:
+                                                Text(list[index].districtName));
+                                      },
+                                      childCount: list.length,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         });
                   },
                   child: AbsorbPointer(
@@ -53,6 +100,10 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                 ),
                 GestureDetector(
                   onTap: () {
+                    if (districtId == null) {
+                      Fluttertoast.showToast(msg: "请先选择小区");
+                      return;
+                    }
                     showModalBottomSheet(
                         context: context,
                         builder: (context) {
@@ -65,7 +116,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                           hintText: "请选择具体地址",
                           labelText: "具体地址",
                           border: OutlineInputBorder()),
-                      controller: _nameController,
+                      controller: _detailController,
                     ),
                   ),
                 ),
@@ -79,15 +130,79 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
     );
   }
 
+  Completer<int> buildingFuture = Completer();
+
   BottomSheet buildRoomSelector() {
     return BottomSheet(
         onClosing: () {},
         builder: (context) {
-          return FutureBuilder(
-            builder: (context, building) {
-              return Text(building.data);
-            },
-            future: Future.value("123"),
+          var list = [];
+          return Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  FlatButton(
+                      onPressed: () {}, child: Text("确定"))
+                ],
+              ),
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: FutureBuilder<BaseResponse<List<String>>>(
+                        future: Api.getBuildings(districtId),
+                        builder: (context,building){
+                          var buildingList = building.data?.data??[];
+                          return CupertinoPicker.builder(
+                            itemExtent: kItemExtend,
+                            onSelectedItemChanged: (index) {
+                            },
+                            itemBuilder: (context, index) {
+                              return Center(
+                                  child:
+                                  Text(buildingList[index]));
+                            },
+                            childCount: buildingList.length,
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoPicker.builder(
+                        itemExtent: kItemExtend,
+                        onSelectedItemChanged: (index) {
+                          _nameController.text =
+                              list[index].districtName;
+                          districtId = list[index].districtId;
+                        },
+                        itemBuilder: (context, index) {
+                          return Center(
+                              child:
+                              Text(list[index].districtName));
+                        },
+                        childCount: list.length,
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoPicker.builder(
+                        itemExtent: kItemExtend,
+                        onSelectedItemChanged: (index) {
+                          _nameController.text =
+                              list[index].districtName;
+                          districtId = list[index].districtId;
+                        },
+                        itemBuilder: (context, index) {
+                          return Center(
+                              child:
+                              Text(list[index].districtName));
+                        },
+                        childCount: list.length,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           );
         });
   }

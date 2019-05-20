@@ -42,13 +42,19 @@ class _HomePageState extends State<HomePage> {
                 child: CircularProgressIndicator(),
               );
             } else if(snapshot.data == null){
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.refresh),
-                    Text("点击重新获取"),
-                  ],
+              return InkWell(
+                onTap: (){
+                  BlocProviders.of<ApplicationBloc>(context)
+                      .getIndexInfo();
+                },
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.refresh),
+                      Text("点击重新获取"),
+                    ],
+                  ),
                 ),
               );
             }

@@ -181,7 +181,7 @@ class DioUtil {
         return BaseResponse<T>("0", null, "请求失败:${response.statusCode}", null);
       }
     }).catchError((Object error, StackTrace trace) {
-      debugPrint(error);
+      debugPrint(error.toString());
       print(trace);
       return BaseResponse<T>("0", null,
           "请求失败:${error is DioError ? error.message : error.toString()}", null);
