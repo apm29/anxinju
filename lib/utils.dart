@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:amap_base_location/amap_base_location.dart';
@@ -209,5 +210,11 @@ Future<String> showRoomPicker(BuildContext context, int districtId) async {
     );
   })).then((address) {
     return address;
+  });
+}
+
+Future<String> getImageBase64(File file) async {
+  return file.readAsBytes().then((bytes) {
+    return "data:image/jpeg;base64,${base64Encode(bytes)}";
   });
 }
