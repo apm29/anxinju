@@ -36,28 +36,41 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
     _avatarUploadController.close();
   }
 
+  PublishSubject<BaseResponse<UserDetail>> _controllerData = PublishSubject();
+  Stream<BaseResponse<UserDetail>> initData;
+
+  @override
+  void initState() {
+    super.initState();
+    initData = _controllerData.stream;
+    Api.getUserDetail().then((b) {
+      _controllerData.add(b);
+     if(b.success()){
+       UserDetail userDetail = b.data;
+       _nameController.text = userDetail.myName;
+       _genderController.text = userDetail.sex;
+       _phoneController.text = userDetail.phone;
+       _avatarController.text = userDetail.avatar;
+       _nickNameController.text = userDetail.nickName;
+       _idCardController.text = userDetail.idCard;
+     }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("用户信息"),
       ),
-      body: FutureBuilder<BaseResponse<UserDetail>>(
-        future: Api.getUserDetail(),
+      body: StreamBuilder<BaseResponse<UserDetail>>(
+        stream: initData,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
               child: CircularProgressIndicator(),
             );
-          } else if (snapshot.data.success()) {
-            UserDetail userDetail = snapshot.data.data;
-            _nameController.text = userDetail.myName;
-            _genderController.text = userDetail.sex;
-            _phoneController.text = userDetail.phone;
-            _avatarController.text = userDetail.avatar;
-            _nickNameController.text = userDetail.nickName;
-            _idCardController.text = userDetail.idCard;
-          } else {
+          } else if(!snapshot.data.success()){
             return Center(
               child: Text(snapshot.data.text),
             );
@@ -143,12 +156,8 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                           child: StreamBuilder<String>(
                               stream: _avatarStream,
                               builder: (context, snapshot) {
-                                return CachedNetworkImage(
-                                  imageUrl:
-                                      snapshot.data ?? _avatarController.text,
-                                  placeholder: (context, url) {
-                                    return CircleAvatar();
-                                  },
+                                return CircleAvatar(
+                                  backgroundImage:NetworkImage(snapshot.data ?? _avatarController.text),
                                 );
                               }),
                         ),
@@ -179,7 +188,10 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                                       }
                                       uploadImageKey.currentState
                                           .startLoading();
-                                      return Api.uploadPic(f.path);
+                                      return rotateWithExifAndCompress(f)
+                                          .then((compressed) {
+                                        return Api.uploadPic(compressed.path);
+                                      });
                                     }).then((baseResp) {
                                       if (baseResp == null) {
                                         return null;
@@ -190,14 +202,12 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                                         _avatarController.text =
                                             baseResp.data.orginPicPath;
                                       }
-                                      uploadImageKey.currentState
-                                          .stopLoading();
+                                      uploadImageKey.currentState.stopLoading();
                                       Scaffold.of(context).showSnackBar(
                                           SnackBar(
                                               content: Text(baseResp.text)));
                                     }).catchError((Object e, StackTrace trace) {
-                                      uploadImageKey.currentState
-                                          .stopLoading();
+                                      uploadImageKey.currentState.stopLoading();
                                       Scaffold.of(context).showSnackBar(
                                           SnackBar(
                                               content: Text(e.toString())));

@@ -92,13 +92,14 @@ void startAudioRecord() {}
 //只能作用于带exif的image
 Future<File> rotateWithExifAndCompress(File file) async {
   if (!Platform.isAndroid) {
-    return FlutterImageCompress.compressWithFile(file.path).then((listInt) {
-      if (listInt == null) {
-        return null;
-      }
-      file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
-      return file;
-    });
+    return FlutterImageCompress.compressAndGetFile(file.path,file.path,quality:70);
+//    return FlutterImageCompress.compressWithFile(file.path,quality: 30,minHeight: 768,minWidth: 1080).then((listInt) {
+//      if (listInt == null) {
+//        return null;
+//      }
+//      file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
+//      return file;
+//    });
   }
   return Future.value(file).then((file) {
     if (file == null) {

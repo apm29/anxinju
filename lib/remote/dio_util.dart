@@ -43,8 +43,8 @@ class DioUtil {
     print('---------------dioInstance init------------------');
     _dioInstance = Dio(BaseOptions(
       method: "POST",
-      connectTimeout: 10000,
-      receiveTimeout: 15000,
+      connectTimeout: 20000,
+      receiveTimeout: 55000,
       baseUrl: BASE_URL,
     ));
     //设置代理
@@ -146,6 +146,7 @@ class DioUtil {
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       String _status, _text, _token;
+      print('N${response.data.toString()}');
       dynamic _data;
       if (response.statusCode == HttpStatus.ok ||
           response.statusCode == HttpStatus.created) {

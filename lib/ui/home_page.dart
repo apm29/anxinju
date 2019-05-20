@@ -428,10 +428,10 @@ class _HomePageState extends State<HomePage> {
                                       indexId: "fkxt",
                                       index: indexInfo,
                                       intercept:userInfo==null||userInfo.isCertification == 0),
-                                  HomeChip(
-                                      title: "在线缴费",
-                                      indexId: "zxjf",
-                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "在线缴费",
+//                                      indexId: "zxjf",
+//                                      index: indexInfo),
                                   HomeChip(
                                       title: "车辆管理",
                                       indexId: "clgl",
@@ -440,10 +440,10 @@ class _HomePageState extends State<HomePage> {
                                       title: "维护报修",
                                       indexId: "whbx",
                                       index: indexInfo),
-                                  HomeChip(
-                                      title: "暂住申报",
-                                      indexId: "zzsb",
-                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "暂住申报",
+//                                      indexId: "zzsb",
+//                                      index: indexInfo),
 //                      Container(
 //                        height: 12,
 //                      ),
@@ -474,72 +474,48 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
 
-                        SliverToBoxAdapter(
-                          child: HomeTitleSliver(
-                            indicatorColor: const Color(0xFFFD6B07),
-                            mainTitle: "商业服务",
-                            subTitle: "Business Service",
-                            onPressed: () {},
-                          ),
-                        ),
-                        SliverToBoxAdapter(
-                          child: Material(
-                            type: MaterialType.card,
-                            elevation: 1,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: ScreenUtil().setHeight(58),
-                                horizontal: ScreenUtil().setWidth(58),
-                              ),
-                              color: Colors.white,
-                              child: Wrap(
-                                children: <Widget>[
-                                  HomeChip(
-                                      color: const Color(0xFFFD6B07),
-                                      title: "附近商家",
-                                      indexId: "fjsj",
-                                      index: indexInfo),
-                                  HomeChip(
-                                      title: "加盟商家",
-                                      indexId: "jmsj",
-                                      index: indexInfo),
-                                  HomeChip(
-                                      title: "促销活动",
-                                      indexId: "cxhd",
-                                      index: indexInfo),
-                                  HomeChip(
-                                      title: "保安公司",
-                                      indexId: "bags",
-                                      index: indexInfo),
-//                      Container(
-//                        height: 12,
-//                      ),
-//                      Row(
-//                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                        children: <Widget>[
-//                          Column(
-//                            mainAxisAlignment: MainAxisAlignment.start,
-//                            crossAxisAlignment: CrossAxisAlignment.start,
-//                            children: list4.map((s) {
-//                              return Text(
-//                                s,
-//                                style:
-//                                    TextStyle(fontSize: ScreenUtil().setSp(30)),
-//                              );
-//                            }).toList(),
+//                        SliverToBoxAdapter(
+//                          child: HomeTitleSliver(
+//                            indicatorColor: const Color(0xFFFD6B07),
+//                            mainTitle: "商业服务",
+//                            subTitle: "Business Service",
+//                            onPressed: () {},
 //                          ),
-//                          Image.asset(
-//                            "images/ic_business_service.png",
-//                            color: const Color(0xFFFEE087),
-//                            width: ScreenUtil().setWidth(185),
+//                        ),
+//                        SliverToBoxAdapter(
+//                          child: Material(
+//                            type: MaterialType.card,
+//                            elevation: 1,
+//                            child: Container(
+//                              padding: EdgeInsets.symmetric(
+//                                vertical: ScreenUtil().setHeight(58),
+//                                horizontal: ScreenUtil().setWidth(58),
+//                              ),
+//                              color: Colors.white,
+//                              child: Wrap(
+//                                children: <Widget>[
+//                                  HomeChip(
+//                                      color: const Color(0xFFFD6B07),
+//                                      title: "附近商家",
+//                                      indexId: "fjsj",
+//                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "加盟商家",
+//                                      indexId: "jmsj",
+//                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "促销活动",
+//                                      indexId: "cxhd",
+//                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "保安公司",
+//                                      indexId: "bags",
+//                                      index: indexInfo),
+//                                ],
+//                              ),
+//                            ),
 //                          ),
-//                        ],
-//                      )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+//                        ),
 
                         SliverToBoxAdapter(
                           child: HomeTitleSliver(
@@ -560,35 +536,36 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.white,
                               child: Wrap(
                                 children: <Widget>[
+//                                  HomeChip(
+//                                      color: const Color(0xFF000078),
+//                                      title: "网上110",
+//                                      indexId: "ws110",
+//                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "暨阳警方",
+//                                      indexId: "jyjf",
+//                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "越警管家",
+//                                      indexId: "yjgj",
+//                                      index: indexInfo),
                                   HomeChip(
                                       color: const Color(0xFF000078),
-                                      title: "网上110",
-                                      indexId: "ws110",
-                                      index: indexInfo),
-                                  HomeChip(
-                                      title: "暨阳警方",
-                                      indexId: "jyjf",
-                                      index: indexInfo),
-                                  HomeChip(
-                                      title: "越警管家",
-                                      indexId: "yjgj",
-                                      index: indexInfo),
-                                  HomeChip(
                                       title: "警务查询",
                                       indexId: "jwcx",
                                       index: indexInfo),
-                                  HomeChip(
-                                      title: "便民地图",
-                                      indexId: "bmdt",
-                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "便民地图",
+//                                      indexId: "bmdt",
+//                                      index: indexInfo),
                                   HomeChip(
                                       title: "巡更管理",
                                       indexId: "xggl",
                                       index: indexInfo),
-                                  HomeChip(
-                                      title: "纠纷化解",
-                                      indexId: "jfhj",
-                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "纠纷化解",
+//                                      indexId: "jfhj",
+//                                      index: indexInfo),
 //                      Container(
 //                        height: 12,
 //                      ),
@@ -639,21 +616,22 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.white,
                               child: Wrap(
                                 children: <Widget>[
+//                                  HomeChip(
+//                                      color: const Color(0xFFCD0004),
+//                                      title: "业主问政",
+//                                      indexId: "yzwz",
+//                                      index: indexInfo),
                                   HomeChip(
                                       color: const Color(0xFFCD0004),
-                                      title: "业主问政",
-                                      indexId: "yzwz",
-                                      index: indexInfo),
-                                  HomeChip(
                                       title: "功德栏", indexId: "gdl", index: indexInfo),
                                   HomeChip(
                                       title: "义警活动",
                                       indexId: "yjhd",
                                       index: indexInfo),
-                                  HomeChip(
-                                      title: "闲置交换",
-                                      indexId: "xzjh",
-                                      index: indexInfo),
+//                                  HomeChip(
+//                                      title: "闲置交换",
+//                                      indexId: "xzjh",
+//                                      index: indexInfo),
                                   HomeChip(
                                       title: "慈善公益",
                                       indexId: "csgy",

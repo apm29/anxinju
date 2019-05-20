@@ -13,9 +13,9 @@ import 'test_page.dart';
 import 'user_detail_auth_page.dart';
 import 'web_view_example.dart';
 const int PAGE_HOME=0;
-const int PAGE_SEARCH=11;
+const int PAGE_SEARCH=1;
 const int PAGE_MESSAGE=21;
-const int PAGE_MINE=1;
+const int PAGE_MINE=2;
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
 
@@ -68,14 +68,14 @@ class _MainPageState extends State<MainPage> {
               color: _currentIndex == PAGE_HOME ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("主页")),
-//        BottomNavigationBarItem(
-//            icon: Image.asset(
-//              "images/search.png",
-//              width: 24,
-//              height: 24,
-//              color: _currentIndex == PAGE_SEARCH ? Colors.blueAccent : Colors.grey,
-//            ),
-//            title: Text("搜索")),
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/search.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == PAGE_SEARCH ? Colors.blueAccent : Colors.grey,
+            ),
+            title: Text("搜索")),
 //        BottomNavigationBarItem(
 //            icon: Icon(
 //              Icons.message,
