@@ -84,7 +84,7 @@ class ApplicationBloc extends BlocBase {
     _getCurrentUserAndNotify();
     _getCurrentDistrictAndNotify();
     getIndexInfo();
-    _getNoticeInfo();
+    getNoticeInfo();
     _requestLocationPermission();
   }
 
@@ -226,7 +226,7 @@ class ApplicationBloc extends BlocBase {
     });
   }
 
-  void _getNoticeInfo() {
+  void getNoticeInfo() {
     Api.getAllNoticeType().then((baseResp) {
       if (baseResp.success()) {
         _noticeTypeController.add(baseResp.data);
