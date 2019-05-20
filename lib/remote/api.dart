@@ -216,9 +216,9 @@ class Api {
     return DioUtil().getIndexJson();
   }
 
-  static Future<BaseResponse<List<UserType>>> getUserType(String userId){
+  static Future<BaseResponse<List<UserType>>> getUserType(String userId) {
     return DioUtil().postAsync(
-      path:"/permission/UserRole/findUserRole",
+        path: "/permission/UserRole/findUserRole",
         jsonProcessor: (json) {
           if (json is List) {
             return json.map((j) {
@@ -227,21 +227,16 @@ class Api {
           }
           return [];
         },
-      dataType: DataType.LIST,
-      data: {
-        "userId":userId
-      }
-    );
+        dataType: DataType.LIST,
+        data: {"userId": userId});
   }
-
 
   static Future<BaseResponse<List<String>>> getBuildings(int districtId) async {
     return DioUtil().postAsync(
         path: "/business/housedictInfo1/getAllBuilding1",
-        jsonProcessor: (s){
-          print('$s');
-          if(s is List){
-            return s.map((i)=>i.toString()).toList();
+        jsonProcessor: (s) {
+          if (s is List) {
+            return s.map((i) => i.toString()).toList();
           }
           return [];
         },
@@ -249,4 +244,51 @@ class Api {
         data: {"districtId": districtId});
   }
 
+  static Future<BaseResponse<List<String>>> getUnits(
+      int districtId, String building) async {
+    return DioUtil().postAsync(
+        path: "/business/housedictInfo1/getAllUnit1",
+        jsonProcessor: (s) {
+          print('$s');
+          if (s is List) {
+            return s.map((i) => i.toString()).toList();
+          }
+          return [];
+        },
+        dataType: DataType.LIST,
+        data: {
+          "districtId": districtId,
+          "building": building,
+        });
+  }
+
+  static Future<BaseResponse<List<String>>> getRooms(
+      int districtId, String building, String unit) async {
+    return DioUtil().postAsync(
+        path: "/business/housedictInfo1/getAllRoom1",
+        jsonProcessor: (s) {
+          print('$s');
+          if (s is List) {
+            return s.map((i) => i.toString()).toList();
+          }
+          return [];
+        },
+        dataType: DataType.LIST,
+        data: {
+          "districtId": districtId,
+          "building": building,
+          "unit": unit,
+        });
+  }
+
+  static Future<BaseResponse> applyMember(
+      String address, int districtId) async {
+    return DioUtil().postAsync(
+      path: "/business/member/applyMember",
+      data: {
+        "districtId":districtId,
+        "addr":address
+      }
+    );
+  }
 }

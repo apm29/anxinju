@@ -147,6 +147,12 @@ class DioUtil {
                     : {}),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
+      if (response.statusCode != HttpStatus.ok) {
+        print('---------RESP-ERR----------');
+        print(response.data);
+        print('---------RESP-END----------');
+      }
+
       String _status, _text, _token;
       dynamic _data;
       if (response.statusCode == HttpStatus.ok ||
