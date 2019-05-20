@@ -97,7 +97,7 @@ class Api {
       String imageUrl, String idCard) async {
     return await DioUtil().postAsync(
         path: "/permission/userCertification/verify",
-        jsonProcessor: (j){
+        jsonProcessor: (j) {
           return UserVerifyInfo.fromJson(j);
         },
         data: {"photo": imageUrl, "idCard": idCard});
@@ -188,7 +188,7 @@ class Api {
   }
 
   static Future<BaseResponse<List<NoticeDetail>>> getNewNotice(
-      List<NoticeType> list) {
+      List<NoticeType> list) async {
     return DioUtil().postAsync(
       path: "/business/notice/getAllNewNotice",
       jsonProcessor: (json) {
@@ -212,7 +212,21 @@ class Api {
     );
   }
 
-  static Future<List<Index>> getIndex() {
+  static Future<List<Index>> getIndex() async {
     return DioUtil().getIndexJson();
+  }
+
+  static Future<BaseResponse<List<String>>> getBuildings(int districtId) async {
+    return DioUtil().postAsync(
+        path: "/business/housedictInfo1/getAllBuilding1",
+        jsonProcessor: (s){
+          print('$s');
+          if(s is List){
+            return s.map((i)=>i.toString()).toList();
+          }
+          return [];
+        },
+        dataType: DataType.LIST,
+        data: {"districtId": districtId});
   }
 }

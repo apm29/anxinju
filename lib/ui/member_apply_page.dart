@@ -1,4 +1,6 @@
 import 'package:ease_life/index.dart';
+import 'package:flutter/cupertino.dart';
+import 'dart:async';
 
 const kItemExtend = 80.0;
 
@@ -10,143 +12,202 @@ class MemberApplyPage extends StatefulWidget {
 }
 
 class _MemberApplyPageState extends State<MemberApplyPage> {
-  TextEditingController _districtTextController = TextEditingController();
-  TextEditingController _detailTextController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _detailController = TextEditingController();
+  int districtId;
 
   @override
   Widget build(BuildContext context) {
-    return buildApply();
-  }
-
-  Scaffold buildApply() {
     return Scaffold(
       appBar: AppBar(
         title: Text("住所成员申请"),
         centerTitle: true,
       ),
-      body: LayoutBuilder(
-        builder: (parentContext, _) {
-          return Container(
-            padding: EdgeInsets.only(top: 12, left: 12, right: 12),
-            margin: EdgeInsets.only(top: 12, left: 12, right: 12),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(parentContext).size.height -
-                          MediaQuery.of(parentContext).padding.top -
-                          kToolbarHeight -
-                          30),
-                  child: Column(
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                              context: parentContext,
-                              builder: (_) {
-                                return buildDistrictSelector(parentContext);
-                              });
-                        },
-                        child: AbsorbPointer(
-                          child: TextField(
-                            decoration: InputDecoration(
-                                hintText: "请选择小区",
-                                border: OutlineInputBorder()),
-                            controller: _districtTextController,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                              context: parentContext,
-                              builder: (context) {
-                                return buildRoomSelector(context);
-                              });
-                        },
-                        child: AbsorbPointer(
-                          child: TextField(
-                            decoration: InputDecoration(
-                                hintText: "请选择具体地址",
-                                border: OutlineInputBorder()),
-                            controller: _detailTextController,
-                          ),
-                        ),
-                      ),
-                      FlatButton(onPressed: () {}, child: Text("发送申请"))
-                    ],
+      body: Container(
+        padding: EdgeInsets.only(top: 12, left: 12, right: 12),
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    kToolbarHeight -
+                    30),
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 12,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          //return buildDistrictSelector();
+                          return FutureBuilder<
+                              BaseResponse<List<DistrictInfo>>>(
+                            future: Api.findAllDistrict(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              } else if (!snapshot.data.success()) {
+                                return Text(snapshot.data.text);
+                              }
+
+                              var list = snapshot.data.data;
+                              return Column(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      FlatButton(
+                                          onPressed: () {}, child: Text("确定"))
+                                    ],
+                                  ),
+                                  Expanded(
+                                    child: CupertinoPicker.builder(
+                                      itemExtent: kItemExtend,
+                                      onSelectedItemChanged: (index) {
+                                        _nameController.text =
+                                            list[index].districtName;
+                                        districtId = list[index].districtId;
+                                      },
+                                      itemBuilder: (context, index) {
+                                        return Center(
+                                            child:
+                                                Text(list[index].districtName));
+                                      },
+                                      childCount: list.length,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        });
+                  },
+                  child: AbsorbPointer(
+                    child: TextField(
+                      decoration: InputDecoration(
+                          hintText: "请选择小区",
+                          labelText: "小区",
+                          border: OutlineInputBorder()),
+                      controller: _nameController,
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(
+                  height: 16,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (districtId == null) {
+                      Fluttertoast.showToast(msg: "请先选择小区");
+                      return;
+                    }
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return buildRoomSelector();
+                        });
+                  },
+                  child: AbsorbPointer(
+                    child: TextField(
+                      decoration: InputDecoration(
+                          hintText: "请选择具体地址",
+                          labelText: "具体地址",
+                          border: OutlineInputBorder()),
+                      controller: _detailController,
+                    ),
+                  ),
+                ),
+                Expanded(child: SizedBox()),
+                FlatButton(onPressed: () {}, child: Text("发送申请"))
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
 
-  Widget buildRoomSelector(BuildContext parentContext) {
-    return SizedBox(
-      height: ScreenUtil().setHeight(720),
-      width: ScreenUtil().setWidth(1080),
-      child: StreamBuilder<DistrictInfo>(
-          stream: BlocProviders.of<MemberApplyBloc>(context).districtInfo,
-          builder: (context, snapshot) {
-            return BottomSheet(
-                onClosing: () {},
-                builder: (context) {
-                  return Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: Row(
-                          children: <Widget>[
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width / 3,
-                              child: StreamBuilder<DistrictInfo>(
-                                stream: BlocProviders.of<MemberApplyBloc>(parentContext).districtInfo,
-                                builder: (context, snapshot) {
-                                  return ListWheelScrollView.useDelegate(
-                                    itemExtent: kItemExtend,
-                                    childDelegate:
-                                        ListWheelChildLoopingListDelegate(
-                                            children: []),
-                                  );
-                                }
-                              ),
-                            ),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width / 3,
-                              child: ListView.builder(
-                                itemBuilder: (context, index) {
-                                  return Text(index.toString());
-                                },
-                                itemCount: 10,
-                              ),
-                            ),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width / 3,
-                              child: ListView.builder(
-                                itemBuilder: (context, index) {
-                                  return Text(index.toString());
-                                },
-                                itemCount: 10,
-                              ),
-                            ),
-                          ],
-                        ),
+  Completer<int> buildingFuture = Completer();
+
+  BottomSheet buildRoomSelector() {
+    return BottomSheet(
+        onClosing: () {},
+        builder: (context) {
+          var list = [];
+          return Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  FlatButton(
+                      onPressed: () {}, child: Text("确定"))
+                ],
+              ),
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: FutureBuilder<BaseResponse<List<String>>>(
+                        future: Api.getBuildings(districtId),
+                        builder: (context,building){
+                          var buildingList = building.data?.data??[];
+                          return CupertinoPicker.builder(
+                            itemExtent: kItemExtend,
+                            onSelectedItemChanged: (index) {
+                            },
+                            itemBuilder: (context, index) {
+                              return Center(
+                                  child:
+                                  Text(buildingList[index]));
+                            },
+                            childCount: buildingList.length,
+                          );
+                        },
                       ),
-                    ],
-                  );
-                });
-          }),
-    );
+                    ),
+                    Expanded(
+                      child: CupertinoPicker.builder(
+                        itemExtent: kItemExtend,
+                        onSelectedItemChanged: (index) {
+                          _nameController.text =
+                              list[index].districtName;
+                          districtId = list[index].districtId;
+                        },
+                        itemBuilder: (context, index) {
+                          return Center(
+                              child:
+                              Text(list[index].districtName));
+                        },
+                        childCount: list.length,
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoPicker.builder(
+                        itemExtent: kItemExtend,
+                        onSelectedItemChanged: (index) {
+                          _nameController.text =
+                              list[index].districtName;
+                          districtId = list[index].districtId;
+                        },
+                        itemBuilder: (context, index) {
+                          return Center(
+                              child:
+                              Text(list[index].districtName));
+                        },
+                        childCount: list.length,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        });
   }
 
-  Widget buildDistrictSelector(BuildContext parentContext) {
+  Widget buildDistrictSelector() {
     return BottomSheet(
         onClosing: () {},
         builder: (context) {
@@ -158,27 +219,17 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                     building.data != null &&
                     building.data.success()) {
                   var list = building.data.data;
-                  return Container(
-                    margin: const EdgeInsets.all(32.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(32.0),
                     child: Stack(
                       children: <Widget>[
                         ListWheelScrollView.useDelegate(
                           itemExtent: kItemExtend,
-                          onSelectedItemChanged: (index) {
-                            selectDistrict(parentContext, list, index);
-                          },
-                          controller: new FixedExtentScrollController(),
                           childDelegate: ListWheelChildBuilderDelegate(
                             childCount: list.length,
                             builder: (context, index) {
-                              return InkWell(
-                                onTap: () {
-                                  print('tap');
-                                  selectDistrict(parentContext, list, index);
-                                },
-                                child: Center(
-                                    child: Text(list[index].districtName)),
-                              );
+                              return Center(
+                                  child: Text(list[index].districtName));
                             },
                           ),
                           physics: const FixedExtentScrollPhysics(),
@@ -189,33 +240,14 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                   );
                 } else {
                   return Center(
-                    child: Text(building.data?.text ?? "获取小区中.."),
+                    child: Text(building.data?.text ?? "获取小区数据失败"),
                   );
                 }
               },
-              future: getAllDistrict(),
+              future: Api.findAllDistrict(),
             ),
           );
         });
-  }
-
-  void selectDistrict(
-      BuildContext parentContext, List<DistrictInfo> list, int index) {
-    BlocProviders.of<MemberApplyBloc>(parentContext)
-        .selectDistrict(list[index]);
-    _districtTextController.text = list[index].districtName;
-  }
-
-  Future<BaseResponse<List<DistrictInfo>>> getAllDistrict() {
-//    var mock = Future.value(BaseResponse("1", "", "", [
-//      DistrictInfo(1,"天马1","通天塔","","12"),
-//      DistrictInfo(2,"天马2","通天塔","","12"),
-//      DistrictInfo(3,"天马3","通天塔","","12"),
-//      DistrictInfo(4,"天马4","通天塔","","12"),
-//      DistrictInfo(5,"天马5","通天塔","","12"),
-//    ]));
-    return Api.findAllDistrict();
-//    return mock;
   }
 
   Widget buildForeground() {

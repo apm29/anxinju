@@ -179,7 +179,9 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                                       }
                                       uploadImageKey.currentState
                                           .startLoading();
-                                      return Api.uploadPic(f.path);
+                                      return rotateWithExifAndCompress(file).then((f){
+                                        return Api.uploadPic(f.path);
+                                      });
                                     }).then((baseResp) {
                                       if (baseResp == null) {
                                         return null;

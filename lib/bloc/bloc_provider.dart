@@ -172,10 +172,17 @@ class ApplicationBloc extends BlocBase {
    * 获取json map,标记主页按钮的去向url
    */
   void getIndexInfo() async {
-    List<Index> list = await Api.getIndex();
-    _homeIndexController.add(list.firstWhere((index) => index.area == "index"));
-    _mineIndexController.add(list.firstWhere((index) => index.area == "mine"));
-    debugPrint("===----> inject index info");
+    try {
+      List<Index> list = await Api.getIndex();
+      _homeIndexController.add(list.firstWhere((index) => index.area == "index"));
+      _mineIndexController.add(list.firstWhere((index) => index.area == "mine"));
+      debugPrint("===----> inject index info");
+    } catch (e) {
+      print(e);
+      _homeIndexController.add(null);
+      _mineIndexController.add(null);
+      debugPrint("===----> inject index info");
+    }
   }
 
   void setCurrentDistrict(DistrictInfo districtInfo) {
@@ -209,14 +216,12 @@ class ApplicationBloc extends BlocBase {
 
   void _getNoticeInfo() {
     Api.getAllNoticeType().then((baseResp) {
-      if (baseResp.success()) {
-        _noticeTypeController.add(baseResp.data);
-        return Api.getNewNotice(baseResp.data);
-      } else {
-        throw Error();
-      }
+      _noticeTypeController.add(baseResp.data);
+      return Api.getNewNotice(baseResp.data);
     }).then((BaseResponse<List<NoticeDetail>> resp) {
-      if (resp.success()) _noticeController.add(resp.data);
+      _noticeController.add(resp.data);
+    }).catchError((e, s) {
+      _noticeController.add(null);
     });
   }
 }

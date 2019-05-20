@@ -15,6 +15,7 @@ const KEY_HEADER_TOKEN = "Authorization";
 const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
 const VALUE_HEADER_CONTENT_TYPE_FORM = "multipart/form-data";
 const BASE_URL = "http://axj.ciih.net/";
+
 class DioUtil {
   Dio _dioInstance;
   bool inDebug = false;
@@ -47,6 +48,7 @@ class DioUtil {
       receiveTimeout: 15000,
       baseUrl: BASE_URL,
     ));
+
     //设置代理
     if (proxyHttp)
       (_dioInstance.httpClientAdapter as DefaultHttpClientAdapter)
@@ -179,7 +181,7 @@ class DioUtil {
         return BaseResponse<T>("0", null, "请求失败:${response.statusCode}", null);
       }
     }).catchError((Object error, StackTrace trace) {
-      print(error);
+      debugPrint(error.toString());
       print(trace);
       return BaseResponse<T>("0", null,
           "请求失败:${error is DioError ? error.message : error.toString()}", null);
@@ -200,23 +202,27 @@ class DioUtil {
   }
 
   Future<List<Index>> getIndexJson() async {
-    Response<String> response = await _dioInstance.get<String>(
-      "/axj_menu.json",
-      options: RequestOptions(
-          contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
-          headers: {
-            KEY_HEADER_TOKEN:
-                sharedPreferences.getString(PreferenceKeys.keyAuthorization),
-          }),
-    );
     List<Index> res = [];
-    if (response.statusCode == 200) {
-      var jsonString = response.data;
-      List list = json.decode(jsonString);
-      var indexList = list.map((d) {
-        return Index.fromJson(d);
-      }).toList();
-      res.addAll(indexList);
+    try {
+      Response<String> response = await _dioInstance.get<String>(
+        "/axj_menu.json",
+        options: RequestOptions(
+            contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+            headers: {
+              KEY_HEADER_TOKEN:
+                  sharedPreferences.getString(PreferenceKeys.keyAuthorization),
+            }),
+      );
+      if (response.statusCode == 200) {
+        var jsonString = response.data;
+        List list = json.decode(jsonString);
+        var indexList = list.map((d) {
+          return Index.fromJson(d);
+        }).toList();
+        res.addAll(indexList);
+      }
+    } catch (e) {
+      print(e);
     }
     return res;
   }
