@@ -77,6 +77,7 @@ class ApplicationBloc extends BlocBase {
     _mineIndexController.close();
     _noticeController.close();
     _noticeTypeController.close();
+    _userTypeController.close();
   }
 
   ApplicationBloc() {
@@ -135,6 +136,10 @@ class ApplicationBloc extends BlocBase {
   Observable<List<NoticeType>> get noticeTypeStream =>
       _noticeTypeController.stream;
 
+  BehaviorSubject<List<UserType>> _userTypeController = BehaviorSubject();
+
+  Stream<List<UserType>> get userTypeStream => _userTypeController.stream;
+
   /*
    * 退出登录:
    * SP清空 userInfo/ token
@@ -147,6 +152,20 @@ class ApplicationBloc extends BlocBase {
     debugPrint("===----> inject user info");
   }
 
+  void getUserTypes(){
+    Api.getUserInfo().then((base){
+      return base.data.userId;
+    }).then((userId){
+      return Api.getUserType(userId);
+    }).then((baseResp){
+      _userTypeController.add(baseResp.data);
+    }).catchError((e,s){
+      print(e);
+      print(s);
+      _userTypeController.add([]);
+    });
+  }
+  
   /*
    * 优先取SP缓存的小区信息
    * 然后取后端返回的小区的第一个

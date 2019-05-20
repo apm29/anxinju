@@ -10,13 +10,22 @@ class MinePage extends StatefulWidget {
 
 class _MinePageState extends State<MinePage> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    if (!mounted) {
+      return;
+    }
     Api.getUserInfo().then((baseResp) {
       print('baseResp:$baseResp');
       if (baseResp.success()) {
         BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
       }
     });
+    BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("我的"),
@@ -25,12 +34,12 @@ class _MinePageState extends State<MinePage> {
         actions: buildActions(context),
       ),
       body: RefreshIndicator(
-        onRefresh: ()async{
+        onRefresh: () async {
           return BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
         },
         child: StreamBuilder<UserInfo>(
           builder: (context, AsyncSnapshot<UserInfo> userSnap) {
-            if(userSnap.connectionState == ConnectionState.waiting){
+            if (userSnap.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
               );
@@ -254,34 +263,47 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                   ),
-                  HomeTitleSliver(
-                    leadingIcon: Container(
-                      height: ScreenUtil().setHeight(70),
-                      width: ScreenUtil().setWidth(10),
-                      color: Color(0xff00007c),
-                    ),
-                    mainTitle: "社区记录",
-                    subTitle: "Society Records",
-                    tailText: "更多",
-                  ),
-                  Material(
-                    type: MaterialType.card,
-                    elevation: 1,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: ScreenUtil().setHeight(42),
-                        horizontal: ScreenUtil().setWidth(42),
-                      ),
-                      color: Colors.white,
-                      child: Wrap(
-                        alignment: WrapAlignment.start,
-                        children: <Widget>[
-                          HomeChip(
-                            color: const Color(0xff00007c),
-                            title: "访客记录",
-                            indexId: 'fkjl',
-                            index: indexInfo,
+                  StreamBuilder<bool>(
+                      stream: hasSocietyRecordPermission(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.data != true) {
+                          return Container();
+                        }
+                        return HomeTitleSliver(
+                          leadingIcon: Container(
+                            height: ScreenUtil().setHeight(70),
+                            width: ScreenUtil().setWidth(10),
+                            color: Color(0xff00007c),
                           ),
+                          mainTitle: "社区记录",
+                          subTitle: "Society Records",
+                          tailText: "更多",
+                        );
+                      }),
+                  StreamBuilder<bool>(
+                      stream: hasSocietyRecordPermission(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.data != true) {
+                          return Container();
+                        }
+                        return Material(
+                          type: MaterialType.card,
+                          elevation: 1,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: ScreenUtil().setHeight(42),
+                              horizontal: ScreenUtil().setWidth(42),
+                            ),
+                            color: Colors.white,
+                            child: Wrap(
+                              alignment: WrapAlignment.start,
+                              children: <Widget>[
+                                HomeChip(
+                                  color: const Color(0xff00007c),
+                                  title: "访客记录",
+                                  indexId: 'fkjl',
+                                  index: indexInfo,
+                                ),
 //                          HomeChip(
 //                            title: "投诉记录",
 //                            indexId: 'tsjl',
@@ -303,21 +325,22 @@ class _MinePageState extends State<MinePage> {
 //                            wrap: true,
 //                            index: indexInfo,
 //                          ),
-                          HomeChip(
-                            title: "巡逻记录",
-                            indexId: 'xljl',
-                            index: indexInfo,
-                          ),
+                                HomeChip(
+                                  title: "巡逻记录",
+                                  indexId: 'xljl',
+                                  index: indexInfo,
+                                ),
 //                          HomeChip(
 //                            title: "小区报修记录",
 //                            indexId: 'xqbxjl',
 //                            index: indexInfo,
 //                            wrap: true,
 //                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
 //                  HomeTitleSliver(
 //                    leadingIcon: Container(
 //                      height: ScreenUtil().setHeight(70),
@@ -413,6 +436,18 @@ class _MinePageState extends State<MinePage> {
         });
   }
 
+  ///民警 或者 物业可以看社区记录
+  Stream<bool> hasSocietyRecordPermission(BuildContext context) {
+    return BlocProviders.of<ApplicationBloc>(context)
+        .userTypeStream
+        .map((list) {
+      return list.firstWhere((e) {
+            return "1" == e.roleCode || "3" == e.roleCode;
+          }, orElse: null) !=
+          null;
+    });
+  }
+
   buildActions(BuildContext context) {
     return <Widget>[
       //DistrictInfoButton(),
@@ -479,7 +514,9 @@ class _MinePageState extends State<MinePage> {
                 color: colorFaceButton,
               ),
               onTap: () {
-                Navigator.of(context).pushNamed(UserDetailAuthPage.routeName).then((v) {
+                Navigator.of(context)
+                    .pushNamed(UserDetailAuthPage.routeName)
+                    .then((v) {
                   //获取当前用户信息
                   Future.delayed(Duration(milliseconds: 500), () {
                     return Api.getUserInfo().then((baseResp) {

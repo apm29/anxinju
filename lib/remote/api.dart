@@ -215,4 +215,24 @@ class Api {
   static Future<List<Index>> getIndex() {
     return DioUtil().getIndexJson();
   }
+
+  static Future<BaseResponse<List<UserType>>> getUserType(String userId){
+    return DioUtil().postAsync(
+      path:"/permission/UserRole/findUserRole",
+        jsonProcessor: (json) {
+          if (json is List) {
+            return json.map((j) {
+              return UserType.fromJson(j);
+            }).toList();
+          }
+          return [];
+        },
+      dataType: DataType.LIST,
+      data: {
+        "userId":userId
+      }
+    );
+  }
+
+
 }
