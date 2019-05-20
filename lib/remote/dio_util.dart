@@ -146,7 +146,6 @@ class DioUtil {
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       String _status, _text, _token;
-      print('N${response.data.toString()}');
       dynamic _data;
       if (response.statusCode == HttpStatus.ok ||
           response.statusCode == HttpStatus.created) {

@@ -1,10 +1,7 @@
 import 'package:ease_life/index.dart';
-import 'package:ease_life/ui/web_view_example.dart';
-
 import '../utils.dart';
 import 'main_page.dart';
 import 'user_detail_auth_page.dart';
-import 'widget/district_info_button.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -27,26 +24,29 @@ class _MinePageState extends State<MinePage> {
         automaticallyImplyLeading: false,
         actions: buildActions(context),
       ),
-      body: StreamBuilder<UserInfo>(
-        builder: (context, AsyncSnapshot<UserInfo> userSnap) {
-          print('userInfo:${userSnap.data}');
-          print('state:${userSnap.connectionState}');
-          if(userSnap.connectionState == ConnectionState.waiting){
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (userSnap.hasError || !userSnap.hasData) {
-            return buildVisitor(context);
-          } else if (userSnap.data.isCertification == 1) {
-            return _buildMine(context, userSnap.data);
-          } else if (userSnap.data.isCertification == 0) {
-            return _buildUnauthorized(context, userSnap.data);
-          } else {
-            return buildVisitor(context);
-          }
+      body: RefreshIndicator(
+        onRefresh: ()async{
+          return BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
         },
-        stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
+        child: StreamBuilder<UserInfo>(
+          builder: (context, AsyncSnapshot<UserInfo> userSnap) {
+            if(userSnap.connectionState == ConnectionState.waiting){
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (userSnap.hasError || !userSnap.hasData) {
+              return buildVisitor(context);
+            } else if (userSnap.data.isCertification == 1) {
+              return _buildMine(context, userSnap.data);
+            } else if (userSnap.data.isCertification == 0) {
+              return _buildUnauthorized(context, userSnap.data);
+            } else {
+              return buildVisitor(context);
+            }
+          },
+          stream: BlocProviders.of<ApplicationBloc>(context).currentUser,
+        ),
       ),
     );
   }

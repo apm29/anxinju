@@ -330,6 +330,24 @@ class _FaceIdPageState extends State<FaceIdPage> {
           Navigator.of(context).pop(baseResponse.text);
         });
       }
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("错误"),
+              content: Text(baseResponse.text),
+              actions: <Widget>[
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("好的"))
+              ],
+            );
+          }).then((v) {
+        Navigator.of(context).pop(baseResponse.text);
+      });
     }
   }
 }
