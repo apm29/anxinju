@@ -164,9 +164,10 @@ class Api {
 
   static Future<BaseResponse<ImageDetail>> uploadPic(String path) async {
     print('file path : $path');
+    var file = File(path);
     var baseResponse = await DioUtil().postAsync<ImageDetail>(
         path: "/business/upload/uploadPic",
-        data: {"pic": UploadFileInfo(File(path), "pic")},
+        data: {"pic": UploadFileInfo(file, file.path)},
         jsonProcessor: (s) => ImageDetail.fromJson(s),
         dataType: DataType.JSON,
         formData: true);

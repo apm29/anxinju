@@ -256,9 +256,11 @@ packages:
   flutter_image_compress:
     dependency: "direct main"
     description:
-      name: flutter_image_compress
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: "5a545f7e5409d091cd18f5891a8b07426f390729"
+      resolved-ref: "5a545f7e5409d091cd18f5891a8b07426f390729"
+      url: "https://github.com/OpenFlutter/flutter_image_compress.git"
+    source: git
     version: "0.5.0"
   flutter_launcher_icons:
     dependency: "direct dev"
@@ -656,7 +658,7 @@ packages:
     source: hosted
     version: "0.9.7+10"
   web_socket_channel:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: web_socket_channel
       url: "https://pub.flutter-io.cn"

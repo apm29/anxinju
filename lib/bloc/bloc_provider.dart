@@ -113,7 +113,7 @@ class ApplicationBloc extends BlocBase {
 
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
 
-  Stream<UserInfo> get currentUser => _userInfoController.stream;
+  Observable<UserInfo> get currentUser => _userInfoController.stream;
 
   BehaviorSubject<DistrictInfo> _districtInfoController = BehaviorSubject();
 
