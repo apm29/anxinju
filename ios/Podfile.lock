@@ -4,10 +4,8 @@ PODS:
     - Flutter
     - MJExtension
   - AMapFoundation (1.5.6)
-  - AMapLocation (2.6.1):
+  - AMapLocation (2.6.2):
     - AMapFoundation (~> 1.4)
-  - android_intent (0.0.1):
-    - Flutter
   - camera (0.0.1):
     - Flutter
   - contacts_service (0.2.1):
@@ -32,7 +30,7 @@ PODS:
   - FMDB/standard (2.7.5)
   - image_picker (0.0.1):
     - Flutter
-  - MJExtension (3.0.16)
+  - MJExtension (3.0.17)
   - package_info (0.0.1):
     - Flutter
   - path_provider (0.0.1):
@@ -49,12 +47,11 @@ PODS:
 
 DEPENDENCIES:
   - amap_base_location (from `.symlinks/plugins/amap_base_location/ios`)
-  - android_intent (from `.symlinks/plugins/android_intent/ios`)
   - camera (from `.symlinks/plugins/camera/ios`)
   - contacts_service (from `.symlinks/plugins/contacts_service/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `.symlinks/flutter/ios-release`)
   - flutter_exif_rotation (from `.symlinks/plugins/flutter_exif_rotation/ios`)
   - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
   - flutter_sms (from `.symlinks/plugins/flutter_sms/ios`)
@@ -78,8 +75,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   amap_base_location:
     :path: ".symlinks/plugins/amap_base_location/ios"
-  android_intent:
-    :path: ".symlinks/plugins/android_intent/ios"
   camera:
     :path: ".symlinks/plugins/camera/ios"
   contacts_service:
@@ -89,7 +84,7 @@ EXTERNAL SOURCES:
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: ".symlinks/flutter/ios-release"
   flutter_exif_rotation:
     :path: ".symlinks/plugins/flutter_exif_rotation/ios"
   flutter_image_compress:
@@ -118,8 +113,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   amap_base_location: 755c35d1f37174a33351720d7dfd8bbe56ddc34d
   AMapFoundation: 20fce2a12cd152e1092afdd04379cdac21932185
-  AMapLocation: cf024b53dc03663efb4ea4bcce27d4cce58bb97a
-  android_intent: 73316069cd1f6aac919df1c6e640cad190fd5e8b
+  AMapLocation: 89a7e4eb6040d32ba73c77a4966ecc66e46aa7c3
   camera: d56ad165545ae5a0ffb892376033760a969c68c8
   contacts_service: 64ebf2a313b34bff0acf668efac52ae402ba9be0
   device_info: 3ebad48f726348f69abd802f3334a8d1ed795fbd
@@ -132,7 +126,7 @@ SPEC CHECKSUMS:
   fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
-  MJExtension: 54dbbf6ee728f1a88e9aad904353d007831c7847
+  MJExtension: 74ec83124a68891619fb7ba9c5c811bbf1691076
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
   permission_handler: 73cfc10e081c379c1dcc19cd0040c77e500fa936
