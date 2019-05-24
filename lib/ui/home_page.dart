@@ -46,9 +46,25 @@ class _HomePageState extends State<HomePage> {
           stream: BlocProviders.of<ApplicationBloc>(context).homeIndex,
           builder: (context, snapshot) {
             var indexInfo = snapshot.data;
-            if (indexInfo == null) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
+              );
+            } else if(snapshot.data == null){
+              return InkWell(
+                onTap: (){
+                  BlocProviders.of<ApplicationBloc>(context)
+                      .getIndexInfo();
+                },
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.refresh),
+                      Text("点击重新获取"),
+                    ],
+                  ),
+                ),
               );
             }
             return StreamBuilder<UserInfo>(
@@ -472,8 +488,10 @@ class _HomePageState extends State<HomePage> {
                                         title: "访客系统",
                                         indexId: "fkxt",
                                         index: indexInfo,
-                                        intercept: userInfo == null ||
-                                            userInfo.isCertification == 0),
+                                        intercept:(userInfo == null ||
+                                            userInfo.isCertification == 0)
+                                            ? "请先完成业主认证"
+                                            : null),
 //                                  HomeChip(
 //                                      title: "在线缴费",
 //                                      indexId: "zxjf",

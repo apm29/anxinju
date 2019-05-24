@@ -9,13 +9,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'audio_record_page.dart';
 import 'camera_page.dart';
+import 'chat_room_page.dart';
+import 'member_apply_page.dart';
 import 'test_page.dart';
 import 'user_detail_auth_page.dart';
 import 'web_view_example.dart';
-const int PAGE_HOME=0;
-const int PAGE_SEARCH=11;
-const int PAGE_MESSAGE=21;
-const int PAGE_MINE=1;
+
+const int PAGE_HOME = 0;
+const int PAGE_SEARCH = 1;
+const int PAGE_MESSAGE = 21;
+const int PAGE_MINE = 2;
+
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
 
@@ -26,6 +30,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   static int _currentIndex = 0;
   static DateTime _lastPressedAt;
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil(width: 1080, height: 2160)..init(context);
@@ -41,20 +46,19 @@ class _MainPageState extends State<MainPage> {
         return true;
       },
       child: StreamBuilder<int>(
-        stream: BlocProviders.of<MainIndexBloc>(context).indexStream,
-        builder: (context, snapshot) {
-          if(snapshot.hasData){
-              _currentIndex = snapshot.data??0;
-          }
-          return Scaffold(
-            body: Container(
-              color: Colors.grey[200],
-              child: buildContent(),
-            ),
-            bottomNavigationBar: buildBottomNavigationBar(),
-          );
-        }
-      ),
+          stream: BlocProviders.of<MainIndexBloc>(context).indexStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _currentIndex = snapshot.data ?? 0;
+            }
+            return Scaffold(
+              body: Container(
+                color: Colors.grey[200],
+                child: buildContent(),
+              ),
+              bottomNavigationBar: buildBottomNavigationBar(),
+            );
+          }),
     );
   }
 
@@ -65,17 +69,20 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(
               Icons.home,
               size: 24,
-              color: _currentIndex == PAGE_HOME ? Colors.blueAccent : Colors.grey,
+              color:
+                  _currentIndex == PAGE_HOME ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("主页")),
-//        BottomNavigationBarItem(
-//            icon: Image.asset(
-//              "images/search.png",
-//              width: 24,
-//              height: 24,
-//              color: _currentIndex == PAGE_SEARCH ? Colors.blueAccent : Colors.grey,
-//            ),
-//            title: Text("搜索")),
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/search.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == PAGE_SEARCH
+                  ? Colors.blueAccent
+                  : Colors.grey,
+            ),
+            title: Text("搜索")),
 //        BottomNavigationBarItem(
 //            icon: Icon(
 //              Icons.message,
@@ -88,12 +95,13 @@ class _MainPageState extends State<MainPage> {
               "images/mine.png",
               width: 24,
               height: 24,
-              color: _currentIndex == PAGE_MINE ? Colors.blueAccent : Colors.grey,
+              color:
+                  _currentIndex == PAGE_MINE ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("我的")),
       ],
       onTap: (index) {
-        if (_currentIndex != index){
+        if (_currentIndex != index) {
           _currentIndex = index;
           BlocProviders.of<MainIndexBloc>(context).toIndex(_currentIndex);
         }
@@ -118,7 +126,8 @@ class _MainPageState extends State<MainPage> {
                   onPressed: () {
 //                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
-                    Navigator.of(context).pushNamed(UserDetailAuthPage.routeName);
+                    Navigator.of(context)
+                        .pushNamed(UserDetailAuthPage.routeName);
                   },
                   child: Text("业主认证"),
                 ),
@@ -147,9 +156,21 @@ class _MainPageState extends State<MainPage> {
                   onPressed: () {
 //                      Navigator.of(context).pushNamed("/preVerify");
 //                      showAndroidKeyboard();
-                    Navigator.of(context).pushNamed(TestPage.routeName);
+                    Navigator.of(context).pushNamed(MemberApplyPage.routeName);
                   },
                   child: Text("测试界面2"),
+                ),
+                OutlineButton(
+                  onPressed: () {
+//                      Navigator.of(context).pushNamed("/preVerify");
+//                      showAndroidKeyboard();
+                    Navigator.of(context)
+                        .pushNamed(ChatRoomPage.routeName, arguments: {
+                      "title": "CHAT",
+                      "group": "1" //"ws://echo.websocket.org"//
+                    });
+                  },
+                  child: Text("测试界面3"),
                 ),
               ],
             ),

@@ -3,11 +3,13 @@ import 'dart:io';
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../index.dart';
 import '../main.dart';
 import '../utils.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -32,22 +34,26 @@ class _TestPageState extends State<TestPage> {
       body: ListView(
         children: <Widget>[
           Container(
-            constraints: BoxConstraints(maxHeight: 100),
-            child: FutureBuilder(
+            child: FutureBuilder<String>(
               builder: (context, snapshot) {
-                if(snapshot.hasData){
-                  return Container(
-                    height: 200,
-                    color: Colors.blueGrey,
-                  );
-                }else{
-                  return Container(
-                    height: 100,
-                    color: Colors.blue,
-                  );
-                }
+                return InkWell(
+                  onLongPress: (){
+                    Clipboard.setData(ClipboardData(text:snapshot.data));
+                    getExternalStorageDirectory().then((d){
+                      File f = File("${d.absolute.path}/base64.txt");
+                      print('${f.path}');
+                      f.createSync();
+                      f.writeAsString(snapshot.data,flush: true);
+                    });
+                  },
+                  child: Text(
+                     snapshot.data,
+                  ),
+                );
               },
-              future: someFuture(),
+              future: ImagePicker.pickImage(source: ImageSource.gallery).then((f){
+                return getImageBase64(f);
+              }),
             ),
           ),
         ],

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:amap_base_location/amap_base_location.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'index.dart';
 import 'ui/login_page.dart';
+import 'ui/widget/room_picker.dart';
 
 List<Color> colors = [
   Color(0xfffb333d),
@@ -89,10 +91,12 @@ void showCamera(File file, OnFileProcess onFileProcess, BuildContext context) {
 
 void startAudioRecord() {}
 
-//只能作用于带exif的image
+///只能作用于带exif的image
+///旋转Android图片并压缩
 Future<File> rotateWithExifAndCompress(File file) async {
   if (!Platform.isAndroid) {
-    return FlutterImageCompress.compressAndGetFile(file.path,file.path,quality:70);
+    return FlutterImageCompress.compressAndGetFile(file.path, file.path,
+        quality: 70);
 //    return FlutterImageCompress.compressWithFile(file.path,quality: 30,minHeight: 768,minWidth: 1080).then((listInt) {
 //      if (listInt == null) {
 //        return null;
@@ -196,4 +200,21 @@ void routeToWeb(BuildContext context, String id, Index index) {
   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
     return WebViewExample(url);
   }));
+}
+
+///选择住房 幢-单元-房间号
+Future<String> showRoomPicker(BuildContext context, int districtId) async {
+  return Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+    return BuildingPicker(
+      districtId: districtId,
+    );
+  })).then((address) {
+    return address;
+  });
+}
+
+Future<String> getImageBase64(File file) async {
+  return file.readAsBytes().then((bytes) {
+    return "data:image/jpeg;base64,${base64Encode(bytes)}";
+  });
 }

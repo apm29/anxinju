@@ -11,9 +11,8 @@ class HomeChip extends StatelessWidget {
   final Color textColor;
   final String indexId;
   final Index index;
-  final bool intercept;
+  final String intercept;
   final bool wrap;
-
   HomeChip(
       {@required this.title,
       this.onPressed,
@@ -25,11 +24,11 @@ class HomeChip extends StatelessWidget {
       this.wrap = false});
 
   void route(String id, Index index, BuildContext context) {
-    if (intercept==true) {
-      Fluttertoast.showToast(msg: "请先完成户主认证");
+    if (intercept !=null) {
+      Fluttertoast.showToast(msg: intercept);
       return;
     }
-    routeToWeb(context,id, index);
+    routeToWeb(context, id, index);
   }
 
   @override

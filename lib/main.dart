@@ -18,6 +18,9 @@ import 'package:camera/camera.dart';
 import 'package:ease_life/ui/user_detail_auth_page.dart';
 import 'package:amap_base_location/amap_base_location.dart';
 
+import 'ui/chat_room_page.dart';
+import 'ui/member_apply_page.dart';
+
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 
@@ -67,6 +70,12 @@ class MyApp extends StatelessWidget {
                 bloc: LoginBloc(),
               ),
           RegisterPage.routeName: (_) => RegisterPage(),
+          MemberApplyPage.routeName: (_) {
+            return BlocProviders<MemberApplyBloc>(
+              bloc: MemberApplyBloc(),
+              child: MemberApplyPage(),
+            );
+          },
           PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
           AuthorizationPage.routeName: (_) => AuthorizationPage(),
           UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
@@ -78,6 +87,7 @@ class MyApp extends StatelessWidget {
           },
           AudioRecordPage.routeName: (_) => AudioRecordPage(),
           TestPage.routeName: (_) => TestPage(),
+          ChatRoomPage.routeName: (_) => ChatRoomPage(),
           ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
                 child: ContactsSelectPage(null),
                 bloc: ContactsBloc(),

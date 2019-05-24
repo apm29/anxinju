@@ -1,7 +1,10 @@
 import 'package:ease_life/index.dart';
+import 'package:rxdart/rxdart.dart';
 import '../utils.dart';
 import 'main_page.dart';
+import 'member_apply_page.dart';
 import 'user_detail_auth_page.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -9,6 +12,9 @@ class MinePage extends StatefulWidget {
 }
 
 class _MinePageState extends State<MinePage> {
+  PublishSubject<UserDetail> _controllerUserDetailData = PublishSubject();
+  Stream<UserDetail> userDetailData;
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +28,19 @@ class _MinePageState extends State<MinePage> {
       }
     });
     BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+    userDetailData = _controllerUserDetailData.stream;
+    Api.getUserDetail().then((baseResp) {
+      if (baseResp.success()) {
+        print('$baseResp');
+        _controllerUserDetailData.add(baseResp.data);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controllerUserDetailData.close();
   }
 
   @override
@@ -35,6 +54,13 @@ class _MinePageState extends State<MinePage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          Api.getUserDetail().then((baseResp) {
+            if (baseResp.success()) {
+              print('$baseResp');
+              _controllerUserDetailData.add(baseResp.data);
+            }
+          });
+          BlocProviders.of<ApplicationBloc>(context).getUserTypes();
           return BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
         },
         child: StreamBuilder<UserInfo>(
@@ -126,50 +152,23 @@ class _MinePageState extends State<MinePage> {
                             children: <Widget>[
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: CircleAvatar(
-                                  child: FlutterLogo(),
+                                child: StreamBuilder<UserDetail>(
+                                  builder: (context, snapshot) {
+                                    String url = snapshot.data?.avatar;
+
+                                    return CircleAvatar(
+                                      backgroundImage: url != null
+                                          ? CachedNetworkImageProvider(url)
+                                          :null,
+                                    );
+                                  },
+                                  stream: userDetailData,
                                 ),
                               ),
                               Text(
                                 '${userInfo.userName}',
                                 style: TextStyle(fontSize: 15),
                               ),
-//                              Expanded(
-//                                child: Column(
-//                                  mainAxisSize: MainAxisSize.min,
-//                                  crossAxisAlignment:
-//                                      CrossAxisAlignment.start,
-//                                  children: <Widget>[
-//                                    Row(
-//                                      children: <Widget>[
-//                                        Padding(
-//                                          padding: const EdgeInsets.all(8.0),
-//                                          child: Text(
-//                                            '${userInfo.userName}',
-//                                            style: TextStyle(fontSize: 15),
-//                                          ),
-//                                        ),
-//                                        Container(
-//                                          padding: EdgeInsets.symmetric(
-//                                              horizontal: 4),
-//                                          decoration: BoxDecoration(
-//                                              border: Border.all(
-//                                                  color: Colors.white,
-//                                                  width: 0.5),
-//                                              borderRadius: BorderRadius.all(
-//                                                  Radius.circular(100))),
-//                                          child: Text("切换用户",
-//                                              style: TextStyle(fontSize: 8)),
-//                                        )
-//                                      ],
-//                                    ),
-//                                    Padding(
-//                                      padding: const EdgeInsets.all(8.0),
-//                                      child: Text('天马花园15-2-1202'),
-//                                    ),
-//                                  ],
-//                                ),
-//                              ),
                             ],
                           ),
                         )
@@ -263,6 +262,25 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                   ),
+//                  SizedBox(
+//                    height: 12,
+//                  ),
+//                  GestureDetector(
+//                    onTap: () {
+//                      Navigator.of(context).pushNamed(MemberApplyPage.routeName);
+//                    },
+//                    child: Container(
+//                      color: Colors.white,
+//                      padding: EdgeInsets.only(left: 15),
+//                      child: HomeTitleSliver(
+//                        leadingIcon: Icon(Icons.storage,size:ScreenUtil().setWidth(50),color: Color(0xff00007c),),
+//                        mainTitle: "我的申请",
+//                        subTitle: "",
+//                        tailText: "",
+//                      ),
+//                    ),
+//                  ),
+
                   StreamBuilder<bool>(
                       stream: hasSocietyRecordPermission(context),
                       builder: (context, snapshot) {
@@ -391,14 +409,19 @@ class _MinePageState extends State<MinePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-//                        Column(
-//                          children: <Widget>[
-//                            Icon(
-//                              Icons.person_outline,
-//                              color: Colors.blue,
-//                            ),
-//                            Text("我的设置")
-//                          ],
+//                        InkWell(
+//                          onTap: (){
+//                            Navigator.of(context).pushNamed(MemberApplyPage.routeName);
+//                          },
+//                          child: Column(
+//                            children: <Widget>[
+//                              Icon(
+//                                Icons.person_outline,
+//                                color: Colors.blue,
+//                              ),
+//                              Text("成员申请")
+//                            ],
+//                          ),
 //                        ),
 //                        Column(
 //                          children: <Widget>[
@@ -409,7 +432,7 @@ class _MinePageState extends State<MinePage> {
 //                            Text("关于我们")
 //                          ],
 //                        ),
-                        GestureDetector(
+                        InkWell(
                           onTap: () {
                             BlocProviders.of<ApplicationBloc>(context).logout();
                           },
@@ -454,6 +477,7 @@ class _MinePageState extends State<MinePage> {
     ];
   }
 
+  ///未认证
   Widget _buildUnauthorized(BuildContext context, UserInfo data) {
     var colorFaceButton = Colors.blue;
     return Stack(

@@ -7,6 +7,7 @@ import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import '../utils.dart';
+import 'member_apply_page.dart';
 import 'widget/loading_state_widget.dart';
 
 class CameraPage extends StatefulWidget {
@@ -323,11 +324,12 @@ class _FaceIdPageState extends State<FaceIdPage> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("好的"))
+                      child: Text("申请成为成员")),
                 ],
               );
-            }).then((v) {
-          Navigator.of(context).pop(baseResponse.text);
+            }).then((_){
+          Navigator.of(context)
+              .pushReplacementNamed(MemberApplyPage.routeName);
         });
       }
     } else {

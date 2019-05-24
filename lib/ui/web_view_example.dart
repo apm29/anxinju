@@ -5,6 +5,7 @@ import 'package:ease_life/interaction/simple_bridge.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:ease_life/ui/widget/district_info_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:convert/convert.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,6 +21,7 @@ import 'camera_page.dart';
 import 'contacts_select_page.dart';
 import 'login_page.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
+
 //import 'package:geolocator/geolocator.dart';
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
@@ -243,6 +245,34 @@ const String kNavigationExamplePage = '''
       UserState.postMessage(param);
     }
     
+    function sendSms(){
+      var json = {
+        "funcName":"sendSms",
+        "data":{
+          "content":"xxxxxx短信内容", //String参数,
+          "contact": "13735218234"
+          , //String参数,接收人,
+        }
+      }
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
+      function sendSms2(){
+      var json = {
+        "funcName":"sendSms",
+        "data":{
+          "content":"xxxxxx短信内容", //String参数,
+          "contact": ["13735218234","17376508275"]
+          , //String参数,接收人,
+        }
+      }
+      var param = JSON.stringify(json);
+      
+      UserState.postMessage(param);
+    }
+    
     
     
 </script>
@@ -271,6 +301,8 @@ const String kNavigationExamplePage = '''
 <button onClick = "faceId()"> face ---- id </button>
 <button onClick = "selectContact()"> selectContact </button>
 <button onClick = "getGeolocation()"> getGeolocation </button>
+<button onClick = "sendSms()"> send SMS </button>
+<button onClick = "sendSms2()"> send SMS to multiple contact </button>
 <br/><input id="textInput1" class="custom" size="32">
 <input id="textInput2" class="custom" size="32">
 <textarea name="textarea" rows="10" cols="50">Write something here</textarea>
@@ -355,9 +387,9 @@ class _WebViewExampleState extends State<WebViewExample> {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
-//            SampleMenu(_controller.future, () {
-//              FocusScope.of(context).requestFocus(FocusNode());
-//            }),
+            SampleMenu(_controller.future, () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            }),
           ],
         ),
         body: Builder(builder: (BuildContext context) {
@@ -617,6 +649,9 @@ class _WebViewExampleState extends State<WebViewExample> {
             case "getLocation":
               doGetLocation(context, jsonMap['data']);
               break;
+            case "sendSms":
+              doSendSms(context, jsonMap['data']);
+              break;
             default:
               break;
           }
@@ -632,8 +667,7 @@ class _WebViewExampleState extends State<WebViewExample> {
         print("======>$javascriptString");
         controller.evaluateJavascript(javascriptString);
       } else {
-        var javascriptStringCancel =
-            "${jsonMap['callbackCancel']}()";
+        var javascriptStringCancel = "${jsonMap['callbackCancel']}()";
         controller.evaluateJavascript(javascriptStringCancel);
       }
     });
@@ -725,8 +759,8 @@ class _WebViewExampleState extends State<WebViewExample> {
       if (file == null) {
         return null;
       }
-      if(!Platform.isAndroid){
-          return Future.value(file);
+      if (!Platform.isAndroid) {
+        return Future.value(file);
       }
       //通过exif旋转图片
       return FlutterExifRotation.rotateImage(path: file.path);
@@ -846,9 +880,9 @@ class _WebViewExampleState extends State<WebViewExample> {
           );
         }).then((param) {
       FocusScope.of(context).requestFocus(FocusNode());
-        var javascriptString = '$callbackName("$param")';
-        print(javascriptString);
-        controller.evaluateJavascript(javascriptString);
+      var javascriptString = '$callbackName("$param")';
+      print(javascriptString);
+      controller.evaluateJavascript(javascriptString);
     });
   }
 
@@ -906,28 +940,48 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void doSelectContact(BuildContext context, jsonMap) {
-    Navigator.of(context).pushNamed(ContactsSelectPage.routeName).then((contact){
-     if(contact!=null && contact is ContactInfo){
-       var javascriptString =
-           "${jsonMap['callbackName']}('${contact.displayName}','${contact.phone}')";
-       controller.evaluateJavascript(javascriptString);
-     } else {
-       var javascriptString =
-           "${jsonMap['callbackName']}()";
-       controller.evaluateJavascript(javascriptString);
-     }
+    Navigator.of(context)
+        .pushNamed(ContactsSelectPage.routeName)
+        .then((contact) {
+      if (contact != null && contact is ContactInfo) {
+        var javascriptString =
+            "${jsonMap['callbackName']}('${contact.displayName}','${contact.phone}')";
+        controller.evaluateJavascript(javascriptString);
+      } else {
+        var javascriptString = "${jsonMap['callbackName']}()";
+        controller.evaluateJavascript(javascriptString);
+      }
     });
   }
 
   void doGetLocation(BuildContext context, jsonMap) {
-    getLocation().then((p){
+    getLocation().then((p) {
       var js = '${jsonMap['callbackName']}("${p.latitude}","${p.longitude}")';
       controller.evaluateJavascript(js);
-    }).catchError((e,s){
+    }).catchError((e, s) {
       var js = '${jsonMap['callbackError']}()';
       controller.evaluateJavascript(js);
       print('$e');
       print('$s');
+    });
+  }
+
+  void doSendSms(BuildContext context, Map<String, dynamic> jsonMap) {
+    FlutterSms.canSendSMS().then((canSend) {
+      if (canSend) {
+        List<String> contact;
+        var originData = jsonMap['contact'];
+        if (originData is List) {
+          contact = originData.map<String>((d) => d.toString()).toList();
+        } else {
+          contact = [originData.toString()];
+        }
+        print('$contact');
+        FlutterSms.sendSMS(
+            message: jsonMap['content'], recipients: contact);
+      } else {
+        Fluttertoast.showToast(msg: "当前设备不支持发送短信");
+      }
     });
   }
 }
