@@ -86,6 +86,7 @@ class ApplicationBloc extends BlocBase {
     getIndexInfo();
     getNoticeInfo();
     _requestLocationPermission();
+    getUserTypes();
   }
 
   void _getCurrentUserAndNotify() async {
@@ -138,7 +139,7 @@ class ApplicationBloc extends BlocBase {
 
   BehaviorSubject<List<UserType>> _userTypeController = BehaviorSubject();
 
-  Stream<List<UserType>> get userTypeStream => _userTypeController.stream;
+  Observable<List<UserType>> get userTypeStream => _userTypeController.stream;
 
   /*
    * 退出登录:

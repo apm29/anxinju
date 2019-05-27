@@ -54,6 +54,10 @@ class _HomePageState extends State<HomePage> {
               return InkWell(
                 onTap: (){
                   BlocProviders.of<ApplicationBloc>(context)
+                      .getUserTypes();
+                  BlocProviders.of<ApplicationBloc>(context)
+                      .getNoticeInfo();
+                  BlocProviders.of<ApplicationBloc>(context)
                       .getIndexInfo();
                 },
                 child: Center(

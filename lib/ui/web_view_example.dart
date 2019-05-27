@@ -804,7 +804,7 @@ class _WebViewExampleState extends State<WebViewExample> {
 
       controller.evaluateJavascript(javascriptString);
     } else {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
         return LoginPage(
           backRoute: data["backRoute"],
         );

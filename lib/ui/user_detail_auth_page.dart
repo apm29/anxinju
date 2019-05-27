@@ -18,7 +18,6 @@ class UserDetailAuthPage extends StatefulWidget {
 class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _genderController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
   TextEditingController _avatarController = TextEditingController();
   TextEditingController _idCardController = TextEditingController();
   TextEditingController _nickNameController = TextEditingController();
@@ -49,7 +48,6 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
        UserDetail userDetail = b.data;
        _nameController.text = userDetail.myName;
        _genderController.text = userDetail.sex;
-       _phoneController.text = userDetail.phone;
        _avatarController.text = userDetail.avatar;
        _nickNameController.text = userDetail.nickName;
        _idCardController.text = userDetail.idCard;
@@ -84,54 +82,43 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                     height: 12,
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "请输入姓名",
-                          labelText: "姓名",
-                          border: OutlineInputBorder()),
-                      controller: _nameController,
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "请输入性别",
-                          labelText: "性别",
-                          border: OutlineInputBorder()),
-                      controller: _genderController,
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "请输入电话",
-                          labelText: "电话",
-                          border: OutlineInputBorder()),
-                      controller: _phoneController,
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "请输入昵称",
-                          labelText: "昵称",
-                          border: OutlineInputBorder()),
-                      controller: _nickNameController,
-                    ),
-                  ),
-                ),
+//                SliverToBoxAdapter(
+//                  child: Padding(
+//                    padding: const EdgeInsets.all(8.0),
+//                    child: TextField(
+//                      decoration: InputDecoration(
+//                          hintText: "请输入姓名",
+//                          labelText: "姓名",
+//                          border: OutlineInputBorder()),
+//                      controller: _nameController,
+//                    ),
+//                  ),
+//                ),
+//                SliverToBoxAdapter(
+//                  child: Padding(
+//                    padding: const EdgeInsets.all(8.0),
+//                    child: TextField(
+//                      decoration: InputDecoration(
+//                          hintText: "请输入性别",
+//                          labelText: "性别",
+//                          border: OutlineInputBorder()),
+//                      controller: _genderController,
+//                    ),
+//                  ),
+//                ),
+//
+//                SliverToBoxAdapter(
+//                  child: Padding(
+//                    padding: const EdgeInsets.all(8.0),
+//                    child: TextField(
+//                      decoration: InputDecoration(
+//                          hintText: "请输入昵称",
+//                          labelText: "昵称",
+//                          border: OutlineInputBorder()),
+//                      controller: _nickNameController,
+//                    ),
+//                  ),
+//                ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -144,82 +131,82 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(shape: BoxShape.rectangle),
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(
-                          width: ScreenUtil().setWidth(200),
-                          height: ScreenUtil().setWidth(200),
-                          child: StreamBuilder<String>(
-                              stream: _avatarStream,
-                              builder: (context, snapshot) {
-                                return CircleAvatar(
-                                  backgroundImage:NetworkImage(snapshot.data ?? _avatarController.text),
-                                );
-                              }),
-                        ),
-                        Expanded(
-                          child: LoadingStateWidget(
-                            key: uploadImageKey,
-                            child: FlatButton(
-                                child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.only(
-                                        top: 8,
-                                        bottom: 8,
-                                      ),
-                                      title: Text("选择头像"),
-                                      trailing:
-                                          Icon(Icons.arrow_drop_down_circle),
-                                    )),
-                                onPressed: () async {
-                                  var directory = await getTemporaryDirectory();
-                                  var file = File(directory.path +
-                                      "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
-                                  showImageSourceDialog(file, context, (v) {},
-                                      (futureFile, localFile) {
-                                    futureFile.then((f) {
-                                      if (f == null) {
-                                        return null;
-                                      }
-                                      uploadImageKey.currentState
-                                          .startLoading();
-                                      return rotateWithExifAndCompress(f)
-                                          .then((compressed) {
-                                        return Api.uploadPic(compressed.path);
-                                      });
-                                    }).then((baseResp) {
-                                      if (baseResp == null) {
-                                        return null;
-                                      }
-                                      if (baseResp.success()) {
-                                        _avatarUploadController
-                                            .add(baseResp.data.thumbnailPath);
-                                        _avatarController.text =
-                                            baseResp.data.orginPicPath;
-                                      }
-                                      uploadImageKey.currentState.stopLoading();
-                                      Scaffold.of(context).showSnackBar(
-                                          SnackBar(
-                                              content: Text(baseResp.text)));
-                                    }).catchError((Object e, StackTrace trace) {
-                                      uploadImageKey.currentState.stopLoading();
-                                      Scaffold.of(context).showSnackBar(
-                                          SnackBar(
-                                              content: Text(e.toString())));
-                                    });
-                                  });
-                                }),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+//                SliverToBoxAdapter(
+//                  child: Container(
+//                    padding: const EdgeInsets.all(8.0),
+//                    decoration: BoxDecoration(shape: BoxShape.rectangle),
+//                    child: Row(
+//                      children: <Widget>[
+//                        SizedBox(
+//                          width: ScreenUtil().setWidth(200),
+//                          height: ScreenUtil().setWidth(200),
+//                          child: StreamBuilder<String>(
+//                              stream: _avatarStream,
+//                              builder: (context, snapshot) {
+//                                return CircleAvatar(
+//                                  backgroundImage:NetworkImage(snapshot.data ?? _avatarController.text),
+//                                );
+//                              }),
+//                        ),
+//                        Expanded(
+//                          child: LoadingStateWidget(
+//                            key: uploadImageKey,
+//                            child: FlatButton(
+//                                child: Align(
+//                                    alignment: Alignment.centerRight,
+//                                    child: ListTile(
+//                                      contentPadding: EdgeInsets.only(
+//                                        top: 8,
+//                                        bottom: 8,
+//                                      ),
+//                                      title: Text("选择头像"),
+//                                      trailing:
+//                                          Icon(Icons.arrow_drop_down_circle),
+//                                    )),
+//                                onPressed: () async {
+//                                  var directory = await getTemporaryDirectory();
+//                                  var file = File(directory.path +
+//                                      "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
+//                                  showImageSourceDialog(file, context, (v) {},
+//                                      (futureFile, localFile) {
+//                                    futureFile.then((f) {
+//                                      if (f == null) {
+//                                        return null;
+//                                      }
+//                                      uploadImageKey.currentState
+//                                          .startLoading();
+//                                      return rotateWithExifAndCompress(f)
+//                                          .then((compressed) {
+//                                        return Api.uploadPic(compressed.path);
+//                                      });
+//                                    }).then((baseResp) {
+//                                      if (baseResp == null) {
+//                                        return null;
+//                                      }
+//                                      if (baseResp.success()) {
+//                                        _avatarUploadController
+//                                            .add(baseResp.data.thumbnailPath);
+//                                        _avatarController.text =
+//                                            baseResp.data.orginPicPath;
+//                                      }
+//                                      uploadImageKey.currentState.stopLoading();
+//                                      Scaffold.of(context).showSnackBar(
+//                                          SnackBar(
+//                                              content: Text(baseResp.text)));
+//                                    }).catchError((Object e, StackTrace trace) {
+//                                      uploadImageKey.currentState.stopLoading();
+//                                      Scaffold.of(context).showSnackBar(
+//                                          SnackBar(
+//                                              content: Text(e.toString())));
+//                                    });
+//                                  });
+//                                }),
+//                          ),
+//                        )
+//                      ],
+//                    ),
+//                  ),
+//                ),
                 SliverToBoxAdapter(
                   child: LoadingStateWidget(
                     key: submitButtonKey,
@@ -229,11 +216,10 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                         var userId = snapshot.data.data.userId;
                         var baseResponse = await Api.saveUserDetail(
                           userId: userId,
-                          myName: _nameController.text,
-                          sex: _genderController.text,
-                          phone: _phoneController.text,
-                          nickName: _nickNameController.text,
-                          avatar: _avatarController.text,
+                          myName: null,
+                          sex: null,
+                          nickName: null,
+                          avatar: null,
                           idCard: _idCardController.text,
                         );
                         Scaffold.of(context).showSnackBar(

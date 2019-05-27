@@ -284,7 +284,6 @@ class NoticeDetail {
   int noticeId;
   String noticeTitle;
   String noticeContent;
-  String noticeBanner;
   int noticeType;
   String noticeScope;
   int districtId;
@@ -293,13 +292,11 @@ class NoticeDetail {
   String userName;
   String companyName;
   String createTime;
-  Null orderNo;
 
   NoticeDetail(
       {this.noticeId,
       this.noticeTitle,
       this.noticeContent,
-      this.noticeBanner,
       this.noticeType,
       this.noticeScope,
       this.districtId,
@@ -308,13 +305,12 @@ class NoticeDetail {
       this.userName,
       this.companyName,
       this.createTime,
-      this.orderNo});
+      });
 
   NoticeDetail.fromJson(Map<String, dynamic> json) {
     noticeId = json['noticeId'];
     noticeTitle = json['noticeTitle'];
     noticeContent = json['noticeContent'];
-    noticeBanner = json['noticeBanner'];
     noticeType = json['noticeType'];
     noticeScope = json['noticeScope'];
     districtId = json['districtId'];
@@ -323,7 +319,6 @@ class NoticeDetail {
     userName = json['userName'];
     companyName = json['companyName'];
     createTime = json['createTime'];
-    orderNo = json['orderNo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -331,7 +326,6 @@ class NoticeDetail {
     data['noticeId'] = this.noticeId;
     data['noticeTitle'] = this.noticeTitle;
     data['noticeContent'] = this.noticeContent;
-    data['noticeBanner'] = this.noticeBanner;
     data['noticeType'] = this.noticeType;
     data['noticeScope'] = this.noticeScope;
     data['districtId'] = this.districtId;
@@ -340,7 +334,6 @@ class NoticeDetail {
     data['userName'] = this.userName;
     data['companyName'] = this.companyName;
     data['createTime'] = this.createTime;
-    data['orderNo'] = this.orderNo;
     return data;
   }
 }
