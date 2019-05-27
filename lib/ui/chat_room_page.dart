@@ -7,6 +7,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../index.dart';
+import 'widget/audio_input_widget.dart';
 
 class ChatRoomPage extends StatefulWidget {
   static String routeName = "/chat";
@@ -180,19 +181,45 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
+  bool audio = false;
+
   Widget buildInputPart({bool disabled = false}) {
     return Container(
       padding: EdgeInsets.all(16),
       height: ScreenUtil().setHeight(240),
       child: Row(
         children: <Widget>[
+          InkWell(
+            onTap: () {
+              setState(() {
+                audio = !audio;
+              });
+            },
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                      padding: EdgeInsets.all(2),
+                      margin: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
+                      child: Transform.rotate(
+                          angle: audio?0:3.14/2,
+                          child: Icon(!audio ? Icons.wifi : Icons.message))),
+                ),
+              ],
+            ),
+          ),
           Expanded(
-              child: TextField(
-            enabled: !disabled,
-            controller: _inputController,
-            maxLines: 100,
-            decoration: InputDecoration(border: OutlineInputBorder()),
-          )),
+              child: audio
+                  ? AudioInputWidget()
+                  : TextField(
+                      enabled: !disabled,
+                      controller: _inputController,
+                      maxLines: 100,
+                      decoration: InputDecoration(border: OutlineInputBorder()),
+                    )),
           FlatButton.icon(
               onPressed: () {
                 var message = Message(_inputController.text);
@@ -397,7 +424,9 @@ class WebSocketManager {
         //处理其他信息
         if (response.code == 200) {
           _messageController.add(Message("${response.data.content}",
-              type: MessageType.TEXT, data: ConnectStatus.CONNECTED,response: response));
+              type: MessageType.TEXT,
+              data: ConnectStatus.CONNECTED,
+              response: response));
         }
         break;
       default:
