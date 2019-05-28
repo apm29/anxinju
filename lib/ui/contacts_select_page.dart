@@ -138,7 +138,7 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
 //                                            data: "smsto:${i.value}",
 //                                            arguments: {
 //                                              "sms_body":
-//                                              "我小区已使用门禁，输入我家庭通行码123456即可进入小区，如您有车辆需进入请点击链接登记车牌."
+//                                              "我${Strings.districtClass}已使用门禁，输入我家庭通行码123456即可进入学校，如您有车辆需进入请点击链接登记车牌."
 //                                            });
 //                                        androidIntent.launch();
                                         Navigator.of(context).pop(ContactInfo(contact.displayName, phone.value));

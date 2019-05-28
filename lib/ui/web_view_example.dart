@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:ease_life/interaction/simple_bridge.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:ease_life/ui/widget/district_info_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
@@ -356,7 +357,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           title: StreamBuilder<Object>(
               stream: titleController.stream,
               builder: (context, snapshot) {
-                return Text(snapshot.data ?? "安心居");
+                return Text(snapshot.data ?? Strings.appName);
               }),
           centerTitle: true,
           // This drop down menu demonstrates that Flutter widgets can be shown over the web view.

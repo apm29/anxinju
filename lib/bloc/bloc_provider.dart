@@ -166,10 +166,10 @@ class ApplicationBloc extends BlocBase {
       _userTypeController.add([]);
     });
   }
-  
+
   /*
-   * 优先取SP缓存的小区信息
-   * 然后取后端返回的小区的第一个
+   * 优先取SP缓存的${Strings.districtClass}信息
+   * 然后取后端返回的${Strings.districtClass}的第一个
    */
   void _getCurrentDistrictAndNotify() async {
     var source = sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
@@ -178,7 +178,7 @@ class ApplicationBloc extends BlocBase {
     if (districtInfo == null) {
       BaseResponse<List<DistrictInfo>> baseResponse =
           await Api.findAllDistrict();
-      //将取到的小区信息存入sp缓存
+      //将取到的${Strings.districtClass}信息存入sp缓存
       sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict,
           baseResponse.data.first.toString());
       _districtInfoController.add(baseResponse.data.first);
@@ -206,7 +206,7 @@ class ApplicationBloc extends BlocBase {
   }
 
   void setCurrentDistrict(DistrictInfo districtInfo) {
-    //将取到的小区信息存入sp缓存
+    //将取到的${Strings.districtClass}信息存入sp缓存
     sharedPreferences.setString(
         PreferenceKeys.keyCurrentDistrict, districtInfo.toString());
     _districtInfoController.add(districtInfo);

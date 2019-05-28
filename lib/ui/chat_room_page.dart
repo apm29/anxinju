@@ -215,11 +215,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               child: audio
                   ? AudioInputWidget()
                   : TextField(
-                      enabled: !disabled,
-                      controller: _inputController,
-                      maxLines: 100,
-                      decoration: InputDecoration(border: OutlineInputBorder()),
-                    )),
+                enabled: !disabled,
+                controller: _inputController,
+                maxLines: 100,
+                decoration: InputDecoration(border: OutlineInputBorder()),
+              )),
           FlatButton.icon(
               onPressed: () {
                 var message = Message(_inputController.text);
@@ -288,12 +288,12 @@ class Data {
 
   Data(
       {this.kfId,
-      this.kfName,
-      this.id,
-      this.name,
-      this.avatar,
-      this.content,
-      this.time});
+        this.kfName,
+        this.id,
+        this.name,
+        this.avatar,
+        this.content,
+        this.time});
 
   String id;
   String name;
@@ -421,7 +421,7 @@ class WebSocketManager {
         }
         break;
       case "chatMessage":
-        //处理其他信息
+      //处理其他信息
         if (response.code == 200) {
           _messageController.add(Message("${response.data.content}",
               type: MessageType.TEXT,
@@ -439,7 +439,7 @@ class WebSocketManager {
     String data = "";
     if (message.type == MessageType.TEXT) {
       data =
-          '{"type": "chatMessage","data": {"to_id": "${config.toId}", "to_name": "${config.toName}", "content": "${message.content}", "from_name": "${config.fromName}","from_id": "${config.fromId}", "from_avatar": "${config.fromAvatar}"}}';
+      '{"type": "chatMessage","data": {"to_id": "${config.toId}", "to_name": "${config.toName}", "content": "${message.content}", "from_name": "${config.fromName}","from_id": "${config.fromId}", "from_avatar": "${config.fromAvatar}"}}';
     }
     _channel.sink.add(data);
   }

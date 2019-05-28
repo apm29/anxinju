@@ -1,3 +1,4 @@
+import 'package:ease_life/res/strings.dart';
 import 'package:flutter/material.dart';
 
 import '../../index.dart';
@@ -32,7 +33,7 @@ class _BuildingPickerState extends State<BuildingPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("选择幢"),
+        title: Text("选择${Strings.buildingClass}"),
       ),
       body: FutureBuilder<BaseResponse<List<String>>>(
         future: Api.getBuildings(widget.districtId),
@@ -80,7 +81,7 @@ class _UnitPickerState extends State<UnitPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("选择单元"),
+        title: Text("选择楼层"),
       ),
       body: FutureBuilder<BaseResponse<List<String>>>(
         future: Api.getUnits(widget.districtId, widget.building),
@@ -131,7 +132,7 @@ class _RoomPickerState extends State<RoomPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("选择房间"),
+        title: Text("选择${Strings.roomClass}"),
       ),
       body: FutureBuilder<BaseResponse<List<String>>>(
         future: Api.getRooms(widget.districtId, widget.building, widget.unit),

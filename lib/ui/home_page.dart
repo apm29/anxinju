@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:ease_life/index.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 
 import '../utils.dart';
@@ -35,7 +36,7 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: Text(
-          "安心居",
+          Strings.appName,
         ),
         actions: <Widget>[
           DistrictInfoButton(),
@@ -129,7 +130,7 @@ class _HomePageState extends State<HomePage> {
                                                       builder:
                                                           (context, snapshot) {
                                                         return Text(
-                                                          "${snapshot.data?.districtName ?? ""}安心居服务平台\n共建共享我们的家园",
+                                                          "${snapshot.data?.districtName ?? ""}${Strings.appName}服务平台\n共建共享我们的家园",
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(

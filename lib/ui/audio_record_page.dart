@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:ease_life/index.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -51,7 +52,7 @@ class _AudioRecordPageState extends State<AudioRecordPage> {
             builder: (context) {
               return AlertDialog(
                 title: Text("警告"),
-                content: Text("您拒绝了一些必要权限,安心居将无法正常运行"),
+                content: Text("您拒绝了一些必要权限,${Strings.appName}将无法正常运行"),
                 actions: <Widget>[
                   FlatButton(
                       onPressed: () {

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/base_response.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:ease_life/ui/widget/loading_state_widget.dart';
 import 'package:ease_life/ui/widget/ticker_widget.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "安心居",
+                    Strings.appName,
                     style: TextStyle(fontSize: 20),
                     textAlign: TextAlign.center,
                   ),
@@ -152,7 +153,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                       ),
                       Expanded(
                         child: FlatButton(
-                          child: Text("我已阅读并同意安心居服务平台服务相关条例"),
+                          child: Text("我已阅读并同意${Strings.appName}服务平台服务相关条例"),
                           onPressed: () {
                             setState(() {
                               _protocolChecked = !_protocolChecked;

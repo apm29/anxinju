@@ -87,7 +87,7 @@ class HomeChip extends StatelessWidget {
     return index.menu.firstWhere((item) {
       return item.id == indexId;
     }, orElse: () {
-      return MenuItem("", "未定义", "");
+      return MenuItem("", title, "");
     }).remark;
   }
 }

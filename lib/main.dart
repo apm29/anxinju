@@ -18,6 +18,7 @@ import 'package:camera/camera.dart';
 import 'package:ease_life/ui/user_detail_auth_page.dart';
 import 'package:amap_base_location/amap_base_location.dart';
 
+import 'res/strings.dart';
 import 'ui/chat_room_page.dart';
 import 'ui/house_member_apply_page.dart';
 
@@ -28,7 +29,7 @@ void main() async {
 //  FlutterBugly.postCatchedException(() async {
   //sp初始化
   sharedPreferences = await SharedPreferences.getInstance();
-  await AMap.init("d712d41f19e76ca74b673f9d5637af8a");
+  await AMap.init(Configs.AMapKey);
   //相机初始化
   cameras = await availableCameras();
 //    sharedPreferences.setString(PreferenceKeys.keyAuthorization,

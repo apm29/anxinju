@@ -1,4 +1,5 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:rxdart/rxdart.dart';
 import '../utils.dart';
 import 'main_page.dart';
@@ -131,7 +132,7 @@ class _MinePageState extends State<MinePage> {
                                           return Text(
                                               snapshot.data.districtName);
                                         }
-                                        return Text("未选择小区");
+                                        return Text("未选择${Strings.districtClass}");
                                       }),
                                   Icon(
                                     Icons.location_on,
@@ -653,7 +654,7 @@ class _MinePageState extends State<MinePage> {
                                           return Text(
                                               snapshot.data.districtName);
                                         }
-                                        return Text("未选择小区");
+                                        return Text("未选择${Strings.districtClass}");
                                       }),
                                   Icon(
                                     Icons.location_on,

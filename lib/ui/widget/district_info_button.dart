@@ -1,5 +1,6 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:flutter/cupertino.dart';
 
 typedef DistrictCallback = void Function(DistrictInfo);
@@ -72,7 +73,7 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                                             children: <Widget>[
                                               CircularProgressIndicator(),
                                               Text(
-                                                "获取小区列表..",
+                                                "获取${Strings.districtClass}列表..",
                                                 textAlign: TextAlign.center,
                                               ),
                                             ],

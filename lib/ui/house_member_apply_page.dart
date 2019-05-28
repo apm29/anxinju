@@ -1,4 +1,5 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
 
@@ -102,7 +103,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                                             children: <Widget>[
                                               CircularProgressIndicator(),
                                               Text(
-                                                "获取小区列表..",
+                                                "获取${Strings.districtClass}列表..",
                                                 textAlign: TextAlign.center,
                                               ),
                                             ],
@@ -119,8 +120,8 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                       child: AbsorbPointer(
                         child: TextField(
                           decoration: InputDecoration(
-                              hintText: "请选择小区",
-                              labelText: "小区",
+                              hintText: "请选择${Strings.districtClass}",
+                              labelText: "${Strings.districtClass}",
                               border: OutlineInputBorder()),
                           controller: _nameController,
                         ),
@@ -132,7 +133,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                     GestureDetector(
                       onTap: () {
                         if (districtId == null) {
-                          Fluttertoast.showToast(msg: "请先选择小区");
+                          Fluttertoast.showToast(msg: "请先选择${Strings.districtClass}");
                           return;
                         }
                         showRoomPicker(context, districtId).then((address) {
@@ -339,7 +340,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                   );
                 } else {
                   return Center(
-                    child: Text(building.data?.text ?? "获取小区数据失败"),
+                    child: Text(building.data?.text ?? "获取${Strings.districtClass}数据失败"),
                   );
                 }
               },
