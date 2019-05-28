@@ -2,7 +2,6 @@ import 'package:ease_life/index.dart';
 import 'package:rxdart/rxdart.dart';
 import '../utils.dart';
 import 'main_page.dart';
-import 'member_apply_page.dart';
 import 'user_detail_auth_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 

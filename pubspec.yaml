@@ -54,7 +54,7 @@ dependencies:
   flutter_image_compress:
     git:
       url: https://github.com/OpenFlutter/flutter_image_compress.git
-      ref: 5a545f7e5409d091cd18f5891a8b07426f390729
+      ref: 173ce7d73835ce35f695ac859bdabf471d1160e6
 
   fluro: ^1.3.4
 

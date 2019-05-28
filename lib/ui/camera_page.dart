@@ -3,11 +3,9 @@ import 'dart:io';
 
 import 'package:ease_life/index.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import '../utils.dart';
-import 'member_apply_page.dart';
+import 'house_member_apply_page.dart';
 import 'widget/loading_state_widget.dart';
 
 class CameraPage extends StatefulWidget {

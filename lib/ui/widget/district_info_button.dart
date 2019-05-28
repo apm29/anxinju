@@ -20,8 +20,9 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
     return StreamBuilder<DistrictInfo>(
       stream: BlocProviders.of<ApplicationBloc>(context).currentDistrict,
       builder: (context, snapShot) {
-        var textString =
-            isLogin() ? snapShot.data?.districtName ?? "无小区" : "未登录";
+        var textString = isLogin()
+            ? isCertificated() ? snapShot.data?.districtName ?? "无小区" : "未认证"
+            : "未登录";
         return FlatButton.icon(
             onPressed: () {
               !isLogin()

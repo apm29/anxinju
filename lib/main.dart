@@ -19,7 +19,7 @@ import 'package:ease_life/ui/user_detail_auth_page.dart';
 import 'package:amap_base_location/amap_base_location.dart';
 
 import 'ui/chat_room_page.dart';
-import 'ui/member_apply_page.dart';
+import 'ui/house_member_apply_page.dart';
 
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;

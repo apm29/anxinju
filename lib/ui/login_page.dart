@@ -134,7 +134,10 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                       onPressed: () {
                         Navigator.of(context).pushNamed(RegisterPage.routeName);
                       },
-                      child: Text("注册")),
+                      child: Text("注册",style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18
+                      ),)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[

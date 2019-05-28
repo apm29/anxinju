@@ -257,11 +257,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "5a545f7e5409d091cd18f5891a8b07426f390729"
-      resolved-ref: "5a545f7e5409d091cd18f5891a8b07426f390729"
+      ref: "173ce7d73835ce35f695ac859bdabf471d1160e6"
+      resolved-ref: "173ce7d73835ce35f695ac859bdabf471d1160e6"
       url: "https://github.com/OpenFlutter/flutter_image_compress.git"
     source: git
-    version: "0.5.0"
+    version: "0.5.2"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -687,4 +687,4 @@ packages:
     version: "2.1.15"
 sdks:
   dart: ">=2.3.0 <3.0.0"
-  flutter: ">=1.5.9-pre.100 <2.0.0"
+  flutter: ">=1.2.1 <2.0.0"

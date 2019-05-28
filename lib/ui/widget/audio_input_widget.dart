@@ -12,24 +12,16 @@ class _AudioInputWidgetState extends State<AudioInputWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (tapDownDetail) {
-        setState(() {
-          recording = true;
-        });
+        startRecord();
       },
       onTapUp: (tapUpDetail) {
-        setState(() {
-          recording = false;
-        });
+        stopRecord();
       },
       onLongPressUp: () {
-        setState(() {
-          recording = false;
-        });
+        stopRecord();
       },
       onLongPressStart: (longPressDetail) {
-        setState(() {
-          recording = true;
-        });
+        startRecord();
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -41,5 +33,17 @@ class _AudioInputWidgetState extends State<AudioInputWidget> {
         child: Text(recording ? "松开结束" : "按住说话"),
       ),
     );
+  }
+
+  void stopRecord() {
+    setState(() {
+      recording = false;
+    });
+  }
+
+  void startRecord() {
+    setState(() {
+      recording = true;
+    });
   }
 }

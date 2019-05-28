@@ -8,6 +8,10 @@ bool isLogin() {
   return sharedPreferences.getString(PreferenceKeys.keyUserInfo) != null;
 }
 
+bool isCertificated(){
+  return UserInfo.fromJson(json.decode(sharedPreferences.getString(PreferenceKeys.keyUserInfo)))?.isCertification??0 == 1;
+}
+
 String getToken(){
   return sharedPreferences.getString(PreferenceKeys.keyAuthorization);
 }
