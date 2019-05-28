@@ -13,6 +13,7 @@ class HomeChip extends StatelessWidget {
   final Index index;
   final bool intercept;
   final bool wrap;
+
   HomeChip(
       {@required this.title,
       this.onPressed,
@@ -20,11 +21,12 @@ class HomeChip extends StatelessWidget {
       this.textColor = const Color(0xFF616161),
       this.indexId,
       this.index,
-      this.intercept,
-      this.wrap = false});
+      this.intercept = false,
+      this.wrap = false})
+      : assert(intercept != null);
 
   void route(String id, Index index, BuildContext context) {
-    if (intercept !=null && !checkIfCertificated(context)) {
+    if (intercept != false && !checkIfCertificated(context)) {
       return;
     }
     routeToWeb(context, id, index);
