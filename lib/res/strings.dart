@@ -3,8 +3,10 @@ class Strings{
   static const districtClass = "小区";
   static const buildingClass = "幢";
   static const roomClass = "房间";
+  static const hostClass = "业主";
 }
 
 class Configs{
   static const AMapKey = "d712d41f19e76ca74b673f9d5637af8a";
+  static const BaseUrl = "http://axj.ciih.net/";
 }

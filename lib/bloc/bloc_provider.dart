@@ -78,6 +78,7 @@ class ApplicationBloc extends BlocBase {
     _noticeController.close();
     _noticeTypeController.close();
     _userTypeController.close();
+    _controllerUserDetailData.close();
   }
 
   ApplicationBloc() {
@@ -87,6 +88,7 @@ class ApplicationBloc extends BlocBase {
     getNoticeInfo();
     _requestLocationPermission();
     getUserTypes();
+    getUserDetail();
   }
 
   void _getCurrentUserAndNotify() async {
@@ -96,7 +98,6 @@ class ApplicationBloc extends BlocBase {
     } else {
       _userInfoController.add(null);
     }
-    debugPrint("===----> inject user info");
   }
 
   void login(UserInfo userInfo) {
@@ -141,6 +142,8 @@ class ApplicationBloc extends BlocBase {
 
   Observable<List<UserType>> get userTypeStream => _userTypeController.stream;
 
+  PublishSubject<UserDetail> _controllerUserDetailData = PublishSubject();
+  Observable<UserDetail> userDetailStream;
   /*
    * 退出登录:
    * SP清空 userInfo/ token
@@ -150,11 +153,13 @@ class ApplicationBloc extends BlocBase {
     sharedPreferences.setString(PreferenceKeys.keyUserInfo, null);
     sharedPreferences.setString(PreferenceKeys.keyAuthorization, null);
     _userInfoController.add(null);
-    debugPrint("===----> inject user info");
   }
 
   void getUserTypes(){
     Api.getUserInfo().then((base){
+      if(base.success()){
+        _userInfoController.add(base.data);
+      }
       return base.data.userId;
     }).then((userId){
       return Api.getUserType(userId);
@@ -185,7 +190,6 @@ class ApplicationBloc extends BlocBase {
     } else {
       _districtInfoController.add(districtInfo);
     }
-    debugPrint("===----> inject district info");
   }
 
   /*
@@ -196,12 +200,10 @@ class ApplicationBloc extends BlocBase {
       List<Index> list = await Api.getIndex();
       _homeIndexController.add(list.firstWhere((index) => index.area == "index"));
       _mineIndexController.add(list.firstWhere((index) => index.area == "mine"));
-      debugPrint("===----> inject index info");
     } catch (e) {
       print(e);
       _homeIndexController.add(null);
       _mineIndexController.add(null);
-      debugPrint("===----> inject index info");
     }
   }
 
@@ -242,6 +244,16 @@ class ApplicationBloc extends BlocBase {
       _noticeController.add(resp.data);
     }).catchError((e, s) {
       _noticeController.add(null);
+    });
+  }
+
+  void getUserDetail() {
+    Api.getUserDetail().then((baseResp) {
+      if (baseResp.success()) {
+        _controllerUserDetailData.add(baseResp.data);
+      }
+    }).catchError((Object e,StackTrace s){
+      _controllerUserDetailData.addError(e,s);
     });
   }
 }

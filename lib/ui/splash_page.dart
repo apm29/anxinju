@@ -25,7 +25,7 @@ class _SplashPageState extends State<SplashPage> {
 //                        child: Column(
 //                          children: <Widget>[
 //                            Text(
-//                              "安心居",
+//                              "${Strings.appName}",
 //                              style: TextStyle(
 //                                  fontSize: 40, fontWeight: FontWeight.bold),
 //                            ),

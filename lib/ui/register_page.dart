@@ -29,95 +29,101 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            SizedBox(
-              height: 100,
-            ),
+
             Card(
               margin: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(6),
-                    padding: EdgeInsets.all(6),
-                    child: TextField(
-                      key: ValueKey("name"),
-                      controller: _mobileController,
-                      decoration: InputDecoration(
-                        hintText: "输入电话号码",
-                        labelText: "电话号码",
-                        border: OutlineInputBorder(),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.all(6),
+                      padding: EdgeInsets.all(6),
+                      child: TextField(
+                        key: ValueKey("name"),
+                        controller: _mobileController,
+                        decoration: InputDecoration(
+                          hintText: "输入电话号码",
+                          labelText: "电话号码",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(6),
-                    padding: EdgeInsets.all(6),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: TextField(
-                            key: ValueKey("sms"),
-                            controller: _smsCodeController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              hintText: "输入验证码",
-                              labelText: "验证码",
-                              border: OutlineInputBorder(),
+                    Container(
+                      margin: EdgeInsets.all(6),
+                      padding: EdgeInsets.all(6),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              key: ValueKey("sms"),
+                              controller: _smsCodeController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                hintText: "输入验证码",
+                                labelText: "验证码",
+                                border: OutlineInputBorder(),
+                              ),
                             ),
                           ),
+                          Container(
+                            constraints: BoxConstraints(
+                                minWidth: ScreenUtil().setWidth(300)
+                            ),
+                            child: TickerWidget(
+                                key: ticker,
+                                textInitial: "发送验证码",
+                                onPressed: () {
+                                  sendSms();
+                                }),
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(6),
+                      padding: EdgeInsets.all(6),
+                      child: TextField(
+                        key: ValueKey("userName"),
+                        controller: _userNameController,
+                        decoration: InputDecoration(
+                          hintText: "输入用户名",
+                          labelText: "用户名",
+                          border: OutlineInputBorder(),
                         ),
-                        TickerWidget(
-                            key: ticker,
-                            textInitial: "发送验证码",
-                            onPressed: () {
-                              sendSms();
-                            })
-                      ],
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(6),
-                    padding: EdgeInsets.all(6),
-                    child: TextField(
-                      key: ValueKey("userName"),
-                      controller: _userNameController,
-                      decoration: InputDecoration(
-                        hintText: "输入用户名",
-                        labelText: "用户名",
-                        border: OutlineInputBorder(),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(6),
-                    padding: EdgeInsets.all(6),
-                    child: TextField(
-                      key: ValueKey("pass"),
-                      obscureText: true,
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        hintText: "输入密码",
-                        labelText: "输入密码",
-                        border: OutlineInputBorder(),
+                    Container(
+                      margin: EdgeInsets.all(6),
+                      padding: EdgeInsets.all(6),
+                      child: TextField(
+                        key: ValueKey("pass"),
+                        obscureText: true,
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          hintText: "输入密码",
+                          labelText: "输入密码",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(6),
-                    padding: EdgeInsets.all(6),
-                    child: TextField(
-                      key: ValueKey("paconfirm"),
-                      obscureText: true,
-                      controller: _confirmController,
-                      decoration: InputDecoration(
-                        hintText: "确认密码",
-                        labelText: "确认密码",
-                        border: OutlineInputBorder(),
+                    Container(
+                      margin: EdgeInsets.all(6),
+                      padding: EdgeInsets.all(6),
+                      child: TextField(
+                        key: ValueKey("paconfirm"),
+                        obscureText: true,
+                        controller: _confirmController,
+                        decoration: InputDecoration(
+                          hintText: "确认密码",
+                          labelText: "确认密码",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Container(
@@ -138,6 +144,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
+
           ],
         ),
       ),

@@ -9,7 +9,7 @@ bool isLogin() {
 }
 
 bool isCertificated(){
-  return (UserInfo.fromJson(json.decode(sharedPreferences.getString(PreferenceKeys.keyUserInfo)))?.isCertification??0) == 1;
+  return (UserInfo.fromJson(json.decode(sharedPreferences.getString(PreferenceKeys.keyUserInfo)??"{}"))?.isCertification??0) == 1;
 }
 
 String getToken(){

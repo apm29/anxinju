@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:ease_life/index.dart';
 import 'package:camera/camera.dart';
+import 'package:ease_life/res/strings.dart';
 
 import '../utils.dart';
 import 'house_member_apply_page.dart';
@@ -301,7 +302,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "您已经成为${houseInfo.addr}的${houseInfo.isHouseOwner ? "业主" : "成员"}",
+                      "您已经成为${houseInfo.addr}的${houseInfo.isHouseOwner ? "${Strings.hostClass}" : "成员"}",
                       textAlign: TextAlign.center,
                     ),
                   );

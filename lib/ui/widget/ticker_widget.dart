@@ -39,6 +39,7 @@ class TickerWidgetState extends State<TickerWidget> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      alignment: Alignment.center,
       children: <Widget>[
         IgnorePointer(
           ignoring: _loading,
@@ -50,10 +51,12 @@ class TickerWidgetState extends State<TickerWidget> {
                     ? Text(
                         textInitial,
                         style: TextStyle(color: Colors.blue),
+                        textAlign: TextAlign.center,
                       )
                     : Text(
                         "$currentTime(s)",
                         style: TextStyle(color: Colors.grey),
+                        textAlign: TextAlign.center,
                       )),
           ),
         ),

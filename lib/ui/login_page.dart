@@ -189,8 +189,6 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
   }
 
   Widget buildLoginSuccess(bool isCertificated, BuildContext context) {
-    var colorFaceButton = Colors.blue;
-    var colorHomeButton = Colors.blueGrey;
     if (widget.backRoute != null) {
       Future.delayed(Duration(seconds: 1)).then((v) {
         Navigator.of(context).pop(widget.backRoute);

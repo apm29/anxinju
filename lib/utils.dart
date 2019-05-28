@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:amap_base_location/amap_base_location.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:ease_life/ui/camera_page.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +10,10 @@ import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'index.dart';
+import 'persistance/shared_preferences.dart';
 import 'ui/login_page.dart';
+import 'ui/main_page.dart';
+import 'ui/user_detail_auth_page.dart';
 import 'ui/widget/room_picker.dart';
 
 List<Color> colors = [
@@ -194,6 +198,7 @@ Future<List<Index>> getIndex(bool refresh) {
 void routeToWeb(BuildContext context, String id, Index index) {
   var indexWhere = index.menu.indexWhere((i) => i.id == id);
   if (indexWhere < 0) {
+    Fluttertoast.showToast(msg: "无效路由");
     return;
   }
   var url = index.menu[indexWhere].url;
@@ -217,4 +222,106 @@ Future<String> getImageBase64(File file) async {
   return file.readAsBytes().then((bytes) {
     return "data:image/jpeg;base64,${base64Encode(bytes)}";
   });
+}
+
+Widget buildCertificationDialog(BuildContext context, VoidCallback onCancel,
+    {bool showQuit = true}) {
+  var colorFaceButton = Colors.blue;
+  return AlertDialog(
+    title: Text(
+      "您还未通过认证,只能使用首页功能",
+      style: TextStyle(
+        fontSize: 16,
+        color: Colors.blueGrey,
+      ),
+    ),
+    actions: <Widget>[
+      FlatButton(
+        onPressed: onCancel,
+        textColor: Colors.blueGrey,
+        child: Text(
+          "暂不认证",
+          maxLines: 1,
+        ),
+      ),
+      showQuit
+          ? FlatButton(
+              onPressed: () {
+                BlocProviders.of<ApplicationBloc>(context).logout();
+              },
+              textColor: Colors.blueGrey,
+              child: Text(
+                "退出登录",
+                maxLines: 1,
+              ),
+            )
+          : Container()
+    ],
+    content: Container(
+      margin: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(color: colorFaceButton),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      child: ListTile(
+        leading: Icon(
+          Icons.fingerprint,
+          size: 40,
+          color: colorFaceButton,
+        ),
+        title: Text("录入人脸照片",
+            style:
+                TextStyle(fontWeight: FontWeight.bold, color: colorFaceButton)),
+        subtitle: Text("一键录入,简单高效", style: TextStyle(color: colorFaceButton)),
+        trailing: Icon(
+          Icons.arrow_forward,
+          color: colorFaceButton,
+        ),
+        onTap: () {
+          Navigator.of(context)
+              .pushNamed(UserDetailAuthPage.routeName)
+              .then((v) {
+            //获取当前用户信息
+            Future.delayed(Duration(milliseconds: 500), () {
+              return Api.getUserInfo().then((baseResp) {
+                if (baseResp.success()) {
+                  BlocProviders.of<ApplicationBloc>(context)
+                      .login(baseResp.data);
+                }
+              });
+            });
+          });
+        },
+      ),
+    ),
+  );
+}
+
+///显示未认证弹框
+showCertificationDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return buildCertificationDialog(context,(){
+          Navigator.of(context).popUntil((r){
+            return r.settings.name == MainPage.routeName;
+          });
+        },showQuit: false);
+      });
+}
+
+///先检查是否登录,再检查是否认证,未认证用户会弹出认证弹框
+bool checkIfCertificated(BuildContext context){
+  if(!isLogin()){
+    Navigator.of(context).pushNamed(LoginPage.routeName);
+    return false;
+  }
+  if (!isCertificated()) {
+    Fluttertoast.showToast(
+        msg: "请先完成${Strings.hostClass}认证");
+    showCertificationDialog(context);
+    return false;
+  } else {
+    return true;
+  }
 }

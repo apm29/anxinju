@@ -11,7 +11,7 @@ class HomeChip extends StatelessWidget {
   final Color textColor;
   final String indexId;
   final Index index;
-  final String intercept;
+  final bool intercept;
   final bool wrap;
   HomeChip(
       {@required this.title,
@@ -24,8 +24,7 @@ class HomeChip extends StatelessWidget {
       this.wrap = false});
 
   void route(String id, Index index, BuildContext context) {
-    if (intercept !=null) {
-      Fluttertoast.showToast(msg: intercept);
+    if (intercept !=null && !checkIfCertificated(context)) {
       return;
     }
     routeToWeb(context, id, index);

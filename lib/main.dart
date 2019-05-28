@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 import 'package:ease_life/ui/audio_record_page.dart';
@@ -26,19 +28,17 @@ SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 
 void main() async {
-//  FlutterBugly.postCatchedException(() async {
   //sp初始化
   sharedPreferences = await SharedPreferences.getInstance();
   await AMap.init(Configs.AMapKey);
   //相机初始化
   cameras = await availableCameras();
-//    sharedPreferences.setString(PreferenceKeys.keyAuthorization,
-//        "eyJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTU1NDcxMjE2MDQ2MTkwMTYyNDIiLCJjcmVhdGVkIjoxNTU0ODkwODk4MzIwLCJleHAiOjE5ODY4OTA4OTh9.VYwQw-3io7XxgQHvtuKrB7RyVSQgnue1zfGGC6rFDbI");
-//    sharedPreferences.setString(PreferenceKeys.keyUserInfo,
-//        '{"userId": "723672", "userName": "应佳伟", "mobile": "17376508275", "isCertification": 0}');
-  runApp(MyApp());
-//  });
-//  FlutterBugly.init(androidAppId: "89b908154e", iOSAppId: "0d1433b494");
+  runZoned((){
+    runApp(MyApp());
+  },onError: (e,s){
+    debugPrint(e.toString());
+    debugPrint(s.toString());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
           });
         },
         routes: {
-          "/": (_) {
+          MainPage.routeName: (_) {
             bool firstEntry =
                 sharedPreferences.getBool(PreferenceKeys.keyFirstEntryTag) ??
                     true;

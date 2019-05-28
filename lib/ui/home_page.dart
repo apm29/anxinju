@@ -14,8 +14,9 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   var topIndex = 0;
+  AnimationController _animationController;
 
   @override
   void initState() {
@@ -23,13 +24,27 @@ class _HomePageState extends State<HomePage> {
     if (!mounted) {
       return;
     }
-    BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+    _animationController =
+        AnimationController(
+            duration: Duration(milliseconds: 2800), vsync: this);
+    print("home init");
+    //_animationController.forward();
   }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
+  }
+
+  GlobalKey<ScaffoldState> homeKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     print('home rebuild');
     return Scaffold(
+      key: homeKey,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -44,22 +59,21 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: StreamBuilder<Index>(
-          stream: BlocProviders.of<ApplicationBloc>(context).homeIndex,
+          stream: BlocProviders
+              .of<ApplicationBloc>(context)
+              .homeIndex,
           builder: (context, snapshot) {
             var indexInfo = snapshot.data;
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
               );
-            } else if(snapshot.data == null){
+            } else if (snapshot.data == null) {
               return InkWell(
-                onTap: (){
-                  BlocProviders.of<ApplicationBloc>(context)
-                      .getUserTypes();
-                  BlocProviders.of<ApplicationBloc>(context)
-                      .getNoticeInfo();
-                  BlocProviders.of<ApplicationBloc>(context)
-                      .getIndexInfo();
+                onTap: () {
+                  BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+                  BlocProviders.of<ApplicationBloc>(context).getNoticeInfo();
+                  BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
                 },
                 child: Center(
                   child: Column(
@@ -150,13 +164,7 @@ class _HomePageState extends State<HomePage> {
                                           children: <Widget>[
                                             GestureDetector(
                                               onTap: () {
-                                                if (userInfo == null ||
-                                                    userInfo.isCertification ==
-                                                        0) {
-                                                  Fluttertoast.showToast(
-                                                      msg: "请先完成业主认证");
-                                                  return;
-                                                }
+                                                if (checkIfCertificated(context))
                                                 routeToWeb(
                                                     context, "fkgl", indexInfo);
                                               },
@@ -180,6 +188,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             GestureDetector(
                                               onTap: () {
+                                                if (checkIfCertificated(context))
                                                 routeToWeb(
                                                     context, "zwy", indexInfo);
                                               },
@@ -203,6 +212,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             GestureDetector(
                                               onTap: () {
+                                                if (checkIfCertificated(context))
                                                 routeToWeb(
                                                     context, "zsq", indexInfo);
                                               },
@@ -226,6 +236,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             GestureDetector(
                                               onTap: () {
+                                                if (checkIfCertificated(context))
                                                 routeToWeb(
                                                     context, "zjc", indexInfo);
                                               },
@@ -493,10 +504,8 @@ class _HomePageState extends State<HomePage> {
                                         title: "访客系统",
                                         indexId: "fkxt",
                                         index: indexInfo,
-                                        intercept:(userInfo == null ||
-                                            userInfo.isCertification == 0)
-                                            ? "请先完成业主认证"
-                                            : null),
+                                        intercept:userInfo == null ||
+                                            userInfo.isCertification == 0),
 //                                  HomeChip(
 //                                      title: "在线缴费",
 //                                      indexId: "zxjf",

@@ -6,14 +6,15 @@ import 'main_page.dart';
 import 'user_detail_auth_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'widget/district_info_button.dart';
+
 class MinePage extends StatefulWidget {
   @override
   _MinePageState createState() => _MinePageState();
 }
 
 class _MinePageState extends State<MinePage> {
-  PublishSubject<UserDetail> _controllerUserDetailData = PublishSubject();
-  Stream<UserDetail> userDetailData;
+
 
   @override
   void initState() {
@@ -21,18 +22,10 @@ class _MinePageState extends State<MinePage> {
     if (!mounted) {
       return;
     }
+    print('mine init');
     Api.getUserInfo().then((baseResp) {
-      print('baseResp:$baseResp');
       if (baseResp.success()) {
         BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
-      }
-    });
-    BlocProviders.of<ApplicationBloc>(context).getUserTypes();
-    userDetailData = _controllerUserDetailData.stream;
-    Api.getUserDetail().then((baseResp) {
-      if (baseResp.success()) {
-        print('$baseResp');
-        _controllerUserDetailData.add(baseResp.data);
       }
     });
   }
@@ -40,7 +33,6 @@ class _MinePageState extends State<MinePage> {
   @override
   void dispose() {
     super.dispose();
-    _controllerUserDetailData.close();
   }
 
   @override
@@ -54,17 +46,12 @@ class _MinePageState extends State<MinePage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          Api.getUserDetail().then((baseResp) {
-            if (baseResp.success()) {
-              print('$baseResp');
-              _controllerUserDetailData.add(baseResp.data);
-            }
-          });
+          BlocProviders.of<ApplicationBloc>(context).getUserDetail();
           BlocProviders.of<ApplicationBloc>(context).getUserTypes();
           return BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
         },
         child: StreamBuilder<UserInfo>(
-          builder: (context, AsyncSnapshot<UserInfo> userSnap) {
+          builder: (_, AsyncSnapshot<UserInfo> userSnap) {
             if (userSnap.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
@@ -115,39 +102,10 @@ class _MinePageState extends State<MinePage> {
                             height: ScreenUtil().setHeight(350),
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: IntrinsicWidth(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: <Widget>[
-                                  StreamBuilder<DistrictInfo>(
-                                      stream: BlocProviders.of<ApplicationBloc>(
-                                              context)
-                                          .currentDistrict,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData &&
-                                            !snapshot.hasError) {
-                                          return Text(
-                                              snapshot.data.districtName);
-                                        }
-                                        return Text("未选择${Strings.districtClass}");
-                                      }),
-                                  Icon(
-                                    Icons.location_on,
-                                    size: 12,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.all(18.0),
                           child: StreamBuilder<UserDetail>(
-                              stream: userDetailData,
+                              stream: BlocProviders.of<ApplicationBloc>(context).userDetailStream,
                               builder: (context, snapshot) {
                                 String url = snapshot.data?.avatar;
                                 //snapshot.data?.nickName??userInfo.userName
@@ -277,144 +235,6 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                   ),
-//                  SizedBox(
-//                    height: 12,
-//                  ),
-//                  GestureDetector(
-//                    onTap: () {
-//                      Navigator.of(context).pushNamed(MemberApplyPage.routeName);
-//                    },
-//                    child: Container(
-//                      color: Colors.white,
-//                      padding: EdgeInsets.only(left: 15),
-//                      child: HomeTitleSliver(
-//                        leadingIcon: Icon(Icons.storage,size:ScreenUtil().setWidth(50),color: Color(0xff00007c),),
-//                        mainTitle: "我的申请",
-//                        subTitle: "",
-//                        tailText: "",
-//                      ),
-//                    ),
-//                  ),
-
-                  StreamBuilder<bool>(
-                      stream: hasSocietyRecordPermission(context),
-                      builder: (context, snapshot) {
-                        if (snapshot.data != true) {
-                          return Container();
-                        }
-                        return HomeTitleSliver(
-                          leadingIcon: Container(
-                            height: ScreenUtil().setHeight(70),
-                            width: ScreenUtil().setWidth(10),
-                            color: Color(0xff00007c),
-                          ),
-                          mainTitle: "社区记录",
-                          subTitle: "Society Records",
-                          tailText: "更多",
-                        );
-                      }),
-                  StreamBuilder<bool>(
-                      stream: hasSocietyRecordPermission(context),
-                      builder: (context, snapshot) {
-                        if (snapshot.data != true) {
-                          return Container();
-                        }
-                        return Material(
-                          type: MaterialType.card,
-                          elevation: 1,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: ScreenUtil().setHeight(42),
-                              horizontal: ScreenUtil().setWidth(42),
-                            ),
-                            color: Colors.white,
-                            child: Wrap(
-                              alignment: WrapAlignment.start,
-                              children: <Widget>[
-                                HomeChip(
-                                  color: const Color(0xff00007c),
-                                  title: "访客记录",
-                                  indexId: 'fkjl',
-                                  index: indexInfo,
-                                ),
-//                          HomeChip(
-//                            title: "投诉记录",
-//                            indexId: 'tsjl',
-//                            index: indexInfo,
-//                          ),
-//                          HomeChip(
-//                            title: "缴费记录",
-//                            indexId: 'jfjl',
-//                            index: indexInfo,
-//                          ),
-//                          HomeChip(
-//                            title: "调解档案",
-//                            indexId: 'tjda',
-//                            index: indexInfo,
-//                          ),
-//                          HomeChip(
-//                            title: "网上110记录",
-//                            indexId: 'ws110jl',
-//                            wrap: true,
-//                            index: indexInfo,
-//                          ),
-                                HomeChip(
-                                  title: "巡逻记录",
-                                  indexId: 'xljl',
-                                  index: indexInfo,
-                                ),
-//                          HomeChip(
-//                            title: "小区报修记录",
-//                            indexId: 'xqbxjl',
-//                            index: indexInfo,
-//                            wrap: true,
-//                          ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-//                  HomeTitleSliver(
-//                    leadingIcon: Container(
-//                      height: ScreenUtil().setHeight(70),
-//                      width: ScreenUtil().setWidth(10),
-//                      color: Color(0xffff6b00),
-//                    ),
-//                    mainTitle: "商业服务",
-//                    subTitle: "Business Service",
-//                    tailText: "更多",
-//                  ),
-//                  Material(
-//                    type: MaterialType.card,
-//                    elevation: 1,
-//                    child: Container(
-//                      padding: EdgeInsets.symmetric(
-//                        vertical: ScreenUtil().setHeight(42),
-//                        horizontal: ScreenUtil().setWidth(42),
-//                      ),
-//                      color: Colors.white,
-//                      child: Wrap(
-//                        children: <Widget>[
-//                          HomeChip(
-//                            color: const Color(0xffff6b00),
-//                            title: "我的订单",
-//                            indexId: 'wddd',
-//                            index: indexInfo,
-//                          ),
-//                          HomeChip(
-//                            title: "购物车",
-//                            indexId: 'gwc',
-//                            index: indexInfo,
-//                          ),
-//                          HomeChip(
-//                            title: "我的收藏",
-//                            indexId: 'wdsc',
-//                            index: indexInfo,
-//                          ),
-//                        ],
-//                      ),
-//                    ),
-//                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -424,30 +244,7 @@ class _MinePageState extends State<MinePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-//                        InkWell(
-//                          onTap: (){
-//                            Navigator.of(context).pushNamed(MemberApplyPage.routeName);
-//                          },
-//                          child: Column(
-//                            children: <Widget>[
-//                              Icon(
-//                                Icons.person_outline,
-//                                color: Colors.blue,
-//                              ),
-//                              Text("成员申请")
-//                            ],
-//                          ),
-//                        ),
-//                        Column(
-//                          children: <Widget>[
-//                            Icon(
-//                              Icons.help_outline,
-//                              color: Colors.green,
-//                            ),
-//                            Text("关于我们")
-//                          ],
-//                        ),
-                        InkWell(
+                        GestureDetector(
                           onTap: () {
                             BlocProviders.of<ApplicationBloc>(context).logout();
                           },
@@ -510,99 +307,22 @@ class _MinePageState extends State<MinePage> {
   ///动作条
   buildActions(BuildContext context) {
     return <Widget>[
-      //DistrictInfoButton(),
+      DistrictInfoButton(),
     ];
   }
 
   ///未认证
   Widget _buildUnauthorized(BuildContext context, UserInfo data) {
-    var colorFaceButton = Colors.blue;
-//    return StreamBuilder<bool>(
-//        stream: hasPropertyPermission(context),
-//        builder: (context, snapshot) {
-//          if (snapshot.data == true) {
-//            return _buildPropertyUserMin(context, data);
-//          } else if (snapshot == null) {
-//            return Center(
-//              child: CircularProgressIndicator(),
-//            );
-//          }
     return Stack(
       children: <Widget>[
         AbsorbPointer(
           absorbing: true,
           child: _buildMine(context, data),
         ),
-        AlertDialog(
-          title: Text(
-            "您还未通过认证,只能使用首页功能",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.blueGrey,
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                BlocProviders.of<MainIndexBloc>(context).toIndex(PAGE_HOME);
-              },
-              textColor: Colors.blueGrey,
-              child: Text(
-                "暂不认证",
-                maxLines: 1,
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                BlocProviders.of<ApplicationBloc>(context).logout();
-              },
-              textColor: Colors.blueGrey,
-              child: Text(
-                "退出登录",
-                maxLines: 1,
-              ),
-            )
-          ],
-          content: Container(
-            margin: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(color: colorFaceButton),
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            child: ListTile(
-              leading: Icon(
-                Icons.fingerprint,
-                size: 40,
-                color: colorFaceButton,
-              ),
-              title: Text("录入人脸照片",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: colorFaceButton)),
-              subtitle:
-                  Text("一键录入,简单高效", style: TextStyle(color: colorFaceButton)),
-              trailing: Icon(
-                Icons.arrow_forward,
-                color: colorFaceButton,
-              ),
-              onTap: () {
-                Navigator.of(context)
-                    .pushNamed(UserDetailAuthPage.routeName)
-                    .then((v) {
-                  //获取当前用户信息
-                  Future.delayed(Duration(milliseconds: 500), () {
-                    return Api.getUserInfo().then((baseResp) {
-                      print('baseResp:$baseResp');
-                      if (baseResp.success()) {
-                        BlocProviders.of<ApplicationBloc>(context)
-                            .login(baseResp.data);
-                      }
-                    });
-                  });
-                });
-              },
-            ),
-          ),
-        )
+        buildCertificationDialog(context,(){
+            //BlocProviders.of<MainIndexBloc>(context).toIndex(PAGE_HOME);
+            IndexNotification(PAGE_HOME).dispatch(context);
+        })
       ],
     );
   }
@@ -669,7 +389,7 @@ class _MinePageState extends State<MinePage> {
                         Padding(
                           padding: const EdgeInsets.all(18.0),
                           child: StreamBuilder<UserDetail>(
-                              stream: userDetailData,
+                              stream: BlocProviders.of<ApplicationBloc>(context).userDetailStream,
                               builder: (context, snapshot) {
                                 String url = snapshot.data?.avatar;
                                 //snapshot.data?.nickName??userInfo.userName

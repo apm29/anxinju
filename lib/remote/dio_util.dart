@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:ease_life/main.dart';
 import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
+import 'package:ease_life/res/strings.dart';
 import 'package:flutter/foundation.dart';
 
 typedef DioErrorCallback = dynamic Function(DioError);
@@ -14,7 +15,7 @@ typedef ProcessRawJson<T> = T Function(dynamic);
 const KEY_HEADER_TOKEN = "Authorization";
 const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
 const VALUE_HEADER_CONTENT_TYPE_FORM = "multipart/form-data";
-const BASE_URL = "http://axj.ciih.net/";
+const BASE_URL = Configs.BaseUrl;
 
 class DioUtil {
   Dio _dioInstance;
@@ -132,6 +133,7 @@ class DioUtil {
     bool formData = false,
     bool addAuthorization = true,
   }) async {
+    print('post $path');
     return _dioInstance
         .post<Map<String, dynamic>>(path,
             data: !formData ? data : FormData.from(data),
