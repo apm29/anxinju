@@ -263,16 +263,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       ],
                                     ),
                                   ),
-//                          Container(
-//                            padding: EdgeInsets.all(8),
-//                            color: Colors.white,
-//                            child: IntrinsicWidth(
-//                              child: Row(
-//                                mainAxisSize: MainAxisSize.min,
-//                                children: buildPagerIndicator(),
-//                              ),
-//                            ),
-//                          )
                                 ],
                               ),
                             ),
