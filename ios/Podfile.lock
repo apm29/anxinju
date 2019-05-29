@@ -32,6 +32,12 @@ PODS:
   - FMDB/standard (2.7.5)
   - image_picker (0.0.1):
     - Flutter
+  - JCore (2.0.1)
+  - JPush (3.2.0):
+    - JCore (< 3.0.0, >= 2.0.0)
+  - jpush_flutter (0.0.2):
+    - Flutter
+    - JPush
   - MJExtension (3.0.17)
   - package_info (0.0.1):
     - Flutter
@@ -61,6 +67,7 @@ DEPENDENCIES:
   - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - jpush_flutter (from `.symlinks/plugins/jpush_flutter/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
@@ -73,6 +80,8 @@ SPEC REPOS:
     - AMapFoundation
     - AMapLocation
     - FMDB
+    - JCore
+    - JPush
     - MJExtension
 
 EXTERNAL SOURCES:
@@ -102,6 +111,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
+  jpush_flutter:
+    :path: ".symlinks/plugins/jpush_flutter/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
   path_provider:
@@ -132,6 +143,9 @@ SPEC CHECKSUMS:
   fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
+  JCore: 8425fb3f85f1400f9bc8ccf8121cd5694a790f3b
+  JPush: 8459e7a709ad86f95884fcb49cbd57a6da24744e
+  jpush_flutter: d7e3a79466eb9447fd940233f02661b514f137c6
   MJExtension: 74ec83124a68891619fb7ba9c5c811bbf1691076
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259

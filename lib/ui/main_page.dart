@@ -38,6 +38,7 @@ class MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    initPlatformState(context);
     if (mounted) BlocProviders.of<ApplicationBloc>(context).getUserTypes();
   }
 
@@ -73,6 +74,7 @@ class MainPageState extends State<MainPage> {
           return true;
         },
         child: Scaffold(
+          key: appKey,
           body: Container(
             color: Colors.grey[200],
             child: buildContent(),

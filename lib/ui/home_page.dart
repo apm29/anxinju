@@ -24,13 +24,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (!mounted) {
       return;
     }
-    _animationController =
-        AnimationController(
-            duration: Duration(milliseconds: 2800), vsync: this);
+    _animationController = AnimationController(
+        duration: Duration(milliseconds: 2800), vsync: this);
     print("home init");
     //_animationController.forward();
   }
-
 
   @override
   void dispose() {
@@ -59,9 +57,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
       body: StreamBuilder<Index>(
-          stream: BlocProviders
-              .of<ApplicationBloc>(context)
-              .homeIndex,
+          stream: BlocProviders.of<ApplicationBloc>(context).homeIndex,
           builder: (context, snapshot) {
             var indexInfo = snapshot.data;
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -164,9 +160,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           children: <Widget>[
                                             GestureDetector(
                                               onTap: () {
-                                                if (checkIfCertificated(context))
-                                                routeToWeb(
-                                                    context, "fkgl", indexInfo);
+                                                if (checkIfCertificated(
+                                                    context))
+                                                  routeToWeb(context, "fkgl",
+                                                      indexInfo);
                                               },
                                               child: Padding(
                                                 padding:
@@ -188,9 +185,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             ),
                                             GestureDetector(
                                               onTap: () {
-                                                if (checkIfCertificated(context))
-                                                routeToWeb(
-                                                    context, "zwy", indexInfo);
+                                                if (checkIfCertificated(
+                                                    context))
+                                                  routeToWeb(context, "zwy",
+                                                      indexInfo);
                                               },
                                               child: Padding(
                                                 padding:
@@ -212,9 +210,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             ),
                                             GestureDetector(
                                               onTap: () {
-                                                if (checkIfCertificated(context))
-                                                routeToWeb(
-                                                    context, "zsq", indexInfo);
+                                                if (checkIfCertificated(
+                                                    context))
+                                                  routeToWeb(context, "zsq",
+                                                      indexInfo);
                                               },
                                               child: Padding(
                                                 padding:
@@ -236,9 +235,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             ),
                                             GestureDetector(
                                               onTap: () {
-                                                if (checkIfCertificated(context))
-                                                routeToWeb(
-                                                    context, "zjc", indexInfo);
+                                                if (checkIfCertificated(
+                                                    context))
+                                                  routeToWeb(context, "zjc",
+                                                      indexInfo);
                                               },
                                               child: Padding(
                                                 padding:
@@ -494,20 +494,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         title: "访客系统",
                                         indexId: "fkxt",
                                         index: indexInfo,
-                                        intercept:userInfo == null ||
-                                            userInfo.isCertification == 0),
+                                        intercept: true),
 //                                  HomeChip(
 //                                      title: "在线缴费",
 //                                      indexId: "zxjf",
 //                                      index: indexInfo),
                                     HomeChip(
-                                        title: "车辆管理",
-                                        indexId: "clgl",
-                                        index: indexInfo),
+                                      title: "车辆管理",
+                                      indexId: "clgl",
+                                      index: indexInfo,
+                                      intercept: true,
+                                    ),
                                     HomeChip(
-                                        title: "维护报修",
-                                        indexId: "whbx",
-                                        index: indexInfo),
+                                      title: "维护报修",
+                                      indexId: "whbx",
+                                      index: indexInfo,
+                                      intercept: true,
+                                    ),
 //                                  HomeChip(
 //                                      title: "暂住申报",
 //                                      indexId: "zzsb",

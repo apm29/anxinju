@@ -9,4 +9,5 @@ class Strings{
 class Configs{
   static const AMapKey = "d712d41f19e76ca74b673f9d5637af8a";
   static const BaseUrl = "http://axj.ciih.net/";
+  static const JPushKey = "a175ef122d6568c5bec7cd53";
 }
