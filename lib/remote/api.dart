@@ -250,7 +250,6 @@ class Api {
     return DioUtil().postAsync(
         path: "/business/housedictInfo1/getAllUnit1",
         jsonProcessor: (s) {
-          print('$s');
           if (s is List) {
             return s.map((i) => i.toString()).toList();
           }
@@ -268,7 +267,6 @@ class Api {
     return DioUtil().postAsync(
         path: "/business/housedictInfo1/getAllRoom1",
         jsonProcessor: (s) {
-          print('$s');
           if (s is List) {
             return s.map((i) => i.toString()).toList();
           }
@@ -290,6 +288,22 @@ class Api {
         "districtId":districtId,
         "addr":address
       }
+    );
+  }
+
+  static Future<BaseResponse<List<HouseDetail>>> getMyHouse(int districtId){
+    return DioUtil().postAsync<List<HouseDetail>>(
+      path: "/business/houseInfo/getMyHouse",
+      data: {
+        "districtId":districtId,
+      },
+      jsonProcessor: (s){
+        if (s is List) {
+          return s.map((i) => HouseDetail.fromJson(i)).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
     );
   }
 }

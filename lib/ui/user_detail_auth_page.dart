@@ -233,7 +233,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                       },
                       color: Colors.blue,
                       child: Text(
-                        "提交",
+                        "下一步",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

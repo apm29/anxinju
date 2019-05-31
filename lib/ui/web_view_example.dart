@@ -324,8 +324,10 @@ class _WebViewExampleState extends State<WebViewExample> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
   WebViewController controller;
-  final _focusNode = FocusNode();
-  final TextEditingController textController = TextEditingController();
+  final _focusNode1 = FocusNode();
+  final _focusNode2 = FocusNode();
+  final TextEditingController textController1 = TextEditingController();
+  final TextEditingController textController2 = TextEditingController();
   final PublishSubject<String> titleController = PublishSubject();
   final GlobalKey<EditableTextState> editKey = GlobalKey();
 
@@ -384,150 +386,186 @@ class _WebViewExampleState extends State<WebViewExample> {
             DistrictInfoButton(
               callback: (district) {
                 controller?.reload();
-                print('hasFocus:${_focusNode.hasFocus}');
+                print('hasFocus:${_focusNode1.hasFocus}');
                 FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
-//            SampleMenu(_controller.future, () {
-//              FocusScope.of(context).requestFocus(FocusNode());
-//            }),
+            SampleMenu(_controller.future, () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            }),
           ],
         ),
-        body: Builder(builder: (BuildContext context) {
-          return Stack(
-            children: <Widget>[
-              TextField(
-                autofocus: false,
-                focusNode: _focusNode,
-                controller: textController,
-                onChanged: (text) {
-                  controller.evaluateJavascript('''
-                   if(current != null){
-                    current.value = '${textController.text}';
-                    current.selectionStart = ${textController.selection.start};
-                    current.selectionEnd = ${textController.selection.end};
-                    current.dispatchEvent(new Event('input'));
-                   }
-                  ''');
-                },
-                onSubmitted: (text) {
-                  controller.evaluateJavascript('''
-                  if(current != null)
-                    current.submit();
-                  ''');
-                  _focusNode.unfocus();
-                },
-              ),
-              WebView(
-                initialUrl: widget.initUrl ?? 'https://flutter.dev',
-                javascriptMode: JavascriptMode.unrestricted,
-                onWebViewCreated: (WebViewController webViewController) {
-                  _controller.complete(webViewController);
-                  controller = webViewController;
-                },
-                // ignore: prefer_collection_literals
-                javascriptChannels: <JavascriptChannel>[
-                  _toasterJavascriptChannel(context),
-                  _dialogJavascriptChannel(context),
-                  _filerJavascriptChannel(context),
-                  _userJavascriptChannel(context)
-                ].toSet(),
-                navigationDelegate: (NavigationRequest request) {
-                  print('allowing navigation to $request');
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: Builder(builder: (BuildContext context) {
+                return Stack(
+                  children: <Widget>[
+                    TextField(
+                      autofocus: false,
+                      focusNode: _focusNode1,
+                      controller: textController1,
+                      onChanged: (text) {
+                        controller.evaluateJavascript('''
+                         if(current != null){
+                          current.value = '${textController1.text}';
+                          current.selectionStart = ${textController1.selection.start};
+                          current.selectionEnd = ${textController1.selection.end};
+                          current.dispatchEvent(new Event('input'));
+                         }
+                        ''');
+                      },
+                      onSubmitted: (text) {
+                        controller.evaluateJavascript('''
+                        if(current != null)
+                          current.submit();
+                        ''');
+                        _focusNode1.unfocus();
+                      },
+                    ),
+                    TextField(
+                      autofocus: false,
+                      focusNode: _focusNode2,
+                      controller: textController2,
+                      onChanged: (text) {
+                        controller.evaluateJavascript('''
+                         if(current != null){
+                          current.value = '${textController2.text}';
+                          current.selectionStart = ${textController2.selection.start};
+                          current.selectionEnd = ${textController2.selection.end};
+                          current.dispatchEvent(new Event('input'));
+                         }
+                        ''');
+                      },
+                      onSubmitted: (text) {
+                        controller.evaluateJavascript('''
+                        if(current != null)
+                          current.submit();
+                        ''');
+                        _focusNode2.unfocus();
+                      },
+                    ),
+                    WebView(
+                      initialUrl: widget.initUrl ?? 'https://flutter.dev',
+                      javascriptMode: JavascriptMode.unrestricted,
+                      onWebViewCreated: (WebViewController webViewController) {
+                        _controller.complete(webViewController);
+                        controller = webViewController;
+                      },
+                      // ignore: prefer_collection_literals
+                      javascriptChannels: <JavascriptChannel>[
+                        _toasterJavascriptChannel(context),
+                        _dialogJavascriptChannel(context),
+                        _filerJavascriptChannel(context),
+                        _userJavascriptChannel(context)
+                      ].toSet(),
+                      navigationDelegate: (NavigationRequest request) {
+                        print('allowing navigation to $request');
 //            if(!request.url.startsWith("http")){
 //              return NavigationDecision.prevent;
 //            }
 //                _focusNode.unfocus();
-                  return NavigationDecision.navigate;
-                },
-                onPageFinished: (String url) {
-                  print('Page finished loading: $url');
-                  controller
-                      .evaluateJavascript(
-                          'document.getElementsByTagName("title")[0].innerText')
-                      .then((title) {
-                    title = title.replaceAll('"', "");
-                    if (title == "null" || title == "undefined") {
-                      title = null;
-                    }
-                    titleController.add(title);
-                  });
-                  if (Platform.isAndroid) {
-                    controller.evaluateJavascript('''
-                    var inputs = document.getElementsByTagName('input');
-                    var textArea = document.getElementsByTagName('textarea');
-                    var current;
-                    var lastFocusElement = current;
-                    for (var i = 0; i < inputs.length; i++) {
-                      inputs[i].addEventListener('click', (e) => {
-                        var json = {
-                          "funcName": "requestFocus",
-                          "data": {
-                            "initText": e.target.value,
-                            "selectionStart":e.target.selectionStart,
-                            "selectionEnd":e.target.selectionEnd
+                        return NavigationDecision.navigate;
+                      },
+                      onPageFinished: (String url) {
+                        print('Page finished loading: $url');
+                        controller
+                            .evaluateJavascript(
+                                'document.getElementsByTagName("title")[0].innerText')
+                            .then((title) {
+                          title = title.replaceAll('"', "");
+                          if (title == "null" || title == "undefined") {
+                            title = null;
                           }
-                        };
-                        lastFocusElement = current;
-                        current = e.target;
-                        var param = JSON.stringify(json);
-                        console.log(param);
-                        //if(lastFocusElement == current){
-                        //  return;
-                        //}
-                        UserState.postMessage(param);
-                      })
-                      //inputs[i].addEventListener('blur',(e)=>{
-                      //  var json = {
-                      //    "funcName":"requestFocusout",
-                      //  };
-                      //  if(eq(current,e.target) ){
-                      //    var param = JSON.stringify(json);
-                      //    console.log(param);
-                      //    UserState.postMessage(param);
-                      //  }
-                      //})
-                    }
-                    for (var i = 0; i < textArea.length; i++) {
-                      console.log(i);
-                      textArea[i].addEventListener('click', (e) => {
-                        var json = {
-                          "funcName": "requestFocus",
-                          "data": {
-                            "initText": e.target.value,
-                            "selectionStart":e.target.selectionStart,
-                            "selectionEnd":e.target.selectionEnd
+                          titleController.add(title);
+                        });
+                        if (Platform.isAndroid) {
+                          controller.evaluateJavascript('''
+                          var inputs = document.getElementsByTagName('input');
+                          var textArea = document.getElementsByTagName('textarea');
+                          var current;
+                          var lastFocusElement = current;
+                          for (var i = 0; i < inputs.length; i++) {
+                            inputs[i].addEventListener('click', (e) => {
+                              var json = {
+                                "funcName": "requestFocus",
+                                "data": {
+                                  "initText": e.target.value,
+                                  "selectionStart":e.target.selectionStart,
+                                  "selectionEnd":e.target.selectionEnd
+                                }
+                              };
+                              json.data.refocus = (document.activeElement == current);
+                              //if(document.activeElement == current){
+                              //  return;
+                              //}
+                              lastFocusElement = current;
+                              current = e.target;
+                              var param = JSON.stringify(json);
+                              console.log(param);
+                              //if(lastFocusElement == current){
+                              //  return;
+                              //}
+                              UserState.postMessage(param);
+                            })
+                            //inputs[i].addEventListener('blur',(e)=>{
+                            //  var json = {
+                            //    "funcName":"requestFocusout",
+                            //  };
+                            //  if(eq(current,e.target) ){
+                            //    var param = JSON.stringify(json);
+                            //    console.log(param);
+                            //    UserState.postMessage(param);
+                            //  }
+                            //})
                           }
-                        };
-                        lastFocusElement = current;
-                        current = e.target;
-                        var param = JSON.stringify(json);
-                        console.log(param);
-                        //if(lastFocusElement == current){
-                        //  return;
-                        //}
-                        UserState.postMessage(param);
-                      })
-                    
-                      //  console.log('textArea focusout');
-                      //  var json = {
-                      //    "funcName":"requestFocusout",
-                      //  };
-                      //  if(eq(current,e.target )  ){
-                      //    var param = JSON.stringify(json);
-                      //    console.log(param);
-                      //    UserState.postMessage(param);
-                      //  }
-                      //})
-                    };
-                    console.log('===JS CODE INJECTED INTO MY WEBVIEW===');
-                  ''');
-                  }
-                },
-              ),
-            ],
-          );
-        }),
+                          for (var i = 0; i < textArea.length; i++) {
+                            console.log(i);
+                            textArea[i].addEventListener('click', (e) => {
+                              var json = {
+                                "funcName": "requestFocus",
+                                "data": {
+                                  "initText": e.target.value,
+                                  "selectionStart":e.target.selectionStart,
+                                  "selectionEnd":e.target.selectionEnd
+                                }
+                              };
+                              //if(document.activeElement == current){
+                              //  return;
+                              //}
+                              json.data.refocus = (document.activeElement == current);
+                              lastFocusElement = current;
+                              current = e.target;
+                              var param = JSON.stringify(json);
+                              console.log(param);
+                              //if(lastFocusElement == current){
+                              //  return;
+                              //}
+                              UserState.postMessage(param);
+                            })
+                          
+                            //  console.log('textArea focusout');
+                            //  var json = {
+                            //    "funcName":"requestFocusout",
+                            //  };
+                            //  if(eq(current,e.target )  ){
+                            //    var param = JSON.stringify(json);
+                            //    console.log(param);
+                            //    UserState.postMessage(param);
+                            //  }
+                            //})
+                          };
+                          console.log('===JS CODE INJECTED INTO MY WEBVIEW===');
+                        ''');
+                        }
+                      },
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
 //        floatingActionButton: favoriteButton(),
       ),
     );
@@ -630,10 +668,10 @@ class _WebViewExampleState extends State<WebViewExample> {
                   .pushReplacementNamed("${jsonMap['data']['routeName']}");
               break;
             case "requestFocus":
-              doOnTextEdit(jsonMap['data']);
+              doOnTextEdit(context, jsonMap['data']);
               break;
             case "requestFocusout":
-              _focusNode.unfocus();
+              _focusNode1.unfocus();
               break;
             case "uploadFile":
               doUploadFile(jsonMap['data']['callbackName']);
@@ -717,30 +755,64 @@ class _WebViewExampleState extends State<WebViewExample> {
         });
   }
 
-  void doOnTextEdit(Map<String, dynamic> data) {
-    if (_focusNode.hasFocus) {
-      //让隐藏TextField失去焦点
-      showAndroidKeyboard();
+  void doOnTextEdit(BuildContext context, Map<String, dynamic> data) {
+    bool refocus = data['refocus'] as bool;
+    if(_focusNode2.hasFocus){
+      if (!refocus) FocusScope.of(context).requestFocus(_focusNode1);
+      //FocusScope.of(context).requestFocus(_focusNode);
+      if (!_focusNode1.hasFocus) {
+        //hideAndroidKeyboard();
+        showAndroidKeyboard();
+      }
+      //把初始文本设置给隐藏TextField
+      String initText = data['initText'];
+      var selectionStart = data['selectionStart'];
+      var selectionEnd = data['selectionEnd'];
+
+      int end = initText.length;
+      int start = initText.length;
+      if (selectionEnd is int) {
+        end = selectionEnd;
+      }
+      if (selectionStart is int) {
+        start = selectionEnd;
+      }
+      print(selectionEnd);
+      textController1.value = TextEditingValue(
+        text: initText,
+        selection: TextSelection(baseOffset: start, extentOffset: end),
+      );
+      //TextField请求显示键盘
+      FocusScope.of(context).requestFocus(_focusNode1);
+    } else{
+      if (!refocus) FocusScope.of(context).requestFocus(_focusNode2);
+      //FocusScope.of(context).requestFocus(_focusNode);
+      if (!_focusNode2.hasFocus) {
+        //hideAndroidKeyboard();
+        showAndroidKeyboard();
+      }
+      //把初始文本设置给隐藏TextField
+      String initText = data['initText'];
+      var selectionStart = data['selectionStart'];
+      var selectionEnd = data['selectionEnd'];
+
+      int end = initText.length;
+      int start = initText.length;
+      if (selectionEnd is int) {
+        end = selectionEnd;
+      }
+      if (selectionStart is int) {
+        start = selectionEnd;
+      }
+      print(selectionEnd);
+      textController2.value = TextEditingValue(
+        text: initText,
+        selection: TextSelection(baseOffset: start, extentOffset: end),
+      );
+      //TextField请求显示键盘
+      FocusScope.of(context).requestFocus(_focusNode2);
     }
-    //把初始文本设置给隐藏TextField
-    String initText = data['initText'];
-    var selectionStart = data['selectionStart'];
-    var selectionEnd = data['selectionEnd'];
-    int end = initText.length;
-    int start = initText.length;
-    if (selectionEnd is int) {
-      end = selectionEnd;
-    }
-    if (selectionStart is int) {
-      start = selectionEnd;
-    }
-    print(selectionEnd);
-    textController.value = TextEditingValue(
-      text: initText,
-      selection: TextSelection(baseOffset: start, extentOffset: end),
-    );
-    //TextField请求显示键盘
-    FocusScope.of(context).requestFocus(_focusNode);
+
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
@@ -799,19 +871,20 @@ class _WebViewExampleState extends State<WebViewExample> {
   void doGetToken(dynamic data) {
     if (isLogin()) {
       var javascriptString =
-          '${data["callbackName"]}("${getToken()}","${getCurrentSocietyId()}","${data["backRoute"]}")';
+          '${data["callbackName"]}("${getToken()}","${getCurrentDistrictId()}","${data["backRoute"]}")';
 
       print('$javascriptString');
 
       controller.evaluateJavascript(javascriptString);
     } else {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) {
         return LoginPage(
           backRoute: data["backRoute"],
         );
       })).then((backRoute) {
         var javascriptString =
-            '${data["callbackName"]}("${getToken()}","${getCurrentSocietyId()}","${data["backRoute"]}")';
+            '${data["callbackName"]}("${getToken()}","${getCurrentDistrictId()}","${data["backRoute"]}")';
 
         controller.evaluateJavascript(javascriptString);
       });
@@ -978,8 +1051,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           contact = [originData.toString()];
         }
         print('$contact');
-        FlutterSms.sendSMS(
-            message: jsonMap['content'], recipients: contact);
+        FlutterSms.sendSMS(message: jsonMap['content'], recipients: contact);
       } else {
         Fluttertoast.showToast(msg: "当前设备不支持发送短信");
       }

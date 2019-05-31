@@ -1,5 +1,7 @@
+import 'package:ease_life/providers/providers.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:ease_life/res/strings.dart';
+import 'package:provider/provider.dart';
 
 import '../index.dart';
 import '../ui/home_page.dart';
@@ -73,18 +75,26 @@ class MainPageState extends State<MainPage> {
           }
           return true;
         },
-        child: Scaffold(
-          key: appKey,
-          body: Container(
-            color: Colors.grey[200],
-            child: buildContent(),
-          ),
-          bottomNavigationBar: buildBottomNavigationBar(),
+        child: Consumer<MainIndexModel>(
+          builder: (context,model,child){
+            _pageController = PageController( initialPage:model.currentIndex);
+            return Scaffold(
+              body: Container(
+                color: Colors.grey[200],
+                child: buildContent(context),
+              ),
+              bottomNavigationBar: buildBottomNavigationBar(),
+            );
+          },
         ));
   }
 
   Widget buildBottomNavigationBar() {
-    return BottomBar(bottomKey, _pageController);
+    return Consumer<MainIndexModel>(
+      builder: (context,value,child){
+        return BottomBar(bottomKey, _pageController, value.currentIndex);
+      },
+    );
   }
 
   void changePage(BuildContext context, int pageIndex) {
@@ -92,7 +102,7 @@ class MainPageState extends State<MainPage> {
     bottomKey.currentState.changePage(pageIndex);
   }
 
-  buildContent() {
+  buildContent(BuildContext context) {
     return NotificationListener<IndexNotification>(
       onNotification: (notification) {
         changePage(context, notification.index);
@@ -114,7 +124,8 @@ class MainPageState extends State<MainPage> {
           }
         },
         onPageChanged: (index) {
-          bottomKey.currentState.changePage(index);
+          //bottomKey.currentState.changePage(index);
+          Provider.of<MainIndexModel>(context).changeIndex(index);
         },
       ),
     );
@@ -182,6 +193,6 @@ class MainPageState extends State<MainPage> {
 
 class IndexNotification extends Notification {
   final int index;
-
+  String indexId;
   IndexNotification(this.index);
 }

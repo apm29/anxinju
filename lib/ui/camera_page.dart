@@ -215,6 +215,12 @@ class _FaceIdPageState extends State<FaceIdPage> {
                   }),
                 ),
                 Align(
+                  alignment: Alignment(0, 0.5),
+                  child: Text("注意:匹配人脸时请将脸部对准圆形采集框",style: TextStyle(
+                    color: Colors.blueAccent
+                  ),),
+                ),
+                Align(
                   alignment: Alignment(0, 0.9),
                   child: LayoutBuilder(
                     builder: (_, constraint) {
@@ -326,9 +332,8 @@ class _FaceIdPageState extends State<FaceIdPage> {
                       child: Text("申请成为成员")),
                 ],
               );
-            }).then((_){
-          Navigator.of(context)
-              .pushReplacementNamed(MemberApplyPage.routeName);
+            }).then((_) {
+          Navigator.of(context).pushReplacementNamed(MemberApplyPage.routeName);
         });
       }
     } else {
@@ -354,8 +359,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
 }
 
 class ClipperCamera extends CustomClipper<Rect> {
-  final double width;
-  final double ratio;
+  final double width;  final double ratio;
   final Size constraint;
 
   ClipperCamera(this.width, this.ratio, this.constraint);

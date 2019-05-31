@@ -410,3 +410,65 @@ class UserType {
     return data;
   }
 }
+
+
+class HouseDetail {
+  int id;
+  int houseId;
+  String districtId;
+  String building;
+  String unit;
+  String house;
+  String addr;
+  String phone;
+  String idcard;
+  String name;
+  String userId;
+  String passCode;
+
+  HouseDetail(
+      {this.id,
+        this.houseId,
+        this.districtId,
+        this.building,
+        this.unit,
+        this.house,
+        this.addr,
+        this.phone,
+        this.idcard,
+        this.name,
+        this.userId,
+        this.passCode});
+
+  HouseDetail.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    houseId = json['houseId'];
+    districtId = json['districtId'];
+    building = json['building'];
+    unit = json['unit'];
+    house = json['house'];
+    addr = json['addr'];
+    phone = json['phone'];
+    idcard = json['idcard'];
+    name = json['name'];
+    userId = json['userId'];
+    passCode = json['passCode'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['houseId'] = this.houseId;
+    data['districtId'] = this.districtId;
+    data['building'] = this.building;
+    data['unit'] = this.unit;
+    data['house'] = this.house;
+    data['addr'] = this.addr;
+    data['phone'] = this.phone;
+    data['idcard'] = this.idcard;
+    data['name'] = this.name;
+    data['userId'] = this.userId;
+    data['passCode'] = this.passCode;
+    return data;
+  }
+}

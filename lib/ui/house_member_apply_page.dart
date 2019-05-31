@@ -133,7 +133,8 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                     GestureDetector(
                       onTap: () {
                         if (districtId == null) {
-                          Fluttertoast.showToast(msg: "请先选择${Strings.districtClass}");
+                          Fluttertoast.showToast(
+                              msg: "请先选择${Strings.districtClass}");
                           return;
                         }
                         showRoomPicker(context, districtId).then((address) {
@@ -166,7 +167,30 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                             Fluttertoast.showToast(msg: baseResponse.text);
                             applyKey.currentState.stopLoading();
                             if (baseResponse.success()) {
-                              Navigator.of(context).pop();
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text("申请成功"),
+                                      content: Text.rich(TextSpan(children: [
+                                        TextSpan(text: "您已经完成了住所成员申请,您可以在 "),
+                                        TextSpan(
+                                            text: "我的-住所成员",
+                                            style:
+                                                TextStyle(color: Colors.blue)),
+                                        TextSpan(text: " 页面查看申请进度"),
+                                      ])),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text("确定"))
+                                      ],
+                                    );
+                                  }).then((_) {
+                                Navigator.of(context).pop();
+                              });
                             }
                           },
                           child: Text("发送申请"),
@@ -340,7 +364,8 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                   );
                 } else {
                   return Center(
-                    child: Text(building.data?.text ?? "获取${Strings.districtClass}数据失败"),
+                    child: Text(building.data?.text ??
+                        "获取${Strings.districtClass}数据失败"),
                   );
                 }
               },

@@ -6,11 +6,13 @@ import 'package:ease_life/res/strings.dart';
 import 'package:ease_life/ui/camera_page.dart';
 import 'package:ease_life/ui/web_view_example.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'index.dart';
 import 'persistance/shared_preferences.dart';
+import 'ui/house_member_apply_page.dart';
 import 'ui/login_page.dart';
 import 'ui/main_page.dart';
 import 'ui/user_detail_auth_page.dart';
@@ -151,7 +153,37 @@ Widget buildVisitor(BuildContext context) {
             "未登录,点击登录",
             style: TextStyle(
                 fontWeight: FontWeight.w400,
-                fontSize: 17,
+                fontSize: 18,
+                color: Colors.grey[700]),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget buildError(BuildContext context, Object err) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.of(context).pushNamed(LoginPage.routeName);
+    },
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            Icons.sms_failed,
+            color: Colors.blue,
+            size: 40,
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          Text(
+            "$err",
+            style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 18,
                 color: Colors.grey[700]),
           ),
         ],
@@ -302,26 +334,91 @@ showCertificationDialog(BuildContext context) {
   showDialog(
       context: context,
       builder: (context) {
-        return buildCertificationDialog(context,(){
-          Navigator.of(context).popUntil((r){
+        return buildCertificationDialog(context, () {
+          Navigator.of(context).popUntil((r) {
             return r.settings.name == MainPage.routeName;
           });
-        },showQuit: false);
+        }, showQuit: false);
       });
 }
 
 ///先检查是否登录,再检查是否认证,未认证用户会弹出认证弹框
-bool checkIfCertificated(BuildContext context){
-  if(!isLogin()){
+bool checkIfCertificated(BuildContext context) {
+  if (!isLogin()) {
     Navigator.of(context).pushNamed(LoginPage.routeName);
     return false;
   }
   if (!isCertificated()) {
-    Fluttertoast.showToast(
-        msg: "请先完成${Strings.hostClass}认证");
+    Fluttertoast.showToast(msg: "请先完成${Strings.hostClass}认证");
     showCertificationDialog(context);
     return false;
   } else {
     return true;
   }
+}
+
+void showAuthDialog(BuildContext context, Index indexInfo) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            children: <Widget>[
+              Icon(
+                Icons.warning,
+                color: Colors.blue,
+              ),
+              Text("无可用房屋")
+            ],
+          ),
+          content: Text.rich(TextSpan(children: [
+            TextSpan(
+              text:
+                  "您当前选择的${Strings.districtClass},名下还没有认证${Strings.roomClass},请选择重新认证,申请成为成员或者切换${Strings.districtClass}\r\n如果您已经申请,请在",
+            ),
+            TextSpan(
+                text: "住所成员",
+                style: TextStyle(color: Colors.blue),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    var indexWhere =
+                        indexInfo.menu.indexWhere((i) => i.id == "zscy");
+                    if (indexWhere < 0) {
+                      Navigator.of(context).pop(IndexNotification(PAGE_MINE));
+                    } else {
+                      routeToWeb(context, "zscy", indexInfo);
+                    }
+                  }),
+            TextSpan(
+              text: "查看申请进度",
+            ),
+          ])),
+          actions: <Widget>[
+            FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "取消",
+                  style: TextStyle(color: Colors.blueGrey),
+                )),
+            FlatButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushReplacementNamed(UserDetailAuthPage.routeName);
+                },
+                child: Text("前往认证")),
+            FlatButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushReplacementNamed(MemberApplyPage.routeName);
+                },
+                child: Text("前往申请")),
+          ],
+        );
+      }).then((value) {
+    if (value is IndexNotification) {
+      value.dispatch(context);
+    }
+  });
 }

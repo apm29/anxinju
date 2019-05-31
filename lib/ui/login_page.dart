@@ -13,6 +13,7 @@ import 'widget/lifecycle_widget.dart';
 class LoginPage extends StatefulWidget {
   final String backRoute;
   static String routeName = "/login";
+
   LoginPage({this.backRoute});
 
   @override
@@ -29,9 +30,12 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
   bool _fastLogin = false;
   bool _protocolChecked = true;
   bool _loading = false;
+  bool _showPassword = false;
   GlobalKey<TickerWidgetState> tickSmsKey = GlobalKey();
   GlobalKey<LoadingStateWidgetState> loadingLoginKey = GlobalKey();
   final cancelToken = CancelToken();
+  FocusNode _focusNodePass = FocusNode();
+  FocusNode _focusNodeMobile = FocusNode();
 
   @override
   void initState() {
@@ -55,7 +59,8 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
           Widget loginButton = buildLoginButton(userSnap, context, _fastLogin);
           print('userInfo:${userSnap.data}');
           if (userSnap.hasData && !userSnap.hasError) {
-            return buildLoginSuccess(userSnap.data.isCertification == 0,context);
+            return buildLoginSuccess(
+                userSnap.data.isCertification == 0, context);
           } else {
             return buildLogin(context, loginButton);
           }
@@ -75,11 +80,12 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text(
-                    Strings.appName,
-                    style: TextStyle(fontSize: 20),
-                    textAlign: TextAlign.center,
-                  ),
+//                  Text(
+//                    Strings.appName,
+//                    style: TextStyle(fontSize: 24,color: Colors.indigo),
+//                    textAlign: TextAlign.center,
+//                  ),
+                  Image.asset("images/ic_launcher.png",width: ScreenUtil().setWidth(200),),
                   Text(
                     "智慧生活，安心陪伴",
                     style: TextStyle(fontSize: 12),
@@ -90,14 +96,33 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                     padding: EdgeInsets.all(6),
                     child: TextField(
                       key: ValueKey("name"),
+                      focusNode: _focusNodeMobile,
                       controller: controllerMobile,
                       onChanged: (text) {
                         _nameReady = text.isNotEmpty;
                       },
+                      maxLength: _fastLogin ? 11 : 32,
+                      maxLengthEnforced: true,
+                      buildCounter: (_, {currentLength, maxLength, isFocused}) {
+                        return Container();
+                      },
+                      keyboardType: _fastLogin
+                          ? TextInputType.number
+                          : TextInputType.text,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: _fastLogin ? "电话号码" : "用户名",
-                          hintText: "输入${_fastLogin ? "电话号码" : "用户名"}"),
+                          hintText: "输入${_fastLogin ? "电话号码" : "用户名"}",
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              controllerMobile.clear();
+                            },
+                            child: Icon(Icons.clear),
+                          )),
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (s) {
+                        _focusNodePass.requestFocus();
+                      },
                     ),
                   ),
                   Container(
@@ -105,15 +130,33 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                     padding: EdgeInsets.all(6),
                     child: TextField(
                       key: ValueKey("pass"),
-                      obscureText: true,
+                      focusNode: _focusNodePass,
+                      obscureText: !_showPassword,
                       onChanged: (text) {
                         _passReady = text.isNotEmpty;
                       },
+                      keyboardType: _fastLogin
+                          ? TextInputType.number
+                          : TextInputType.text,
                       decoration: InputDecoration(
                           hintText: "输入${_fastLogin ? "验证码" : "密码"}",
                           labelText: "${_fastLogin ? "验证码" : "密码"}",
-                          border: OutlineInputBorder()),
+                          border: OutlineInputBorder(),
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _showPassword = !_showPassword;
+                              });
+                            },
+                            child: Icon(_showPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                          )),
                       controller: controllerPassword,
+                      textInputAction: TextInputAction.go,
+                      onSubmitted: (s) {
+                        login(context, _fastLogin);
+                      },
                     ),
                   ),
                   Container(
@@ -126,6 +169,8 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                             onChanged: (value) {
                               setState(() {
                                 _fastLogin = value;
+                                controllerMobile.clear();
+                                controllerPassword.clear();
                               });
                             }),
                       ],
@@ -135,10 +180,10 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                       onPressed: () {
                         Navigator.of(context).pushNamed(RegisterPage.routeName);
                       },
-                      child: Text("注册",style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 18
-                      ),)),
+                      child: Text(
+                        "注册",
+                        style: TextStyle(color: Colors.blue, fontSize: 18),
+                      )),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
@@ -193,7 +238,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
       Future.delayed(Duration(seconds: 1)).then((v) {
         Navigator.of(context).pop(widget.backRoute);
       });
-    }else{
+    } else {
       Future.delayed(Duration(seconds: 1)).then((v) {
         Navigator.of(context).pushReplacementNamed("/");
       });

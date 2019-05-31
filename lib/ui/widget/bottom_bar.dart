@@ -5,15 +5,21 @@ import '../main_page.dart';
 class BottomBar extends StatefulWidget {
 
   final PageController controller;
-
+  final int initialPage;
   @override
   BottomBarState createState() => BottomBarState();
 
-  BottomBar(Key key,this.controller) : super(key: key);
+  BottomBar(Key key,this.controller,this.initialPage) : super(key: key);
 }
 
 class BottomBarState extends State<BottomBar> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialPage;
+  }
 
   @override
   Widget build(BuildContext context) {

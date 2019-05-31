@@ -42,6 +42,11 @@ class _BuildingPickerState extends State<BuildingPicker> {
             return Center(child: CircularProgressIndicator());
           }
           var list = snapshot.data?.data ?? [];
+          if(list.length == 0){
+            return Center(
+              child: Text("当前选择${Strings.districtClass}暂无数据"),
+            );
+          }
           return ListView.builder(
             itemBuilder: (_, index) {
               return InkWell(
@@ -81,7 +86,7 @@ class _UnitPickerState extends State<UnitPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("选择楼层"),
+        title: Text("选择${Strings.unitClass}"),
       ),
       body: FutureBuilder<BaseResponse<List<String>>>(
         future: Api.getUnits(widget.districtId, widget.building),
@@ -90,6 +95,11 @@ class _UnitPickerState extends State<UnitPicker> {
             return Center(child: CircularProgressIndicator());
           }
           var list = snapshot.data?.data ?? [];
+          if(list.length == 0){
+            return Center(
+              child: Text("当前选择${Strings.buildingClass}暂无数据"),
+            );
+          }
           return ListView.builder(
             itemBuilder: (_, index) {
               return InkWell(
@@ -141,6 +151,11 @@ class _RoomPickerState extends State<RoomPicker> {
             return Center(child: CircularProgressIndicator());
           }
           var list = snapshot.data?.data ?? [];
+          if(list.length == 0){
+            return Center(
+              child: Text("当前选择${Strings.unitClass}暂无数据"),
+            );
+          }
           return ListView.builder(
             itemBuilder: (_, index) {
               return InkWell(

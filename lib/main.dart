@@ -23,16 +23,17 @@ import 'package:camera/camera.dart';
 import 'package:ease_life/ui/user_detail_auth_page.dart';
 import 'package:amap_base_location/amap_base_location.dart';
 
+import 'providers/providers.dart';
 import 'res/strings.dart';
 import 'ui/chat_room_page.dart';
 import 'ui/house_member_apply_page.dart';
 import 'package:jpush_flutter/jpush_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 JPush jPush = JPush();
-GlobalKey<ScaffoldState> appKey = GlobalKey();
 void main() async {
   //sp初始化
   sharedPreferences = await SharedPreferences.getInstance();
@@ -143,54 +144,61 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProviders<ApplicationBloc>(
-      bloc: ApplicationBloc(),
-      child: MaterialApp(
-        theme: defaultThemeData,
-        debugShowCheckedModeBanner: false,
-        onUnknownRoute: (settings) {
-          return MaterialPageRoute(builder: (context) {
-            return NotFoundPage(routeName: settings.name);
-          });
-        },
-        routes: {
-          MainPage.routeName: (_) {
-            bool firstEntry =
-                sharedPreferences.getBool(PreferenceKeys.keyFirstEntryTag) ??
-                    true;
-            return BlocProviders<MainIndexBloc>(
-              child: firstEntry ? SplashPage() : MainPage(),
-              bloc: MainIndexBloc(),
-            );
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<MainIndexModel>(
+          builder: (context)=>MainIndexModel(),
+        ),
+      ],
+      child: BlocProviders<ApplicationBloc>(
+        bloc: ApplicationBloc(),
+        child: MaterialApp(
+          theme: defaultThemeData,
+          debugShowCheckedModeBanner: false,
+          onUnknownRoute: (settings) {
+            return MaterialPageRoute(builder: (context) {
+              return NotFoundPage(routeName: settings.name);
+            });
           },
-          LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
-                child: LoginPage(),
-                bloc: LoginBloc(),
-              ),
-          RegisterPage.routeName: (_) => RegisterPage(),
-          MemberApplyPage.routeName: (_) {
-            return BlocProviders<MemberApplyBloc>(
-              bloc: MemberApplyBloc(),
-              child: MemberApplyPage(),
-            );
+          routes: {
+            MainPage.routeName: (_) {
+              bool firstEntry =
+                  sharedPreferences.getBool(PreferenceKeys.keyFirstEntryTag) ??
+                      true;
+              return BlocProviders<MainIndexBloc>(
+                child: firstEntry ? SplashPage() : MainPage(),
+                bloc: MainIndexBloc(),
+              );
+            },
+            LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
+                  child: LoginPage(),
+                  bloc: LoginBloc(),
+                ),
+            RegisterPage.routeName: (_) => RegisterPage(),
+            MemberApplyPage.routeName: (_) {
+              return BlocProviders<MemberApplyBloc>(
+                bloc: MemberApplyBloc(),
+                child: MemberApplyPage(),
+              );
+            },
+            PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
+            AuthorizationPage.routeName: (_) => AuthorizationPage(),
+            UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
+            FaceIdPage.routeName: (_) {
+              return BlocProviders<CameraBloc>(
+                child: FaceIdPage(),
+                bloc: CameraBloc(),
+              );
+            },
+            AudioRecordPage.routeName: (_) => AudioRecordPage(),
+            TestPage.routeName: (_) => TestPage(),
+            ChatRoomPage.routeName: (_) => ChatRoomPage(),
+            ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
+                  child: ContactsSelectPage(null),
+                  bloc: ContactsBloc(),
+                ),
           },
-          PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
-          AuthorizationPage.routeName: (_) => AuthorizationPage(),
-          UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
-          FaceIdPage.routeName: (_) {
-            return BlocProviders<CameraBloc>(
-              child: FaceIdPage(),
-              bloc: CameraBloc(),
-            );
-          },
-          AudioRecordPage.routeName: (_) => AudioRecordPage(),
-          TestPage.routeName: (_) => TestPage(),
-          ChatRoomPage.routeName: (_) => ChatRoomPage(),
-          ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
-                child: ContactsSelectPage(null),
-                bloc: ContactsBloc(),
-              ),
-        },
+        ),
       ),
     );
   }

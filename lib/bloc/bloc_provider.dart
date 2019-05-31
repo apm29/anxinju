@@ -14,6 +14,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:contacts_service/contacts_service.dart';
 
+import '../index.dart';
+
 //class BlocProvider extends InheritedWidget {
 //  final UserBloc bloc = UserBloc();
 //
@@ -79,6 +81,7 @@ class ApplicationBloc extends BlocBase {
     _noticeTypeController.close();
     _userTypeController.close();
     _controllerUserDetailData.close();
+    _controllerMyHouseData.close();
   }
 
   ApplicationBloc() {
@@ -143,7 +146,15 @@ class ApplicationBloc extends BlocBase {
   Observable<List<UserType>> get userTypeStream => _userTypeController.stream;
 
   PublishSubject<UserDetail> _controllerUserDetailData = PublishSubject();
-  Observable<UserDetail> userDetailStream;
+
+  Observable<UserDetail> get userDetailStream =>
+      _controllerUserDetailData.stream;
+
+  PublishSubject<List<HouseDetail>> _controllerMyHouseData = PublishSubject();
+
+  Observable<List<HouseDetail>> get myHouseStream =>
+      _controllerMyHouseData.stream;
+
   /*
    * 退出登录:
    * SP清空 userInfo/ token
@@ -155,20 +166,32 @@ class ApplicationBloc extends BlocBase {
     _userInfoController.add(null);
   }
 
-  void getUserTypes(){
-    Api.getUserInfo().then((base){
-      if(base.success()){
+  void getUserTypes() {
+    Api.getUserInfo().then((base) {
+      if (base.success()) {
         _userInfoController.add(base.data);
       }
       return base.data.userId;
-    }).then((userId){
+    }).then((userId) {
       return Api.getUserType(userId);
-    }).then((baseResp){
+    }).then((baseResp) {
       _userTypeController.add(baseResp.data);
-    }).catchError((e,s){
+    }).catchError((e, s) {
       print(e);
       print(s);
       _userTypeController.add([]);
+    });
+  }
+
+  void getMyHouseList() {
+    Api.getMyHouse(getCurrentDistrictId()).then((baseResp) {
+      if (baseResp.success()) {
+        _controllerMyHouseData.add(baseResp.data);
+      } else {
+        _controllerMyHouseData.addError(baseResp.text);
+      }
+    }).catchError((e, s) {
+      _controllerMyHouseData.addError(e);
     });
   }
 
@@ -190,6 +213,7 @@ class ApplicationBloc extends BlocBase {
     } else {
       _districtInfoController.add(districtInfo);
     }
+    getMyHouseList();
   }
 
   /*
@@ -198,8 +222,10 @@ class ApplicationBloc extends BlocBase {
   void getIndexInfo() async {
     try {
       List<Index> list = await Api.getIndex();
-      _homeIndexController.add(list.firstWhere((index) => index.area == "index"));
-      _mineIndexController.add(list.firstWhere((index) => index.area == "mine"));
+      _homeIndexController
+          .add(list.firstWhere((index) => index.area == "index"));
+      _mineIndexController
+          .add(list.firstWhere((index) => index.area == "mine"));
     } catch (e) {
       print(e);
       _homeIndexController.add(null);
@@ -252,8 +278,8 @@ class ApplicationBloc extends BlocBase {
       if (baseResp.success()) {
         _controllerUserDetailData.add(baseResp.data);
       }
-    }).catchError((Object e,StackTrace s){
-      _controllerUserDetailData.addError(e,s);
+    }).catchError((Object e, StackTrace s) {
+      _controllerUserDetailData.addError(e, s);
     });
   }
 }

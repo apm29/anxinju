@@ -26,7 +26,11 @@ public class MainActivity extends FlutterActivity {
                         if (call.method.equals("showKeyboard")) {
                             InputMethodManager inputMethodManager =
                                     (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            inputMethodManager.toggleSoftInputFromWindow(getWindow().getDecorView().getWindowToken(),0,InputMethodManager.SHOW_FORCED);
+                            //inputMethodManager.toggleSoftInputFromWindow(getWindow().getDecorView().getWindowToken(),0,InputMethodManager.SHOW_FORCED);
+                            if ("0".equals(call.arguments.toString()))
+                                inputMethodManager.hideSoftInputFromWindow(getWindow().getDecorView().findFocus().getWindowToken(), 0);
+                            else
+                                inputMethodManager.showSoftInputFromInputMethod(getWindow().getDecorView().findFocus().getWindowToken(), 0);
                             result.success(0);
                         }
                     }

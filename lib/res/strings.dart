@@ -2,7 +2,8 @@ class Strings{
   static const appName = "安心居";
   static const districtClass = "小区";
   static const buildingClass = "幢";
-  static const roomClass = "房间";
+  static const unitClass = "单元";
+  static const roomClass = "房屋";
   static const hostClass = "业主";
 }
 

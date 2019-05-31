@@ -1,11 +1,14 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/res/strings.dart';
+import 'package:flutter/gestures.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import '../utils.dart';
+import 'house_member_apply_page.dart';
 import 'main_page.dart';
 import 'user_detail_auth_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
+import 'package:ease_life/providers/providers.dart';
 import 'widget/district_info_button.dart';
 
 class MinePage extends StatefulWidget {
@@ -14,8 +17,6 @@ class MinePage extends StatefulWidget {
 }
 
 class _MinePageState extends State<MinePage> {
-
-
   @override
   void initState() {
     super.initState();
@@ -23,11 +24,14 @@ class _MinePageState extends State<MinePage> {
       return;
     }
     print('mine init');
+
+    ///认证相关,每次进入刷新
     Api.getUserInfo().then((baseResp) {
       if (baseResp.success()) {
         BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
       }
     });
+    BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
   }
 
   @override
@@ -48,6 +52,7 @@ class _MinePageState extends State<MinePage> {
         onRefresh: () async {
           BlocProviders.of<ApplicationBloc>(context).getUserDetail();
           BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+          BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
           return BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
         },
         child: StreamBuilder<UserInfo>(
@@ -57,8 +62,10 @@ class _MinePageState extends State<MinePage> {
                 child: CircularProgressIndicator(),
               );
             }
-            if (userSnap.hasError || !userSnap.hasData) {
+            if (!userSnap.hasData) {
               return buildVisitor(context);
+            } else if (userSnap.hasError) {
+              return buildError(context, userSnap.error);
             } else if (userSnap.data.isCertification == 1) {
               return _buildMine(context, userSnap.data);
             } else if (userSnap.data.isCertification == 0) {
@@ -74,202 +81,295 @@ class _MinePageState extends State<MinePage> {
   }
 
   Widget _buildMine(BuildContext context, UserInfo userInfo) {
-    return StreamBuilder<Index>(
-        stream: BlocProviders.of<ApplicationBloc>(context).mineIndex,
-        builder: (context, snapshot) {
-          var indexInfo = snapshot.data;
-          return DefaultTextStyle(
-            style: TextStyle(color: Colors.grey[800]),
-            child: Container(
-              padding:
-                  EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(24)),
-              color: Colors.grey[200],
-              alignment: Alignment.center,
-              child: ListView(
-                key: PageStorageKey("mine"),
-                children: <Widget>[
-                  SizedBox(
-                    height: 12,
-                  ),
-                  DefaultTextStyle(
-                    style: TextStyle(color: Colors.white),
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned.fill(
-                          child: Image.asset(
-                            "images/ic_banner_mine.png",
-                            fit: BoxFit.fill,
-                            height: ScreenUtil().setHeight(350),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(18.0),
-                          child: StreamBuilder<UserDetail>(
-                              stream: BlocProviders.of<ApplicationBloc>(context).userDetailStream,
-                              builder: (context, snapshot) {
-                                String url = snapshot.data?.avatar;
-                                //snapshot.data?.nickName??userInfo.userName
-                                String userName = userInfo.userName;
-                                return Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: CircleAvatar(
-                                          backgroundImage: url != null
-                                              ? CachedNetworkImageProvider(url)
-                                              : null,
-                                        )),
-                                    Text(
-                                      '$userName',
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                  ],
-                                );
-                              }),
-                        )
-                      ],
-                    ),
-                  ),
-                  StreamBuilder<bool>(
-                    stream: hasCommonUserPermission(context),
-                    builder: (context, snapshot) {
-                      if(snapshot.data != true){
-                        return Container();
-                      }
-                      return Container(
-                        color: Colors.white,
-                        padding: EdgeInsets.only(top: 12, bottom: 16),
-                        margin: EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return StreamBuilder<List<HouseDetail>>(
+      stream: BlocProviders.of<ApplicationBloc>(context).myHouseStream,
+      builder: (context, houseListData) {
+        List<HouseDetail> houseList = houseListData.data ?? [];
+        bool hasHouse = houseList != null && houseList.length > 0;
+        return StreamBuilder<Index>(
+            stream: BlocProviders.of<ApplicationBloc>(context).mineIndex,
+            builder: (context, snapshot) {
+              var indexInfo = snapshot.data;
+              return DefaultTextStyle(
+                style: TextStyle(color: Colors.grey[800]),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil().setWidth(24)),
+                  color: Colors.grey[200],
+                  alignment: Alignment.center,
+                  child: ListView(
+                    key: PageStorageKey("mine"),
+                    children: <Widget>[
+                      SizedBox(
+                        height: 12,
+                      ),
+                      DefaultTextStyle(
+                        style: TextStyle(color: Colors.white),
+                        child: Stack(
                           children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                routeToWeb(context, 'wdfw', indexInfo);
-                              },
-                              child: Column(
-                                children: <Widget>[
-                                  Image.asset(
-                                    "images/ic_home_mine.png",
-                                    width: ScreenUtil().setWidth(96),
-                                  ),
-                                  Text("我的房屋")
-                                ],
+                            Positioned.fill(
+                              child: Image.asset(
+                                "images/ic_banner_mine.png",
+                                fit: BoxFit.fill,
+                                height: ScreenUtil().setHeight(350),
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                routeToWeb(context, 'zscy', indexInfo);
-                              },
-                              child: Column(
-                                children: <Widget>[
-                                  Image.asset(
-                                    "images/ic_member_mine.png",
-                                    width: ScreenUtil().setWidth(96),
-                                  ),
-                                  Text("住所成员")
-                                ],
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                routeToWeb(context, 'wdac', indexInfo);
-                              },
-                              child: Column(
-                                children: <Widget>[
-                                  Image.asset(
-                                    "images/ic_car_mine.png",
-                                    width: ScreenUtil().setWidth(96),
-                                  ),
-                                  Text("我的爱车")
-                                ],
-                              ),
+                            Padding(
+                              padding: const EdgeInsets.all(18.0),
+                              child: StreamBuilder<UserDetail>(
+                                  stream:
+                                      BlocProviders.of<ApplicationBloc>(context)
+                                          .userDetailStream,
+                                  builder: (context, snapshot) {
+                                    String url = snapshot.data?.avatar;
+                                    //String userName = snapshot.data?.nickName ??
+                                    //    userInfo.userName;
+                                    String userName = userInfo.userName;
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: CircleAvatar(
+                                              backgroundImage: url != null
+                                                  ? CachedNetworkImageProvider(
+                                                      url)
+                                                  : null,
+                                            )),
+                                        Icon(
+                                          userInfo.isCertification == 1 ?Icons.verified_user : Icons.error,
+                                          color:userInfo.isCertification == 1 ?  Colors.green : Colors.red,
+                                          size: 12,
+                                        ),
+                                        Text(
+                                          '$userName',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                        InkWell(
+                                          onTap:(){
+                                            showReAuthDialog(context);
+                                          },
+                                          child: Container(
+                                            child: Text(
+                                              "重新认证",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12),
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 2),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.white
+                                              ),
+                                              borderRadius: BorderRadius.all(Radius.circular(4))
+                                            ),
+                                            margin: EdgeInsets.only(left: 2),
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  }),
                             ),
                           ],
                         ),
-                      );
-                    }
-                  ),
-                  StreamBuilder<bool>(
-                    stream: hasCommonUserPermission(context),
-                    builder: (context, snapshot) {
-                      if(snapshot.data!=true){
-                        return Container();
-                      }
-                      return GestureDetector(
+                      ),
+                      StreamBuilder<bool>(
+                          stream: hasCommonUserPermission(context),
+                          builder: (context, snapshot) {
+                            if (snapshot.data != true) {
+                              return Container();
+                            }
+                            return Container(
+                              color: Colors.white,
+                              padding: EdgeInsets.only(top: 12, bottom: 16),
+                              margin: EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (hasHouse)
+                                        routeToWeb(context, 'wdfw', indexInfo);
+                                      else {
+                                        showAuthDialog(context, indexInfo);
+                                      }
+                                    },
+                                    child: Column(
+                                      children: <Widget>[
+                                        Image.asset(
+                                          "images/ic_home_mine.png",
+                                          width: ScreenUtil().setWidth(96),
+                                        ),
+                                        Text("我的房屋")
+                                      ],
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+//                                        if (hasHouse)
+                                      routeToWeb(context, 'zscy', indexInfo);
+//                                        else {
+//                                          showAuthDialog(context);
+//                                        }
+                                    },
+                                    child: Column(
+                                      children: <Widget>[
+                                        Image.asset(
+                                          "images/ic_member_mine.png",
+                                          width: ScreenUtil().setWidth(96),
+                                        ),
+                                        Text("住所成员")
+                                      ],
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      routeToWeb(context, 'wdac', indexInfo);
+                                    },
+                                    child: Column(
+                                      children: <Widget>[
+                                        Image.asset(
+                                          "images/ic_car_mine.png",
+                                          width: ScreenUtil().setWidth(96),
+                                        ),
+                                        Text("我的爱车")
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                      StreamBuilder<bool>(
+                          stream: hasCommonUserPermission(context),
+                          builder: (context, snapshot) {
+                            if (snapshot.data != true) {
+                              return Container();
+                            }
+                            return GestureDetector(
+                              onTap: () {
+                                if (hasHouse)
+                                  routeToWeb(context, 'jttxm', indexInfo);
+                                else {
+                                  showAuthDialog(context, indexInfo);
+                                }
+                              },
+                              child: Container(
+                                color: Colors.white,
+                                padding: EdgeInsets.only(left: 15),
+                                child: HomeTitleSliver(
+                                  leadingIcon: Image.asset(
+                                      'images/ic_qrcode_mini.png',
+                                      width: ScreenUtil().setWidth(50)),
+                                  mainTitle: "家庭通行码",
+                                  subTitle: "",
+                                  tailText: "",
+                                ),
+                              ),
+                            );
+                          }),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      GestureDetector(
                         onTap: () {
-                          routeToWeb(context, 'jttxm', indexInfo);
+                          if (hasHouse)
+                            routeToWeb(context, 'crgl', indexInfo);
+                          else {
+                            showAuthDialog(context, indexInfo);
+                          }
                         },
                         child: Container(
                           color: Colors.white,
                           padding: EdgeInsets.only(left: 15),
                           child: HomeTitleSliver(
-                            leadingIcon: Image.asset('images/ic_qrcode_mini.png',
+                            leadingIcon: Image.asset('images/ic_face_id.png',
                                 width: ScreenUtil().setWidth(50)),
-                            mainTitle: "家庭通行码",
+                            mainTitle: "出入记录",
                             subTitle: "",
                             tailText: "",
                           ),
                         ),
-                      );
-                    }
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      routeToWeb(context, 'crgl', indexInfo);
-                    },
-                    child: Container(
-                      color: Colors.white,
-                      padding: EdgeInsets.only(left: 15),
-                      child: HomeTitleSliver(
-                        leadingIcon: Image.asset('images/ic_face_id.png',
-                            width: ScreenUtil().setWidth(50)),
-                        mainTitle: "出入记录",
-                        subTitle: "",
-                        tailText: "",
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.all(12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () {
-                            BlocProviders.of<ApplicationBloc>(context).logout();
-                          },
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.exit_to_app,
-                                color: Colors.red,
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.all(12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                BlocProviders.of<ApplicationBloc>(context)
+                                    .logout();
+                              },
+                              child: Column(
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.exit_to_app,
+                                    color: Colors.red,
+                                  ),
+                                  Text("退出登录")
+                                ],
                               ),
-                              Text("退出登录")
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                ],
-              ),
+                ),
+              );
+            });
+      },
+    );
+  }
+
+  void showReAuthDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.warning,
+                  color: Colors.blue,
+                ),
+                Text("重新认证")
+              ],
             ),
+            content: Text("重新认证个人信息将会覆盖已认证信息,请谨慎操作!"),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    "取消",
+                    style: TextStyle(color: Colors.blueGrey),
+                  )),
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(UserDetailAuthPage.routeName);
+                  },
+                  child: Text("前往认证")),
+            ],
           );
         });
   }
+
+
 
   ///民警 或者 物业可以看社区记录
   Stream<bool> hasSocietyRecordPermission(BuildContext context) {
@@ -292,13 +392,13 @@ class _MinePageState extends State<MinePage> {
     });
   }
 
-  ///是否是普通用户
+  ///是否是普通用户 "2", "4", "5", "6"
   Stream<bool> hasCommonUserPermission(BuildContext context) {
     return BlocProviders.of<ApplicationBloc>(context)
         .userTypeStream
         .map((list) {
       return list.firstWhere((e) {
-            return ["2","4","5","6"].contains(e.roleCode);
+            return ["1", "3", "2", "4", "5", "6"].contains(e.roleCode);
           }, orElse: null) !=
           null;
     });
@@ -307,7 +407,11 @@ class _MinePageState extends State<MinePage> {
   ///动作条
   buildActions(BuildContext context) {
     return <Widget>[
-      DistrictInfoButton(),
+      DistrictInfoButton(
+        callback: (district) {
+          BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
+        },
+      ),
     ];
   }
 
@@ -319,9 +423,9 @@ class _MinePageState extends State<MinePage> {
           absorbing: true,
           child: _buildMine(context, data),
         ),
-        buildCertificationDialog(context,(){
-            //BlocProviders.of<MainIndexBloc>(context).toIndex(PAGE_HOME);
-            IndexNotification(PAGE_HOME).dispatch(context);
+        buildCertificationDialog(context, () {
+          //BlocProviders.of<MainIndexBloc>(context).toIndex(PAGE_HOME);
+          IndexNotification(PAGE_HOME).dispatch(context);
         })
       ],
     );
@@ -374,7 +478,8 @@ class _MinePageState extends State<MinePage> {
                                           return Text(
                                               snapshot.data.districtName);
                                         }
-                                        return Text("未选择${Strings.districtClass}");
+                                        return Text(
+                                            "未选择${Strings.districtClass}");
                                       }),
                                   Icon(
                                     Icons.location_on,
@@ -389,7 +494,8 @@ class _MinePageState extends State<MinePage> {
                         Padding(
                           padding: const EdgeInsets.all(18.0),
                           child: StreamBuilder<UserDetail>(
-                              stream: BlocProviders.of<ApplicationBloc>(context).userDetailStream,
+                              stream: BlocProviders.of<ApplicationBloc>(context)
+                                  .userDetailStream,
                               builder: (context, snapshot) {
                                 String url = snapshot.data?.avatar;
                                 //snapshot.data?.nickName??userInfo.userName

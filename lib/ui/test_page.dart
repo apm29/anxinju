@@ -26,20 +26,17 @@ class ProviderTestPage extends StatefulWidget {
 class CartModel extends ChangeNotifier {
   double price = 0.0;
 
-  void add(double newValue) {
-    price += newValue;
-    notifyListeners();
-  }
-
   List<Item> items = [];
 
   void addItem(Item item) {
+    price+=item.price * item.count;
     var contain = items.firstWhere((v) => item.id == v.id, orElse: () => null);
     if (contain == null) {
       items.add(item);
     } else {
       contain.count += item.count;
     }
+    notifyListeners();
   }
 }
 
@@ -93,7 +90,6 @@ class _ProviderTestPageState extends State<ProviderTestPage> {
             return FlatButton(
               onPressed: () {
                 Provider.of<CartModel>(context).addItem(item);
-                Provider.of<CartModel>(context).add(item.price * item.count);
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),

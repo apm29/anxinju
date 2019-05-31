@@ -17,7 +17,7 @@ String getToken(){
 }
 
 
-int getCurrentSocietyId(){
+int getCurrentDistrictId(){
   if(!isLogin()){
     return null;
   }

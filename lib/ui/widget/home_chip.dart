@@ -11,25 +11,31 @@ class HomeChip extends StatelessWidget {
   final Color textColor;
   final String indexId;
   final Index index;
-  final bool intercept;
+  final bool interceptCertification;
+  final bool hasHouse;
   final bool wrap;
 
-  HomeChip(
-      {@required this.title,
-      this.onPressed,
-      this.color = Colors.white,
-      this.textColor = const Color(0xFF616161),
-      this.indexId,
-      this.index,
-      this.intercept = false,
-      this.wrap = false})
-      : assert(intercept != null);
+  HomeChip({
+    @required this.title,
+    this.onPressed,
+    this.color = Colors.white,
+    this.textColor = const Color(0xFF616161),
+    this.indexId,
+    this.index,
+    this.interceptCertification = false,
+    this.hasHouse,
+    this.wrap = false,
+  }) : assert(interceptCertification != null);
 
   void route(String id, Index index, BuildContext context) {
-    if (intercept != false && !checkIfCertificated(context)) {
+    if (interceptCertification != false && !checkIfCertificated(context)) {
       return;
     }
-    routeToWeb(context, id, index);
+    if(hasHouse!=null && hasHouse == true) {
+      routeToWeb(context, id, index);
+    }else{
+      showAuthDialog(context, index);
+    }
   }
 
   @override
