@@ -1,7 +1,4 @@
-import 'package:ease_life/res/strings.dart';
-import 'package:ease_life/ui/widget/text_picker_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ease_life/index.dart';
 
 class AuthorizationPage extends StatefulWidget {
 
@@ -91,7 +88,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                     height: 32,
                   ),
                   SizedBox(
-                    child: Text("位置:(请在${Strings.districtClass}住所获取位置进行验证)"),
+                    child: Text("位置:(请在${Strings.districtClass}${Strings.roomClass_2}获取位置进行验证)"),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

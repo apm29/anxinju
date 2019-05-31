@@ -1,8 +1,5 @@
 import 'package:ease_life/index.dart';
 
-import '../utils.dart';
-import 'web_view_example.dart';
-
 class MessagePage extends StatefulWidget {
   @override
   _MessagePageState createState() => _MessagePageState();

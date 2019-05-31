@@ -1,7 +1,5 @@
 import 'package:ease_life/index.dart';
 
-import 'widget/loading_state_widget.dart';
-
 class RegisterPage extends StatefulWidget {
 
   static String routeName="/register";

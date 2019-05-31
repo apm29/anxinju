@@ -1,15 +1,4 @@
 import 'package:ease_life/index.dart';
-import 'package:ease_life/res/strings.dart';
-import 'package:flutter/gestures.dart';
-import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
-import '../utils.dart';
-import 'house_member_apply_page.dart';
-import 'main_page.dart';
-import 'user_detail_auth_page.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ease_life/providers/providers.dart';
-import 'widget/district_info_button.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -222,7 +211,7 @@ class _MinePageState extends State<MinePage> {
                                           "images/ic_member_mine.png",
                                           width: ScreenUtil().setWidth(96),
                                         ),
-                                        Text("住所成员")
+                                        Text("${Strings.roomClass_2}成员")
                                       ],
                                     ),
                                   ),

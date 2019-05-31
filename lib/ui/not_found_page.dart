@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:ease_life/index.dart';
 
 class NotFoundPage extends StatefulWidget {
 

@@ -1,21 +1,4 @@
-import 'package:ease_life/providers/providers.dart';
-import 'package:ease_life/remote/api.dart';
-import 'package:ease_life/res/strings.dart';
-import 'package:provider/provider.dart';
-
-import '../index.dart';
-import '../ui/home_page.dart';
-import '../ui/message_page.dart';
-import '../ui/mine_page.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'audio_record_page.dart';
-import 'camera_page.dart';
-import 'house_member_apply_page.dart';
-import 'user_detail_auth_page.dart';
-import 'web_view_example.dart';
-import 'widget/bottom_bar.dart';
+import 'package:ease_life/index.dart';
 
 const int PAGE_HOME = 0;
 const int PAGE_SEARCH = 11;
@@ -63,35 +46,32 @@ class MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     ScreenUtil(width: 1080, height: 2160)..init(context);
-    return WillPopScope(
-        onWillPop: () async {
-          if (_lastPressedAt == null ||
-              DateTime.now().difference(_lastPressedAt) >
-                  Duration(seconds: 1)) {
-            //两次点击间隔超过1秒则重新计时
-            _lastPressedAt = DateTime.now();
-            Fluttertoast.showToast(msg: "再按一次退出");
-            return false;
-          }
-          return true;
-        },
-        child: Consumer<MainIndexModel>(
-          builder: (context,model,child){
-            _pageController = PageController( initialPage:model.currentIndex);
-            return Scaffold(
-              body: Container(
-                color: Colors.grey[200],
-                child: buildContent(context),
-              ),
-              bottomNavigationBar: buildBottomNavigationBar(),
-            );
-          },
-        ));
+    return WillPopScope(onWillPop: () async {
+      if (_lastPressedAt == null ||
+          DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
+        //两次点击间隔超过1秒则重新计时
+        _lastPressedAt = DateTime.now();
+        Fluttertoast.showToast(msg: "再按一次退出");
+        return false;
+      }
+      return true;
+    }, child: Consumer<MainIndexModel>(
+      builder: (context, model, child) {
+        _pageController = PageController(initialPage: model.currentIndex);
+        return Scaffold(
+          body: Container(
+            color: Colors.grey[200],
+            child: buildContent(context),
+          ),
+          bottomNavigationBar: buildBottomNavigationBar(),
+        );
+      },
+    ));
   }
 
   Widget buildBottomNavigationBar() {
     return Consumer<MainIndexModel>(
-      builder: (context,value,child){
+      builder: (context, value, child) {
         return BottomBar(bottomKey, _pageController, value.currentIndex);
       },
     );
@@ -103,9 +83,20 @@ class MainPageState extends State<MainPage> {
   }
 
   buildContent(BuildContext context) {
+    ///监听主页面切换
     return NotificationListener<IndexNotification>(
       onNotification: (notification) {
         changePage(context, notification.index);
+        if (notification.indexId != null) {
+          Index index = getIndexInfo().firstWhere((index) =>
+              index.area ==
+              (notification.index == PAGE_HOME ? 'index' : 'mine'));
+          routeToWeb(
+            context,
+            notification.indexId,
+            index
+          );
+        }
       },
       child: PageView.builder(
         controller: _pageController,
@@ -194,5 +185,6 @@ class MainPageState extends State<MainPage> {
 class IndexNotification extends Notification {
   final int index;
   String indexId;
+
   IndexNotification(this.index);
 }

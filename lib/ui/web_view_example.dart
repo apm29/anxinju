@@ -1,28 +1,5 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'package:ease_life/interaction/simple_bridge.dart';
-import 'package:ease_life/persistance/shared_preferences.dart';
-import 'package:ease_life/res/strings.dart';
-import 'package:ease_life/ui/widget/district_info_button.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_sms/flutter_sms.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:convert/convert.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/services.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:ease_life/index.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:file_picker/file_picker.dart';
-import '../utils.dart';
-import 'camera_page.dart';
-import 'contacts_select_page.dart';
-import 'login_page.dart';
-import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
-
+import 'package:rxdart/rxdart.dart';
 //import 'package:geolocator/geolocator.dart';
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>

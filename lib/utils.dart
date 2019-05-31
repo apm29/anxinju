@@ -1,22 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:amap_base_location/amap_base_location.dart';
-import 'package:ease_life/res/strings.dart';
-import 'package:ease_life/ui/camera_page.dart';
-import 'package:ease_life/ui/web_view_example.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:image_picker/image_picker.dart';
 import 'index.dart';
-import 'persistance/shared_preferences.dart';
-import 'ui/house_member_apply_page.dart';
-import 'ui/login_page.dart';
-import 'ui/main_page.dart';
-import 'ui/user_detail_auth_page.dart';
-import 'ui/widget/room_picker.dart';
 
 List<Color> colors = [
   Color(0xfffb333d),
@@ -377,15 +359,18 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
                   "您当前选择的${Strings.districtClass},名下还没有认证${Strings.roomClass},请选择重新认证,申请成为成员或者切换${Strings.districtClass}\r\n如果您已经申请,请在",
             ),
             TextSpan(
-                text: "住所成员",
+                text: "${Strings.roomClass_2}成员",
                 style: TextStyle(color: Colors.blue),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     var indexWhere =
                         indexInfo.menu.indexWhere((i) => i.id == "zscy");
                     if (indexWhere < 0) {
-                      Navigator.of(context).pop(IndexNotification(PAGE_MINE));
+                      ///先pop再路由,否则dialog的context找不到listener
+                      Navigator.of(context)
+                          .pop("zscy");
                     } else {
+                      Navigator.of(context).pop();
                       routeToWeb(context, "zscy", indexInfo);
                     }
                   }),
@@ -417,8 +402,14 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
           ],
         );
       }).then((value) {
-    if (value is IndexNotification) {
-      value.dispatch(context);
+    if (value == "zscy") {
+      routeToWebByCache(context, PAGE_MINE, indexId: "zscy");
     }
   });
+}
+
+///导航到指定页面
+/// 发起者Widget ---> MainPage(NotificationListener) --> WebView
+void routeToWebByCache(BuildContext context, int mainIndex, {String indexId}) {
+  (IndexNotification(mainIndex)..indexId = indexId).dispatch(context);
 }

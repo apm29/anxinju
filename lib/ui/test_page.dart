@@ -1,22 +1,6 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:math';
-import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:ease_life/index.dart';
+import 'package:rxdart/rxdart.dart';
 
-import '../index.dart';
-import '../main.dart';
-import '../utils.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-
-void main() {
-  runApp(MaterialApp(
-    home: ProviderTestPage(),
-  ));
-}
 
 class ProviderTestPage extends StatefulWidget {
   @override
@@ -26,9 +10,9 @@ class ProviderTestPage extends StatefulWidget {
 class CartModel extends ChangeNotifier {
   double price = 0.0;
 
-  List<Item> items = [];
+  List<CartItem> items = [];
 
-  void addItem(Item item) {
+  void addItem(CartItem item) {
     price+=item.price * item.count;
     var contain = items.firstWhere((v) => item.id == v.id, orElse: () => null);
     if (contain == null) {
@@ -40,12 +24,12 @@ class CartModel extends ChangeNotifier {
   }
 }
 
-class Item {
+class CartItem {
   double price;
   int id;
   double count;
 
-  Item(this.price, this.id, this.count);
+  CartItem(this.price, this.id, this.count);
 }
 
 class _ProviderTestPageState extends State<ProviderTestPage> {
@@ -86,7 +70,7 @@ class _ProviderTestPageState extends State<ProviderTestPage> {
         ),
         body: ListView.builder(
           itemBuilder: (context, index) {
-            Item item = Item(Random(12).nextDouble() * 100, index, 1.0);
+            CartItem item = CartItem(Random(12).nextDouble() * 100, index, 1.0);
             return FlatButton(
               onPressed: () {
                 Provider.of<CartModel>(context).addItem(item);
@@ -106,7 +90,7 @@ class _ProviderTestPageState extends State<ProviderTestPage> {
 }
 
 class CartPage extends StatefulWidget {
-  final List<Item> lists;
+  final List<CartItem> lists;
 
   CartPage(this.lists);
 

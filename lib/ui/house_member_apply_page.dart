@@ -1,11 +1,13 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/res/strings.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
 import '../utils.dart';
+import 'main_page.dart';
 import 'widget/loading_state_widget.dart';
 import 'widget/room_picker.dart';
 
@@ -37,7 +39,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
     var findAllDistrict = Api.findAllDistrict();
     return Scaffold(
       appBar: AppBar(
-        title: Text("住所成员申请"),
+        title: Text("${Strings.roomClass_2}成员申请"),
         centerTitle: true,
       ),
       body: Builder(
@@ -173,11 +175,15 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                                     return AlertDialog(
                                       title: Text("申请成功"),
                                       content: Text.rich(TextSpan(children: [
-                                        TextSpan(text: "您已经完成了住所成员申请,您可以在 "),
+                                        TextSpan(text: "您已经完成了${Strings.roomClass_2}成员申请,您可以在 "),
                                         TextSpan(
-                                            text: "我的-住所成员",
+                                            text: "我的-${Strings.roomClass_2}成员",
                                             style:
-                                                TextStyle(color: Colors.blue)),
+                                                TextStyle(color: Colors.blue),
+                                          recognizer: TapGestureRecognizer()..onTap=(){
+                                              Navigator.of(context).pop();
+                                          }
+                                        ),
                                         TextSpan(text: " 页面查看申请进度"),
                                       ])),
                                       actions: <Widget>[
@@ -188,7 +194,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                                             child: Text("确定"))
                                       ],
                                     );
-                                  }).then((_) {
+                                  }).then((v) {
                                 Navigator.of(context).pop();
                               });
                             }

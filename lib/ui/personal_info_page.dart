@@ -1,8 +1,4 @@
-import 'package:ease_life/bloc/bloc_provider.dart';
-import 'package:ease_life/model/base_response.dart';
-import 'package:flutter/material.dart';
-
-import 'authorization_page.dart';
+import 'package:ease_life/index.dart';
 
 class PersonalInfoPage extends StatelessWidget {
 

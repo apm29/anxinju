@@ -226,8 +226,14 @@ class ApplicationBloc extends BlocBase {
           .add(list.firstWhere((index) => index.area == "index"));
       _mineIndexController
           .add(list.firstWhere((index) => index.area == "mine"));
-    } catch (e) {
+      var content = list.map((index){
+        return index.toString();
+      }).toList().join(",");
+      sharedPreferences.setString(PreferenceKeys.keyIndexInfo,"[$content]");
+    } catch (e,s) {
       print(e);
+      print(s);
+      Fluttertoast.showToast(msg: "获取网页索引失败");
       _homeIndexController.add(null);
       _mineIndexController.add(null);
     }

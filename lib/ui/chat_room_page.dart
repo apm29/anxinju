@@ -1,13 +1,6 @@
-import 'dart:convert';
-
-import 'package:ease_life/persistance/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
+import 'package:ease_life/index.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:flutter/material.dart';
-import 'dart:async';
-import '../index.dart';
-import 'widget/audio_input_widget.dart';
+
 
 class ChatRoomPage extends StatefulWidget {
   static String routeName = "/chat";

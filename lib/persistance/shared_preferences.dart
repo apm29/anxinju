@@ -8,21 +8,38 @@ bool isLogin() {
   return sharedPreferences.getString(PreferenceKeys.keyUserInfo) != null;
 }
 
-bool isCertificated(){
-  return (UserInfo.fromJson(json.decode(sharedPreferences.getString(PreferenceKeys.keyUserInfo)??"{}"))?.isCertification??0) == 1;
+bool isCertificated() {
+  return (UserInfo.fromJson(json.decode(
+                  sharedPreferences.getString(PreferenceKeys.keyUserInfo) ??
+                      "{}"))
+              ?.isCertification ??
+          0) ==
+      1;
 }
 
-String getToken(){
+String getToken() {
   return sharedPreferences.getString(PreferenceKeys.keyAuthorization);
 }
 
-
-int getCurrentDistrictId(){
-  if(!isLogin()){
+int getCurrentDistrictId() {
+  if (!isLogin()) {
     return null;
   }
-  var jsonString = sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
+  var jsonString =
+      sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
   var jsonMap = json.decode(jsonString);
   var districtInfo = DistrictInfo.fromJson(jsonMap);
   return districtInfo.districtId;
+}
+
+List<Index> getIndexInfo() {
+  var indexString = sharedPreferences.getString(PreferenceKeys.keyIndexInfo);
+  print('$indexString');
+  var decode = json.decode(indexString);
+  if (decode is List) {
+    return decode.map((s) {
+      return Index.fromJson(s);
+    }).toList();
+  }
+  return [];
 }

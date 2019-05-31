@@ -1,13 +1,4 @@
-import 'dart:math';
-
 import 'package:ease_life/index.dart';
-import 'package:ease_life/res/strings.dart';
-import 'package:ease_life/ui/web_view_example.dart';
-
-import '../utils.dart';
-import 'contacts_select_page.dart';
-import 'login_page.dart';
-import 'widget/district_info_button.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -52,7 +43,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           Strings.appName,
         ),
         actions: <Widget>[
-          DistrictInfoButton(),
+          DistrictInfoButton(callback: (d){
+            BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
+          },),
 //          buildActions(context),
         ],
       ),

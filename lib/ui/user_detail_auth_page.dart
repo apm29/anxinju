@@ -1,12 +1,5 @@
-import 'dart:io';
-
 import 'package:ease_life/index.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rxdart/rxdart.dart';
-
-import '../utils.dart';
-import 'camera_page.dart';
-import 'widget/loading_state_widget.dart';
 
 class UserDetailAuthPage extends StatefulWidget {
   static String routeName = "/preVerify";

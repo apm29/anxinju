@@ -1,15 +1,5 @@
-import 'package:dio/dio.dart';
-import 'package:ease_life/bloc/bloc_provider.dart';
 import 'package:ease_life/index.dart';
-import 'package:ease_life/model/base_response.dart';
-import 'package:ease_life/res/strings.dart';
-import 'package:ease_life/ui/widget/loading_state_widget.dart';
-import 'package:ease_life/ui/widget/ticker_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'register_page.dart';
-import 'widget/lifecycle_widget.dart';
-
+import 'package:dio/dio.dart';
 class LoginPage extends StatefulWidget {
   final String backRoute;
   static String routeName = "/login";

@@ -1,35 +1,5 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 
-import 'package:ease_life/bloc/bloc_provider.dart';
-import 'package:ease_life/persistance/shared_preference_keys.dart';
-import 'package:ease_life/ui/audio_record_page.dart';
-import 'package:ease_life/ui/authorization_page.dart';
-import 'package:ease_life/ui/camera_page.dart';
-import 'package:ease_life/ui/contacts_select_page.dart';
-import 'package:ease_life/ui/main_page.dart';
-import 'package:ease_life/ui/login_page.dart';
-import 'package:ease_life/ui/not_found_page.dart';
-import 'package:ease_life/ui/personal_info_page.dart';
-import 'package:ease_life/ui/register_page.dart';
-import 'package:ease_life/ui/splash_page.dart';
-import 'package:ease_life/ui/style.dart';
-import 'package:ease_life/ui/test_page.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:camera/camera.dart';
-import 'package:ease_life/ui/user_detail_auth_page.dart';
-import 'package:amap_base_location/amap_base_location.dart';
-
-import 'providers/providers.dart';
-import 'res/strings.dart';
-import 'ui/chat_room_page.dart';
-import 'ui/house_member_apply_page.dart';
-import 'package:jpush_flutter/jpush_flutter.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'index.dart';
 
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;

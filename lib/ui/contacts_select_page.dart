@@ -1,6 +1,4 @@
-import 'package:contacts_service/contacts_service.dart';
 import 'package:ease_life/index.dart';
-import 'package:android_intent/android_intent.dart';
 
 typedef ContactCallback = Function(Contact);
 class ContactInfo{
