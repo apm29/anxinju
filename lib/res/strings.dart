@@ -44,5 +44,9 @@ class WebIndexID{
   static const WO_DE_AI_CHE="wdac";
   ///
   static const JIA_TING_TONG_XING_MA="jttxm";
-  static const CHU_RU_JI_LU="crjl";
+  static const CHU_RU_JI_LU="crgl";
+
+  ///
+  static const FANG_KE_JI_LU = "fkjl";
+  static const XUN_LUO_JI_LU = "xljl";
 }

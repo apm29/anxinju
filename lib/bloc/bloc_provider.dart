@@ -173,8 +173,12 @@ class ApplicationBloc extends BlocBase {
       }
       return base.data.userId;
     }).then((userId) {
+      print(userId);
       return Api.getUserType(userId);
     }).then((baseResp) {
+      print('$baseResp');
+      var data = baseResp.data[0];
+      print(data);
       _userTypeController.add(baseResp.data);
     }).catchError((e, s) {
       print(e);
@@ -230,6 +234,7 @@ class ApplicationBloc extends BlocBase {
         return index.toString();
       }).toList().join(",");
       sharedPreferences.setString(PreferenceKeys.keyIndexInfo,"[$content]");
+      getMyHouseList();
     } catch (e,s) {
       print(e);
       print(s);

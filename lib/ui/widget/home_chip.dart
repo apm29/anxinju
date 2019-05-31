@@ -31,7 +31,7 @@ class HomeChip extends StatelessWidget {
     if (interceptCertification != false && !checkIfCertificated(context)) {
       return;
     }
-    if(hasHouse!=null && hasHouse == true) {
+    if(hasHouse==null || hasHouse == true) {
       routeToWeb(context, id, index);
     }else{
       showAuthDialog(context, index);

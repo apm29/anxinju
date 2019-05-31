@@ -364,14 +364,14 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     var indexWhere =
-                        indexInfo.menu.indexWhere((i) => i.id == "zscy");
+                        indexInfo.menu.indexWhere((i) => i.id == WebIndexID.ZHU_SUO_CHENG_YUAN);
                     if (indexWhere < 0) {
                       ///先pop再路由,否则dialog的context找不到listener
                       Navigator.of(context)
-                          .pop("zscy");
+                          .pop(WebIndexID.ZHU_SUO_CHENG_YUAN);
                     } else {
                       Navigator.of(context).pop();
-                      routeToWeb(context, "zscy", indexInfo);
+                      routeToWeb(context, WebIndexID.ZHU_SUO_CHENG_YUAN, indexInfo);
                     }
                   }),
             TextSpan(
@@ -402,8 +402,8 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
           ],
         );
       }).then((value) {
-    if (value == "zscy") {
-      routeToWebByCache(context, PAGE_MINE, indexId: "zscy");
+    if (value == WebIndexID.ZHU_SUO_CHENG_YUAN) {
+      routeToWebByCache(context, PAGE_MINE, indexId: WebIndexID.ZHU_SUO_CHENG_YUAN);
     }
   });
 }

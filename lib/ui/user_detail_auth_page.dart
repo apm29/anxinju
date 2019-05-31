@@ -37,14 +37,14 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
     initData = _controllerData.stream;
     Api.getUserDetail().then((b) {
       _controllerData.add(b);
-     if(b.success()){
-       UserDetail userDetail = b.data;
-       _nameController.text = userDetail.myName;
-       _genderController.text = userDetail.sex;
-       _avatarController.text = userDetail.avatar;
-       _nickNameController.text = userDetail.nickName;
-       _idCardController.text = userDetail.idCard;
-     }
+      if (b.success()) {
+        UserDetail userDetail = b.data;
+        _nameController.text = userDetail.myName;
+        _genderController.text = userDetail.sex;
+        _avatarController.text = userDetail.avatar;
+        _nickNameController.text = userDetail.nickName;
+        _idCardController.text = userDetail.idCard;
+      }
     });
   }
 
@@ -61,7 +61,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
             return Center(
               child: CircularProgressIndicator(),
             );
-          } else if(!snapshot.data.success()){
+          } else if (!snapshot.data.success()) {
             return Center(
               child: Text(snapshot.data.text),
             );
@@ -114,8 +114,15 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
 //                ),
                 SliverToBoxAdapter(
                   child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("您已经经过认证,重新认证不可修改身份证信息"),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      enabled: (snapshot.data?.data?.idCard ?? "").isEmpty,
                       decoration: InputDecoration(
                           hintText: "请输入身份证",
                           labelText: "身份证",

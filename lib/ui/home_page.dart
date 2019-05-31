@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         duration: Duration(milliseconds: 2800), vsync: this);
     print("home init");
     //_animationController.forward();
+    BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
   }
 
   @override
@@ -68,6 +69,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       BlocProviders.of<ApplicationBloc>(context)
                           .getNoticeInfo();
                       BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
+                      BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
                     },
                     child: Center(
                       child: Column(
@@ -157,7 +159,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               if (hasHouse) {
                                                 if (checkIfCertificated(
                                                     context))
-                                                  routeToWeb(context, "fkgl",
+                                                  routeToWeb(context, WebIndexID.FANG_KE_GUAN_LI,
                                                       indexInfo);
                                               } else {
                                                 showAuthDialog(
@@ -186,7 +188,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             onTap: () {
                                               if (checkIfCertificated(context))
                                                 routeToWeb(
-                                                    context, "zwy", indexInfo);
+                                                    context, WebIndexID.ZHAO_WU_YE, indexInfo);
                                             },
                                             child: Padding(
                                               padding:
@@ -210,7 +212,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             onTap: () {
                                               if (checkIfCertificated(context))
                                                 routeToWeb(
-                                                    context, "zsq", indexInfo);
+                                                    context, WebIndexID.ZHAO_SHE_QU, indexInfo);
                                             },
                                             child: Padding(
                                               padding:
@@ -234,7 +236,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             onTap: () {
                                               if (checkIfCertificated(context))
                                                 routeToWeb(
-                                                    context, "zjc", indexInfo);
+                                                    context, WebIndexID.ZHAO_JING_CHA, indexInfo);
                                             },
                                             child: Padding(
                                               padding:
@@ -480,11 +482,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   HomeChip(
                                       color: const Color(0xFF16A702),
                                       title: "通知公告",
-                                      indexId: "tztg",
+                                      indexId: WebIndexID.TONG_ZHI_TONG_GAO,
                                       index: indexInfo),
                                   HomeChip(
                                     title: "访客系统",
-                                    indexId: "fkxt",
+                                    indexId: WebIndexID.FANG_KE_XI_TONG,
                                     index: indexInfo,
                                     interceptCertification: true,
                                     hasHouse: hasHouse,
@@ -495,13 +497,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 //                                      index: indexInfo),
                                   HomeChip(
                                     title: "车辆管理",
-                                    indexId: "clgl",
+                                    indexId: WebIndexID.CHE_LIANG_GUAN_LI,
                                     index: indexInfo,
                                     interceptCertification: true,
                                   ),
                                   HomeChip(
                                     title: "维护报修",
-                                    indexId: "whbx",
+                                    indexId: WebIndexID.WEI_HU_BAO_XIU,
                                     index: indexInfo,
                                     interceptCertification: true,
                                   ),
@@ -617,7 +619,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   HomeChip(
                                       color: const Color(0xFF000078),
                                       title: "警务查询",
-                                      indexId: "jwcx",
+                                      indexId: WebIndexID.JING_WU_CHA_XUN,
                                       index: indexInfo),
 //                                  HomeChip(
 //                                      title: "便民地图",
@@ -625,7 +627,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 //                                      index: indexInfo),
                                   HomeChip(
                                       title: "巡更管理",
-                                      indexId: "xggl",
+                                      indexId: WebIndexID.XUN_GENG_GUAN_LI,
                                       index: indexInfo),
 //                                  HomeChip(
 //                                      title: "纠纷化解",
@@ -689,11 +691,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   HomeChip(
                                       color: const Color(0xFFCD0004),
                                       title: "功德栏",
-                                      indexId: "gdl",
+                                      indexId: WebIndexID.GONG_DE_LAN,
                                       index: indexInfo),
                                   HomeChip(
                                       title: "义警活动",
-                                      indexId: "yjhd",
+                                      indexId: WebIndexID.YI_JING_HUO_DONG,
                                       index: indexInfo),
 //                                  HomeChip(
 //                                      title: "闲置交换",
@@ -701,11 +703,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 //                                      index: indexInfo),
                                   HomeChip(
                                       title: "慈善公益",
-                                      indexId: "csgy",
+                                      indexId: WebIndexID.CI_SHAN_GONG_YI,
                                       index: indexInfo),
                                   HomeChip(
                                       title: "小区活动",
-                                      indexId: "xqhd",
+                                      indexId: WebIndexID.XIAO_QU_HUO_DONG,
                                       index: indexInfo),
 //                      Container(
 //                        height: 12,

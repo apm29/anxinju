@@ -409,6 +409,12 @@ class UserType {
     data['roleCode'] = this.roleCode;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'UserType{id: $id, userId: $userId, roleCode: $roleCode}';
+  }
+
 }
 
 
