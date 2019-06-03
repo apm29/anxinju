@@ -193,7 +193,7 @@ class _MinePageState extends State<MinePage> {
                                           "images/ic_home_mine.png",
                                           width: ScreenUtil().setWidth(96),
                                         ),
-                                        Text("我的房屋")
+                                        Text("我的${Strings.roomClass}")
                                       ],
                                     ),
                                   ),

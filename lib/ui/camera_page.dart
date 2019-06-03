@@ -319,7 +319,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
             builder: (context) {
               return AlertDialog(
                 title: Text("没有数据"),
-                content: Text("您的名下没有的房屋"),
+                content: Text("您的名下没有的${Strings.roomClass}"),
                 actions: <Widget>[
                   FlatButton(
                       onPressed: () {

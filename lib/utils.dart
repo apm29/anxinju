@@ -351,7 +351,7 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
                 Icons.warning,
                 color: Colors.blue,
               ),
-              Text("无可用房屋")
+              Text("无可用${Strings.roomClass}")
             ],
           ),
           content: Text.rich(TextSpan(children: [
