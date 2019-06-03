@@ -25,16 +25,17 @@ void showImageSourceDialog(File file, BuildContext context,
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
                         InkWell(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              showPicker(file, onFileProcess);
-                            },
-                            child: Container(
-                              width: constraint.biggest.width,
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(18.0),
-                              child: Text("相册"),
-                            )),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            showPicker(file, onFileProcess);
+                          },
+                          child: Container(
+                            width: constraint.biggest.width,
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.all(18.0),
+                            child: Text("相册"),
+                          ),
+                        ),
                         InkWell(
                             onTap: () {
                               Navigator.of(context).pop();
@@ -363,15 +364,15 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
                 style: TextStyle(color: Colors.blue),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    var indexWhere =
-                        indexInfo.menu.indexWhere((i) => i.id == WebIndexID.ZHU_SUO_CHENG_YUAN);
+                    var indexWhere = indexInfo.menu.indexWhere(
+                        (i) => i.id == WebIndexID.ZHU_SUO_CHENG_YUAN);
                     if (indexWhere < 0) {
                       ///先pop再路由,否则dialog的context找不到listener
-                      Navigator.of(context)
-                          .pop(WebIndexID.ZHU_SUO_CHENG_YUAN);
+                      Navigator.of(context).pop(WebIndexID.ZHU_SUO_CHENG_YUAN);
                     } else {
                       Navigator.of(context).pop();
-                      routeToWeb(context, WebIndexID.ZHU_SUO_CHENG_YUAN, indexInfo);
+                      routeToWeb(
+                          context, WebIndexID.ZHU_SUO_CHENG_YUAN, indexInfo);
                     }
                   }),
             TextSpan(
@@ -403,8 +404,17 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
         );
       }).then((value) {
     if (value == WebIndexID.ZHU_SUO_CHENG_YUAN) {
-      routeToWebByCache(context, PAGE_MINE, indexId: WebIndexID.ZHU_SUO_CHENG_YUAN);
+      routeToWebByCache(context, PAGE_MINE,
+          indexId: WebIndexID.ZHU_SUO_CHENG_YUAN);
     }
+    //获取当前用户信息
+    Future.delayed(Duration(milliseconds: 500), () {
+      return Api.getUserInfo().then((baseResp) {
+        if (baseResp.success()) {
+          BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
+        }
+      });
+    });
   });
 }
 

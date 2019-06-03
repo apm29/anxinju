@@ -66,6 +66,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
               child: Text(snapshot.data.text),
             );
           }
+          bool isReAuth = (snapshot.data.data?.idCard??"").isNotEmpty;
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: CustomScrollView(
@@ -113,10 +114,10 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
 //                  ),
 //                ),
                 SliverToBoxAdapter(
-                  child: Padding(
+                  child: isReAuth?Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text("您已经经过认证,重新认证不可修改身份证信息"),
-                  ),
+                  ):Container(),
                 ),
                 SliverToBoxAdapter(
                   child: Padding(

@@ -44,9 +44,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           Strings.appName,
         ),
         actions: <Widget>[
-          DistrictInfoButton(callback: (d){
-            BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
-          },),
+          DistrictInfoButton(
+            callback: (d) {
+              BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
+            },
+          ),
 //          buildActions(context),
         ],
       ),
@@ -69,7 +71,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       BlocProviders.of<ApplicationBloc>(context)
                           .getNoticeInfo();
                       BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
-                      BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
+                      BlocProviders.of<ApplicationBloc>(context)
+                          .getMyHouseList();
                     },
                     child: Center(
                       child: Column(
@@ -156,14 +159,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         children: <Widget>[
                                           GestureDetector(
                                             onTap: () {
-                                              if (hasHouse) {
-                                                if (checkIfCertificated(
-                                                    context))
-                                                  routeToWeb(context, WebIndexID.FANG_KE_GUAN_LI,
+                                              if (checkIfCertificated(
+                                                  context)) {
+                                                if (hasHouse) {
+                                                  routeToWeb(
+                                                      context,
+                                                      WebIndexID
+                                                          .FANG_KE_GUAN_LI,
                                                       indexInfo);
-                                              } else {
-                                                showAuthDialog(
-                                                    context, indexInfo);
+                                                } else {
+                                                  showAuthDialog(
+                                                      context, indexInfo);
+                                                }
                                               }
                                             },
                                             child: Padding(
@@ -188,7 +195,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             onTap: () {
                                               if (checkIfCertificated(context))
                                                 routeToWeb(
-                                                    context, WebIndexID.ZHAO_WU_YE, indexInfo);
+                                                    context,
+                                                    WebIndexID.ZHAO_WU_YE,
+                                                    indexInfo);
                                             },
                                             child: Padding(
                                               padding:
@@ -212,7 +221,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             onTap: () {
                                               if (checkIfCertificated(context))
                                                 routeToWeb(
-                                                    context, WebIndexID.ZHAO_SHE_QU, indexInfo);
+                                                    context,
+                                                    WebIndexID.ZHAO_SHE_QU,
+                                                    indexInfo);
                                             },
                                             child: Padding(
                                               padding:
@@ -236,7 +247,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             onTap: () {
                                               if (checkIfCertificated(context))
                                                 routeToWeb(
-                                                    context, WebIndexID.ZHAO_JING_CHA, indexInfo);
+                                                    context,
+                                                    WebIndexID.ZHAO_JING_CHA,
+                                                    indexInfo);
                                             },
                                             child: Padding(
                                               padding:

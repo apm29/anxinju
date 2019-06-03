@@ -207,9 +207,10 @@ class _FaceIdPageState extends State<FaceIdPage> {
                 ),
                 Align(
                   alignment: Alignment(0, 0.5),
-                  child: Text("注意:匹配人脸时请将脸部对准圆形采集框",style: TextStyle(
-                    color: Colors.blueAccent
-                  ),),
+                  child: Text(
+                    "注意:匹配人脸时请将脸部对准圆形采集框",
+                    style: TextStyle(color: Colors.blueAccent),
+                  ),
                 ),
                 Align(
                   alignment: Alignment(0, 0.9),
@@ -248,6 +249,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
   void takePicture() async {
     var argument = ModalRoute.of(context).settings.arguments;
     if (argument is Map) {
+      ///认证
       if (argument['idCard'] != null) {
         faceRecognizeKey.currentState.startLoading();
         Directory directory = await getTemporaryDirectory();
@@ -288,6 +290,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
       print(baseResponse.text);
       //Navigator.of(context).pop(baseResponse.text);
       UserVerifyInfo userVerifyInfo = baseResponse.data;
+      ///有房认证
       if (userVerifyInfo.rows != null && userVerifyInfo.rows.length > 0) {
         showDialog(
             context: context,
@@ -309,7 +312,9 @@ class _FaceIdPageState extends State<FaceIdPage> {
           Navigator.of(context).pop(baseResponse.text);
         });
       } else {
+        ///无房用户,导向成员申请
         showDialog(
+            barrierDismissible: false,
             context: context,
             builder: (context) {
               return AlertDialog(
@@ -328,6 +333,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
         });
       }
     } else {
+      ///认证出错
       showDialog(
           context: context,
           builder: (context) {
@@ -346,11 +352,18 @@ class _FaceIdPageState extends State<FaceIdPage> {
         Navigator.of(context).pop(baseResponse.text);
       });
     }
+    ///认证之后不管是否成功都更新userInfo
+    Api.getUserInfo().then((baseResponse) {
+      if (baseResponse.success()) {
+        BlocProviders.of<ApplicationBloc>(context).login(baseResponse.data);
+      }
+    });
   }
 }
 
 class ClipperCamera extends CustomClipper<Rect> {
-  final double width;  final double ratio;
+  final double width;
+  final double ratio;
   final Size constraint;
 
   ClipperCamera(this.width, this.ratio, this.constraint);

@@ -107,7 +107,7 @@ class DistrictInfo {
     districtName = json['districtName'];
     districtAddr = json['districtAddr'];
     districtPic = json['districtPic'];
-    companyId = json['companyId'];
+    companyId = json['companyId'].toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -293,19 +293,19 @@ class NoticeDetail {
   String companyName;
   String createTime;
 
-  NoticeDetail(
-      {this.noticeId,
-      this.noticeTitle,
-      this.noticeContent,
-      this.noticeType,
-      this.noticeScope,
-      this.districtId,
-      this.userId,
-      this.companyId,
-      this.userName,
-      this.companyName,
-      this.createTime,
-      });
+  NoticeDetail({
+    this.noticeId,
+    this.noticeTitle,
+    this.noticeContent,
+    this.noticeType,
+    this.noticeScope,
+    this.districtId,
+    this.userId,
+    this.companyId,
+    this.userName,
+    this.companyName,
+    this.createTime,
+  });
 
   NoticeDetail.fromJson(Map<String, dynamic> json) {
     noticeId = json['noticeId'];
@@ -369,7 +369,9 @@ class HouseInfo {
   String addr;
 
   HouseInfo({this.isOwner, this.addr});
-  bool get isHouseOwner => isOwner !=0;
+
+  bool get isHouseOwner => isOwner == 1;
+
   HouseInfo.fromJson(Map<String, dynamic> json) {
     isOwner = json['isOwner'];
     addr = json['addr'];
@@ -386,6 +388,7 @@ class HouseInfo {
 class UserType {
   int id;
   String userId;
+
   ///物业人员 1
   ///有房认证用户 2
   ///民警 3
@@ -414,9 +417,7 @@ class UserType {
   String toString() {
     return 'UserType{id: $id, userId: $userId, roleCode: $roleCode}';
   }
-
 }
-
 
 class HouseDetail {
   int id;
@@ -434,17 +435,17 @@ class HouseDetail {
 
   HouseDetail(
       {this.id,
-        this.houseId,
-        this.districtId,
-        this.building,
-        this.unit,
-        this.house,
-        this.addr,
-        this.phone,
-        this.idcard,
-        this.name,
-        this.userId,
-        this.passCode});
+      this.houseId,
+      this.districtId,
+      this.building,
+      this.unit,
+      this.house,
+      this.addr,
+      this.phone,
+      this.idcard,
+      this.name,
+      this.userId,
+      this.passCode});
 
   HouseDetail.fromJson(Map<String, dynamic> json) {
     id = json['id'];
