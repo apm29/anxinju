@@ -187,6 +187,19 @@ class ApplicationBloc extends BlocBase {
     });
   }
 
+  void getMyUserTypes() {
+    Api.getUserTypeWithOutId().then((baseResp) {
+      print('$baseResp');
+      var data = baseResp.data[0];
+      print(data);
+      _userTypeController.add(baseResp.data);
+    }).catchError((e, s) {
+      print(e);
+      print(s);
+      _userTypeController.add([]);
+    });
+  }
+
   void getMyHouseList() {
     Api.getMyHouse(getCurrentDistrictId()).then((baseResp) {
       if (baseResp.success()) {
@@ -230,12 +243,15 @@ class ApplicationBloc extends BlocBase {
           .add(list.firstWhere((index) => index.area == "index"));
       _mineIndexController
           .add(list.firstWhere((index) => index.area == "mine"));
-      var content = list.map((index){
-        return index.toString();
-      }).toList().join(",");
-      sharedPreferences.setString(PreferenceKeys.keyIndexInfo,"[$content]");
+      var content = list
+          .map((index) {
+            return index.toString();
+          })
+          .toList()
+          .join(",");
+      sharedPreferences.setString(PreferenceKeys.keyIndexInfo, "[$content]");
       getMyHouseList();
-    } catch (e,s) {
+    } catch (e, s) {
       print(e);
       print(s);
       Fluttertoast.showToast(msg: "获取网页索引失败");

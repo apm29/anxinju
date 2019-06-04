@@ -21,6 +21,7 @@ class MemberApplyPage extends StatefulWidget {
 }
 
 class _MemberApplyPageState extends State<MemberApplyPage> {
+  TextEditingController _realNameController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _detailController = TextEditingController();
   int districtId;
@@ -57,6 +58,17 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                   children: <Widget>[
                     SizedBox(
                       height: 12,
+                    ),
+
+                    TextField(
+                      controller: _realNameController,
+                      decoration: InputDecoration(
+                          hintText: "请输入真实姓名",
+                          labelText: "真实姓名",
+                          border: OutlineInputBorder()),
+                    ),
+                    SizedBox(
+                      height: 16,
                     ),
                     GestureDetector(
                       onTap: () {
@@ -165,7 +177,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                           onPressed: () async {
                             applyKey.currentState.startLoading();
                             var baseResponse = await Api.applyMember(
-                                _detailController.text, districtId);
+                                _detailController.text, districtId,_realNameController.text);
                             Fluttertoast.showToast(msg: baseResponse.text);
                             applyKey.currentState.stopLoading();
                             if (baseResponse.success()) {

@@ -281,12 +281,13 @@ class Api {
   }
 
   static Future<BaseResponse> applyMember(
-      String address, int districtId) async {
+      String address, int districtId,String name) async {
     return DioUtil().postAsync(
       path: "/business/member/applyMember",
       data: {
         "districtId":districtId,
-        "addr":address
+        "addr":address,
+        "name":name,
       }
     );
   }
@@ -305,5 +306,20 @@ class Api {
       },
       dataType: DataType.LIST,
     );
+  }
+
+  static Future<BaseResponse<List<UserType>>> getUserTypeWithOutId() {
+    return DioUtil().postAsync(
+        path: "/permission/UserRole/findUserRole",
+        jsonProcessor: (json) {
+          if (json is List) {
+            return json.map((j) {
+              return UserType.fromJson(j);
+            }).toList();
+          }
+          return [];
+        },
+        dataType: DataType.LIST,
+        data: {});
   }
 }

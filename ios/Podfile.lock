@@ -43,7 +43,7 @@ PODS:
     - Flutter
   - path_provider (0.0.1):
     - Flutter
-  - permission_handler (3.1.0):
+  - permission_handler (3.0.2):
     - Flutter
   - shared_preferences (0.0.1):
     - Flutter
@@ -149,7 +149,7 @@ SPEC CHECKSUMS:
   MJExtension: 74ec83124a68891619fb7ba9c5c811bbf1691076
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
-  permission_handler: fa6b0d784b1a43cb96b468a5b8365cb130b1956a
+  permission_handler: 73cfc10e081c379c1dcc19cd0040c77e500fa936
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
   sqflite: ff1d9da63c06588cc8d1faf7256d741f16989d5a
   webview_flutter: 1aa7604e6cdb451a9b7ed2c37d5454c0b440246b

@@ -352,10 +352,12 @@ class _FaceIdPageState extends State<FaceIdPage> {
         Navigator.of(context).pop(baseResponse.text);
       });
     }
-    ///认证之后不管是否成功都更新userInfo
+    ///认证之后不管是否成功都更新userInfo 和 房屋列表
     Api.getUserInfo().then((baseResponse) {
       if (baseResponse.success()) {
         BlocProviders.of<ApplicationBloc>(context).login(baseResponse.data);
+        BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
+        BlocProviders.of<ApplicationBloc>(context).getMyUserTypes();
       }
     });
   }
