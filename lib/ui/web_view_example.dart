@@ -1,5 +1,6 @@
 import 'package:ease_life/index.dart';
 import 'package:rxdart/rxdart.dart';
+
 //import 'package:geolocator/geolocator.dart';
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
@@ -301,6 +302,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
   WebViewController controller;
+  StreamSubscription _streamSubscription;
   final _focusNode1 = FocusNode();
   final _focusNode2 = FocusNode();
   final TextEditingController textController1 = TextEditingController();
@@ -317,6 +319,9 @@ class _WebViewExampleState extends State<WebViewExample> {
   void dispose() {
     super.dispose();
     titleController.close();
+    if (_streamSubscription != null) {
+      _streamSubscription.cancel();
+    }
   }
 
   @override
@@ -438,6 +443,8 @@ class _WebViewExampleState extends State<WebViewExample> {
                       ].toSet(),
                       navigationDelegate: (NavigationRequest request) {
                         print('allowing navigation to $request');
+                        if (_streamSubscription != null)
+                          _streamSubscription.cancel();
 //            if(!request.url.startsWith("http")){
 //              return NavigationDecision.prevent;
 //            }
@@ -457,12 +464,35 @@ class _WebViewExampleState extends State<WebViewExample> {
                           titleController.add(title);
                         });
                         if (Platform.isAndroid) {
-                          controller.evaluateJavascript('''
+                          imeConfig();
+                          if (_streamSubscription != null)
+                            _streamSubscription.cancel();
+                          _streamSubscription = Observable.periodic(
+                              Duration(seconds: 2), (i) => i).listen((i) {
+                            imeConfig();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
+//        floatingActionButton: favoriteButton(),
+      ),
+    );
+  }
+
+  void imeConfig() async {
+    if (controller != null) controller.evaluateJavascript('''
                           var inputs = document.getElementsByTagName('input');
                           var textArea = document.getElementsByTagName('textarea');
                           var current;
                           var lastFocusElement = current;
                           for (var i = 0; i < inputs.length; i++) {
+                            console.log(i);
                             inputs[i].addEventListener('click', (e) => {
                               var json = {
                                 "funcName": "requestFocus",
@@ -534,18 +564,6 @@ class _WebViewExampleState extends State<WebViewExample> {
                           };
                           console.log('===JS CODE INJECTED INTO MY WEBVIEW===');
                         ''');
-                        }
-                      },
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ],
-        ),
-//        floatingActionButton: favoriteButton(),
-      ),
-    );
   }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
@@ -734,7 +752,7 @@ class _WebViewExampleState extends State<WebViewExample> {
 
   void doOnTextEdit(BuildContext context, Map<String, dynamic> data) {
     bool refocus = data['refocus'] as bool;
-    if(_focusNode2.hasFocus){
+    if (_focusNode2.hasFocus) {
       if (!refocus) FocusScope.of(context).requestFocus(_focusNode1);
       //FocusScope.of(context).requestFocus(_focusNode);
       if (!_focusNode1.hasFocus) {
@@ -761,7 +779,7 @@ class _WebViewExampleState extends State<WebViewExample> {
       );
       //TextField请求显示键盘
       FocusScope.of(context).requestFocus(_focusNode1);
-    } else{
+    } else {
       if (!refocus) FocusScope.of(context).requestFocus(_focusNode2);
       //FocusScope.of(context).requestFocus(_focusNode);
       if (!_focusNode2.hasFocus) {
@@ -789,7 +807,6 @@ class _WebViewExampleState extends State<WebViewExample> {
       //TextField请求显示键盘
       FocusScope.of(context).requestFocus(_focusNode2);
     }
-
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
@@ -1044,6 +1061,7 @@ enum MenuOptions {
   listCache,
   clearCache,
   navigationDelegate,
+  js,
 }
 
 class SampleMenu extends StatelessWidget {
@@ -1084,6 +1102,9 @@ class SampleMenu extends StatelessWidget {
               case MenuOptions.navigationDelegate:
                 _onNavigationDelegateExample(controller.data, context);
                 break;
+              case MenuOptions.js:
+                _jsDialog(controller.data, context);
+                break;
             }
             callback();
           },
@@ -1112,6 +1133,10 @@ class SampleMenu extends StatelessWidget {
                 const PopupMenuItem<MenuOptions>(
                   value: MenuOptions.clearCache,
                   child: Text('Clear cache'),
+                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.js,
+                  child: Text('js'),
                 ),
                 const PopupMenuItem<MenuOptions>(
                   value: MenuOptions.navigationDelegate,
@@ -1202,6 +1227,28 @@ class SampleMenu extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: cookieWidgets.toList(),
     );
+  }
+
+  TextEditingController _editingController =
+      TextEditingController(text: "console.log(document.activeElement);");
+
+  void _jsDialog(WebViewController data, BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            children: <Widget>[
+              TextField(
+                controller: _editingController,
+              ),
+              FlatButton(
+                  onPressed: () {
+                    data.evaluateJavascript(_editingController.text);
+                  },
+                  child: Text("go"))
+            ],
+          );
+        });
   }
 }
 
