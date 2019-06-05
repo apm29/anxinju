@@ -24,7 +24,34 @@ class MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     initPlatformState(context);
-    if (mounted) BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+    if (mounted) {
+      BlocProviders.of<ApplicationBloc>(context).getUserTypes();
+    }
+    if (Platform.isAndroid)
+      FlutterBugly.init(
+        androidAppId: "89b908154e",
+        iOSAppId: "0d1433b494",
+      ).then((result) {
+        print('${result.message} ${result.isSuccess}');
+        return FlutterBugly.checkUpgrade(isManual: false, isSilence: false)
+            .then((_) {
+          return FlutterBugly.getUpgradeInfo();
+        });
+      }).then((UpgradeInfo info) {
+        //showAboutDialog(
+        //  context: context,
+        //  applicationName: Strings.appName,
+        //  applicationVersion: info.versionName,
+        //  children: [FlatButton(onPressed: () {}, child: Text("更新"))],
+        //);
+        PackageInfo.fromPlatform().then((packageInfo) {
+          if (int.parse(
+              packageInfo.buildNumber) <
+              info.versionCode) {
+            showUpdateDialog(context, info);
+          }
+        });
+      });
   }
 
   @override
@@ -88,14 +115,11 @@ class MainPageState extends State<MainPage> {
       onNotification: (notification) {
         changePage(context, notification.index);
         if (notification.indexId != null) {
+          print('$notification');
           Index index = getIndexInfo().firstWhere((index) =>
               index.area ==
               (notification.index == PAGE_HOME ? 'index' : 'mine'));
-          routeToWeb(
-            context,
-            notification.indexId,
-            index
-          );
+          routeToWeb(context, notification.indexId, index);
         }
       },
       child: PageView.builder(
@@ -187,4 +211,10 @@ class IndexNotification extends Notification {
   String indexId;
 
   IndexNotification(this.index);
+
+  @override
+  String toString() {
+    return 'IndexNotification{index: $index, indexId: $indexId}';
+  }
+
 }

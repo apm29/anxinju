@@ -41,6 +41,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: TextField(
                         key: ValueKey("name"),
                         controller: _mobileController,
+                        maxLengthEnforced: true,
+                        maxLength: 11,
                         decoration: InputDecoration(
                           hintText: "输入电话号码",
                           labelText: "电话号码",
@@ -155,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     ticker.currentState?.startLoading();
-    BaseResponse<Object> baseResp = await Api.sendSms(_mobileController.text);
+    BaseResponse<Object> baseResp = await Api.sendSms(_mobileController.text,0);
     Fluttertoast.showToast(msg: baseResp.text);
     ticker.currentState?.stopLoading();
     if (baseResp.success()) {

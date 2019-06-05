@@ -123,6 +123,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      maxLength: 18,
                       enabled: (snapshot.data?.data?.idCard ?? "").isEmpty,
                       decoration: InputDecoration(
                           hintText: "请输入身份证",
@@ -213,24 +214,24 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                     key: submitButtonKey,
                     child: RaisedButton(
                       onPressed: () async {
-                        submitButtonKey.currentState.startLoading();
-                        var userId = snapshot.data.data.userId;
-                        var baseResponse = await Api.saveUserDetail(
-                          userId: userId,
-                          myName: null,
-                          sex: null,
-                          nickName: null,
-                          avatar: null,
-                          idCard: _idCardController.text,
-                        );
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(content: Text(baseResponse.text)));
-                        submitButtonKey.currentState.stopLoading();
-                        if (baseResponse.success()) {
+                        //submitButtonKey.currentState.startLoading();
+                        //var userId = snapshot.data.data.userId;
+                        //var baseResponse = await Api.saveUserDetail(
+                        //  userId: userId,
+                        //  myName: null,
+                        //  sex: null,
+                        //  nickName: null,
+                        //  avatar: null,
+                        //  idCard: _idCardController.text,
+                        //);
+                        //Scaffold.of(context).showSnackBar(
+                        //    SnackBar(content: Text(baseResponse.text)));
+                        //submitButtonKey.currentState.stopLoading();
+                        //if (baseResponse.success()) {
                           Navigator.of(context).pushReplacementNamed(
                               FaceIdPage.routeName,
                               arguments: {"idCard": _idCardController.text});
-                        }
+                        //}
                       },
                       color: Colors.blue,
                       child: Text(

@@ -898,18 +898,20 @@ class _WebViewExampleState extends State<WebViewExample> {
             title: Text(title),
             content: Text(content),
             actions: <Widget>[
-              OutlineButton(
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(null);
+                },
+                child: Text("取消",style: TextStyle(
+                  color: Colors.grey
+                ),),
+              ),
+              FlatButton(
                 onPressed: () {
                   Navigator.of(context).pop(callbackName);
                 },
                 child: Text("确定"),
               ),
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop(null);
-                },
-                child: Text("取消"),
-              )
             ],
           );
         }).then((param) {
@@ -938,7 +940,7 @@ class _WebViewExampleState extends State<WebViewExample> {
             title: Text(title),
             content: Text(content),
             actions: <Widget>[
-              OutlineButton(
+              FlatButton(
                 onPressed: () {
                   Navigator.of(context).pop(callbackParam);
                 },

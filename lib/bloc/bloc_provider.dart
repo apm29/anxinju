@@ -170,6 +170,8 @@ class ApplicationBloc extends BlocBase {
     Api.getUserInfo().then((base) {
       if (base.success()) {
         _userInfoController.add(base.data);
+      } else{
+        throw Exception("用户未登录,获取角色列表失败");
       }
       return base.data.userId;
     }).then((userId) {
@@ -182,7 +184,7 @@ class ApplicationBloc extends BlocBase {
       _userTypeController.add(baseResp.data);
     }).catchError((e, s) {
       print(e);
-      print(s);
+      //print(s);
       _userTypeController.add([]);
     });
   }

@@ -38,3 +38,6 @@ export 'package:file_picker/file_picker.dart';
 export 'package:contacts_service/contacts_service.dart';
 export 'package:web_socket_channel/io.dart';
 export 'package:permission_handler/permission_handler.dart';
+export 'package:flutter_bugly/flutter_bugly.dart';
+export 'package:package_info/package_info.dart';
+export 'package:open_file/open_file.dart';

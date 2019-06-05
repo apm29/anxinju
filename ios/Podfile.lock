@@ -8,6 +8,7 @@ PODS:
     - AMapFoundation (~> 1.4)
   - android_intent (0.0.1):
     - Flutter
+  - Bugly (2.5.0)
   - camera (0.0.1):
     - Flutter
   - contacts_service (0.2.1):
@@ -17,6 +18,9 @@ PODS:
   - file_picker (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_bugly (0.0.1):
+    - Bugly
+    - Flutter
   - flutter_exif_rotation (0.0.1):
     - Flutter
   - flutter_image_compress (0.0.1):
@@ -43,7 +47,7 @@ PODS:
     - Flutter
   - path_provider (0.0.1):
     - Flutter
-  - permission_handler (3.0.2):
+  - permission_handler (3.1.0):
     - Flutter
   - shared_preferences (0.0.1):
     - Flutter
@@ -61,6 +65,7 @@ DEPENDENCIES:
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `.symlinks/flutter/ios`)
+  - flutter_bugly (from `.symlinks/plugins/flutter_bugly/ios`)
   - flutter_exif_rotation (from `.symlinks/plugins/flutter_exif_rotation/ios`)
   - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
   - flutter_sms (from `.symlinks/plugins/flutter_sms/ios`)
@@ -79,6 +84,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - AMapFoundation
     - AMapLocation
+    - Bugly
     - FMDB
     - JCore
     - JPush
@@ -99,6 +105,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: ".symlinks/flutter/ios"
+  flutter_bugly:
+    :path: ".symlinks/plugins/flutter_bugly/ios"
   flutter_exif_rotation:
     :path: ".symlinks/plugins/flutter_exif_rotation/ios"
   flutter_image_compress:
@@ -131,11 +139,13 @@ SPEC CHECKSUMS:
   AMapFoundation: 20fce2a12cd152e1092afdd04379cdac21932185
   AMapLocation: 89a7e4eb6040d32ba73c77a4966ecc66e46aa7c3
   android_intent: 73316069cd1f6aac919df1c6e640cad190fd5e8b
+  Bugly: 3ca9f255c01025582df26f9222893b383c7e4b4e
   camera: d56ad165545ae5a0ffb892376033760a969c68c8
   contacts_service: 64ebf2a313b34bff0acf668efac52ae402ba9be0
   device_info: 3ebad48f726348f69abd802f3334a8d1ed795fbd
   file_picker: 408623be2125b79a4539cf703be3d4b3abe5e245
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
+  flutter_bugly: c9800f4d5bc5bdc27ffdde3417a26ba44266e0c3
   flutter_exif_rotation: 093dd59f20679d71ce9ae186f2b86c01307b9a6a
   flutter_image_compress: c29e818cdf6e4276875601a245b6bb18eb444157
   flutter_sms: 96f145a6ee930686d1126f3de2b50ff90d5d427f
@@ -149,7 +159,7 @@ SPEC CHECKSUMS:
   MJExtension: 74ec83124a68891619fb7ba9c5c811bbf1691076
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
-  permission_handler: 73cfc10e081c379c1dcc19cd0040c77e500fa936
+  permission_handler: fa6b0d784b1a43cb96b468a5b8365cb130b1956a
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
   sqflite: ff1d9da63c06588cc8d1faf7256d741f16989d5a
   webview_flutter: 1aa7604e6cdb451a9b7ed2c37d5454c0b440246b

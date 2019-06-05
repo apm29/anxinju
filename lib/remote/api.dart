@@ -42,12 +42,13 @@ class Api {
         cancelToken: cancelToken);
   }
 
-  static Future<BaseResponse<Object>> sendSms(String mobile,
+  ///type  0 注册 ,其他登录
+  static Future<BaseResponse<Object>> sendSms(String mobile, int type,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<Object>(
         path: "permission/user/getVerifyCode",
         jsonProcessor: (dynamic json) => null,
-        data: {"mobile": mobile},
+        data: {"mobile": mobile, "type": type},
         cancelToken: cancelToken);
   }
 
@@ -281,24 +282,21 @@ class Api {
   }
 
   static Future<BaseResponse> applyMember(
-      String address, int districtId,String name) async {
-    return DioUtil().postAsync(
-      path: "/business/member/applyMember",
-      data: {
-        "districtId":districtId,
-        "addr":address,
-        "name":name,
-      }
-    );
+      String address, int districtId, String name) async {
+    return DioUtil().postAsync(path: "/business/member/applyMember", data: {
+      "districtId": districtId,
+      "addr": address,
+      "name": name,
+    });
   }
 
-  static Future<BaseResponse<List<HouseDetail>>> getMyHouse(int districtId){
+  static Future<BaseResponse<List<HouseDetail>>> getMyHouse(int districtId) {
     return DioUtil().postAsync<List<HouseDetail>>(
       path: "/business/houseInfo/getMyHouse",
       data: {
-        "districtId":districtId,
+        "districtId": districtId,
       },
-      jsonProcessor: (s){
+      jsonProcessor: (s) {
         if (s is List) {
           return s.map((i) => HouseDetail.fromJson(i)).toList();
         }
@@ -321,5 +319,28 @@ class Api {
         },
         dataType: DataType.LIST,
         data: {});
+  }
+
+  static Future<BaseResponse<List>> getMyApplyList(
+      {String status, int page, int row}) {
+    var map= <String,dynamic> {
+      "page": page,
+      "row": row,
+    };
+    if(status!=null){
+      map["status"] = status;
+    }
+    return DioUtil().postAsync(
+        path: "/business/member/getMyApplyList",
+        jsonProcessor: (jsonString) {
+          if (jsonString is List) {
+            return jsonString.map((j) {
+              return UserType.fromJson(j);
+            }).toList();
+          }
+          return [];
+        },
+        dataType: DataType.LIST,
+        data: map);
   }
 }

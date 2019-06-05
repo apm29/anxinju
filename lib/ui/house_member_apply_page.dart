@@ -59,7 +59,6 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                     SizedBox(
                       height: 12,
                     ),
-
                     TextField(
                       controller: _realNameController,
                       decoration: InputDecoration(
@@ -175,9 +174,19 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                           color: Colors.blue,
                           textColor: Colors.white,
                           onPressed: () async {
+                            if (_detailController.text == null ||
+                                districtId == null ||
+                                _realNameController.text == null ||
+                                _detailController.text.isEmpty ||
+                                _realNameController.text.isEmpty) {
+                              Fluttertoast.showToast(msg: "请先完善信息再提交");
+                              return;
+                            }
                             applyKey.currentState.startLoading();
                             var baseResponse = await Api.applyMember(
-                                _detailController.text, districtId,_realNameController.text);
+                                _detailController.text,
+                                districtId,
+                                _realNameController.text);
                             Fluttertoast.showToast(msg: baseResponse.text);
                             applyKey.currentState.stopLoading();
                             if (baseResponse.success()) {
@@ -187,27 +196,30 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                                     return AlertDialog(
                                       title: Text("申请成功"),
                                       content: Text.rich(TextSpan(children: [
-                                        TextSpan(text: "您已经完成了${Strings.roomClass_2}成员申请,您可以在 "),
                                         TextSpan(
-                                            text: "我的-${Strings.roomClass_2}成员",
+                                            text:
+                                                "您已经完成了${Strings.roomClass_2}成员申请,您可以在 "),
+                                        TextSpan(
+                                            text: "我的-申请记录",
                                             style:
                                                 TextStyle(color: Colors.blue),
-                                          recognizer: TapGestureRecognizer()..onTap=(){
-                                              Navigator.of(context).pop();
-                                          }
-                                        ),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                Navigator.of(context).pop();
+                                              }),
                                         TextSpan(text: " 页面查看申请进度"),
                                       ])),
                                       actions: <Widget>[
                                         FlatButton(
                                             onPressed: () {
                                               Navigator.of(context).pop();
+                                              //routeToWebByCache(context, PAGE_MINE,indexId:WebIndexID.SHEN_QING_JI_LU);
                                             },
                                             child: Text("确定"))
                                       ],
                                     );
                                   }).then((v) {
-                                Navigator.of(context).pop();
+                                Navigator.of(context).popUntil((r)=>r.settings.name==MainPage.routeName);
                               });
                             }
                           },

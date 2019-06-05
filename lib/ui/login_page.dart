@@ -293,7 +293,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     }
     tickSmsKey.currentState?.startLoading();
     BaseResponse<Object> baseResp =
-        await Api.sendSms(controllerMobile.text, cancelToken: cancelToken);
+        await Api.sendSms(controllerMobile.text,1, cancelToken: cancelToken);
     Fluttertoast.showToast(msg: baseResp.text);
     tickSmsKey.currentState?.stopLoading();
     if (baseResp.success()) {

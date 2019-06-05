@@ -1,11 +1,5 @@
-import 'dart:convert';
-import 'dart:io';
+import 'package:ease_life/index.dart';
 import 'package:dio/dio.dart';
-import 'package:ease_life/main.dart';
-import 'package:ease_life/model/base_response.dart';
-import 'package:ease_life/persistance/shared_preference_keys.dart';
-import 'package:ease_life/res/strings.dart';
-import 'package:flutter/foundation.dart';
 
 typedef DioErrorCallback = dynamic Function(DioError);
 typedef ResponseCallback<T> = void Function(T);
@@ -82,7 +76,8 @@ class DioUtil {
         debugPrint("REQUEST:");
         debugPrint("===========================================");
         debugPrint(
-            "  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
+            "  Method:${resp.request.method},Url:${resp.request.baseUrl +
+                resp.request.path}");
         debugPrint("  Headers:${resp.request.headers}");
         debugPrint("  QueryParams:${resp.request.queryParameters}");
         if (resp.request.data.runtimeType != FormData) {
@@ -136,18 +131,18 @@ class DioUtil {
     print('post $path');
     return _dioInstance
         .post<Map<String, dynamic>>(path,
-            data: !formData ? data : FormData.from(data),
-            options: RequestOptions(
-                contentType: formData
-                    ? ContentType.parse(VALUE_HEADER_CONTENT_TYPE_FORM)
-                    : ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
-                headers: addAuthorization
-                    ? {
-                        KEY_HEADER_TOKEN: sharedPreferences
-                            .getString(PreferenceKeys.keyAuthorization),
-                      }
-                    : {}),
-            cancelToken: cancelToken)
+        data: !formData ? data : FormData.from(data),
+        options: RequestOptions(
+            contentType: formData
+                ? ContentType.parse(VALUE_HEADER_CONTENT_TYPE_FORM)
+                : ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+            headers: addAuthorization
+                ? {
+              KEY_HEADER_TOKEN: sharedPreferences
+                  .getString(PreferenceKeys.keyAuthorization),
+            }
+                : {}),
+        cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       if (response.statusCode != HttpStatus.ok) {
         print('---------RESP-ERR----------');
@@ -179,9 +174,9 @@ class DioUtil {
         BaseResponse<T> baseResponse = BaseResponse<T>(_status, _token, _text,
             jsonProcessor == null ? null : jsonProcessor(_data));
         //当请求失败的时候,吧data的String交给text,对后端的兼容...
-        if (!baseResponse.success() && _rawData is String) {
-          baseResponse.text = _rawData;
-        } else if (baseResponse.success() && baseResponse.text.isEmpty) {
+        //if (!baseResponse.success() && _rawData is String) {
+        //  baseResponse.text = _rawData;
+        if (baseResponse.success() && baseResponse.text.isEmpty) {
           baseResponse.text = "成功";
         }
         return baseResponse;
@@ -190,7 +185,7 @@ class DioUtil {
       }
     }).catchError((Object error, StackTrace trace) {
       debugPrint(error.toString());
-      print(trace);
+      //print(trace);
       return BaseResponse<T>("0", null,
           "请求失败:${error is DioError ? error.message : error.toString()}", null);
     });
@@ -204,7 +199,7 @@ class DioUtil {
 
     var data = FormData.from({
       "upfile":
-          UploadFileInfo(File(path), path.substring(path.lastIndexOf("/")))
+      UploadFileInfo(File(path), path.substring(path.lastIndexOf("/")))
     });
     return dio.post<String>("/UploadFile/UploadFile/upFileAjax", data: data);
   }
@@ -218,7 +213,7 @@ class DioUtil {
             contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
             headers: {
               KEY_HEADER_TOKEN:
-                  sharedPreferences.getString(PreferenceKeys.keyAuthorization),
+              sharedPreferences.getString(PreferenceKeys.keyAuthorization),
             }),
       );
       if (response.statusCode == 200) {
@@ -233,6 +228,31 @@ class DioUtil {
       print(e);
     }
     return res;
+  }
+
+  void downloadFile(String apkUrl, Function onProgress) async {
+    var status =await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    print('$status');
+    if(status == PermissionStatus.granted){
+      await _doDownload(apkUrl, onProgress);
+    } else {
+      var map = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+      if(map[PermissionGroup.storage] == PermissionStatus.granted){
+        await _doDownload(apkUrl, onProgress);
+      }
+    }
+
+  }
+
+  Future _doDownload(String apkUrl, Function onProgress) async {
+    var directory = await getTemporaryDirectory();
+    File savePath = File("${directory.path}/app.apk");
+    if(!await savePath.exists()){
+      savePath.create(recursive: true);
+    }
+    _dioInstance.download(apkUrl, savePath.path,onReceiveProgress: (count,total){
+      onProgress(count,total,savePath.path);
+    });
   }
 }
 

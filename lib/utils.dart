@@ -360,19 +360,19 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
                   "您当前选择的${Strings.districtClass},名下还没有认证${Strings.roomClass},请选择重新认证,申请成为成员或者切换${Strings.districtClass}\r\n如果您已经申请,请在",
             ),
             TextSpan(
-                text: "${Strings.roomClass_2}成员",
+                text: "申请记录",
                 style: TextStyle(color: Colors.blue),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    var indexWhere = indexInfo.menu.indexWhere(
-                        (i) => i.id == WebIndexID.ZHU_SUO_CHENG_YUAN);
+                    var indexWhere = indexInfo.menu
+                        .indexWhere((i) => i.id == WebIndexID.SHEN_QING_JI_LU);
                     if (indexWhere < 0) {
                       ///先pop再路由,否则dialog的context找不到listener
-                      Navigator.of(context).pop(WebIndexID.ZHU_SUO_CHENG_YUAN);
+                      Navigator.of(context).pop(WebIndexID.SHEN_QING_JI_LU);
                     } else {
                       Navigator.of(context).pop();
                       routeToWeb(
-                          context, WebIndexID.ZHU_SUO_CHENG_YUAN, indexInfo);
+                          context, WebIndexID.SHEN_QING_JI_LU, indexInfo);
                     }
                   }),
             TextSpan(
@@ -393,7 +393,7 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
                   Navigator.of(context)
                       .pushReplacementNamed(UserDetailAuthPage.routeName);
                 },
-                child: Text("前往认证")),
+                child: Text("重新认证")),
             FlatButton(
                 onPressed: () {
                   Navigator.of(context)
@@ -403,9 +403,9 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
           ],
         );
       }).then((value) {
-    if (value == WebIndexID.ZHU_SUO_CHENG_YUAN) {
+    if (value == WebIndexID.SHEN_QING_JI_LU) {
       routeToWebByCache(context, PAGE_MINE,
-          indexId: WebIndexID.ZHU_SUO_CHENG_YUAN);
+          indexId: WebIndexID.SHEN_QING_JI_LU);
     }
     //获取当前用户信息
     Future.delayed(Duration(milliseconds: 500), () {
@@ -422,4 +422,37 @@ void showAuthDialog(BuildContext context, Index indexInfo) {
 /// 发起者Widget ---> MainPage(NotificationListener) --> WebView
 void routeToWebByCache(BuildContext context, int mainIndex, {String indexId}) {
   (IndexNotification(mainIndex)..indexId = indexId).dispatch(context);
+}
+
+GlobalKey<UpdateDialogState> updateDialogKey = GlobalKey();
+
+void showUpdateDialog(BuildContext context, UpgradeInfo info) {
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return WillPopScope(
+          onWillPop: () async {
+            //强制更新时不让取消
+            return info.updateType == 2 ? false : true;
+          },
+          child: UpdateDialog(
+            key: updateDialogKey,
+            info: info,
+            onClickWhenDownload: () {
+              Fluttertoast.showToast(msg: "正在下载");
+            },
+            onClickWhenNotDownload: () {
+              DioUtil().downloadFile(info.apkUrl, (count, total,path) {
+                var _progress = count / total;
+                updateDialogKey.currentState.progress = _progress;
+                if(_progress >=1){
+                  Fluttertoast.showToast(msg: "下载完成");
+                  OpenFile.open(path);
+                }
+              });
+            },
+          ),
+        );
+      });
 }

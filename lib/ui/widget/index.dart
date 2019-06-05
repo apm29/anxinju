@@ -13,3 +13,4 @@ export 'refresh_list_view.dart';
 export 'room_picker.dart';
 export 'text_picker_widget.dart';
 export 'ticker_widget.dart';
+export 'update_dialog.dart';

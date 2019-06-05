@@ -16,7 +16,9 @@ void main() async {
 //    debugPrint(e.toString());
 //    debugPrint(s.toString());
 //  });
-  runApp(MyApp());
+  FlutterBugly.postCatchedException((){
+    runApp(MyApp());
+  });
 }
 
 // Platform messages are asynchronous, so we initialize in an async method.

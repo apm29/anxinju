@@ -128,8 +128,12 @@ class _MinePageState extends State<MinePage> {
                                                   : null,
                                             )),
                                         Icon(
-                                          userInfo.isCertification == 1 ?Icons.verified_user : Icons.error,
-                                          color:userInfo.isCertification == 1 ?  Colors.green : Colors.red,
+                                          userInfo.isCertification == 1
+                                              ? Icons.verified_user
+                                              : Icons.error,
+                                          color: userInfo.isCertification == 1
+                                              ? Colors.green
+                                              : Colors.red,
                                           size: 12,
                                         ),
                                         Text(
@@ -137,7 +141,7 @@ class _MinePageState extends State<MinePage> {
                                           style: TextStyle(fontSize: 15),
                                         ),
                                         InkWell(
-                                          onTap:(){
+                                          onTap: () {
                                             showReAuthDialog(context);
                                           },
                                           child: Container(
@@ -150,11 +154,10 @@ class _MinePageState extends State<MinePage> {
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 2),
                                             decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Colors.white
-                                              ),
-                                              borderRadius: BorderRadius.all(Radius.circular(4))
-                                            ),
+                                                border: Border.all(
+                                                    color: Colors.white),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(4))),
                                             margin: EdgeInsets.only(left: 2),
                                           ),
                                         )
@@ -182,7 +185,10 @@ class _MinePageState extends State<MinePage> {
                                   GestureDetector(
                                     onTap: () {
                                       if (hasHouse)
-                                        routeToWeb(context, WebIndexID.WO_DE_FANG_WU, indexInfo);
+                                        routeToWeb(
+                                            context,
+                                            WebIndexID.WO_DE_FANG_WU,
+                                            indexInfo);
                                       else {
                                         showAuthDialog(context, indexInfo);
                                       }
@@ -200,7 +206,10 @@ class _MinePageState extends State<MinePage> {
                                   GestureDetector(
                                     onTap: () {
 //                                        if (hasHouse)
-                                      routeToWeb(context, WebIndexID.ZHU_SUO_CHENG_YUAN, indexInfo);
+                                      routeToWeb(
+                                          context,
+                                          WebIndexID.ZHU_SUO_CHENG_YUAN,
+                                          indexInfo);
 //                                        else {
 //                                          showAuthDialog(context);
 //                                        }
@@ -217,7 +226,8 @@ class _MinePageState extends State<MinePage> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      routeToWeb(context, WebIndexID.WO_DE_AI_CHE, indexInfo);
+                                      routeToWeb(context,
+                                          WebIndexID.WO_DE_AI_CHE, indexInfo);
                                     },
                                     child: Column(
                                       children: <Widget>[
@@ -242,7 +252,10 @@ class _MinePageState extends State<MinePage> {
                             return GestureDetector(
                               onTap: () {
                                 if (hasHouse)
-                                  routeToWeb(context, WebIndexID.JIA_TING_TONG_XING_MA, indexInfo);
+                                  routeToWeb(
+                                      context,
+                                      WebIndexID.JIA_TING_TONG_XING_MA,
+                                      indexInfo);
                                 else {
                                   showAuthDialog(context, indexInfo);
                                 }
@@ -264,10 +277,39 @@ class _MinePageState extends State<MinePage> {
                       SizedBox(
                         height: 12,
                       ),
+                      hasHouse
+                          ? Container()
+                          : GestureDetector(
+                              onTap: () {
+                                routeToWeb(context, WebIndexID.SHEN_QING_JI_LU,
+                                    indexInfo);
+                                //Navigator.of(context).pushNamed(MemberApplyPage.routeName);
+                              },
+                              child: Container(
+                                color: Colors.white,
+                                padding: EdgeInsets.only(left: 15),
+                                child: HomeTitleSliver(
+                                  leadingIcon: Icon(
+                                    Icons.format_list_bulleted,
+                                    size: ScreenUtil().setWidth(56),
+                                    color: Color(0xff00007c),
+                                  ),
+                                  mainTitle: "历史申请记录",
+                                  subTitle: "",
+                                  tailText: "",
+                                ),
+                              ),
+                            ),
+                      !hasHouse
+                          ? SizedBox(
+                              height: 12,
+                            )
+                          : Container(),
                       GestureDetector(
                         onTap: () {
                           if (hasHouse)
-                            routeToWeb(context, WebIndexID.CHU_RU_JI_LU, indexInfo);
+                            routeToWeb(
+                                context, WebIndexID.CHU_RU_JI_LU, indexInfo);
                           else {
                             showAuthDialog(context, indexInfo);
                           }
@@ -338,29 +380,78 @@ class _MinePageState extends State<MinePage> {
                       SizedBox(
                         height: 10,
                       ),
-                      Container(
-                        color: Colors.white,
-                        padding: EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                BlocProviders.of<ApplicationBloc>(context)
-                                    .logout();
-                              },
-                              child: Column(
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.exit_to_app,
-                                    color: Colors.red,
+                      Row(
+                        children: <Widget>[
+                          Platform.isAndroid
+                              ? Expanded(
+                                  child: Container(
+                                  color: Colors.white,
+                                  padding: EdgeInsets.all(12),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      InkWell(
+                                        onTap: () {
+                                          FlutterBugly.checkUpgrade().then((_) {
+                                            return FlutterBugly
+                                                .getUpgradeInfo();
+                                          }).then((info) {
+                                            PackageInfo.fromPlatform()
+                                                .then((packageInfo) {
+                                              if (int.parse(
+                                                      packageInfo.buildNumber) <
+                                                  info.versionCode) {
+                                                showUpdateDialog(context, info);
+                                              }
+                                            });
+                                          });
+                                        },
+                                        splashColor: Colors.lightGreen,
+                                        child: Container(
+                                          child: Column(
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.autorenew,
+                                                color: Colors.lightGreen,
+                                              ),
+                                              Text("检查更新")
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text("退出登录")
+                                ))
+                              : Container(),
+                          Expanded(
+                            child: Container(
+                              color: Colors.white,
+                              padding: EdgeInsets.all(12),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  GestureDetector(
+                                    onTap: () {
+                                      BlocProviders.of<ApplicationBloc>(context)
+                                          .logout();
+                                    },
+                                    child: Column(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.exit_to_app,
+                                          color: Colors.red,
+                                        ),
+                                        Text("退出登录")
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: 50,
@@ -403,13 +494,11 @@ class _MinePageState extends State<MinePage> {
                     Navigator.of(context)
                         .pushReplacementNamed(UserDetailAuthPage.routeName);
                   },
-                  child: Text("前往认证")),
+                  child: Text("重新认证")),
             ],
           );
         });
   }
-
-
 
   ///民警 或者 物业可以看社区记录
   Stream<bool> hasSocietyRecordPermission(BuildContext context) {
@@ -470,5 +559,4 @@ class _MinePageState extends State<MinePage> {
       ],
     );
   }
-
 }
