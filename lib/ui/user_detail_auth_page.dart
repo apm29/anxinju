@@ -66,7 +66,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
               child: Text(snapshot.data.text),
             );
           }
-          bool isReAuth = (snapshot.data.data?.idCard??"").isNotEmpty;
+          bool isReAuth = (snapshot.data.data?.idCard ?? "").isNotEmpty;
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: CustomScrollView(
@@ -114,10 +114,12 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
 //                  ),
 //                ),
                 SliverToBoxAdapter(
-                  child: isReAuth?Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("您已经经过认证,重新认证不可修改身份证信息"),
-                  ):Container(),
+                  child: isReAuth
+                      ? Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("您已经经过认证,重新认证不可修改身份证信息"),
+                        )
+                      : Container(),
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
@@ -217,7 +219,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                         //submitButtonKey.currentState.startLoading();
                         //var userId = snapshot.data.data.userId;
                         //var baseResponse = await Api.saveUserDetail(
-                        //  userId: userId,
+                        //  userId: userId, 
                         //  myName: null,
                         //  sex: null,
                         //  nickName: null,
@@ -228,9 +230,12 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                         //    SnackBar(content: Text(baseResponse.text)));
                         //submitButtonKey.currentState.stopLoading();
                         //if (baseResponse.success()) {
-                          Navigator.of(context).pushReplacementNamed(
-                              FaceIdPage.routeName,
-                              arguments: {"idCard": _idCardController.text});
+                        Navigator.of(context).pushReplacementNamed(
+                            FaceIdPage.routeName,
+                            arguments: {
+                              "idCard": _idCardController.text,
+                              "isAgain": isReAuth
+                            });
                         //}
                       },
                       color: Colors.blue,

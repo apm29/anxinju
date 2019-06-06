@@ -33,7 +33,7 @@ class MainPageState extends State<MainPage> {
         iOSAppId: "0d1433b494",
       ).then((result) {
         print('${result.message} ${result.isSuccess}');
-        return FlutterBugly.checkUpgrade(isManual: false, isSilence: false)
+        return FlutterBugly.checkUpgrade(isManual: false, isSilence: true)
             .then((_) {
           return FlutterBugly.getUpgradeInfo();
         });

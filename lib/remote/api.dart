@@ -12,7 +12,7 @@ class Api {
       String userName, String password,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
-        path: "permission/login",
+        path: "/permission/login",
         jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
         data: {
           "userName": userName,
@@ -25,7 +25,7 @@ class Api {
       String mobile, String verifyCode,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
-        path: "permission/fastLogin",
+        path: "/permission/fastLogin",
         jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
         data: {
           "mobile": mobile,
@@ -37,7 +37,7 @@ class Api {
   static Future<BaseResponse<UserInfo>> getUserInfo(
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfo>(
-        path: "permission/user/getUserInfo",
+        path: "/permission/user/getUserInfo",
         jsonProcessor: (json) => UserInfo.fromJson(json),
         cancelToken: cancelToken);
   }
@@ -46,7 +46,7 @@ class Api {
   static Future<BaseResponse<Object>> sendSms(String mobile, int type,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<Object>(
-        path: "permission/user/getVerifyCode",
+        path: "/permission/user/getVerifyCode",
         jsonProcessor: (dynamic json) => null,
         data: {"mobile": mobile, "type": type},
         cancelToken: cancelToken);
@@ -55,7 +55,7 @@ class Api {
   static register(
       String mobile, String smsCode, String password, String userName) async {
     return DioUtil().postAsync<Object>(
-      path: "permission/user/register",
+      path: "/permission/user/register",
       jsonProcessor: (dynamic json) => null,
       data: {
         "userName": userName,
@@ -69,7 +69,7 @@ class Api {
   static Future<BaseResponse<List<DistrictInfo>>> findAllDistrict() async {
     BaseResponse<List<DistrictInfo>> baseResponse =
         await DioUtil().postAsync<List<DistrictInfo>>(
-            path: "business/district/findDistrictInfo",
+            path: "/business/district/findDistrictInfo",
             jsonProcessor: (dynamic json) {
               if (json is List) {
                 return json.map((j) {
@@ -95,13 +95,17 @@ class Api {
   }
 
   static Future<BaseResponse<UserVerifyInfo>> verify(
-      String imageUrl, String idCard) async {
+      String imageUrl, String idCard, bool isAgain) async {
     return await DioUtil().postAsync(
         path: "/permission/userCertification/verify",
         jsonProcessor: (j) {
           return UserVerifyInfo.fromJson(j);
         },
-        data: {"photo": imageUrl, "idCard": idCard});
+        data: {
+          "photo": imageUrl,
+          "idCard": idCard,
+          "isAgain": isAgain ? 1 : 0
+        });
   }
 
   /*
@@ -323,11 +327,11 @@ class Api {
 
   static Future<BaseResponse<List>> getMyApplyList(
       {String status, int page, int row}) {
-    var map= <String,dynamic> {
+    var map = <String, dynamic>{
       "page": page,
       "row": row,
     };
-    if(status!=null){
+    if (status != null) {
       map["status"] = status;
     }
     return DioUtil().postAsync(
@@ -342,5 +346,17 @@ class Api {
         },
         dataType: DataType.LIST,
         data: map);
+  }
+
+  static Future<BaseResponse> faceCompare(
+      String imageBase64,String idCard
+      ){
+    return DioUtil().postAsync(
+      path: "http://192.168.0.20:8089/facecompare/compare/",
+      data: {
+        "idNo":idCard,
+        "imageBase64Str":imageBase64
+      }
+    );
   }
 }
