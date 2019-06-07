@@ -1018,7 +1018,7 @@ class _WebViewExampleState extends State<WebViewExample> {
             "${jsonMap['callbackName']}('${contact.displayName}','${contact.phone}')";
         controller.evaluateJavascript(javascriptString);
       } else {
-        var javascriptString = "${jsonMap['callbackName']}()";
+        var javascriptString = "${jsonMap['callbackCancel']}()";
         controller.evaluateJavascript(javascriptString);
       }
     });
