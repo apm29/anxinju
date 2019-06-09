@@ -45,7 +45,7 @@ class MainPageState extends State<MainPage> {
         //  children: [FlatButton(onPressed: () {}, child: Text("更新"))],
         //);
         PackageInfo.fromPlatform().then((packageInfo) {
-          if (int.parse(
+          if (info!=null&&int.parse(
               packageInfo.buildNumber) <
               info.versionCode) {
             showUpdateDialog(context, info);

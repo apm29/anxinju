@@ -107,6 +107,7 @@ class ApplicationBloc extends BlocBase {
     sharedPreferences.setString(
         PreferenceKeys.keyUserInfo, userInfo?.toString());
     _getCurrentUserAndNotify();
+    _getCurrentDistrictAndNotify();
   }
 
   void saveToken(String token) {
@@ -163,14 +164,16 @@ class ApplicationBloc extends BlocBase {
   void logout() {
     sharedPreferences.setString(PreferenceKeys.keyUserInfo, null);
     sharedPreferences.setString(PreferenceKeys.keyAuthorization, null);
+    sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, null);
     _userInfoController.add(null);
+    _districtInfoController.add(null);
   }
 
   void getUserTypes() {
     Api.getUserInfo().then((base) {
       if (base.success()) {
         _userInfoController.add(base.data);
-      } else{
+      } else {
         throw Exception("用户未登录,获取角色列表失败");
       }
       return base.data.userId;

@@ -372,9 +372,9 @@ class _WebViewExampleState extends State<WebViewExample> {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
-            SampleMenu(_controller.future, () {
-              FocusScope.of(context).requestFocus(FocusNode());
-            }),
+//            SampleMenu(_controller.future, () {
+//              FocusScope.of(context).requestFocus(FocusNode());
+//            }),
           ],
         ),
         body: Column(
@@ -1111,39 +1111,39 @@ class SampleMenu extends StatelessWidget {
             callback();
           },
           itemBuilder: (BuildContext context) => <PopupMenuItem<MenuOptions>>[
-                PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.showUserAgent,
-                  child: const Text('Show user agent'),
-                  enabled: controller.hasData,
-                ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.listCookies,
-                  child: Text('List cookies'),
-                ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.clearCookies,
-                  child: Text('Clear cookies'),
-                ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.addToCache,
-                  child: Text('Add to cache'),
-                ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.listCache,
-                  child: Text('List cache'),
-                ),
+//                PopupMenuItem<MenuOptions>(
+//                  value: MenuOptions.showUserAgent,
+//                  child: const Text('Show user agent'),
+//                  enabled: controller.hasData,
+//                ),
+//                const PopupMenuItem<MenuOptions>(
+//                  value: MenuOptions.listCookies,
+//                  child: Text('List cookies'),
+//                ),
+//                const PopupMenuItem<MenuOptions>(
+//                  value: MenuOptions.clearCookies,
+//                  child: Text('Clear cookies'),
+//                ),
+//                const PopupMenuItem<MenuOptions>(
+//                  value: MenuOptions.addToCache,
+//                  child: Text('Add to cache'),
+//                ),
+//                const PopupMenuItem<MenuOptions>(
+//                  value: MenuOptions.listCache,
+//                  child: Text('List cache'),
+//                ),
                 const PopupMenuItem<MenuOptions>(
                   value: MenuOptions.clearCache,
                   child: Text('Clear cache'),
                 ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.js,
-                  child: Text('js'),
-                ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.navigationDelegate,
-                  child: Text('Example'),
-                ),
+//                const PopupMenuItem<MenuOptions>(
+//                  value: MenuOptions.js,
+//                  child: Text('js'),
+//                ),
+//                const PopupMenuItem<MenuOptions>(
+//                  value: MenuOptions.navigationDelegate,
+//                  child: Text('Example'),
+//                ),
               ],
         );
       },

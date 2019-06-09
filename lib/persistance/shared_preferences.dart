@@ -27,6 +27,9 @@ int getCurrentDistrictId() {
   }
   var jsonString =
       sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
+  if(jsonString==null || jsonString.isNotEmpty){
+    return null;
+  }
   var jsonMap = json.decode(jsonString);
   var districtInfo = DistrictInfo.fromJson(jsonMap);
   return districtInfo.districtId;
