@@ -195,7 +195,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
                                     transform: Matrix4.rotationY(3.14),
                                     child: Image.file(
                                       currentPic,
-                                      fit: BoxFit.fill,
+                                      fit: BoxFit.cover,
                                     ),
                                   );
                                 }
@@ -272,7 +272,6 @@ class _FaceIdPageState extends State<FaceIdPage> {
         file = await rotateWithExifAndCompress(file);
         BaseResponse<ImageDetail> resp = await Api.uploadPic(file.path);
         faceRecognizeKey.currentState.stopLoading();
-        //注册成功
         Navigator.of(context).pop(resp.data);
       }
     }
@@ -280,15 +279,14 @@ class _FaceIdPageState extends State<FaceIdPage> {
 
   Future verify(File file, Map argument) async {
     file = await rotateWithExifAndCompress(file);
-    var lengthSync = file.lengthSync();
-    print('$lengthSync');
     var resp = await Api.uploadPic(file.path);
+    var faceResult = await Api.faceCompare(await getImageBase64(file), argument['idCard']);
+    print('$faceResult');
     BaseResponse<UserVerifyInfo> baseResponse =
         await Api.verify(resp.data.orginPicPath, argument['idCard'],argument['isAgain']);
     faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
     if (baseResponse.success()) {
-      //注册成功
       print(baseResponse.text);
       //Navigator.of(context).pop(baseResponse.text);
       UserVerifyInfo userVerifyInfo = baseResponse.data;
@@ -312,6 +310,8 @@ class _FaceIdPageState extends State<FaceIdPage> {
               );
             }).then((v) {
           Navigator.of(context).pop(baseResponse.text);
+          ///认证之后不管是否成功都更新userInfo 和 房屋列表
+          refreshUserState();
         });
       } else {
         ///无房用户,导向成员申请
@@ -332,6 +332,8 @@ class _FaceIdPageState extends State<FaceIdPage> {
               );
             }).then((_) {
           Navigator.of(context).pushReplacementNamed(MemberApplyPage.routeName);
+          ///认证之后不管是否成功都更新userInfo 和 房屋列表
+          refreshUserState();
         });
       }
     } else {
@@ -352,16 +354,22 @@ class _FaceIdPageState extends State<FaceIdPage> {
             );
           }).then((v) {
         Navigator.of(context).pop(baseResponse.text);
+        ///认证之后不管是否成功都更新userInfo 和 房屋列表
+        refreshUserState();
       });
     }
-    ///认证之后不管是否成功都更新userInfo 和 房屋列表
-    Api.getUserInfo().then((baseResponse) {
-      if (baseResponse.success()) {
-        BlocProviders.of<ApplicationBloc>(context).login(baseResponse.data);
-        BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
-        BlocProviders.of<ApplicationBloc>(context).getMyUserTypes();
-      }
-    });
+
+  }
+
+  void refreshUserState() async{
+     ///认证之后不管是否成功都更新userInfo 和 房屋列表
+    var baseResp = await Api.getUserInfo();
+    if(baseResp.success()) {
+      BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
+      BlocProviders.of<ApplicationBloc>(context).getMyUserTypes();
+      BlocProviders.of<ApplicationBloc>(context)
+          .clearDistrictAndGetCurrentDistrict();
+    }
   }
 }
 

@@ -27,7 +27,7 @@ int getCurrentDistrictId() {
   }
   var jsonString =
       sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
-  if(jsonString==null || jsonString.isNotEmpty){
+  if(jsonString==null || jsonString.isEmpty){
     return null;
   }
   var jsonMap = json.decode(jsonString);

@@ -348,15 +348,10 @@ class Api {
         data: map);
   }
 
-  static Future<BaseResponse> faceCompare(
-      String imageBase64,String idCard
-      ){
+  static Future<BaseResponse> faceCompare(String imageBase64, String idCard) {
     return DioUtil().postAsync(
-      path: "http://192.168.0.20:8089/facecompare/compare/",
-      data: {
-        "idNo":idCard,
-        "imageBase64Str":imageBase64
-      }
+      path: "/facecompare/compare/",
+      data: {"idNo": idCard, "imageBase64Str": imageBase64},
     );
   }
 }

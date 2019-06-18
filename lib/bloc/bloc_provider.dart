@@ -107,7 +107,7 @@ class ApplicationBloc extends BlocBase {
     sharedPreferences.setString(
         PreferenceKeys.keyUserInfo, userInfo?.toString());
     _getCurrentUserAndNotify();
-    _getCurrentDistrictAndNotify();
+    clearDistrictAndGetCurrentDistrict();
   }
 
   void saveToken(String token) {
@@ -181,7 +181,6 @@ class ApplicationBloc extends BlocBase {
       print(userId);
       return Api.getUserType(userId);
     }).then((baseResp) {
-      print('$baseResp');
       var data = baseResp.data[0];
       print(data);
       _userTypeController.add(baseResp.data);
@@ -232,10 +231,30 @@ class ApplicationBloc extends BlocBase {
       sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict,
           baseResponse.data.first.toString());
       _districtInfoController.add(baseResponse.data.first);
+      getMyHouseList();
     } else {
       _districtInfoController.add(districtInfo);
+      getMyHouseList();
     }
-    getMyHouseList();
+
+  }
+
+  ///清空小区缓存重新获取
+  void clearDistrictAndGetCurrentDistrict() async {
+    BaseResponse<List<DistrictInfo>> baseResponse = await Api.findAllDistrict();
+    //将取到的${Strings.districtClass}信息存入sp缓存
+    var string = baseResponse.data.first.toString();
+    sharedPreferences.setString(
+        PreferenceKeys.keyCurrentDistrict, string);
+    if (baseResponse.success()) {
+      sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict,
+          string);
+      _districtInfoController.add(baseResponse.data.first);
+      getMyHouseList();
+    } else {
+      _districtInfoController.add(null);
+      getMyHouseList();
+    }
   }
 
   /*
