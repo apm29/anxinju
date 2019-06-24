@@ -3,13 +3,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:ease_life/model/base_response.dart';
+import '../index.dart';
 import 'dio_util.dart';
 
 class Api {
   static CancelToken defaultToken = CancelToken();
 
-  static Future<BaseResponse<UserInfoWrapper>> login(
-      String userName, String password,
+  static Future<BaseResponse<UserInfoWrapper>> login(String userName,
+      String password,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
         path: "/permission/login",
@@ -21,8 +22,8 @@ class Api {
         cancelToken: cancelToken);
   }
 
-  static Future<BaseResponse<UserInfoWrapper>> fastLogin(
-      String mobile, String verifyCode,
+  static Future<BaseResponse<UserInfoWrapper>> fastLogin(String mobile,
+      String verifyCode,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
         path: "/permission/fastLogin",
@@ -52,8 +53,8 @@ class Api {
         cancelToken: cancelToken);
   }
 
-  static register(
-      String mobile, String smsCode, String password, String userName) async {
+  static register(String mobile, String smsCode, String password,
+      String userName) async {
     return DioUtil().postAsync<Object>(
       path: "/permission/user/register",
       jsonProcessor: (dynamic json) => null,
@@ -68,18 +69,18 @@ class Api {
 
   static Future<BaseResponse<List<DistrictInfo>>> findAllDistrict() async {
     BaseResponse<List<DistrictInfo>> baseResponse =
-        await DioUtil().postAsync<List<DistrictInfo>>(
-            path: "/business/district/findDistrictInfo",
-            jsonProcessor: (dynamic json) {
-              if (json is List) {
-                return json.map((j) {
-                  return DistrictInfo.fromJson(j);
-                }).toList();
-              }
-              return null;
-            },
-            data: {},
-            dataType: DataType.LIST);
+    await DioUtil().postAsync<List<DistrictInfo>>(
+        path: "/business/district/findDistrictInfo",
+        jsonProcessor: (dynamic json) {
+          if (json is List) {
+            return json.map((j) {
+              return DistrictInfo.fromJson(j);
+            }).toList();
+          }
+          return null;
+        },
+        data: {},
+        dataType: DataType.LIST);
 
     return baseResponse;
   }
@@ -87,15 +88,15 @@ class Api {
   /*
    *  前端发送photo、idCard，
    */
-  static Future<BaseResponse> verifyUserFace(
-      String imageUrl, String idCard) async {
+  static Future<BaseResponse> verifyUserFace(String imageUrl,
+      String idCard) async {
     return await DioUtil().postAsync(
         path: "/permission/userCertification/verify",
         data: {"photo": imageUrl, "idCard": idCard});
   }
 
-  static Future<BaseResponse<UserVerifyInfo>> verify(
-      String imageUrl, String idCard, bool isAgain) async {
+  static Future<BaseResponse<UserVerifyInfo>> verify(String imageUrl,
+      String idCard, bool isAgain) async {
     return await DioUtil().postAsync(
         path: "/permission/userCertification/verify",
         jsonProcessor: (j) {
@@ -134,14 +135,13 @@ class Api {
    * userId,用户id:带上id为修改,不带id为新增详情
    * myName
    */
-  static Future<BaseResponse> saveUserDetail(
-      {String userId,
-      String myName,
-      String sex,
-      String phone,
-      String nickName,
-      String avatar,
-      String idCard}) async {
+  static Future<BaseResponse> saveUserDetail({String userId,
+    String myName,
+    String sex,
+    String phone,
+    String nickName,
+    String avatar,
+    String idCard}) async {
     var dataMap = {
       "myName": myName,
       "sex": sex,
@@ -208,8 +208,8 @@ class Api {
       data: {
         "noticeType": list
             .map((notice) {
-              return notice.typeId;
-            })
+          return notice.typeId;
+        })
             .toList()
             .join(",")
       },
@@ -250,8 +250,8 @@ class Api {
         data: {"districtId": districtId});
   }
 
-  static Future<BaseResponse<List<String>>> getUnits(
-      int districtId, String building) async {
+  static Future<BaseResponse<List<String>>> getUnits(int districtId,
+      String building) async {
     return DioUtil().postAsync(
         path: "/business/housedictInfo1/getAllUnit1",
         jsonProcessor: (s) {
@@ -267,8 +267,8 @@ class Api {
         });
   }
 
-  static Future<BaseResponse<List<String>>> getRooms(
-      int districtId, String building, String unit) async {
+  static Future<BaseResponse<List<String>>> getRooms(int districtId,
+      String building, String unit) async {
     return DioUtil().postAsync(
         path: "/business/housedictInfo1/getAllRoom1",
         jsonProcessor: (s) {
@@ -285,8 +285,8 @@ class Api {
         });
   }
 
-  static Future<BaseResponse> applyMember(
-      String address, int districtId, String name) async {
+  static Future<BaseResponse> applyMember(String address, int districtId,
+      String name) async {
     return DioUtil().postAsync(path: "/business/member/applyMember", data: {
       "districtId": districtId,
       "addr": address,
@@ -352,6 +352,24 @@ class Api {
     return DioUtil().postAsync(
       path: "/facecompare/compare/",
       data: {"idNo": idCard, "imageBase64Str": imageBase64},
+    );
+  }
+
+}
+
+class ApiKf {
+  static Future<BaseResponse<AudioUploadInfo>> uploadAudio(File file) {
+    return DioUtil().postAsync(
+        path: "/Php/Home/UploadFile/upVoiceFileAjax",
+        data: {
+          "upfile": UploadFileInfo(
+              file, file.path, contentType: ContentType.binary),
+        },
+        jsonProcessor: (s) {
+          return AudioUploadInfo.fromJson(s);
+        },
+        dataType: DataType.JSON,
+        formData: true
     );
   }
 }

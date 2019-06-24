@@ -372,9 +372,9 @@ class _WebViewExampleState extends State<WebViewExample> {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
-//            SampleMenu(_controller.future, () {
-//              FocusScope.of(context).requestFocus(FocusNode());
-//            }),
+            //SampleMenu(_controller.future, () {
+            //  FocusScope.of(context).requestFocus(FocusNode());
+            //}),
           ],
         ),
         body: Column(
@@ -810,18 +810,15 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
-    var directory = await getTemporaryDirectory();
-    var file = File(directory.path +
-        "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg");
-    showImageSourceDialog(file, context, (v) {
+    showImageSourceDialog( context, (v) {
       FocusScope.of(context).requestFocus(FocusNode());
-    }, (futureFile, localFile) {
-      processFileAndNotify(futureFile, localFile, callbackName);
+    }, (futureFile) {
+      processFileAndNotify(futureFile, callbackName);
     });
   }
 
   void processFileAndNotify(
-      Future<File> fileFuture, File localFile, String jsCallbackNam) {
+      Future<File> fileFuture, String jsCallbackNam) {
     fileFuture.then((File file) {
       if (file == null) {
         return null;
@@ -839,13 +836,11 @@ class _WebViewExampleState extends State<WebViewExample> {
       return FlutterImageCompress.compressWithFile(
         f.path,
         quality: 80,
-      );
-    }).then((listInt) {
-      if (listInt == null) {
-        return null;
-      }
-      localFile.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
-      return localFile;
+      ).then((listInt){
+        return f.writeAsBytesSync(listInt);
+      }).then((_){
+        return f;
+      });
     }).then((compressed) {
       if (compressed == null) {
         return null;
@@ -956,40 +951,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     });
   }
 
-  /*
-   * {
-      "callbackName": "funcOneParams",//一个String参数的callback, 回调返回参数
-      }
-   */
-  void doUploadImage(Map<String, dynamic> jsData) async {
-    var directory = await getTemporaryDirectory();
-    var localCompressedPath = directory.path +
-        "/compressed${DateTime.now().millisecondsSinceEpoch}.jpg";
-    String localPath;
-    ImagePicker.pickImage(source: ImageSource.gallery).then((file) {
-      localPath = file.absolute.path;
-      return FlutterImageCompress.compressWithFile(file.path,
-          minWidth: 1080, minHeight: 768, quality: 60);
-    }).then((listInt) {
-      var file = File(localCompressedPath);
-      print('${file.absolute.path}');
-      file.writeAsBytesSync(listInt, flush: true, mode: FileMode.write);
-      return file;
-    }).then((compressed) {
-      DioUtil().uploadFile("upfile", compressed.absolute.path).then((resp) {
-        if (resp.statusCode == 200) {
-          var data = resp.data;
-          Map<String, dynamic> jsonMap = json.decode(data);
-          var javascriptString =
-              '${jsData['callbackName']}("${jsonMap['data']['url']}","$localPath")';
-          print('$javascriptString');
-          controller.evaluateJavascript(javascriptString);
-        }
-      });
-    });
 
-    //showImageSourceDialog(File(path), callbackName)
-  }
 
   //文件上传
   void doUploadFile(String callbackName) {
@@ -1140,10 +1102,10 @@ class SampleMenu extends StatelessWidget {
 //                  value: MenuOptions.js,
 //                  child: Text('js'),
 //                ),
-//                const PopupMenuItem<MenuOptions>(
-//                  value: MenuOptions.navigationDelegate,
-//                  child: Text('Example'),
-//                ),
+                const PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.navigationDelegate,
+                  child: Text('Example'),
+                ),
               ],
         );
       },

@@ -1,5 +1,4 @@
 export 'app_bar.dart';
-export 'audio_input_widget.dart';
 export 'bottom_bar.dart';
 export 'district_info_button.dart';
 export 'home_card_with_icon.dart';
@@ -14,3 +13,4 @@ export 'room_picker.dart';
 export 'text_picker_widget.dart';
 export 'ticker_widget.dart';
 export 'update_dialog.dart';
+export 'bubble.dart';

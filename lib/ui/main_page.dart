@@ -1,9 +1,9 @@
 import 'package:ease_life/index.dart';
 
 const int PAGE_HOME = 0;
-const int PAGE_SEARCH = 11;
+const int PAGE_SEARCH = 1;
 const int PAGE_MESSAGE = 21;
-const int PAGE_MINE = 1;
+const int PAGE_MINE = 2;
 
 class MainPage extends StatefulWidget {
   static String routeName = "/";
@@ -45,9 +45,8 @@ class MainPageState extends State<MainPage> {
         //  children: [FlatButton(onPressed: () {}, child: Text("更新"))],
         //);
         PackageInfo.fromPlatform().then((packageInfo) {
-          if (info!=null&&int.parse(
-              packageInfo.buildNumber) <
-              info.versionCode) {
+          if (info != null &&
+              int.parse(packageInfo.buildNumber) < info.versionCode) {
             showUpdateDialog(context, info);
           }
         });
@@ -121,6 +120,7 @@ class MainPageState extends State<MainPage> {
               (notification.index == PAGE_HOME ? 'index' : 'mine'));
           routeToWeb(context, notification.indexId, index);
         }
+        return true;
       },
       child: PageView.builder(
         controller: _pageController,
@@ -136,6 +136,8 @@ class MainPageState extends State<MainPage> {
               return MessagePage();
             case PAGE_MINE:
               return MinePage();
+            default:
+              throw Exception("无效索引");
           }
         },
         onPageChanged: (index) {
@@ -178,9 +180,12 @@ class MainPageState extends State<MainPage> {
             ),
             OutlineButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(AudioRecordPage.routeName);
+                Navigator.of(context).pushNamed(ChatRoomPage.routeName,arguments: {
+                  "group":"1",
+                  "title":"紧急呼救"
+                });
               },
-              child: Text("语音录入界面"),
+              child: Text("紧急呼救"),
             ),
             OutlineButton(
               onPressed: () {
@@ -216,5 +221,4 @@ class IndexNotification extends Notification {
   String toString() {
     return 'IndexNotification{index: $index, indexId: $indexId}';
   }
-
 }

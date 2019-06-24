@@ -1,4 +1,3 @@
-export 'audio_record_page.dart';
 export 'authorization_page.dart';
 export 'camera_page.dart';
 export 'chat_room_page.dart';
@@ -17,3 +16,4 @@ export 'style.dart';
 export 'test_page.dart';
 export 'user_detail_auth_page.dart';
 export 'web_view_example.dart';
+export 'picture_page.dart';

@@ -479,3 +479,23 @@ class HouseDetail {
     return data;
   }
 }
+
+
+class AudioUploadInfo {
+  String key;
+  String url;
+
+  AudioUploadInfo({this.key, this.url});
+
+  AudioUploadInfo.fromJson(Map<String, dynamic> json) {
+    key = json['key'];
+    url = json['url'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['key'] = this.key;
+    data['url'] = this.url;
+    return data;
+  }
+}

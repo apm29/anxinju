@@ -7,9 +7,9 @@ List<Color> colors = [
   Color(0xfffebf1f),
 ];
 
-typedef OnFileProcess = Function(Future<File>, File localFile);
+typedef OnFileProcess = Function(Future<File>);
 
-void showImageSourceDialog(File file, BuildContext context,
+void showImageSourceDialog( BuildContext context,
     ValueCallback onValue, OnFileProcess onFileProcess) {
   FocusScope.of(context).requestFocus(FocusNode());
   showModalBottomSheet(
@@ -27,7 +27,7 @@ void showImageSourceDialog(File file, BuildContext context,
                         InkWell(
                           onTap: () {
                             Navigator.of(context).pop();
-                            showPicker(file, onFileProcess);
+                            showPicker( onFileProcess);
                           },
                           child: Container(
                             width: constraint.biggest.width,
@@ -39,7 +39,7 @@ void showImageSourceDialog(File file, BuildContext context,
                         InkWell(
                             onTap: () {
                               Navigator.of(context).pop();
-                              showCameraPicker(file, onFileProcess);
+                              showCameraPicker(onFileProcess);
                             },
                             child: Container(
                               width: constraint.biggest.width,
@@ -58,25 +58,16 @@ void showImageSourceDialog(File file, BuildContext context,
   });
 }
 
-void showPicker(File file, OnFileProcess onFileProcess) {
+void showPicker(OnFileProcess onFileProcess) {
   var future = ImagePicker.pickImage(source: ImageSource.gallery);
-  onFileProcess(future, file);
+  onFileProcess(future);
 }
 
-void showCameraPicker(File file, OnFileProcess onFileProcess) {
+void showCameraPicker(OnFileProcess onFileProcess) {
   var future = ImagePicker.pickImage(source: ImageSource.camera);
-  onFileProcess(future, file);
+  onFileProcess(future);
 }
 
-void showCamera(File file, OnFileProcess onFileProcess, BuildContext context) {
-  var future =
-      Navigator.of(context).push<File>(MaterialPageRoute(builder: (context) {
-    return CameraPage(
-      capturedFile: file,
-    );
-  }));
-  onFileProcess(future, file);
-}
 
 void startAudioRecord() {}
 

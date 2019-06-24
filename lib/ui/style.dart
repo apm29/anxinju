@@ -8,16 +8,13 @@ final ThemeData defaultThemeData = ThemeData(
     brightness: Brightness.light,
     color: Colors.white,
     elevation: 8,
-    iconTheme: IconThemeData(
-      color: Colors.blue,
-      size: 12
-    ),
+    iconTheme: IconThemeData(color: Colors.blue, size: 12),
     textTheme: TextTheme(
-      body1: TextStyle(fontSize: 11 ,color: Colors.grey),
+      body1: TextStyle(fontSize: 11, color: Colors.grey),
       body2: TextStyle(fontSize: 11),
       subtitle: TextStyle(
         color: Colors.grey[200],
-      )
-    )
-  )
+      ),
+    ),
+  ),
 );

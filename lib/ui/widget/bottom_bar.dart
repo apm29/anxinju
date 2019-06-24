@@ -33,14 +33,14 @@ class BottomBarState extends State<BottomBar> {
               _currentIndex == PAGE_HOME ? Colors.blueAccent : Colors.grey,
             ),
             title: Text("主页")),
-//        BottomNavigationBarItem(
-//            icon: Image.asset(
-//              "images/search.png",
-//              width: 24,
-//              height: 24,
-//              color: _currentIndex == PAGE_SEARCH ? Colors.blueAccent : Colors.grey,
-//            ),
-//            title: Text("搜索")),
+        BottomNavigationBarItem(
+            icon: Image.asset(
+              "images/search.png",
+              width: 24,
+              height: 24,
+              color: _currentIndex == PAGE_SEARCH ? Colors.blueAccent : Colors.grey,
+            ),
+            title: Text("搜索")),
 //        BottomNavigationBarItem(
 //            icon: Icon(
 //              Icons.message,
