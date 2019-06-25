@@ -1,6 +1,7 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/interaction/audio_recorder.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:intl/intl.dart';
 
 List<String> faces = [
   "[微笑]",
@@ -97,13 +98,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Observable<Message> get commandMessageStream => manager.commandMessageStream;
 
   TextEditingController _inputController = TextEditingController();
-  ScrollController _messagesController = ScrollController();
+  ScrollController _listViewController = ScrollController();
 
   BehaviorSubject<bool> _emotionIconController = BehaviorSubject();
 
   Observable<bool> get _emotionVisibilityStream =>
       _emotionIconController.stream;
   FocusNode _editFocusNode = FocusNode();
+  List<Message> messages = [];
 
   @override
   void initState() {
@@ -114,6 +116,28 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         _emotionIconController.add(emotionIcon);
       }
     });
+
+    Api.getUserInfo().then((resp) {
+      if(resp.success()) {
+        ChatMessageProvider().open().then((db) {
+          var arguments = ModalRoute
+              .of(context)
+              .settings
+              .arguments;
+          if (arguments is Map) {
+            group = arguments['group'];
+            db.getAll(group,resp.data.userId).then((list) {
+              var added = list.map((chatMessage) {
+                return chatMessage.toMessage();
+              }).toList();
+              setState(() {
+                messages.addAll(added);
+              });
+            });
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -122,8 +146,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.dispose();
     _emotionIconController.close();
   }
-
-  List<Message> messages = [];
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +158,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         manager.messageStream.listen((message) {
           setState(() {
             messages.insert(0, message);
+            _listViewController.animateTo(0,
+                duration: Duration(seconds: 1), curve: Curves.ease);
           });
           switch (message.type) {
             case MessageType.TEXT:
@@ -212,93 +236,108 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   Expanded buildMessageList() {
     return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          _editFocusNode.unfocus();
-          emotionIcon = false;
-          _emotionIconController.add(emotionIcon);
-        },
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: ListView.builder(
-                controller: _messagesController,
-                physics: AlwaysScrollableScrollPhysics(),
-                reverse: true,
-                itemBuilder: (context, index) {
-                  var message = messages[index];
-                  if (message.response != null) {
-                    return Row(
-                      children: <Widget>[
-                        SizedBox(
-                          width: 6,
-                        ),
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              "${WebSocketManager.kfBaseUrl}${message.response.data.msg.avatar}"),
-                        ),
-                        Flexible(
-                          child: buildMessageBody(context, message),
-                        ),
-                      ],
-                    );
-                  }
-                  return Row(
-                    children: <Widget>[
-                      Flexible(
-                        flex: 1000,
-                        child: Container(),
-                      ),
-                      buildMessageBody(context, message),
-                      CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(manager.config.fromAvatar ?? ""),
-                        child: manager.config.fromAvatar == null
-                            ? Icon(
-                                Icons.perm_identity,
-                                color: Colors.white,
-                              )
-                            : Container(),
-                      ),
-                      SizedBox(
-                        width: 6,
-                      ),
-                    ],
-                  );
-                },
-                itemCount: messages.length,
+      child: StreamBuilder<Message>(
+          stream: commandMessageStream,
+          builder: (context, snapshot) {
+            if ((snapshot.data?.status ?? ConnectStatus.WAIT) !=
+                ConnectStatus.CONNECTED) {
+              return Center(child: CircularProgressIndicator());
+            }
+            return GestureDetector(
+              onTap: () {
+                _editFocusNode.unfocus();
+                emotionIcon = false;
+                _emotionIconController.add(emotionIcon);
+              },
+              child: Stack(
+                children: <Widget>[
+                  Positioned.fill(
+                    child: ListView.builder(
+                      controller: _listViewController,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      reverse: true,
+                      itemCount: messages.length,
+                      itemBuilder: (
+                        context,
+                        index,
+                      ) {
+                        var message = messages[index];
+                        var child;
+                        if (message.fromId == manager.config.kfId) {
+                          child = Row(
+                            children: <Widget>[
+                              SizedBox(
+                                width: 6,
+                              ),
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    "${WebSocketManager.kfBaseUrl}${message.fromAvatar}"),
+                              ),
+                              Flexible(
+                                child:
+                                    buildMessageBody(context, message, false),
+                              ),
+                            ],
+                          );
+                        } else {
+                          child = Row(
+                            children: <Widget>[
+                              Flexible(
+                                flex: 1000,
+                                child: Container(),
+                              ),
+                              buildMessageBody(context, message, true),
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    manager.config.userAvatar ?? ""),
+                                child: manager.config.userAvatar == null
+                                    ? Icon(
+                                        Icons.perm_identity,
+                                        color: Colors.white,
+                                      )
+                                    : Container(),
+                              ),
+                              SizedBox(
+                                width: 6,
+                              ),
+                            ],
+                          );
+                        }
+                        return child;
+                      },
+                    ),
+                  ),
+                  Align(
+                    child: AudioHintWidget(),
+                    alignment: Alignment.center,
+                  ),
+                ],
               ),
-            ),
-            Align(
-              child: AudioHintWidget(),
-              alignment: Alignment.center,
-            ),
-          ],
-        ),
-      ),
+            );
+          }),
     );
   }
 
-  Widget buildMessageBody(BuildContext context, Message message) {
+  Widget buildMessageBody(BuildContext context, Message message, bool send) {
     switch (message.type) {
       case MessageType.TEXT:
-        return buildText(context, message);
+        return buildText(context, message, send);
         break;
       case MessageType.IMAGE:
-        return buildImage(context, message);
+        return buildImage(context, message, send);
         break;
       case MessageType.AUDIO:
-        return buildAudio(context, message);
+        return buildAudio(context, message, send);
         break;
       case MessageType.VIDEO:
         break;
       case MessageType.COMMAND:
         break;
     }
-    return buildText(context, message);
+    return buildText(context, message, send);
   }
 
-  Widget buildText(BuildContext context, Message message) {
+  Widget buildText(BuildContext context, Message message, bool send) {
     var allMatches = RegExp(r"face\[.*?\]").allMatches(message.content);
     List<Widget> children = [];
     int lastStart = 0;
@@ -331,35 +370,65 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         bottomLeft: Radius.circular(12),
         bottomRight: Radius.circular(12),
       ),
-      child: Container(
-        constraints: BoxConstraints.loose(
-            Size.fromWidth(MediaQuery.of(context).size.width - 140)),
-        decoration: BoxDecoration(
-          color: Colors.lightGreenAccent,
-          border: Border.all(
-            color: Colors.lightGreen,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment:
+            send ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: <Widget>[
+          _buildTimeText(message),
+          Container(
+            constraints: BoxConstraints.loose(
+                Size.fromWidth(MediaQuery.of(context).size.width - 140)),
+            decoration: BoxDecoration(
+              color: Colors.lightGreenAccent,
+              border: Border.all(
+                color: Colors.lightGreen,
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            padding: EdgeInsets.all(16),
+            margin: EdgeInsets.only(
+                left: send ? 16 : 4, right: send ? 4 : 16, top: 2, bottom: 4),
+            child: Wrap(
+              children: children,
+            ),
           ),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
-          ),
-        ),
-        padding: EdgeInsets.all(16),
-        margin: EdgeInsets.all(16),
-        child: Wrap(
-          children: children,
-        ),
+        ],
       ),
     );
   }
 
-  Widget buildAudio(BuildContext context, Message message) {
-    return AudioMessageTile(message.content, message.duration);
+  String _getMessageSendTime(Message message) {
+    var time = DateTime.fromMillisecondsSinceEpoch(message.sendTime);
+    if (isToday(time)) {
+      return DateFormat("HH:mm:ss").format(time);
+    } else {
+      return DateFormat("yyyy-MM-dd HH:mm:ss").format(time);
+    }
   }
 
-  Widget buildImage(BuildContext context, Message message) {
+  bool isToday(DateTime time) {
+    return time.difference(DateTime.now()).inDays < 1;
+  }
+
+  Widget buildAudio(BuildContext context, Message message, bool send) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment:
+          send ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: <Widget>[
+        _buildTimeText(message),
+        AudioMessageTile(message.content, message.duration),
+      ],
+    );
+  }
+
+  Widget buildImage(BuildContext context, Message message, bool send) {
     var rawUrl = message.content.substring(4, message.content.length - 1);
     var url;
     if (!rawUrl.startsWith("http")) {
@@ -374,27 +443,48 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           return PicturePage(url);
         }));
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.lightGreenAccent,
-          border: Border.all(
-            color: Colors.lightGreen,
+      child: Column(
+        crossAxisAlignment:
+            send ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(
+            height: 6,
           ),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
+          _buildTimeText(message),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.lightGreenAccent,
+              border: Border.all(
+                color: Colors.lightGreen,
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            constraints: BoxConstraints.tightFor(
+                width: MediaQuery.of(context).size.width * 0.7),
+            padding: EdgeInsets.all(4),
+            child: Hero(
+              tag: url,
+              child: Image.network(url),
+            ),
           ),
-        ),
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        constraints: BoxConstraints.tightFor(
-            width: MediaQuery.of(context).size.width * 0.7),
-        padding: EdgeInsets.all(4),
-        child: Hero(
-          tag: url,
-          child: Image.network(url),
-        ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeText(Message message) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 12),
+      child: Text(
+        _getMessageSendTime(message),
+        style: TextStyle(fontSize: 10, color: Colors.grey),
       ),
     );
   }
@@ -413,7 +503,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       : Colors.blueGrey,
               child: Text(
                 snapshot.data.status == ConnectStatus.CONNECTED
-                    ? "正在与 ${snapshot.data.response.data.kfName} 交流"
+                    ? "正在与 ${snapshot.data.fromName} 交流"
                     : snapshot.data.content,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
@@ -432,8 +522,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  bool audio = false;
   bool emotionIcon = false;
+  bool audio = false;
 
   Widget buildInputPart({bool disabled = false}) {
     return IntrinsicHeight(
@@ -467,18 +557,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             Expanded(
               child: audio
                   ? AudioInputWidget((recordDetail) {
-                      var message = Message(recordDetail.path,
-                          type: MessageType.AUDIO,
-                          duration: recordDetail.duration);
-                      manager.sendMessage(message).then((success) {
-                        if (success)
-                          setState(() {
-                            messages.insert(0, message);
-                            _messagesController.animateTo(0.0,
-                                duration: Duration(seconds: 1),
-                                curve: Curves.ease);
-                          });
-                      });
+                      _doSendAudio(recordDetail);
                     })
                   : SizedBox(
                       height: ScreenUtil().setHeight(120),
@@ -540,6 +619,30 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
+  void _doSendAudio(RecordDetail recordDetail) {
+    ApiKf.uploadAudio(File(recordDetail.path)).then((resp) {
+      if (resp.success()) {
+        var message = Message(resp.data.url,
+            type: MessageType.AUDIO, duration: recordDetail.duration);
+        manager.sendMessage(message).then((success) {
+          if (success) {
+            setState(() {
+              messages.insert(0, message);
+            });
+            _listViewController.animateTo(0.0,
+                duration: Duration(seconds: 1), curve: Curves.ease);
+          } else {
+            Fluttertoast.showToast(msg: "发送失败");
+          }
+        });
+      } else {
+        Fluttertoast.showToast(msg: "发送失败");
+      }
+    }).catchError((e) {
+      Fluttertoast.showToast(msg: "发送失败");
+    });
+  }
+
   void _doSendMessage() {
     if (_inputController.text == null || _inputController.text.isEmpty) {
       Fluttertoast.showToast(msg: "请输入文字");
@@ -549,12 +652,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     _inputController.text = "";
     _editFocusNode.unfocus();
     manager.sendMessage(message).then((success) {
-      if (success)
+      if (success) {
         setState(() {
           messages.insert(0, message);
-          _messagesController.animateTo(0.0,
-              duration: Duration(seconds: 1), curve: Curves.ease);
         });
+        _listViewController.animateTo(0.0,
+            duration: Duration(seconds: 1), curve: Curves.ease);
+      }
     });
   }
 
@@ -570,9 +674,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 if (success) {
                   setState(() {
                     messages.insert(0, message);
-                    _messagesController.animateTo(0.0,
-                        duration: Duration(seconds: 1), curve: Curves.ease);
                   });
+                  _listViewController.animateTo(0.0,
+                      duration: Duration(seconds: 1), curve: Curves.ease);
                 } else {
                   Fluttertoast.showToast(msg: "发送失败");
                 }

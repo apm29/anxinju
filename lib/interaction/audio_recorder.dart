@@ -120,6 +120,7 @@ class AudioRecorder {
 
   //返回uri
   Future<String> stopRecorder() async {
+    print('$_isRecording');
     if (!_isRecording) {
       return Future.value(null);
     }
@@ -139,13 +140,13 @@ class AudioRecorder {
   String _currentPlayPath;
   String _currentRecordPath;
 
-  Future<Stream<PlayStatus>> startPlay(File file) async {
+  Future<Stream<PlayStatus>> startPlay(String path) async {
     if (_isPlaying) {
       _playSubscription?.cancel();
       await _flutterSound.stopPlayer();
     }
-    return _flutterSound.startPlayer(file.path).then((path) {
-      _currentPlayPath = Uri.parse(path).toFilePath();
+    return _flutterSound.startPlayer(path).then((path) {
+      _currentPlayPath = path;
       _startListenOnPlay();
       return _playStatus;
     });
@@ -243,17 +244,12 @@ class _AudioInputWidgetState extends State<AudioInputWidget> {
             }
           }
           return GestureDetector(
-            onTapDown: (tapDownDetail) {
-              print('tapDown');
-              startRecord();
+            onTap: () {
+              Fluttertoast.showToast(msg: "长按按钮录音");
             },
-            onTapUp: (tapUpDetail) {
-              print('tapUp');
-              stopRecord();
-            },
-            onLongPressUp: () {
+            onLongPressUp: () async {
               print('onLongPressUp');
-              stopRecord();
+              await stopRecord();
             },
             onLongPressStart: (longPressDetail) {
               print('onLongPressStart');
@@ -277,14 +273,12 @@ class _AudioInputWidgetState extends State<AudioInputWidget> {
   }
 
   void startRecord() {
-    print('start record: ${AudioRecorder().isRecording}');
     if (!AudioRecorder().isRecording) AudioRecorder().startRecorder(null);
   }
 
-  void stopRecord() {
-    print('stop record: ${AudioRecorder().isRecording}');
-    AudioRecorder().stopRecorder().then((uri) {
-      if (_duration < _minRecordDuration) {
+  Future<void> stopRecord() async{
+    return AudioRecorder().stopRecorder().then((uri) {
+      if (_duration < _minRecordDuration || uri == null) {
         Fluttertoast.showToast(msg: "录音时间过短");
         return;
       }
@@ -370,7 +364,7 @@ class _AudioMessageTileState extends State<AudioMessageTile> {
               if (playing) {
                 AudioRecorder().stopPlay();
               } else {
-                AudioRecorder().startPlay(File(widget.path));
+                AudioRecorder().startPlay(widget.path);
               }
             },
             child: Container(
@@ -385,7 +379,7 @@ class _AudioMessageTileState extends State<AudioMessageTile> {
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(12))),
               padding: EdgeInsets.symmetric(horizontal: 16),
-              margin: EdgeInsets.all(16),
+              margin: EdgeInsets.only(right: 16, left: 16, top: 4, bottom: 4),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[

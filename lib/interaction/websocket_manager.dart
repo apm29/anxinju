@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ease_life/persistance/db_manager.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -109,18 +110,33 @@ class Message {
   String content;
   MessageType type;
   ConnectStatus status;
-  ConnectResponse response;
   double duration;
+
+  String fromId;
+  String toId;
+
+  String fromAvatar;
+  String fromName;
+  String toAvatar;
+
+  String group;
+  int sendTime;
 
   Message(this.content,
       {this.type = MessageType.TEXT,
       this.status,
-      this.response,
-      this.duration});
+      this.duration,
+      this.toId,
+      this.fromId,
+      this.fromAvatar,
+      this.fromName,
+      this.group,
+      this.sendTime,
+      this.toAvatar});
 
   @override
   String toString() {
-    return 'Message{content: $content, type: $type, data: $status, response: $response}';
+    return 'Message{content: $content, type: $type, status: $status, duration: $duration, fromId: $fromId, toId: $toId, fromAvatar: $fromAvatar, fromName: $fromName, toAvatar: $toAvatar, group: $group}';
   }
 }
 
@@ -153,9 +169,10 @@ class WebSocketManager {
     Api.getUserDetail().then((userDetail) {
       // ok 1
       if (userDetail.success()) {
-        config.fromAvatar = userDetail.data.avatar;
-        config.fromName = userDetail.data.nickName;
-        config.fromId = userDetail.data.userId;
+        config.userAvatar = userDetail.data.avatar;
+        config.userName = userDetail.data.nickName;
+        config.userId = userDetail.data.userId;
+        print('${config.userId}');
       } else {
         // err 1
         _sendDisconnectedCommand("获取用户信息失败");
@@ -207,21 +224,25 @@ class WebSocketManager {
     //ok 3
     switch (response.messageType) {
       case "serviceLogOut":
-        if("1" == response.data.status) {
+        if ("1" == response.data.status) {
           connectStatus = ConnectStatus.DISCONNECTED;
           _sendDisconnectedCommand("客服系统已断开连接");
         }
         break;
       case "connect":
         if (response.code == 200) {
-          config.toId = response.data.kfId;
-          config.toName = response.data.kfName;
+          config.kfId = response.data.kfId;
+          config.kfName = response.data.kfName;
           connectStatus = ConnectStatus.CONNECTED;
 
           _commandController.add(Message("${response.toString()}",
               type: MessageType.COMMAND,
               status: ConnectStatus.CONNECTED,
-              response: response));
+              fromName: response.data.kfName,
+              fromAvatar: response.data.msg?.avatar,
+              fromId: config.kfId,
+              group: config.group,
+              toId: config.userId));
         } else {
           //err 2
           connectStatus = ConnectStatus.DISCONNECTED;
@@ -238,10 +259,19 @@ class WebSocketManager {
               rawContent.endsWith("]")) {
             messageType = MessageType.IMAGE;
           }
-          _messageController.add(Message("${response.data.msg.content}",
+          var message = Message("${response.data.msg.content}",
               type: messageType,
               status: ConnectStatus.CONNECTED,
-              response: response));
+              fromName: response.data.kfName,
+              fromAvatar: response.data.msg.avatar??"",
+              fromId: config.kfId,
+              group: config.group,
+              toId: config.userId,
+              sendTime: DateTime.now().millisecondsSinceEpoch);
+          _messageController.add(message);
+          ChatMessageProvider().add(ChatMessage.fromMessage(message)).then((c) {
+            print('数据库插入:$c');
+          });
         }
         break;
       case "wait":
@@ -256,32 +286,36 @@ class WebSocketManager {
   ///发送一个消息
   Future<bool> sendMessage(Message message) async {
     String data = "";
+    bool success = false;
     if (message.type == MessageType.TEXT) {
       data =
-          '{"type": "chatMessage","data": {"to_id": "${config.toId}", "to_name": "${config.toName}", "content": "${message.content}", "from_name": "${config.fromName}","from_id": "${config.fromId}", "from_avatar": "${config.fromAvatar}"}}';
+          '{"type": "chatMessage","data": {"to_id": "${config.kfId}", "to_name": "${config.kfName}", "content": "${message.content}", "from_name": "${config.userName}","from_id": "${config.userId}", "from_avatar": "${config.userAvatar}"}}';
       _channel.sink.add(data);
-      return true;
+      success = true;
     } else if (message.type == MessageType.AUDIO) {
-      return ApiKf.uploadAudio(File(message.content)).then((resp) {
-        if (resp.success()) {
-          data =
-              '{"type": "chatMessage","data": {"to_id": "${config.toId}", "to_name": "${config.toName}", "content": "audio[${resp.data.url}]", "from_name": "${config.fromName}","from_id": "${config.fromId}", "from_avatar": "${config.fromAvatar}"}}';
-          _channel.sink.add(data);
-          return true;
-        } else {
-          Fluttertoast.showToast(msg: "发送失败");
-          return false;
-        }
-      }).catchError((e) {
-        return false;
-      });
+      data =
+          '{"type": "chatMessage","data": {"to_id": "${config.kfId}", "to_name": "${config.kfName}", "content": "audio[${message.content}]", "from_name": "${config.userName}","from_id": "${config.userId}", "from_avatar": "${config.userAvatar}"}}';
+      _channel.sink.add(data);
+      success = true;
     } else if (message.type == MessageType.IMAGE) {
       data =
-          '{"type": "chatMessage","data": {"to_id": "${config.toId}", "to_name": "${config.toName}", "content": "${message.content}", "from_name": "${config.fromName}","from_id": "${config.fromId}", "from_avatar": "${config.fromAvatar}"}}';
+          '{"type": "chatMessage","data": {"to_id": "${config.kfId}", "to_name": "${config.kfName}", "content": "${message.content}", "from_name": "${config.userName}","from_id": "${config.userId}", "from_avatar": "${config.userAvatar}"}}';
       _channel.sink.add(data);
-      return true;
+      success = true;
     }
-    return false;
+    if (success) {
+      message.fromId = config.userId;
+      message.toId = config.kfId;
+      message.fromName = config.userName;
+      message.group = config.group;
+      message.fromAvatar = config.userAvatar??"";
+      message.sendTime = DateTime.now().millisecondsSinceEpoch;
+      print('------------$message');
+      ChatMessageProvider().add(ChatMessage.fromMessage(message)).then((c) {
+        print('数据库插入:$c');
+      });
+    }
+    return success;
   }
 
   BehaviorSubject<Message> _commandController = BehaviorSubject();
@@ -303,16 +337,17 @@ class WebSocketManager {
 
 /// 聊天室配置信息 , 来自 userDetail 和 login
 class ChatRoomConfig {
-  String toId;
-  String toName;
-  String fromName;
-  String fromId;
+  String kfId;
+  String kfName;
+  String userName;
+  String userId;
   String group;
   String appId;
-  String fromAvatar;
+  String userAvatar;
+  String kfAvatar;
 
   @override
   String toString() {
-    return 'ChatRoomConfig{toId: $toId, toName: $toName, fromName: $fromName, fromId: $fromId, group: $group, fromAvatar: $fromAvatar,appId : $appId}';
+    return 'ChatRoomConfig{kfId: $kfId, kfName: $kfName, userName: $userName, userId: $userId, group: $group, appId: $appId, userAvatar: $userAvatar, kfAvatar: $kfAvatar}';
   }
 }

@@ -13,7 +13,6 @@ export 'personal_info_page.dart';
 export 'register_page.dart';
 export 'splash_page.dart';
 export 'style.dart';
-export 'test_page.dart';
 export 'user_detail_auth_page.dart';
 export 'web_view_example.dart';
 export 'picture_page.dart';

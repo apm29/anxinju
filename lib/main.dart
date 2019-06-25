@@ -162,7 +162,6 @@ class MyApp extends StatelessWidget {
                 bloc: CameraBloc(),
               );
             },
-            TestPage.routeName: (_) => TestPage(),
             ChatRoomPage.routeName: (_) => ChatRoomPage(),
             ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
                   child: ContactsSelectPage(null),
