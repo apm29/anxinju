@@ -15,7 +15,6 @@ import 'dart:async';
 
 import '../index.dart';
 
-
 class AudioRecorder {
   FlutterSound _flutterSound = FlutterSound();
   static AudioRecorder _instance;
@@ -84,7 +83,7 @@ class AudioRecorder {
     return _flutterSound
         .startRecorder(recordFile.path, androidEncoder: AndroidEncoder.AAC)
         .then((path) {
-          _currentRecordPath = path;
+      _currentRecordPath = path;
       _listenOnRecord();
       return _recordStatus;
     });
@@ -124,8 +123,8 @@ class AudioRecorder {
     if (!_isRecording) {
       return Future.value(null);
     }
-    return _flutterSound.stopRecorder().then((uri){
-      return Platform.isIOS?uri:_currentRecordPath;
+    return _flutterSound.stopRecorder().then((uri) {
+      return Platform.isIOS ? uri : _currentRecordPath;
     });
   }
 
@@ -245,19 +244,23 @@ class _AudioInputWidgetState extends State<AudioInputWidget> {
           }
           return GestureDetector(
             onTapDown: (tapDownDetail) {
-              //startRecord();
+              print('tapDown');
+              startRecord();
             },
             onTapUp: (tapUpDetail) {
-              //stopRecord();
+              print('tapUp');
+              stopRecord();
             },
             onLongPressUp: () {
+              print('onLongPressUp');
               stopRecord();
             },
             onLongPressStart: (longPressDetail) {
+              print('onLongPressStart');
               startRecord();
             },
             child: Container(
-              padding: EdgeInsets.all(12),
+              padding: EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                   color: recording ? Colors.blue : Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -274,10 +277,12 @@ class _AudioInputWidgetState extends State<AudioInputWidget> {
   }
 
   void startRecord() {
-    AudioRecorder().startRecorder(null);
+    print('start record: ${AudioRecorder().isRecording}');
+    if (!AudioRecorder().isRecording) AudioRecorder().startRecorder(null);
   }
 
   void stopRecord() {
+    print('stop record: ${AudioRecorder().isRecording}');
     AudioRecorder().stopRecorder().then((uri) {
       if (_duration < _minRecordDuration) {
         Fluttertoast.showToast(msg: "录音时间过短");

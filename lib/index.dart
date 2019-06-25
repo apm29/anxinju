@@ -42,3 +42,4 @@ export 'package:flutter_bugly/flutter_bugly.dart';
 export 'package:package_info/package_info.dart';
 export 'package:open_file/open_file.dart';
 export 'package:photo_view/photo_view.dart';
+export 'package:ease_life/interaction/websocket_manager.dart';
