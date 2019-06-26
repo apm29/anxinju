@@ -7,6 +7,7 @@ typedef ValueCallback<T> = void Function(T value);
 typedef ProcessRawJson<T> = T Function(dynamic);
 
 const KEY_HEADER_TOKEN = "Authorization";
+const KEY_HEADER_REGISTRATION_ID = "RegistrationId";
 const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
 const VALUE_HEADER_CONTENT_TYPE_FORM = "multipart/form-data";
 const BASE_URL = Configs.BaseUrl;
@@ -139,8 +140,13 @@ class DioUtil {
                     ? {
                         KEY_HEADER_TOKEN: sharedPreferences
                             .getString(PreferenceKeys.keyAuthorization),
+                        KEY_HEADER_REGISTRATION_ID: sharedPreferences
+                            .getString(PreferenceKeys.keyRegistrationId),
                       }
-                    : {}),
+                    : {
+                  KEY_HEADER_REGISTRATION_ID: sharedPreferences
+                      .getString(PreferenceKeys.keyRegistrationId),
+                }),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       if (response.statusCode != HttpStatus.ok) {

@@ -70,6 +70,25 @@ class _BlocProviderState extends State<BlocProviders> {
   }
 }
 
+class GlobalBloc extends BlocBase{
+
+  @override
+  void dispose() {
+    _userInfoController.close();
+  }
+
+
+  BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
+  Observable<UserInfo> get userInfoStream => _userInfoController.stream;
+
+  GlobalBloc(){
+    var userInfoStr = sharedPreferences.getString(PreferenceKeys.keyUserInfo)??"{}";
+    var userInfo = UserInfo.fromJson(json.decode(userInfoStr));
+    _userInfoController.add(userInfo);
+  }
+
+}
+
 class ApplicationBloc extends BlocBase {
   @override
   void dispose() {
@@ -82,7 +101,11 @@ class ApplicationBloc extends BlocBase {
     _userTypeController.close();
     _controllerUserDetailData.close();
     _controllerMyHouseData.close();
+    _userVerifyStatusController.close();
+    subscription?.cancel();
   }
+
+  StreamSubscription subscription;
 
   ApplicationBloc() {
     _getCurrentUserAndNotify();
@@ -92,6 +115,10 @@ class ApplicationBloc extends BlocBase {
     _requestLocationPermission();
     getUserTypes();
     getUserDetail();
+    getUserVerifyStatus();
+    subscription = Observable.periodic(Duration(seconds: 25)).listen((_) {
+      getUserVerifyStatus();
+    });
   }
 
   void _getCurrentUserAndNotify() async {
@@ -155,6 +182,12 @@ class ApplicationBloc extends BlocBase {
 
   Observable<List<HouseDetail>> get myHouseStream =>
       _controllerMyHouseData.stream;
+
+  BehaviorSubject<UserVerifyStatus> _userVerifyStatusController =
+      BehaviorSubject();
+
+  Observable<UserVerifyStatus> get userVerifyStatusStream =>
+      _userVerifyStatusController.stream;
 
   /*
    * 退出登录:
@@ -236,7 +269,6 @@ class ApplicationBloc extends BlocBase {
       _districtInfoController.add(districtInfo);
       getMyHouseList();
     }
-
   }
 
   ///清空小区缓存重新获取
@@ -244,11 +276,9 @@ class ApplicationBloc extends BlocBase {
     BaseResponse<List<DistrictInfo>> baseResponse = await Api.findAllDistrict();
     //将取到的${Strings.districtClass}信息存入sp缓存
     var string = baseResponse.data.first.toString();
-    sharedPreferences.setString(
-        PreferenceKeys.keyCurrentDistrict, string);
+    sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, string);
     if (baseResponse.success()) {
-      sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict,
-          string);
+      sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, string);
       _districtInfoController.add(baseResponse.data.first);
       getMyHouseList();
     } else {
@@ -331,6 +361,22 @@ class ApplicationBloc extends BlocBase {
       }
     }).catchError((Object e, StackTrace s) {
       _controllerUserDetailData.addError(e, s);
+    });
+  }
+
+  Future getUserVerifyStatus() async {
+    return Api.getUserVerify().then((resp) {
+      if (resp.success()) {
+        _userVerifyStatusController.add(resp.data);
+        sharedPreferences.setString(
+            PreferenceKeys.keyUserVerify, resp.data.toString());
+      } else {
+        _userVerifyStatusController.addError(resp.text);
+        sharedPreferences.setString(PreferenceKeys.keyUserVerify, null);
+      }
+    }).catchError((e) {
+      _userVerifyStatusController.addError(e);
+      sharedPreferences.setString(PreferenceKeys.keyUserVerify, null);
     });
   }
 }

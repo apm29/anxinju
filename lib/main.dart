@@ -26,6 +26,7 @@ Future<void> initPlatformState(BuildContext context) async {
   // Platform messages may fail, so we use a try/catch PlatformException.
   jPush.getRegistrationID().then((rid) {
     print("flutter getRegistrationID: $rid");
+    sharedPreferences.setString(PreferenceKeys.keyRegistrationId, rid);
   });
   jPush.applyPushAuthority(
       new NotificationSettingsIOS(sound: true, alert: true, badge: true));

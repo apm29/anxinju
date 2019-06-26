@@ -280,10 +280,9 @@ class _FaceIdPageState extends State<FaceIdPage> {
   Future verify(File file, Map argument) async {
     file = await rotateWithExifAndCompress(file);
     var resp = await Api.uploadPic(file.path);
-    var faceResult = await Api.faceCompare(await getImageBase64(file), argument['idCard']);
-    print('$faceResult');
+    var base64 = await getImageBase64(file);
     BaseResponse<UserVerifyInfo> baseResponse =
-        await Api.verify(resp.data.orginPicPath, argument['idCard'],argument['isAgain']);
+        await Api.verify(resp.data.orginPicPath, argument['idCard'],argument['isAgain'],base64);
     faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
     if (baseResponse.success()) {
@@ -309,9 +308,11 @@ class _FaceIdPageState extends State<FaceIdPage> {
                 }).toList(),
               );
             }).then((v) {
-          Navigator.of(context).pop(baseResponse.text);
+
           ///认证之后不管是否成功都更新userInfo 和 房屋列表
-          refreshUserState();
+          refreshUserState((){
+            Navigator.of(context).pop(baseResponse.text);
+          });
         });
       } else {
         ///无房用户,导向成员申请
@@ -331,9 +332,11 @@ class _FaceIdPageState extends State<FaceIdPage> {
                 ],
               );
             }).then((_) {
-          Navigator.of(context).pushReplacementNamed(MemberApplyPage.routeName);
+
           ///认证之后不管是否成功都更新userInfo 和 房屋列表
-          refreshUserState();
+          refreshUserState((){
+            Navigator.of(context).pushReplacementNamed(MemberApplyPage.routeName);
+          });
         });
       }
     } else {
@@ -353,23 +356,27 @@ class _FaceIdPageState extends State<FaceIdPage> {
               ],
             );
           }).then((v) {
-        Navigator.of(context).pop(baseResponse.text);
+
         ///认证之后不管是否成功都更新userInfo 和 房屋列表
-        refreshUserState();
+        refreshUserState((){
+          Navigator.of(context).pop(baseResponse.text);
+        });
+
       });
     }
 
   }
 
-  void refreshUserState() async{
+  void refreshUserState(VoidCallback callback) async{
      ///认证之后不管是否成功都更新userInfo 和 房屋列表
     var baseResp = await Api.getUserInfo();
     if(baseResp.success()) {
       BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
       BlocProviders.of<ApplicationBloc>(context).getMyUserTypes();
-      BlocProviders.of<ApplicationBloc>(context)
-          .clearDistrictAndGetCurrentDistrict();
+      BlocProviders.of<ApplicationBloc>(context).clearDistrictAndGetCurrentDistrict();
     }
+    await BlocProviders.of<ApplicationBloc>(context).getUserVerifyStatus();
+    callback();
   }
 }
 

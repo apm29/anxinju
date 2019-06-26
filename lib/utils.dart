@@ -322,7 +322,7 @@ bool checkIfCertificated(BuildContext context) {
     Navigator.of(context).pushNamed(LoginPage.routeName);
     return false;
   }
-  if (!isCertificated()) {
+  if (!isVerified()) {
     Fluttertoast.showToast(msg: "请先完成${Strings.hostClass}认证");
     showCertificationDialog(context);
     return false;

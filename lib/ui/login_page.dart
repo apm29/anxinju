@@ -49,8 +49,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
           Widget loginButton = buildLoginButton(userSnap, context, _fastLogin);
           print('userInfo:${userSnap.data}');
           if (userSnap.hasData && !userSnap.hasError) {
-            return buildLoginSuccess(
-                userSnap.data.isCertification == 0, context);
+            return buildLoginSuccess(context);
           } else {
             return buildLogin(context, loginButton);
           }
@@ -223,7 +222,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     );
   }
 
-  Widget buildLoginSuccess(bool isCertificated, BuildContext context) {
+  Widget buildLoginSuccess( BuildContext context) {
     if (widget.backRoute != null) {
       Future.delayed(Duration(seconds: 1)).then((v) {
         Navigator.of(context).pop(widget.backRoute);

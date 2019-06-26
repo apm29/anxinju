@@ -47,15 +47,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           DistrictInfoButton(
             callback: (d) {
               BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
+              BlocProviders.of<ApplicationBloc>(context).getUserVerifyStatus();
             },
           ),
 //          buildActions(context),
         ],
       ),
-      body: StreamBuilder<List<HouseDetail>>(
-        stream: BlocProviders.of<ApplicationBloc>(context).myHouseStream,
-        builder: (context, houseInfo) {
-          bool hasHouse = (houseInfo.data ?? []).length > 0;
+      body: StreamBuilder<UserVerifyStatus>(
+        stream: BlocProviders.of<ApplicationBloc>(context).userVerifyStatusStream,
+        builder: (context, userVerifySnapshot) {
+          bool hasHouse = userVerifySnapshot.data?.hasHouse()??false;
           return StreamBuilder<Index>(
               stream: BlocProviders.of<ApplicationBloc>(context).homeIndex,
               builder: (context, snapshot) {
@@ -71,8 +72,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       BlocProviders.of<ApplicationBloc>(context)
                           .getNoticeInfo();
                       BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
-                      BlocProviders.of<ApplicationBloc>(context)
-                          .getMyHouseList();
+                      BlocProviders.of<ApplicationBloc>(context).getMyHouseList();
+                      BlocProviders.of<ApplicationBloc>(context).getUserVerifyStatus();
                     },
                     child: Center(
                       child: Column(
@@ -91,12 +92,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: RefreshIndicator(
                     onRefresh: () async {
                       BlocProviders.of<ApplicationBloc>(context).getUserTypes();
-                      BlocProviders.of<ApplicationBloc>(context)
-                          .getNoticeInfo();
-                      BlocProviders.of<ApplicationBloc>(context)
-                          .getMyHouseList();
-                      return BlocProviders.of<ApplicationBloc>(context)
-                          .getIndexInfo();
+                      BlocProviders.of<ApplicationBloc>(context).getNoticeInfo();
+                      BlocProviders.of<ApplicationBloc>(context).getUserVerifyStatus();
+                      BlocProviders.of<ApplicationBloc>(context) .getMyHouseList();
+                      return BlocProviders.of<ApplicationBloc>(context).getIndexInfo();
                     },
                     child: CustomScrollView(
                       physics: AlwaysScrollableScrollPhysics(),
