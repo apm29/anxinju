@@ -280,9 +280,9 @@ class _FaceIdPageState extends State<FaceIdPage> {
   Future verify(File file, Map argument) async {
     file = await rotateWithExifAndCompress(file);
     var resp = await Api.uploadPic(file.path);
-    var base64 = await getImageBase64(file);
+    //var base64 = await getImageBase64(file);
     BaseResponse<UserVerifyInfo> baseResponse =
-        await Api.verify(resp.data.orginPicPath, argument['idCard'],argument['isAgain'],base64);
+        await Api.verify(resp.data.orginPicPath, argument['idCard'],argument['isAgain']);
     faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
     if (baseResponse.success()) {

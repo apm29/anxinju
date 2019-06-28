@@ -9,10 +9,10 @@ List<Color> colors = [
 
 typedef OnFileProcess = Function(Future<File>);
 
-void showImageSourceDialog( BuildContext context,
-    ValueCallback onValue, OnFileProcess onFileProcess) {
+Future<File> showImageSourceDialog(
+    BuildContext context, VoidCallback onValue) async {
   FocusScope.of(context).requestFocus(FocusNode());
-  showModalBottomSheet(
+  return showModalBottomSheet<File>(
       context: context,
       builder: (context) {
         return BottomSheet(
@@ -26,8 +26,10 @@ void showImageSourceDialog( BuildContext context,
                       children: <Widget>[
                         InkWell(
                           onTap: () {
-                            Navigator.of(context).pop();
-                            showPicker( onFileProcess);
+                            showPicker().then((f){
+                              Navigator.of(context).pop(f);
+                            });
+
                           },
                           child: Container(
                             width: constraint.biggest.width,
@@ -38,8 +40,9 @@ void showImageSourceDialog( BuildContext context,
                         ),
                         InkWell(
                             onTap: () {
-                              Navigator.of(context).pop();
-                              showCameraPicker(onFileProcess);
+                              showCameraPicker().then((f){
+                                Navigator.of(context).pop(f);
+                              });
                             },
                             child: Container(
                               width: constraint.biggest.width,
@@ -54,27 +57,25 @@ void showImageSourceDialog( BuildContext context,
               );
             });
       }).then((v) {
-    onValue(v);
+    onValue();
+    return v;
   });
 }
 
-void showPicker(OnFileProcess onFileProcess) {
-  var future = ImagePicker.pickImage(source: ImageSource.gallery);
-  onFileProcess(future);
+Future<File> showPicker() {
+  return ImagePicker.pickImage(source: ImageSource.gallery);
 }
 
-void showCameraPicker(OnFileProcess onFileProcess) {
-  var future = ImagePicker.pickImage(source: ImageSource.camera);
-  onFileProcess(future);
+Future<File> showCameraPicker() {
+  return ImagePicker.pickImage(source: ImageSource.camera);
 }
-
 
 void startAudioRecord() {}
 
 ///只能作用于带exif的image
 ///旋转Android图片并压缩
 Future<File> rotateWithExifAndCompress(File file) async {
-  if (!Platform.isAndroid) {
+  if (!Platform.isWindows) {
     return FlutterImageCompress.compressAndGetFile(file.path, file.path,
         quality: 70);
 //    return FlutterImageCompress.compressWithFile(file.path,quality: 30,minHeight: 768,minWidth: 1080).then((listInt) {
@@ -434,10 +435,10 @@ void showUpdateDialog(BuildContext context, UpgradeInfo info) {
               Fluttertoast.showToast(msg: "正在下载");
             },
             onClickWhenNotDownload: () {
-              DioUtil().downloadFile(info.apkUrl, (count, total,path) {
+              DioUtil().downloadFile(info.apkUrl, (count, total, path) {
                 var _progress = count / total;
                 updateDialogKey.currentState.progress = _progress;
-                if(_progress >=1){
+                if (_progress >= 1) {
                   Fluttertoast.showToast(msg: "下载完成");
                   OpenFile.open(path);
                 }

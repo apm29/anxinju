@@ -810,42 +810,46 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
-    showImageSourceDialog( context, (v) {
+    showImageSourceDialog( context, () {
       FocusScope.of(context).requestFocus(FocusNode());
-    }, (futureFile) {
-      processFileAndNotify(futureFile, callbackName);
+    }).then((file){
+      processFileAndNotify(file, callbackName);
     });
   }
 
   void processFileAndNotify(
-      Future<File> fileFuture, String jsCallbackNam) {
-    fileFuture.then((File file) {
-      if (file == null) {
-        return null;
-      }
-      if (!Platform.isAndroid) {
-        return Future.value(file);
-      }
-      //通过exif旋转图片
-      return FlutterExifRotation.rotateImage(path: file.path);
-    }).then((f) {
-      if (f == null) {
-        return null;
-      }
-      //压缩图片
-      return FlutterImageCompress.compressWithFile(
-        f.path,
-        quality: 80,
-      ).then((listInt){
-        return f.writeAsBytesSync(listInt);
-      }).then((_){
-        return f;
-      });
-    }).then((compressed) {
-      if (compressed == null) {
-        return null;
-      }
-      Api.uploadPic(compressed.absolute.path)
+      File sourceFile, String jsCallbackNam) {
+    //Future.value(sourceFile).then((File file) {
+    //  if (file == null) {
+    //    return null;
+    //  }
+    //  if (!Platform.isAndroid) {
+    //    return Future.value(file);
+    //  }
+    //  //通过exif旋转图片
+    //  return FlutterExifRotation.rotateImage(path: file.path);
+    //}).then((f) {
+    //  if (f == null) {
+    //    return null;
+    //  }
+    //  //压缩图片
+    //  return FlutterImageCompress.compressWithFile(
+    //    f.path,
+    //    quality: 80,
+    //  ).then((listInt){
+    //    return f.writeAsBytesSync(listInt);
+    //  }).then((_){
+    //    return f;
+    //  });
+    //}).then((compressed) {
+    //  if (compressed == null) {
+    //    return null;
+    //  }
+    //
+    //});
+    rotateWithExifAndCompress(sourceFile)
+        .then((file){
+      Api.uploadPic(file.absolute.path)
           .then((BaseResponse<ImageDetail> resp) {
         if (resp.success()) {
           controller.evaluateJavascript(

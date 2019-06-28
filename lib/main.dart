@@ -1,9 +1,9 @@
-
 import 'index.dart';
 
 SharedPreferences sharedPreferences;
 List<CameraDescription> cameras;
 JPush jPush = JPush();
+
 void main() async {
   //sp初始化
   sharedPreferences = await SharedPreferences.getInstance();
@@ -16,7 +16,7 @@ void main() async {
 //    debugPrint(e.toString());
 //    debugPrint(s.toString());
 //  });
-  FlutterBugly.postCatchedException((){
+  FlutterBugly.postCatchedException(() {
     runApp(MyApp());
   });
 }
@@ -29,7 +29,8 @@ Future<void> initPlatformState(BuildContext context) async {
     sharedPreferences.setString(PreferenceKeys.keyRegistrationId, rid);
   });
   jPush.applyPushAuthority(
-      new NotificationSettingsIOS(sound: true, alert: true, badge: true));
+    new NotificationSettingsIOS(sound: true, alert: true, badge: true),
+  );
 
   try {
     jPush.addEventHandler(
@@ -44,8 +45,24 @@ Future<void> initPlatformState(BuildContext context) async {
             extrasMap.putIfAbsent(k.toString(), () => v.toString());
           });
           print('EXTRAS ===> $extras');
-          if (extras != null) {
-            Navigator.of(context).pushNamed(extrasMap['test']);
+
+          /// "extra":{
+          ///   "type":"web",
+          ///   "data":{"url":"fkgl"},
+          /// }
+          if (extras != null && extras["type"] == "web") {
+              Api.getIndex().then((resp) {
+                resp.forEach((index) {
+                  index.menu.forEach((menu) {
+                    if (menu.id == extras['data']['url']) {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return WebViewExample(menu.url);
+                      }));
+                    }
+                  });
+                });
+              });
           }
         } catch (e, s) {
           print(e.toString());
@@ -120,7 +137,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<MainIndexModel>(
-          builder: (context)=>MainIndexModel(),
+          builder: (context) => MainIndexModel(),
         ),
       ],
       child: BlocProviders<ApplicationBloc>(

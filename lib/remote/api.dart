@@ -96,7 +96,8 @@ class Api {
   }
 
   static Future<BaseResponse<UserVerifyInfo>> verify(String imageUrl,
-      String idCard, bool isAgain,String imageBase64) async {
+      String idCard, bool isAgain
+      ) async {
     return await DioUtil().postAsync(
         path: "/permission/userCertification/verify",
         jsonProcessor: (j) {
@@ -106,7 +107,6 @@ class Api {
           "photo": imageUrl,
           "idCard": idCard,
           "isAgain": isAgain ? 1 : 0,
-          "imgStr":imageBase64
         });
   }
 

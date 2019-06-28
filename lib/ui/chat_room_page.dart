@@ -118,15 +118,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     });
 
     Api.getUserInfo().then((resp) {
-      if(resp.success()) {
+      if (resp.success()) {
         ChatMessageProvider().open().then((db) {
-          var arguments = ModalRoute
-              .of(context)
-              .settings
-              .arguments;
+          var arguments = ModalRoute.of(context).settings.arguments;
           if (arguments is Map) {
             group = arguments['group'];
-            db.getAll(group,resp.data.userId).then((list) {
+            db.getAll(group, resp.data.userId).then((list) {
               var added = list.map((chatMessage) {
                 return chatMessage.toMessage();
               }).toList();
@@ -271,7 +268,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               ),
                               CircleAvatar(
                                 backgroundImage: NetworkImage(
-                                    "${WebSocketManager.kfBaseUrl}${message.fromAvatar}"),
+                                    "${Configs.KFBaseUrl}${message.fromAvatar}"),
                               ),
                               Flexible(
                                 child:
@@ -432,7 +429,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     var rawUrl = message.content.substring(4, message.content.length - 1);
     var url;
     if (!rawUrl.startsWith("http")) {
-      url = "${WebSocketManager.kfBaseUrl}$rawUrl";
+      url = "${Configs.KFBaseUrl}$rawUrl";
     } else {
       url = rawUrl;
     }
@@ -471,17 +468,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             padding: EdgeInsets.all(4),
             child: Hero(
               tag: url,
-              child: Image.network(url,loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent loadingProgress) {
-                if (loadingProgress == null)
-                  return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
-                        : null,
-                  ),
-                );
-              },),
+              child: Image.network(
+                url,
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes
+                          : null,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -673,30 +674,28 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void _doSendImage() {
-    showImageSourceDialog(context, (file) {}, (f) {
-      f.then((file) {
-        rotateWithExifAndCompress(file).then((f) {
-          Api.uploadPic(f.path).then((resp) {
-            if (resp.success()) {
-              var message = Message("img[${resp.data.orginPicPath}]",
-                  type: MessageType.IMAGE);
-              manager.sendMessage(message).then((success) {
-                if (success) {
-                  setState(() {
-                    messages.insert(0, message);
-                  });
-                  _listViewController.animateTo(0.0,
-                      duration: Duration(seconds: 1), curve: Curves.ease);
-                } else {
-                  Fluttertoast.showToast(msg: "发送失败");
-                }
-              });
-            } else {
-              Fluttertoast.showToast(msg: "发送失败");
-            }
-          }).catchError((e) {
+    showImageSourceDialog(context, () {}).then((sourceFile) {
+      rotateWithExifAndCompress(sourceFile).then((f) {
+        Api.uploadPic(f.path).then((resp) {
+          if (resp.success()) {
+            var message = Message("img[${resp.data.orginPicPath}]",
+                type: MessageType.IMAGE);
+            manager.sendMessage(message).then((success) {
+              if (success) {
+                setState(() {
+                  messages.insert(0, message);
+                });
+                _listViewController.animateTo(0.0,
+                    duration: Duration(seconds: 1), curve: Curves.ease);
+              } else {
+                Fluttertoast.showToast(msg: "发送失败");
+              }
+            });
+          } else {
             Fluttertoast.showToast(msg: "发送失败");
-          });
+          }
+        }).catchError((e) {
+          Fluttertoast.showToast(msg: "发送失败");
         });
       });
     });

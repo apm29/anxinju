@@ -141,7 +141,6 @@ class Message {
 }
 
 class WebSocketManager {
-  static String kfBaseUrl = "http://axjkftest.ciih.net";
   IOWebSocketChannel _channel;
   ChatRoomConfig config = ChatRoomConfig();
   ConnectStatus connectStatus = ConnectStatus.DISCONNECTED;

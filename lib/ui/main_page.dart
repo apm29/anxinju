@@ -20,6 +20,9 @@ class MainPageState extends State<MainPage> {
   GlobalKey<BottomBarState> bottomKey = GlobalKey();
   PageStorageKey<String> pagerKey = PageStorageKey("main");
 
+
+
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +30,8 @@ class MainPageState extends State<MainPage> {
     if (mounted) {
       BlocProviders.of<ApplicationBloc>(context).getUserTypes();
     }
+
+
     if (Platform.isAndroid)
       FlutterBugly.init(
         androidAppId: "89b908154e",
