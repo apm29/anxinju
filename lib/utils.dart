@@ -236,7 +236,7 @@ Widget buildCertificationDialog(BuildContext context, VoidCallback onCancel,
   var colorFaceButton = Colors.blue;
   return AlertDialog(
     title: Text(
-      "您还未通过认证,只能使用首页功能",
+      "人脸核验未通过,只能使用首页功能",
       style: TextStyle(
         fontSize: 16,
         color: Colors.blueGrey,

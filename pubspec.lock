@@ -261,12 +261,10 @@ packages:
   flutter_image_compress:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "173ce7d73835ce35f695ac859bdabf471d1160e6"
-      resolved-ref: "173ce7d73835ce35f695ac859bdabf471d1160e6"
-      url: "https://github.com/OpenFlutter/flutter_image_compress.git"
-    source: git
-    version: "0.5.2"
+      name: flutter_image_compress
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.6.0"
   flutter_screenutil:
     dependency: "direct main"
     description:

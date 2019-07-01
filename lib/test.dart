@@ -12,12 +12,12 @@ void main()async{
     txt.createSync();
   }
   txt.writeAsStringSync(base64,flush: true,mode: FileMode.write);
-  Dio().post("http://192.168.0.20:8089/facecompare/compare/",data: FormData.from({
-    'idNo':"330681199112151718",
-    'imageBase64str':base64
-  })).then((resp){
-    print('${resp.data.toString()}');
-  });
+  //Dio().post("http://192.168.0.20:8089/facecompare/compare/",data: FormData.from({
+  //  'idNo':"330681199112151718",
+  //  'imageBase64str':base64
+  //})).then((resp){
+  //  print('${resp.data.toString()}');
+  //});
 }
 
 Future<String> getImageBase64(File file) async {
