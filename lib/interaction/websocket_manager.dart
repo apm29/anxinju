@@ -193,13 +193,12 @@ class WebSocketManager {
     print(' ---config--- $config');
     _channel.sink.add(data);
     beatStreamSubscription?.cancel();
-    beatStreamSubscription = Observable.periodic(Duration(seconds: 10), (i) {
+    beatStreamSubscription = Observable.periodic(Duration(seconds: 20), (i) {
       return i;
-    }).listen((i) async {
+    }).listen((i) {
       //断线后重新连接一次
       if (ConnectStatus.DISCONNECTED == connectStatus) {
         _sendReconnectedCommand("正在重新连接..");
-        await Future.delayed(Duration(seconds: 5));
         _channel.sink.add(data);
       }
     });

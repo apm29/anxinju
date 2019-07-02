@@ -70,23 +70,22 @@ class _BlocProviderState extends State<BlocProviders> {
   }
 }
 
-class GlobalBloc extends BlocBase{
-
+class GlobalBloc extends BlocBase {
   @override
   void dispose() {
     _userInfoController.close();
   }
 
-
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
+
   Observable<UserInfo> get userInfoStream => _userInfoController.stream;
 
-  GlobalBloc(){
-    var userInfoStr = sharedPreferences.getString(PreferenceKeys.keyUserInfo)??"{}";
+  GlobalBloc() {
+    var userInfoStr =
+        sharedPreferences.getString(PreferenceKeys.keyUserInfo) ?? "{}";
     var userInfo = UserInfo.fromJson(json.decode(userInfoStr));
     _userInfoController.add(userInfo);
   }
-
 }
 
 class ApplicationBloc extends BlocBase {
@@ -116,7 +115,14 @@ class ApplicationBloc extends BlocBase {
     getUserTypes();
     getUserDetail();
     getUserVerifyStatus();
-    subscription = Observable.periodic(Duration(seconds: 25)).listen((_) {
+    tryRefreshUserVerifyStatus();
+  }
+
+  void tryRefreshUserVerifyStatus() async {
+    subscription?.cancel();
+    subscription = Observable.periodic(
+      Duration(seconds: 25),
+    ).take(5).listen((_) {
       getUserVerifyStatus();
     });
   }

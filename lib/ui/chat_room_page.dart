@@ -236,8 +236,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       child: StreamBuilder<Message>(
           stream: commandMessageStream,
           builder: (context, snapshot) {
-            if ((snapshot.data?.status ?? ConnectStatus.WAIT) !=
-                ConnectStatus.CONNECTED) {
+            if ((snapshot.data?.status ?? ConnectStatus.WAIT) ==
+                ConnectStatus.WAIT) {
               return Center(child: CircularProgressIndicator());
             }
             return GestureDetector(

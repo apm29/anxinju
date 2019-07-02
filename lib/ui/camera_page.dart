@@ -375,7 +375,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
       BlocProviders.of<ApplicationBloc>(context).getMyUserTypes();
       BlocProviders.of<ApplicationBloc>(context).clearDistrictAndGetCurrentDistrict();
     }
-    await BlocProviders.of<ApplicationBloc>(context).getUserVerifyStatus();
+    BlocProviders.of<ApplicationBloc>(context).tryRefreshUserVerifyStatus();
     callback();
   }
 }
