@@ -1,11 +1,11 @@
 import 'dart:math';
 
-import 'package:ai_life/remote/api.dart';
+import 'package:ease_life/remote/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'base_response.dart';
-import 'package:ai_life/persistence/const.dart';
+import 'package:ease_life/persistance/shared_preference_keys.dart';
 import 'package:oktoast/oktoast.dart';
 
 class DistrictModel extends ChangeNotifier {
@@ -49,7 +49,7 @@ class DistrictModel extends ChangeNotifier {
 
 
   Future tryFetchCurrentDistricts() async {
-    return Api.getCurrentDistricts().then((resp) {
+    return Api.findAllDistrict().then((resp) {
       if (resp.success) {
         allDistricts = resp.data;
       }

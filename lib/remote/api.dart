@@ -67,14 +67,14 @@ class Api {
     );
   }
 
-  static Future<BaseResponse<List<DistrictInfo>>> findAllDistrict() async {
-    BaseResponse<List<DistrictInfo>> baseResponse =
-    await DioUtil().postAsync<List<DistrictInfo>>(
+  static Future<BaseResponse<List<DistrictDetail>>> findAllDistrict() async {
+    BaseResponse<List<DistrictDetail>> baseResponse =
+    await DioUtil().postAsync<List<DistrictDetail>>(
         path: "/business/district/findDistrictInfo",
         jsonProcessor: (dynamic json) {
           if (json is List) {
             return json.map((j) {
-              return DistrictInfo.fromJson(j);
+              return DistrictDetail.fromJson(j);
             }).toList();
           }
           return null;
@@ -180,13 +180,13 @@ class Api {
     return baseResponse;
   }
 
-  static Future<BaseResponse<List<NoticeType>>> getAllNoticeType() async {
+  static Future<BaseResponse<List<AnnouncementType>>> getAllNoticeType() async {
     return DioUtil().postAsync(
         path: "/business/noticeDict/getAllType",
         jsonProcessor: (json) {
           if (json is List) {
             return json.map((j) {
-              return NoticeType.fromJson(j);
+              return AnnouncementType.fromJson(j);
             }).toList();
           }
           return null;
@@ -194,14 +194,14 @@ class Api {
         dataType: DataType.LIST);
   }
 
-  static Future<BaseResponse<List<NoticeDetail>>> getNewNotice(
-      List<NoticeType> list) async {
+  static Future<BaseResponse<List<Announcement>>> getNewNotice(
+      List<AnnouncementType> list) async {
     return DioUtil().postAsync(
       path: "/business/notice/getAllNewNotice",
       jsonProcessor: (json) {
         if (json is List) {
           return json.map((j) {
-            return NoticeDetail.fromJson(j);
+            return Announcement.fromJson(j);
           }).toList();
         }
         return null;

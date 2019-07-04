@@ -1,88 +1,5 @@
 import 'package:ease_life/index.dart';
 
-class CameraPage extends StatefulWidget {
-  final File capturedFile;
-
-  CameraPage({this.capturedFile});
-
-  @override
-  _CameraPageState createState() => _CameraPageState();
-}
-
-class _CameraPageState extends State<CameraPage> {
-  CameraController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    if (cameras.length == 0) {
-      return;
-    }
-    var cameraInstance = cameras[0];
-    //默认打开后置
-    cameras.forEach((c) {
-      if (c.lensDirection == CameraLensDirection.back) {
-        cameraInstance = c;
-      }
-    });
-    controller = CameraController(cameraInstance, ResolutionPreset.high);
-    controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (controller == null || !controller.value.isInitialized) {
-      return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("人脸录入"),
-        ),
-        body: Center(
-          child: Text("没有检测到相机设备"),
-        ),
-      );
-    }
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("相机"),
-        ),
-        body: Stack(
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: CameraPreview(controller),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: GestureDetector(
-                onTap: () {
-                  controller
-                      .takePicture(widget.capturedFile.absolute.path)
-                      .then((v) {
-                    Navigator.of(context).pop(widget.capturedFile);
-                  });
-                },
-                child: Container(
-                  height: 70,
-                  width: 70,
-                  margin: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(width: 1.5, color: Colors.grey[600])),
-                ),
-              ),
-            )
-          ],
-        ));
-  }
-}
-
 class FaceIdPage extends StatefulWidget {
   static String routeName = "/faceId";
 
@@ -141,16 +58,6 @@ class _FaceIdPageState extends State<FaceIdPage> {
       appBar: AppBar(
         centerTitle: true,
         title: Text("人脸录入"),
-        actions: <Widget>[
-//          FlatButton.icon(
-//              onPressed: () {
-//                setState(() {
-//                  fullScreen = !fullScreen;
-//                });
-//              },
-//              icon: Icon(Icons.swap_horizontal_circle),
-//              label: Text("切换全屏"))
-        ],
       ),
       body: fullScreen
           ? Stack(
@@ -285,7 +192,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
         await Api.verify(resp.data.orginPicPath, argument['idCard'],argument['isAgain']);
     faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
-    if (baseResponse.success()) {
+    if (baseResponse.success) {
       print(baseResponse.text);
       //Navigator.of(context).pop(baseResponse.text);
       UserVerifyInfo userVerifyInfo = baseResponse.data;
@@ -370,7 +277,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
   void refreshUserState(VoidCallback callback) async{
      ///认证之后不管是否成功都更新userInfo 和 房屋列表
     var baseResp = await Api.getUserInfo();
-    if(baseResp.success()) {
+    if(baseResp.success) {
       BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
       BlocProviders.of<ApplicationBloc>(context).getMyUserTypes();
       BlocProviders.of<ApplicationBloc>(context).clearDistrictAndGetCurrentDistrict();

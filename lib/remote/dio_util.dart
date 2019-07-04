@@ -138,15 +138,14 @@ class DioUtil {
                     : ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
                 headers: addAuthorization
                     ? {
-                        KEY_HEADER_TOKEN: sharedPreferences
-                            .getString(PreferenceKeys.keyAuthorization),
-                        KEY_HEADER_REGISTRATION_ID: sharedPreferences
-                            .getString(PreferenceKeys.keyRegistrationId),
+                        KEY_HEADER_TOKEN: sp.getString(KEY_TOKEN),
+                        KEY_HEADER_REGISTRATION_ID:
+                            sp.getString(PreferenceKeys.keyRegistrationId),
                       }
                     : {
-                  KEY_HEADER_REGISTRATION_ID: sharedPreferences
-                      .getString(PreferenceKeys.keyRegistrationId),
-                }),
+                        KEY_HEADER_REGISTRATION_ID:
+                            sp.getString(PreferenceKeys.keyRegistrationId),
+                      }),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
       if (response.statusCode != HttpStatus.ok) {
@@ -178,9 +177,9 @@ class DioUtil {
         BaseResponse<T> baseResponse = BaseResponse<T>(_status, _token, _text,
             jsonProcessor == null ? null : jsonProcessor(_data));
         //当请求失败的时候,吧data的String交给text,对后端的兼容...
-        //if (!baseResponse.success() && _rawData is String) {
+        //if (!baseResponse.success && _rawData is String) {
         //  baseResponse.text = _rawData;
-        if (baseResponse.success() &&
+        if (baseResponse.success &&
             (baseResponse.text == null || baseResponse.text.isEmpty)) {
           baseResponse.text = "成功";
         }
@@ -214,11 +213,8 @@ class DioUtil {
       Response<String> response = await _dioInstance.get<String>(
         "/axj_menu.json",
         options: RequestOptions(
-            contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
-            headers: {
-              KEY_HEADER_TOKEN:
-                  sharedPreferences.getString(PreferenceKeys.keyAuthorization),
-            }),
+          contentType: ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
+        ),
       );
       if (response.statusCode == 200) {
         var jsonString = response.data;

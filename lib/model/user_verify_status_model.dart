@@ -1,4 +1,4 @@
-import 'package:ai_life/remote/api.dart';
+import 'package:ease_life/remote/api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +20,7 @@ class UserVerifyStatusModel extends ChangeNotifier {
   }
 
   Future tryFetchVerifyStatus() async {
-    return Api.getUserVerifyStatus().then((resp) {
+    return Api.getUserVerify().then((resp) {
       if (resp.success) {
         status = resp.data;
       }
@@ -43,4 +43,5 @@ class UserVerifyStatusModel extends ChangeNotifier {
   void logout() {
     status = null;
   }
+
 }

@@ -118,7 +118,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     });
 
     Api.getUserInfo().then((resp) {
-      if (resp.success()) {
+      if (resp.success) {
         ChatMessageProvider().open().then((db) {
           var arguments = ModalRoute.of(context).settings.arguments;
           if (arguments is Map) {
@@ -632,7 +632,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   void _doSendAudio(RecordDetail recordDetail) {
     ApiKf.uploadAudio(File(recordDetail.path)).then((resp) {
-      if (resp.success()) {
+      if (resp.success) {
         var message = Message(resp.data.url,
             type: MessageType.AUDIO, duration: recordDetail.duration);
         manager.sendMessage(message).then((success) {
@@ -677,7 +677,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     showImageSourceDialog(context, () {}).then((sourceFile) {
       rotateWithExifAndCompress(sourceFile).then((f) {
         Api.uploadPic(f.path).then((resp) {
-          if (resp.success()) {
+          if (resp.success) {
             var message = Message("img[${resp.data.orginPicPath}]",
                 type: MessageType.IMAGE);
             manager.sendMessage(message).then((success) {

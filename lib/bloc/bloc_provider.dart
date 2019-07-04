@@ -82,7 +82,7 @@ class GlobalBloc extends BlocBase {
 
   GlobalBloc() {
     var userInfoStr =
-        sharedPreferences.getString(PreferenceKeys.keyUserInfo) ?? "{}";
+        sp.getString(PreferenceKeys.keyUserInfo) ?? "{}";
     var userInfo = UserInfo.fromJson(json.decode(userInfoStr));
     _userInfoController.add(userInfo);
   }
@@ -93,8 +93,6 @@ class ApplicationBloc extends BlocBase {
   void dispose() {
     _userInfoController.close();
     _districtInfoController.close();
-    _homeIndexController.close();
-    _mineIndexController.close();
     _noticeController.close();
     _noticeTypeController.close();
     _userTypeController.close();
@@ -128,7 +126,7 @@ class ApplicationBloc extends BlocBase {
   }
 
   void _getCurrentUserAndNotify() async {
-    var userInfoStr = sharedPreferences.getString(PreferenceKeys.keyUserInfo);
+    var userInfoStr = sp.getString(PreferenceKeys.keyUserInfo);
     if (userInfoStr?.isNotEmpty == true) {
       _userInfoController.add(UserInfo.fromJson(json.decode(userInfoStr)));
     } else {
@@ -137,14 +135,14 @@ class ApplicationBloc extends BlocBase {
   }
 
   void login(UserInfo userInfo) {
-    sharedPreferences.setString(
+    sp.setString(
         PreferenceKeys.keyUserInfo, userInfo?.toString());
     _getCurrentUserAndNotify();
     clearDistrictAndGetCurrentDistrict();
   }
 
   void saveToken(String token) {
-    sharedPreferences.setString(
+    sp.setString(
         PreferenceKeys.keyAuthorization, token?.toString());
   }
 
@@ -152,48 +150,31 @@ class ApplicationBloc extends BlocBase {
 
   BehaviorSubject<UserInfo> _userInfoController = BehaviorSubject();
 
-  Observable<UserInfo> get currentUser => _userInfoController.stream;
+  //Observable<UserInfo> get currentUser => _userInfoController.stream;
 
-  BehaviorSubject<DistrictInfo> _districtInfoController = BehaviorSubject();
+  BehaviorSubject<DistrictDetail> _districtInfoController = BehaviorSubject();
 
-  Observable<DistrictInfo> get currentDistrict =>
-      _districtInfoController.stream;
 
-  BehaviorSubject<Index> _homeIndexController = BehaviorSubject();
-  BehaviorSubject<Index> _mineIndexController = BehaviorSubject();
 
-  Observable<Index> get homeIndex => _homeIndexController.stream;
 
-  Observable<Index> get mineIndex => _mineIndexController.stream;
 
-  BehaviorSubject<List<NoticeDetail>> _noticeController = BehaviorSubject();
-  BehaviorSubject<List<NoticeType>> _noticeTypeController = BehaviorSubject();
+  BehaviorSubject<List<Announcement>> _noticeController = BehaviorSubject();
+  BehaviorSubject<List<AnnouncementType>> _noticeTypeController = BehaviorSubject();
 
-  Observable<List<NoticeDetail>> get homeNoticeStream =>
-      _noticeController.stream;
 
-  Observable<List<NoticeType>> get noticeTypeStream =>
-      _noticeTypeController.stream;
 
   BehaviorSubject<List<UserType>> _userTypeController = BehaviorSubject();
 
-  Observable<List<UserType>> get userTypeStream => _userTypeController.stream;
 
   PublishSubject<UserDetail> _controllerUserDetailData = PublishSubject();
 
-  Observable<UserDetail> get userDetailStream =>
-      _controllerUserDetailData.stream;
 
   PublishSubject<List<HouseDetail>> _controllerMyHouseData = PublishSubject();
 
-  Observable<List<HouseDetail>> get myHouseStream =>
-      _controllerMyHouseData.stream;
 
   BehaviorSubject<UserVerifyStatus> _userVerifyStatusController =
       BehaviorSubject();
 
-  Observable<UserVerifyStatus> get userVerifyStatusStream =>
-      _userVerifyStatusController.stream;
 
   /*
    * 退出登录:
@@ -201,16 +182,16 @@ class ApplicationBloc extends BlocBase {
    * 登录体系以SP中的 userInfo 作为唯一标识
    */
   void logout() {
-    sharedPreferences.setString(PreferenceKeys.keyUserInfo, null);
-    sharedPreferences.setString(PreferenceKeys.keyAuthorization, null);
-    sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, null);
+    sp.setString(PreferenceKeys.keyUserInfo, null);
+    sp.setString(PreferenceKeys.keyAuthorization, null);
+    sp.setString(PreferenceKeys.keyCurrentDistrict, null);
     _userInfoController.add(null);
     _districtInfoController.add(null);
   }
 
   void getUserTypes() {
     Api.getUserInfo().then((base) {
-      if (base.success()) {
+      if (base.success) {
         _userInfoController.add(base.data);
       } else {
         throw Exception("用户未登录,获取角色列表失败");
@@ -245,7 +226,7 @@ class ApplicationBloc extends BlocBase {
 
   void getMyHouseList() {
     Api.getMyHouse(getCurrentDistrictId()).then((baseResp) {
-      if (baseResp.success()) {
+      if (baseResp.success) {
         _controllerMyHouseData.add(baseResp.data);
       } else {
         _controllerMyHouseData.addError(baseResp.text);
@@ -260,14 +241,14 @@ class ApplicationBloc extends BlocBase {
    * 然后取后端返回的${Strings.districtClass}的第一个
    */
   void _getCurrentDistrictAndNotify() async {
-    var source = sharedPreferences.getString(PreferenceKeys.keyCurrentDistrict);
-    DistrictInfo districtInfo =
-        source == null ? null : DistrictInfo.fromJson(json.decode(source));
+    var source = sp.getString(PreferenceKeys.keyCurrentDistrict);
+    DistrictDetail districtInfo =
+        source == null ? null : DistrictDetail.fromJson(json.decode(source));
     if (districtInfo == null) {
-      BaseResponse<List<DistrictInfo>> baseResponse =
+      BaseResponse<List<DistrictDetail>> baseResponse =
           await Api.findAllDistrict();
       //将取到的${Strings.districtClass}信息存入sp缓存
-      sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict,
+      sp.setString(PreferenceKeys.keyCurrentDistrict,
           baseResponse.data.first.toString());
       _districtInfoController.add(baseResponse.data.first);
       getMyHouseList();
@@ -279,12 +260,12 @@ class ApplicationBloc extends BlocBase {
 
   ///清空小区缓存重新获取
   void clearDistrictAndGetCurrentDistrict() async {
-    BaseResponse<List<DistrictInfo>> baseResponse = await Api.findAllDistrict();
+    BaseResponse<List<DistrictDetail>> baseResponse = await Api.findAllDistrict();
     //将取到的${Strings.districtClass}信息存入sp缓存
     var string = baseResponse.data.first.toString();
-    sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, string);
-    if (baseResponse.success()) {
-      sharedPreferences.setString(PreferenceKeys.keyCurrentDistrict, string);
+    sp.setString(PreferenceKeys.keyCurrentDistrict, string);
+    if (baseResponse.success) {
+      sp.setString(PreferenceKeys.keyCurrentDistrict, string);
       _districtInfoController.add(baseResponse.data.first);
       getMyHouseList();
     } else {
@@ -293,36 +274,10 @@ class ApplicationBloc extends BlocBase {
     }
   }
 
-  /*
-   * 获取json map,标记主页按钮的去向url
-   */
-  void getIndexInfo() async {
-    try {
-      List<Index> list = await Api.getIndex();
-      _homeIndexController
-          .add(list.firstWhere((index) => index.area == "index"));
-      _mineIndexController
-          .add(list.firstWhere((index) => index.area == "mine"));
-      var content = list
-          .map((index) {
-            return index.toString();
-          })
-          .toList()
-          .join(",");
-      sharedPreferences.setString(PreferenceKeys.keyIndexInfo, "[$content]");
-      getMyHouseList();
-    } catch (e, s) {
-      print(e);
-      print(s);
-      Fluttertoast.showToast(msg: "获取网页索引失败");
-      _homeIndexController.add(null);
-      _mineIndexController.add(null);
-    }
-  }
 
-  void setCurrentDistrict(DistrictInfo districtInfo) {
+  void setCurrentDistrict(DistrictDetail districtInfo) {
     //将取到的${Strings.districtClass}信息存入sp缓存
-    sharedPreferences.setString(
+    sp.setString(
         PreferenceKeys.keyCurrentDistrict, districtInfo.toString());
     _districtInfoController.add(districtInfo);
   }
@@ -353,7 +308,7 @@ class ApplicationBloc extends BlocBase {
     Api.getAllNoticeType().then((baseResp) {
       _noticeTypeController.add(baseResp.data);
       return Api.getNewNotice(baseResp.data);
-    }).then((BaseResponse<List<NoticeDetail>> resp) {
+    }).then((BaseResponse<List<Announcement>> resp) {
       _noticeController.add(resp.data);
     }).catchError((e, s) {
       _noticeController.add(null);
@@ -362,7 +317,7 @@ class ApplicationBloc extends BlocBase {
 
   void getUserDetail() {
     Api.getUserDetail().then((baseResp) {
-      if (baseResp.success()) {
+      if (baseResp.success) {
         _controllerUserDetailData.add(baseResp.data);
       }
     }).catchError((Object e, StackTrace s) {
@@ -372,17 +327,17 @@ class ApplicationBloc extends BlocBase {
 
   Future getUserVerifyStatus() async {
     return Api.getUserVerify().then((resp) {
-      if (resp.success()) {
+      if (resp.success) {
         _userVerifyStatusController.add(resp.data);
-        sharedPreferences.setString(
+        sp.setString(
             PreferenceKeys.keyUserVerify, resp.data.toString());
       } else {
         _userVerifyStatusController.addError(resp.text);
-        sharedPreferences.setString(PreferenceKeys.keyUserVerify, null);
+        sp.setString(PreferenceKeys.keyUserVerify, null);
       }
     }).catchError((e) {
       _userVerifyStatusController.addError(e);
-      sharedPreferences.setString(PreferenceKeys.keyUserVerify, null);
+      sp.setString(PreferenceKeys.keyUserVerify, null);
     });
   }
 }
@@ -417,25 +372,6 @@ class ContactsBloc extends BlocBase {
   }
 }
 
-class MainIndexBloc extends BlocBase {
-  PublishSubject<int> _indexController = PublishSubject();
-
-  Observable<int> get indexStream => _indexController.stream;
-
-  MainIndexBloc() {
-    _indexController.add(0);
-  }
-
-  @override
-  void dispose() {
-    _indexController.close();
-  }
-
-  void toIndex(int index) {
-    _indexController.add(index);
-  }
-}
-
 enum CAMERA_STATUS { PREVIEW, PICTURE_STILL, VIDEO_RECORD }
 
 class CameraBloc extends BlocBase {
@@ -453,17 +389,4 @@ class CameraBloc extends BlocBase {
   }
 }
 
-class MemberApplyBloc extends BlocBase {
-  @override
-  void dispose() {
-    _districtController.close();
-  }
 
-  BehaviorSubject<DistrictInfo> _districtController = BehaviorSubject();
-
-  Observable<DistrictInfo> get districtInfo => _districtController.stream;
-
-  void selectDistrict(DistrictInfo district) {
-    _districtController.add(district);
-  }
-}

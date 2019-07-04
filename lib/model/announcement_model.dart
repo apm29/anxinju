@@ -1,8 +1,8 @@
-import 'package:ai_life/remote/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'base_response.dart';
+import 'package:ease_life/remote/api.dart';
 
 const List<Color> colors =const [
   Colors.redAccent,
@@ -48,11 +48,11 @@ class AnnouncementModel extends ChangeNotifier {
 
   Future tryFetchAllAnnouncement() async {
     return Future.delayed(Duration(seconds: 0)).then((_) {
-      Api.getAnnounceTypes().then((resp) {
+      Api.getAllNoticeType().then((resp) {
         if (resp.success) {
           announcementTypes = resp.data;
         }
-        return Api.getAnnouncements(typesString);
+        return Api.getNewNotice(resp.data);
       }).then((resp) {
         if (resp.success) {
           announcementList = resp.data;
@@ -78,6 +78,13 @@ class AnnouncementModel extends ChangeNotifier {
 
   String title(int index) {
     return announcements[index].noticeTitle;
+  }
+
+  String typeTitleByDetail(Announcement detail){
+    return announcementTypes.firstWhere((type) {
+      return type.typeId == detail.noticeType;
+    }, orElse: () => null)?.typeName ??
+        "";
   }
 
   Gradient bannerColor(int index) {

@@ -25,7 +25,7 @@ class BaseResponse<T> {
   String text;
   T data;
 
-  bool success() => status == "1";
+  bool get success => status == "1";
 
   BaseResponse(this.status, this.token, this.text, this.data);
 
@@ -87,14 +87,14 @@ class UserInfo {
   }
 }
 
-class DistrictInfo {
+class DistrictDetail {
   int districtId;
   String districtName;
   String districtAddr;
   String districtPic;
   String companyId;
 
-  DistrictInfo(this.districtId, this.districtName, this.districtAddr,
+  DistrictDetail(this.districtId, this.districtName, this.districtAddr,
       this.districtPic, this.companyId);
 
   @override
@@ -102,7 +102,7 @@ class DistrictInfo {
     return '{"districtId":$districtId,"districtName":"$districtName","districtAddr":"$districtAddr","districtPic":"$districtPic","companyId":"$companyId"}';
   }
 
-  DistrictInfo.fromJson(Map<String, dynamic> json) {
+  DistrictDetail.fromJson(Map<String, dynamic> json) {
     districtId = json['districtId'];
     districtName = json['districtName'];
     districtAddr = json['districtAddr'];
@@ -118,6 +118,24 @@ class DistrictInfo {
     data['districtPic'] = this.districtPic;
     data['companyId'] = this.companyId;
     return data;
+  }
+
+  @override
+  bool operator ==(other) {
+    if (other == null || other is! DistrictDetail) {
+      return false;
+    } else if (other is DistrictDetail) {
+      return districtId == other.districtId &&
+          districtName == other.districtName &&
+          districtAddr == other.districtAddr &&
+          districtPic == other.districtPic;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode {
+    return super.hashCode;
   }
 }
 
@@ -258,14 +276,14 @@ class FileDetail {
   }
 }
 
-class NoticeType {
+class AnnouncementType {
   int typeId;
   int typeUid;
   String typeName;
 
-  NoticeType({this.typeId, this.typeUid, this.typeName});
+  AnnouncementType({this.typeId, this.typeUid, this.typeName});
 
-  NoticeType.fromJson(Map<String, dynamic> json) {
+  AnnouncementType.fromJson(Map<String, dynamic> json) {
     typeId = json['typeId'];
     typeUid = json['typeUid'];
     typeName = json['typeName'];
@@ -280,7 +298,7 @@ class NoticeType {
   }
 }
 
-class NoticeDetail {
+class Announcement {
   int noticeId;
   String noticeTitle;
   String noticeContent;
@@ -293,7 +311,7 @@ class NoticeDetail {
   String companyName;
   String createTime;
 
-  NoticeDetail({
+  Announcement({
     this.noticeId,
     this.noticeTitle,
     this.noticeContent,
@@ -307,7 +325,7 @@ class NoticeDetail {
     this.createTime,
   });
 
-  NoticeDetail.fromJson(Map<String, dynamic> json) {
+  Announcement.fromJson(Map<String, dynamic> json) {
     noticeId = json['noticeId'];
     noticeTitle = json['noticeTitle'];
     noticeContent = json['noticeContent'];

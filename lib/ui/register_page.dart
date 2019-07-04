@@ -160,7 +160,7 @@ class _RegisterPageState extends State<RegisterPage> {
     BaseResponse<Object> baseResp = await Api.sendSms(_mobileController.text,0);
     Fluttertoast.showToast(msg: baseResp.text);
     ticker.currentState?.stopLoading();
-    if (baseResp.success()) {
+    if (baseResp.success) {
       //发送短信成功
       ticker.currentState.startTick();
     }
@@ -203,7 +203,7 @@ class _RegisterPageState extends State<RegisterPage> {
         _userNameController.text);
     Fluttertoast.showToast(msg: baseResp.text.trim());
     register.currentState?.stopLoading();
-    if (baseResp.success()) {
+    if (baseResp.success) {
       //注册成功
       Navigator.of(context).pop();
     }

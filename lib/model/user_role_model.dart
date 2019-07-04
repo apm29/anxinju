@@ -1,4 +1,4 @@
-import 'package:ai_life/remote/api.dart';
+import 'package:ease_life/remote/api.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,7 @@ class UserRoleModel extends ChangeNotifier {
   }
 
   Future tryFetchUserRoleTypes() async {
-    return Api.getUserRoleTypes().then((resp) {
+    return Api.getUserTypeWithOutId().then((resp) {
       if (resp.success) {
         types = resp.data;
       }
@@ -41,7 +41,38 @@ class UserRoleModel extends ChangeNotifier {
       return false;
     }
     return types.any((role) {
-      return role.roleCode == "1" || role.roleCode == "3" ;
+      return role.roleCode == "1" || role.roleCode == "3";
     });
+  }
+
+  ///民警 或者 物业可以看社区记录
+  bool hasSocietyRecordPermission() {
+    if (_types == null || _types.length == 0) {
+      return false;
+    }
+    print('------------> $types');
+    return _types.firstWhere((e) {
+          return "1" == e.roleCode || "3" == e.roleCode;
+        }, orElse: ()=>null) !=
+        null;
+  }
+
+  ///是否是物业人员
+  bool hasPropertyPermission() {
+    if (_types == null || _types.length == 0) {
+      return false;
+    }
+    return _types.firstWhere((e) => "1" == e.roleCode, orElse: ()=>null) != null;
+  }
+
+  ///是否是普通用户
+  bool hasCommonUserPermission() {
+    if (_types == null || _types.length == 0) {
+      return true;
+    }
+    return _types.firstWhere((e) {
+          return ["1", "2", "3", "4", "5", "6"].contains(e.roleCode);
+        }, orElse: ()=>null) !=
+        null;
   }
 }

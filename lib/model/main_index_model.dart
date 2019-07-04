@@ -22,7 +22,9 @@ class MainIndexModel extends ChangeNotifier {
 
   List<Index> _index;
 
-  Future<List<Index>> getIndex() async {
+  List<Index> get index => _index??[];
+
+  Future<List<Index>> tryFetchIndex() async {
     if (_index == null) {
       return _readFromSpThenNet();
     } else {
@@ -56,7 +58,7 @@ class MainIndexModel extends ChangeNotifier {
   }
 
   Future<List<Index>> _fetchIndexFromNet() async {
-    return Api.getIndexMenu().then((list) {
+    return Api.getIndex().then((list) {
       sp.setString(KEY_JSON_MENU_INDEX, "[${list.join(",")}]");
       index = list;
       return list;

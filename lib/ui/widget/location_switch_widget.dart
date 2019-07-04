@@ -1,55 +1,53 @@
-import 'package:ease_life/index.dart';
 import 'package:ease_life/model/district_model.dart';
-import 'package:ease_life/model/user_model.dart';
-import 'package:ease_life/model/user_verify_status_model.dart';
-import 'package:ease_life/persistance/shared_preferences.dart';
-import 'package:ease_life/res/strings.dart';
 import 'package:ease_life/ui/widget/refresh_hint_widget.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../utils.dart';
-
-typedef DistrictCallback = void Function(DistrictDetail);
-
-class DistrictInfoButton extends StatefulWidget {
-
-  const DistrictInfoButton({Key key}) : super(key: key);
-
+class LocationSwitchWidget extends StatefulWidget {
   @override
-  _DistrictInfoButtonState createState() => _DistrictInfoButtonState();
+  _LocationSwitchWidgetState createState() => _LocationSwitchWidgetState();
 }
 
-class _DistrictInfoButtonState extends State<DistrictInfoButton> {
+const _kAnimationDuration = const Duration(milliseconds: 800);
+
+class _LocationSwitchWidgetState extends State<LocationSwitchWidget>
+    with SingleTickerProviderStateMixin {
+  AnimationController _controller;
+  Animation<double> _animation;
+
   @override
   void initState() {
+    _controller = AnimationController(
+        vsync: this,
+        duration: _kAnimationDuration,
+        reverseDuration: _kAnimationDuration);
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.fastOutSlowIn,
+    );
+    _controller.value = 1;
     super.initState();
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<DistrictModel>(
-      builder: (BuildContext context, DistrictModel value, Widget child) {
-        bool isLogin = UserModel.of(context).isLogin;
-        bool isVerified = UserVerifyStatusModel.of(context).isVerified();
-        var textString = isLogin
-            ? isVerified
-                ? value.currentDistrict?.districtName ?? "无小区"
-                : "未认证"
-            : "未登录";
-        return FlatButton.icon(
-            onPressed: () {
-              !isLogin
-                  ? toLogin()
-                  : isVerified
-                      ? showDistrictMenu(context)
-                      : showCertificationDialog(context);
-            },
-            icon: Icon(
-              Icons.location_on,
-              color: Colors.blue,
-            ),
-            label: Text(textString));
+    return GestureDetector(
+      onTap: () async {
+        _controller.reverse();
+        showDistrictMenu(context);
       },
+      child: AnimatedIcon(
+        size: 36,
+        icon: AnimatedIcons.close_menu,
+        color: Colors.white,
+        progress: _animation,
+      ),
     );
   }
 
@@ -100,12 +98,8 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
           },
         );
       },
-    );
-  }
-
-
-
-  toLogin() {
-    Navigator.of(context).pushNamed("/login");
+    ).then((_) {
+      _controller.forward();
+    });
   }
 }

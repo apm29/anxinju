@@ -1,4 +1,5 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/model/user_model.dart';
 import 'package:rxdart/rxdart.dart';
 
 //import 'package:geolocator/geolocator.dart';
@@ -365,13 +366,7 @@ class _WebViewExampleState extends State<WebViewExample> {
               }),
           actions: <Widget>[
 //          NavigationControls(_controller.future),
-            DistrictInfoButton(
-              callback: (district) {
-                controller?.reload();
-                print('hasFocus:${_focusNode1.hasFocus}');
-                FocusScope.of(context).requestFocus(FocusNode());
-              },
-            ),
+            DistrictInfoButton(),
             //SampleMenu(_controller.future, () {
             //  FocusScope.of(context).requestFocus(FocusNode());
             //}),
@@ -810,15 +805,14 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
-    showImageSourceDialog( context, () {
+    showImageSourceDialog(context, () {
       FocusScope.of(context).requestFocus(FocusNode());
-    }).then((file){
+    }).then((file) {
       processFileAndNotify(file, callbackName);
     });
   }
 
-  void processFileAndNotify(
-      File sourceFile, String jsCallbackNam) {
+  void processFileAndNotify(File sourceFile, String jsCallbackNam) {
     //Future.value(sourceFile).then((File file) {
     //  if (file == null) {
     //    return null;
@@ -847,11 +841,9 @@ class _WebViewExampleState extends State<WebViewExample> {
     //  }
     //
     //});
-    rotateWithExifAndCompress(sourceFile)
-        .then((file){
-      Api.uploadPic(file.absolute.path)
-          .then((BaseResponse<ImageDetail> resp) {
-        if (resp.success()) {
+    rotateWithExifAndCompress(sourceFile).then((file) {
+      Api.uploadPic(file.absolute.path).then((BaseResponse<ImageDetail> resp) {
+        if (resp.success) {
           controller.evaluateJavascript(
               '$jsCallbackNam("${resp.data.thumbnailPath}","${resp.data.orginPicPath}")');
         } else {
@@ -864,20 +856,23 @@ class _WebViewExampleState extends State<WebViewExample> {
   void doGetToken(dynamic data) {
     if (isLogin()) {
       var javascriptString =
-          '${data["callbackName"]}("${getToken()}","${getCurrentDistrictId()}","${data["backRoute"]}")';
+          '${data["callbackName"]}("${UserModel.of(context).token}","${getCurrentDistrictId()}","${data["backRoute"]}")';
 
       print('$javascriptString');
 
       controller.evaluateJavascript(javascriptString);
     } else {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (context) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return LoginPage(
           backRoute: data["backRoute"],
         );
-      })).then((backRoute) {
+      })).then((token) {
+        if (token == null) {
+          Navigator.of(context).pop();
+          return null;
+        }
         var javascriptString =
-            '${data["callbackName"]}("${getToken()}","${getCurrentDistrictId()}","${data["backRoute"]}")';
+            '${data["callbackName"]}("${UserModel.of(context).token}","${getCurrentDistrictId()}","${data["backRoute"]}")';
 
         controller.evaluateJavascript(javascriptString);
       });
@@ -901,9 +896,10 @@ class _WebViewExampleState extends State<WebViewExample> {
                 onPressed: () {
                   Navigator.of(context).pop(null);
                 },
-                child: Text("取消",style: TextStyle(
-                  color: Colors.grey
-                ),),
+                child: Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
               FlatButton(
                 onPressed: () {
@@ -955,8 +951,6 @@ class _WebViewExampleState extends State<WebViewExample> {
     });
   }
 
-
-
   //文件上传
   void doUploadFile(String callbackName) {
     //显示选择器
@@ -966,7 +960,7 @@ class _WebViewExampleState extends State<WebViewExample> {
       //文件上传
       return Api.uploadFile(f.path);
     }).then((resp) {
-      if (resp.success()) {
+      if (resp.success) {
         //callback文件地址
         controller.evaluateJavascript('$callbackName("${resp.data.filePath}")');
       } else {
@@ -1098,19 +1092,19 @@ class SampleMenu extends StatelessWidget {
 //                  value: MenuOptions.listCache,
 //                  child: Text('List cache'),
 //                ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.clearCache,
-                  child: Text('Clear cache'),
-                ),
+            const PopupMenuItem<MenuOptions>(
+              value: MenuOptions.clearCache,
+              child: Text('Clear cache'),
+            ),
 //                const PopupMenuItem<MenuOptions>(
 //                  value: MenuOptions.js,
 //                  child: Text('js'),
 //                ),
-                const PopupMenuItem<MenuOptions>(
-                  value: MenuOptions.navigationDelegate,
-                  child: Text('Example'),
-                ),
-              ],
+            const PopupMenuItem<MenuOptions>(
+              value: MenuOptions.navigationDelegate,
+              child: Text('Example'),
+            ),
+          ],
         );
       },
     );

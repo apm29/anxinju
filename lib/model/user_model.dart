@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:ai_life/remote/api.dart';
+import 'package:ease_life/remote/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'base_response.dart';
-import 'package:ai_life/persistence/const.dart';
+import 'package:ease_life/persistance/shared_preference_keys.dart';
 
 import 'district_model.dart';
 import 'user_role_model.dart';
@@ -19,6 +19,15 @@ class UserModel extends ChangeNotifier {
   String get userId => _userInfo?.userId;
 
   String get userName => _userInfo?.userName;
+
+  UserDetail _userDetail;
+
+  UserDetail get userDetail => _userDetail;
+
+  set userDetail(UserDetail value) {
+    _userDetail = value;
+    notifyListeners();
+  }
 
   String get token => _token;
 
@@ -53,6 +62,7 @@ class UserModel extends ChangeNotifier {
 
   UserModel() {
     tryLoginWithLocalToken();
+    tryFetchUserDetail();
   }
 
   void tryLoginWithLocalToken() {
@@ -71,5 +81,14 @@ class UserModel extends ChangeNotifier {
 
   static UserModel of(BuildContext context) {
     return Provider.of<UserModel>(context, listen: false);
+  }
+
+  Future tryFetchUserDetail() async {
+    return Api.getUserDetail().then((resp) {
+      if(resp.success){
+        userDetail = resp.data;
+      }
+      return null;
+    });
   }
 }

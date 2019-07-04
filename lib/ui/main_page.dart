@@ -1,4 +1,9 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/model/announcement_model.dart';
+import 'package:ease_life/model/district_model.dart';
+import 'package:ease_life/model/main_index_model.dart';
+import 'package:ease_life/model/user_model.dart';
+import 'package:ease_life/model/user_verify_status_model.dart';
 
 const int PAGE_HOME = 0;
 const int PAGE_SEARCH = 1;
@@ -16,12 +21,6 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   static DateTime _lastPressedAt;
-  PageController _pageController = PageController();
-  GlobalKey<BottomBarState> bottomKey = GlobalKey();
-  PageStorageKey<String> pagerKey = PageStorageKey("main");
-
-
-
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class MainPageState extends State<MainPage> {
     if (mounted) {
       BlocProviders.of<ApplicationBloc>(context).getUserTypes();
     }
-
 
     if (Platform.isAndroid)
       FlutterBugly.init(
@@ -66,12 +64,6 @@ class MainPageState extends State<MainPage> {
   @override
   void didUpdateWidget(MainPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    var mainIndexBloc = BlocProviders.of<MainIndexBloc>(context);
-    mainIndexBloc.indexStream.listen((index) {
-      changePage(context, index);
-    }).onError((e) {
-      print(e.toString());
-    });
   }
 
   @override
@@ -87,80 +79,50 @@ class MainPageState extends State<MainPage> {
       }
       return true;
     }, child: Consumer<MainIndexModel>(
-      builder: (context, model, child) {
-        _pageController = PageController(initialPage: model.currentIndex);
-        return Scaffold(
-          body: Container(
-            color: Colors.grey[200],
-            child: buildContent(context),
+      builder: (context, indexModel, child) {
+        return RefreshIndicator(
+          child: Scaffold(
+            body: Container(
+              color: Colors.grey[200],
+              child: buildContent(context),
+            ),
+            bottomNavigationBar:
+                buildBottomNavigationBar(indexModel.currentIndex),
           ),
-          bottomNavigationBar: buildBottomNavigationBar(),
+          onRefresh: () async {
+            UserModel.of(context).tryLoginWithLocalToken();
+            await AnnouncementModel.of(context).tryFetchAllAnnouncement();
+            await DistrictModel.of(context).tryFetchCurrentDistricts();
+            await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+            return;
+          },
         );
       },
     ));
   }
 
-  Widget buildBottomNavigationBar() {
-    return Consumer<MainIndexModel>(
-      builder: (context, value, child) {
-        return BottomBar(bottomKey, _pageController, value.currentIndex);
-      },
-    );
-  }
-
-  void changePage(BuildContext context, int pageIndex) {
-    _pageController.jumpToPage(pageIndex);
-    bottomKey.currentState.changePage(pageIndex);
+  Widget buildBottomNavigationBar(int currentIndex) {
+    return BottomBar(currentIndex);
   }
 
   buildContent(BuildContext context) {
     ///监听主页面切换
-    return NotificationListener<IndexNotification>(
-      onNotification: (notification) {
-        changePage(context, notification.index);
-        if (notification.indexId != null) {
-          print('$notification');
-          Index index = getIndexInfo().firstWhere((index) =>
-              index.area ==
-              (notification.index == PAGE_HOME ? 'index' : 'mine'));
-          routeToWeb(context, notification.indexId, index);
+    return Consumer<MainIndexModel>(
+      builder: (BuildContext context, MainIndexModel indexModel, Widget child) {
+        switch (indexModel.currentIndex) {
+          case PAGE_HOME:
+            return HomePage();
+          case PAGE_SEARCH:
+            return buildTestPage();
+          case PAGE_MESSAGE:
+            return MessagePage();
+          case PAGE_MINE:
+            return MinePage();
+          default:
+            throw Exception("无效索引");
         }
-        return true;
       },
-      child: PageView.builder(
-        controller: _pageController,
-        physics: NeverScrollableScrollPhysics(),
-        key: pagerKey,
-        itemBuilder: (context, index) {
-          switch (index) {
-            case PAGE_HOME:
-              return HomePage();
-            case PAGE_SEARCH:
-              return buildTestPage();
-            case PAGE_MESSAGE:
-              return MessagePage();
-            case PAGE_MINE:
-              return MinePage();
-            default:
-              throw Exception("无效索引");
-          }
-        },
-        onPageChanged: (index) {
-          //bottomKey.currentState.changePage(index);
-          Provider.of<MainIndexModel>(context).changeIndex(index);
-        },
-      ),
     );
-//    switch (_currentIndex) {
-//      case PAGE_HOME:
-//        return HomePage();
-//      case PAGE_SEARCH:
-//        return buildTestPage();
-//      case PAGE_MESSAGE:
-//        return MessagePage();
-//      case PAGE_MINE:
-//        return MinePage();
-//    }
   }
 
   Container buildTestPage() {
@@ -185,10 +147,8 @@ class MainPageState extends State<MainPage> {
             ),
             OutlineButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(ChatRoomPage.routeName,arguments: {
-                  "group":"1",
-                  "title":"紧急呼救"
-                });
+                Navigator.of(context).pushNamed(ChatRoomPage.routeName,
+                    arguments: {"group": "1", "title": "紧急呼救"});
               },
               child: Text("紧急呼救"),
             ),

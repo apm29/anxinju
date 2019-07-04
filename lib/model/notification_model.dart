@@ -1,4 +1,4 @@
-import 'package:ai_life/index.dart';
+import '../index.dart';
 
 class NotificationModel extends ChangeNotifier{
 

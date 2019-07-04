@@ -167,7 +167,7 @@ class WebSocketManager {
     //配置设置
     Api.getUserDetail().then((userDetail) {
       // ok 1
-      if (userDetail.success()) {
+      if (userDetail.success) {
         config.userAvatar = userDetail.data.avatar;
         config.userName = userDetail.data.nickName;
         config.userId = userDetail.data.userId;

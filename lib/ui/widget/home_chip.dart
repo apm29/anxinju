@@ -1,8 +1,10 @@
 import 'package:ease_life/model/base_response.dart';
+import 'package:ease_life/model/main_index_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ease_life/utils.dart';
+import 'package:provider/provider.dart';
 
 class HomeChip extends StatelessWidget {
   final String title;
@@ -10,9 +12,8 @@ class HomeChip extends StatelessWidget {
   final Color color;
   final Color textColor;
   final String indexId;
-  final Index index;
-  final bool interceptCertification;
-  final bool hasHouse;
+  final bool checkIsFaceVerified;
+  final bool checkHasHouse;
   final bool wrap;
 
   HomeChip({
@@ -21,32 +22,25 @@ class HomeChip extends StatelessWidget {
     this.color = Colors.white,
     this.textColor = const Color(0xFF616161),
     this.indexId,
-    this.index,
-    this.interceptCertification = false,
-    this.hasHouse,
+    this.checkIsFaceVerified = false,
+    this.checkHasHouse = false,
     this.wrap = false,
-  }) : assert(interceptCertification != null);
+  }) : assert(checkIsFaceVerified != null);
 
-  void route(String id, Index index, BuildContext context) {
-    if (interceptCertification != false && !checkIfCertificated(context)) {
-      return;
-    }
-    if(hasHouse==null || hasHouse == true) {
-      routeToWeb(context, id, index);
-    }else{
-      showAuthDialog(context, index);
-    }
+  void route(String id, BuildContext context) {
+    toWebPage(
+      context,
+      indexId,
+      checkHasHouse: checkHasHouse,
+      checkFaceVerified: checkIsFaceVerified,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (index == null) {
-      return Container();
-    }
-
     return GestureDetector(
       onTap: () {
-        route(indexId, index, context);
+        route(indexId, context);
       },
       child: Container(
           margin: EdgeInsets.all(ScreenUtil().setWidth(8)),
@@ -74,14 +68,20 @@ class HomeChip extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    getTitle(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color:
-                            color != Colors.white ? Colors.white : Colors.black,
-                        fontSize: ScreenUtil().setSp(30)),
-                    maxLines: 3,
+                  child: Consumer<MainIndexModel>(
+                    builder: (BuildContext context, MainIndexModel value,
+                        Widget child) {
+                      return Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: color != Colors.white
+                                ? Colors.white
+                                : Colors.black,
+                            fontSize: ScreenUtil().setSp(30)),
+                        maxLines: 3,
+                      );
+                    },
                   ),
                 ),
               ],
@@ -90,11 +90,5 @@ class HomeChip extends StatelessWidget {
     );
   }
 
-  String getTitle() {
-    return index.menu.firstWhere((item) {
-      return item.id == indexId;
-    }, orElse: () {
-      return MenuItem("", title, "");
-    }).remark;
-  }
+
 }

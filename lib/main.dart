@@ -1,12 +1,22 @@
-import 'index.dart';
+import 'package:ease_life/model/user_role_model.dart';
+import 'package:ease_life/model/user_verify_status_model.dart';
+import 'package:oktoast/oktoast.dart';
 
-SharedPreferences sharedPreferences;
+import 'index.dart';
+import 'model/announcement_model.dart';
+import 'model/district_model.dart';
+import 'model/home_end_scroll_model.dart';
+import 'model/main_index_model.dart';
+import 'model/notification_model.dart';
+import 'model/theme_model.dart';
+import 'model/user_model.dart';
+
 List<CameraDescription> cameras;
 JPush jPush = JPush();
 
 void main() async {
   //sp初始化
-  sharedPreferences = await SharedPreferences.getInstance();
+  sp = await SharedPreferences.getInstance();
   await AMap.init(Configs.AMapKey);
   //相机初始化
   cameras = await availableCameras();
@@ -26,7 +36,7 @@ Future<void> initPlatformState(BuildContext context) async {
   // Platform messages may fail, so we use a try/catch PlatformException.
   jPush.getRegistrationID().then((rid) {
     print("flutter getRegistrationID: $rid");
-    sharedPreferences.setString(PreferenceKeys.keyRegistrationId, rid);
+    sp.setString(PreferenceKeys.keyRegistrationId, rid);
   });
   jPush.applyPushAuthority(
     new NotificationSettingsIOS(sound: true, alert: true, badge: true),
@@ -134,66 +144,62 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<MainIndexModel>(
-          builder: (context) => MainIndexModel(),
-        ),
-      ],
-      child: BlocProviders<ApplicationBloc>(
-        bloc: ApplicationBloc(),
-        child: MaterialApp(
-          theme: defaultThemeData,
-          debugShowCheckedModeBanner: false,
-          onUnknownRoute: (settings) {
-            return MaterialPageRoute(builder: (context) {
-              return NotFoundPage(routeName: settings.name);
-            });
-          },
-          routes: {
-            MainPage.routeName: (_) {
-              bool firstEntry =
-                  sharedPreferences.getBool(PreferenceKeys.keyFirstEntryTag) ??
-                      true;
-              return BlocProviders<MainIndexBloc>(
-                child: firstEntry ? SplashPage() : MainPage(),
-                bloc: MainIndexBloc(),
-              );
+    return OKToast(
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: MainIndexModel()),
+          ChangeNotifierProvider.value(value: UserModel()),
+          ChangeNotifierProvider.value(value: AnnouncementModel()),
+          ChangeNotifierProvider.value(value: AppThemeModel()),
+          ChangeNotifierProvider.value(value: DistrictModel()),
+          ChangeNotifierProvider.value(value: HomeEndScrollModel()),
+          ChangeNotifierProvider.value(value: NotificationModel()),
+          ChangeNotifierProvider.value(value: UserVerifyStatusModel()),
+          ChangeNotifierProvider.value(value: UserRoleModel()),
+        ],
+        child: BlocProviders<ApplicationBloc>(
+          bloc: ApplicationBloc(),
+          child: MaterialApp(
+            theme: defaultThemeData,
+            debugShowCheckedModeBanner: false,
+            onUnknownRoute: (settings) {
+              return MaterialPageRoute(builder: (context) {
+                return NotFoundPage(routeName: settings.name);
+              });
             },
-            LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
-                  child: LoginPage(),
-                  bloc: LoginBloc(),
-                ),
-            RegisterPage.routeName: (_) => RegisterPage(),
-            MemberApplyPage.routeName: (_) {
-              return BlocProviders<MemberApplyBloc>(
-                bloc: MemberApplyBloc(),
-                child: MemberApplyPage(),
-              );
+            routes: {
+              MainPage.routeName: (_) {
+                bool firstEntry =
+                    sp.getBool(PreferenceKeys.keyFirstEntryTag) ??
+                        true;
+                return firstEntry ? SplashPage() : MainPage();
+              },
+              LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
+                    child: LoginPage(),
+                    bloc: LoginBloc(),
+                  ),
+              RegisterPage.routeName: (_) => RegisterPage(),
+              MemberApplyPage.routeName: (_) {
+                return MemberApplyPage();
+              },
+              PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
+              AuthorizationPage.routeName: (_) => AuthorizationPage(),
+              UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
+              FaceIdPage.routeName: (_) {
+                return BlocProviders<CameraBloc>(
+                  child: FaceIdPage(),
+                  bloc: CameraBloc(),
+                );
+              },
+              ChatRoomPage.routeName: (_) => ChatRoomPage(),
+              ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
+                    child: ContactsSelectPage(null),
+                    bloc: ContactsBloc(),
+                  ),
             },
-            PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
-            AuthorizationPage.routeName: (_) => AuthorizationPage(),
-            UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
-            FaceIdPage.routeName: (_) {
-              return BlocProviders<CameraBloc>(
-                child: FaceIdPage(),
-                bloc: CameraBloc(),
-              );
-            },
-            ChatRoomPage.routeName: (_) => ChatRoomPage(),
-            ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
-                  child: ContactsSelectPage(null),
-                  bloc: ContactsBloc(),
-                ),
-          },
+          ),
         ),
       ),
     );
   }
-}
-
-class PushNotification extends Notification {
-  final Map<String, String> extras;
-
-  PushNotification(this.extras);
 }

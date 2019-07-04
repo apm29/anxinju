@@ -75,12 +75,12 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                             context: context,
                             builder: (context) {
                               return FutureBuilder<
-                                  BaseResponse<List<DistrictInfo>>>(
+                                  BaseResponse<List<DistrictDetail>>>(
                                 future: findAllDistrict,
                                 builder: (context, districtSnap) {
                                   if (districtSnap.hasData &&
                                       !districtSnap.hasError &&
-                                      districtSnap.data.success()) {
+                                      districtSnap.data.success) {
                                     return SizedBox(
                                       height: ScreenUtil().setHeight(800),
                                       child: ListView(
@@ -189,7 +189,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                                 _realNameController.text);
                             Fluttertoast.showToast(msg: baseResponse.text);
                             applyKey.currentState.stopLoading();
-                            if (baseResponse.success()) {
+                            if (baseResponse.success) {
                               showDialog(
                                   context: context,
                                   builder: (context) {
@@ -367,11 +367,11 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
         builder: (context) {
           return SizedBox(
             height: ScreenUtil().setHeight(720),
-            child: FutureBuilder<BaseResponse<List<DistrictInfo>>>(
+            child: FutureBuilder<BaseResponse<List<DistrictDetail>>>(
               builder: (context, building) {
                 if (building.hasData &&
                     building.data != null &&
-                    building.data.success()) {
+                    building.data.success) {
                   var list = building.data.data;
                   return Padding(
                     padding: const EdgeInsets.all(32.0),

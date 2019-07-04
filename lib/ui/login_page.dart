@@ -1,5 +1,8 @@
 import 'package:ease_life/index.dart';
 import 'package:dio/dio.dart';
+import 'package:ease_life/model/user_model.dart';
+import 'package:oktoast/oktoast.dart';
+
 class LoginPage extends StatefulWidget {
   final String backRoute;
   static String routeName = "/login";
@@ -40,23 +43,10 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
-    ApplicationBloc applicationBloc =
-        BlocProviders.of<ApplicationBloc>(context);
-    return StreamBuilder<UserInfo>(
-        stream: applicationBloc.currentUser,
-        builder: (context, AsyncSnapshot<UserInfo> userSnap) {
-          Widget loginButton = buildLoginButton(userSnap, context, _fastLogin);
-          print('userInfo:${userSnap.data}');
-          if (userSnap.hasData && !userSnap.hasError) {
-            return buildLoginSuccess(context);
-          } else {
-            return buildLogin(context, loginButton);
-          }
-        });
+    return buildLogin(context);
   }
 
-  Scaffold buildLogin(BuildContext context, Widget loginButton) {
+  Scaffold buildLogin(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("登录"),
@@ -74,7 +64,10 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
 //                    style: TextStyle(fontSize: 24,color: Colors.indigo),
 //                    textAlign: TextAlign.center,
 //                  ),
-                  Image.asset("images/ic_launcher.png",width: ScreenUtil().setWidth(200),),
+                  Image.asset(
+                    "images/ic_launcher.png",
+                    width: ScreenUtil().setWidth(200),
+                  ),
                   Text(
                     "智慧生活，安心陪伴",
                     style: TextStyle(fontSize: 12),
@@ -205,7 +198,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                         _fastLogin
                             ? buildSmsButton(context, _fastLogin)
                             : Container(),
-                        loginButton,
+                        buildLoginButton(context, _fastLogin),
                       ],
                     ),
                   ),
@@ -222,7 +215,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     );
   }
 
-  Widget buildLoginSuccess( BuildContext context) {
+  Widget buildLoginSuccess(BuildContext context) {
     if (widget.backRoute != null) {
       Future.delayed(Duration(seconds: 1)).then((v) {
         Navigator.of(context).pop(widget.backRoute);
@@ -244,8 +237,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     );
   }
 
-  Widget buildLoginButton(
-      AsyncSnapshot<UserInfo> userSnap, BuildContext context, bool _fastLogin) {
+  Widget buildLoginButton(BuildContext context, bool _fastLogin) {
     return LoadingStateWidget(
       key: loadingLoginKey,
       child: RaisedButton(
@@ -292,17 +284,16 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     }
     tickSmsKey.currentState?.startLoading();
     BaseResponse<Object> baseResp =
-        await Api.sendSms(controllerMobile.text,1, cancelToken: cancelToken);
+        await Api.sendSms(controllerMobile.text, 1, cancelToken: cancelToken);
     Fluttertoast.showToast(msg: baseResp.text);
     tickSmsKey.currentState?.stopLoading();
-    if (baseResp.success()) {
+    if (baseResp.success) {
       //发送短信成功
       tickSmsKey.currentState.startTick();
     }
   }
 
   void login(BuildContext context, bool fastLogin) async {
-    var applicationBloc = BlocProviders.of<ApplicationBloc>(context);
     if (!_protocolChecked) {
       Fluttertoast.showToast(msg: "请勾选协议");
       return;
@@ -326,11 +317,12 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
     loadingLoginKey.currentState?.stopLoading();
     Fluttertoast.showToast(msg: baseResp.text);
     print('$baseResp');
-    if (baseResp.success()) {
-      applicationBloc.saveToken(baseResp.token);
-      applicationBloc.login(baseResp.data.userInfo);
+    if (baseResp.success) {
+      UserModel.of(context)
+          .login(baseResp.data.userInfo, baseResp.token, context);
+      Navigator.of(context).pop(baseResp.token);
     } else {
-      applicationBloc.login(null);
+      showToast(baseResp.text);
     }
   }
 }

@@ -21,21 +21,6 @@ class _SplashPageState extends State<SplashPage> {
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
                       Expanded(child: Container()),
-//                      Expanded(
-//                        child: Column(
-//                          children: <Widget>[
-//                            Text(
-//                              "${Strings.appName}",
-//                              style: TextStyle(
-//                                  fontSize: 40, fontWeight: FontWeight.bold),
-//                            ),
-//                            Text(
-//                              "智慧生活,安心陪伴",
-//                              style: TextStyle(fontSize: 14),
-//                            )
-//                          ],
-//                        ),
-//                      ),
                       Expanded(
                         child: Container(),
                       ),
@@ -52,7 +37,7 @@ class _SplashPageState extends State<SplashPage> {
                                 borderSide:
                                     BorderSide(color: Colors.greenAccent),
                                 onPressed: () {
-                                  sharedPreferences.setBool(
+                                  sp.setBool(
                                       PreferenceKeys.keyFirstEntryTag, false);
                                   Navigator.of(context)
                                       .pushReplacementNamed("/");
