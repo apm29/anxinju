@@ -5,12 +5,12 @@ import 'package:ease_life/model/base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
 
 bool isLogin() {
-  return sp.getString(PreferenceKeys.keyUserInfo) != null;
+  return userSp.getString(PreferenceKeys.keyUserInfo) != null;
 }
 
 bool isCertificated() {
   return (UserInfo.fromJson(json.decode(
-                  sp.getString(PreferenceKeys.keyUserInfo) ??
+                  userSp.getString(PreferenceKeys.keyUserInfo) ??
                       "{}"))
               ?.isCertification ??
           0) ==
@@ -18,17 +18,17 @@ bool isCertificated() {
 }
 
 bool isVerified() {
-  var str = sp.getString(PreferenceKeys.keyUserVerify) ?? "{}";
+  var str = userSp.getString(PreferenceKeys.keyUserVerify) ?? "{}";
   return UserVerifyStatus.fromJson(json.decode(str))?.isVerified() ?? false;
 }
 
 bool hasHouse() {
-  var str = sp.getString(PreferenceKeys.keyUserVerify) ?? "{}";
+  var str = userSp.getString(PreferenceKeys.keyUserVerify) ?? "{}";
   return UserVerifyStatus.fromJson(json.decode(str))?.hasHouse() ?? false;
 }
 
 String getToken() {
-  return sp.getString(PreferenceKeys.keyAuthorization);
+  return userSp.getString(PreferenceKeys.keyAuthorization);
 }
 
 int getCurrentDistrictId() {
@@ -36,7 +36,7 @@ int getCurrentDistrictId() {
     return null;
   }
   var jsonString =
-      sp.getString(PreferenceKeys.keyCurrentDistrict);
+      userSp.getString(PreferenceKeys.keyCurrentDistrict);
   if (jsonString == null || jsonString.isEmpty) {
     return null;
   }
@@ -46,7 +46,7 @@ int getCurrentDistrictId() {
 }
 
 List<Index> getIndexInfo() {
-  var indexString = sp.getString(PreferenceKeys.keyIndexInfo);
+  var indexString = userSp.getString(PreferenceKeys.keyIndexInfo);
   print('$indexString');
   var decode = json.decode(indexString);
   if (decode is List) {

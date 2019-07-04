@@ -102,7 +102,7 @@ class AppThemeModel extends ChangeNotifier {
       return;
     }
     _currentThemeIndex = newValue;
-    sp.setInt(KEY_CURRENT_THEME_INDEX, _currentThemeIndex);
+    userSp.setInt(KEY_CURRENT_THEME_INDEX, _currentThemeIndex);
     notifyListeners();
   }
 
@@ -119,7 +119,7 @@ class AppThemeModel extends ChangeNotifier {
   }
 
   AppThemeModel() {
-    int index = sp.getInt(KEY_CURRENT_THEME_INDEX) ?? 0;
+    int index = userSp.getInt(KEY_CURRENT_THEME_INDEX) ?? 0;
     currentThemeIndex = index;
   }
 

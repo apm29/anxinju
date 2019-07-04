@@ -16,7 +16,8 @@ JPush jPush = JPush();
 
 void main() async {
   //sp初始化
-  sp = await SharedPreferences.getInstance();
+  userSp = await SharedPreferences.getInstance();
+  appSp = await SharedPreferences.getInstance();
   await AMap.init(Configs.AMapKey);
   //相机初始化
   cameras = await availableCameras();
@@ -36,7 +37,7 @@ Future<void> initPlatformState(BuildContext context) async {
   // Platform messages may fail, so we use a try/catch PlatformException.
   jPush.getRegistrationID().then((rid) {
     print("flutter getRegistrationID: $rid");
-    sp.setString(PreferenceKeys.keyRegistrationId, rid);
+    userSp.setString(PreferenceKeys.keyRegistrationId, rid);
   });
   jPush.applyPushAuthority(
     new NotificationSettingsIOS(sound: true, alert: true, badge: true),
@@ -170,7 +171,7 @@ class MyApp extends StatelessWidget {
             routes: {
               MainPage.routeName: (_) {
                 bool firstEntry =
-                    sp.getBool(PreferenceKeys.keyFirstEntryTag) ??
+                    appSp.getBool(PreferenceKeys.keyFirstEntryTag) ??
                         true;
                 return firstEntry ? SplashPage() : MainPage();
               },

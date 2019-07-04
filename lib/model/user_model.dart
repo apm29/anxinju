@@ -36,8 +36,8 @@ class UserModel extends ChangeNotifier {
   void login(UserInfo info, String token, BuildContext context) {
     _userInfo = info;
     _token = token;
-    sp.setString(KEY_USER_INFO, info.toString());
-    sp.setString(KEY_TOKEN, token);
+    userSp.setString(KEY_USER_INFO, info.toString());
+    userSp.setString(KEY_TOKEN, token);
 
     ///重新获取验证状态/获取小区
     if (context != null) {
@@ -53,9 +53,9 @@ class UserModel extends ChangeNotifier {
     UserRoleModel.of(context).logout();
     _userInfo = null;
     _token = null;
-    sp.setString(KEY_USER_INFO, null);
-    sp.setString(KEY_TOKEN, null);
-    sp.clear();
+    userSp.setString(KEY_USER_INFO, null);
+    userSp.setString(KEY_TOKEN, null);
+    userSp.clear();
     DistrictModel.of(context).tryFetchCurrentDistricts();
     notifyListeners();
   }
@@ -66,8 +66,8 @@ class UserModel extends ChangeNotifier {
   }
 
   void tryLoginWithLocalToken() {
-    var userInfoStr = sp.getString(KEY_USER_INFO);
-    var token = sp.getString(KEY_TOKEN);
+    var userInfoStr = userSp.getString(KEY_USER_INFO);
+    var token = userSp.getString(KEY_TOKEN);
     Map<String, dynamic> map =
         userInfoStr == null ? null : json.decode(userInfoStr);
     UserInfo userInfo = map == null ? null : UserInfo.fromJson(map);

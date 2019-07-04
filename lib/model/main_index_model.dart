@@ -46,7 +46,7 @@ class MainIndexModel extends ChangeNotifier {
   }
 
   Object _readFromSpThenNet() {
-    var jsonStr = sp.getString(KEY_JSON_MENU_INDEX);
+    var jsonStr = userSp.getString(KEY_JSON_MENU_INDEX);
     if (jsonStr == null || jsonStr.isEmpty) {
       return _fetchIndexFromNet();
     } else {
@@ -59,7 +59,7 @@ class MainIndexModel extends ChangeNotifier {
 
   Future<List<Index>> _fetchIndexFromNet() async {
     return Api.getIndex().then((list) {
-      sp.setString(KEY_JSON_MENU_INDEX, "[${list.join(",")}]");
+      userSp.setString(KEY_JSON_MENU_INDEX, "[${list.join(",")}]");
       index = list;
       return list;
     });

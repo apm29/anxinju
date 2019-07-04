@@ -82,7 +82,7 @@ class GlobalBloc extends BlocBase {
 
   GlobalBloc() {
     var userInfoStr =
-        sp.getString(PreferenceKeys.keyUserInfo) ?? "{}";
+        userSp.getString(PreferenceKeys.keyUserInfo) ?? "{}";
     var userInfo = UserInfo.fromJson(json.decode(userInfoStr));
     _userInfoController.add(userInfo);
   }
@@ -107,7 +107,6 @@ class ApplicationBloc extends BlocBase {
   ApplicationBloc() {
     _getCurrentUserAndNotify();
     _getCurrentDistrictAndNotify();
-    getIndexInfo();
     getNoticeInfo();
     _requestLocationPermission();
     getUserTypes();
@@ -126,7 +125,7 @@ class ApplicationBloc extends BlocBase {
   }
 
   void _getCurrentUserAndNotify() async {
-    var userInfoStr = sp.getString(PreferenceKeys.keyUserInfo);
+    var userInfoStr = userSp.getString(PreferenceKeys.keyUserInfo);
     if (userInfoStr?.isNotEmpty == true) {
       _userInfoController.add(UserInfo.fromJson(json.decode(userInfoStr)));
     } else {
@@ -135,14 +134,14 @@ class ApplicationBloc extends BlocBase {
   }
 
   void login(UserInfo userInfo) {
-    sp.setString(
+    userSp.setString(
         PreferenceKeys.keyUserInfo, userInfo?.toString());
     _getCurrentUserAndNotify();
     clearDistrictAndGetCurrentDistrict();
   }
 
   void saveToken(String token) {
-    sp.setString(
+    userSp.setString(
         PreferenceKeys.keyAuthorization, token?.toString());
   }
 
@@ -182,9 +181,9 @@ class ApplicationBloc extends BlocBase {
    * 登录体系以SP中的 userInfo 作为唯一标识
    */
   void logout() {
-    sp.setString(PreferenceKeys.keyUserInfo, null);
-    sp.setString(PreferenceKeys.keyAuthorization, null);
-    sp.setString(PreferenceKeys.keyCurrentDistrict, null);
+    userSp.setString(PreferenceKeys.keyUserInfo, null);
+    userSp.setString(PreferenceKeys.keyAuthorization, null);
+    userSp.setString(PreferenceKeys.keyCurrentDistrict, null);
     _userInfoController.add(null);
     _districtInfoController.add(null);
   }
@@ -241,14 +240,14 @@ class ApplicationBloc extends BlocBase {
    * 然后取后端返回的${Strings.districtClass}的第一个
    */
   void _getCurrentDistrictAndNotify() async {
-    var source = sp.getString(PreferenceKeys.keyCurrentDistrict);
+    var source = userSp.getString(PreferenceKeys.keyCurrentDistrict);
     DistrictDetail districtInfo =
         source == null ? null : DistrictDetail.fromJson(json.decode(source));
     if (districtInfo == null) {
       BaseResponse<List<DistrictDetail>> baseResponse =
           await Api.findAllDistrict();
       //将取到的${Strings.districtClass}信息存入sp缓存
-      sp.setString(PreferenceKeys.keyCurrentDistrict,
+      userSp.setString(PreferenceKeys.keyCurrentDistrict,
           baseResponse.data.first.toString());
       _districtInfoController.add(baseResponse.data.first);
       getMyHouseList();
@@ -263,9 +262,9 @@ class ApplicationBloc extends BlocBase {
     BaseResponse<List<DistrictDetail>> baseResponse = await Api.findAllDistrict();
     //将取到的${Strings.districtClass}信息存入sp缓存
     var string = baseResponse.data.first.toString();
-    sp.setString(PreferenceKeys.keyCurrentDistrict, string);
+    userSp.setString(PreferenceKeys.keyCurrentDistrict, string);
     if (baseResponse.success) {
-      sp.setString(PreferenceKeys.keyCurrentDistrict, string);
+      userSp.setString(PreferenceKeys.keyCurrentDistrict, string);
       _districtInfoController.add(baseResponse.data.first);
       getMyHouseList();
     } else {
@@ -277,7 +276,7 @@ class ApplicationBloc extends BlocBase {
 
   void setCurrentDistrict(DistrictDetail districtInfo) {
     //将取到的${Strings.districtClass}信息存入sp缓存
-    sp.setString(
+    userSp.setString(
         PreferenceKeys.keyCurrentDistrict, districtInfo.toString());
     _districtInfoController.add(districtInfo);
   }
@@ -329,15 +328,15 @@ class ApplicationBloc extends BlocBase {
     return Api.getUserVerify().then((resp) {
       if (resp.success) {
         _userVerifyStatusController.add(resp.data);
-        sp.setString(
+        userSp.setString(
             PreferenceKeys.keyUserVerify, resp.data.toString());
       } else {
         _userVerifyStatusController.addError(resp.text);
-        sp.setString(PreferenceKeys.keyUserVerify, null);
+        userSp.setString(PreferenceKeys.keyUserVerify, null);
       }
     }).catchError((e) {
       _userVerifyStatusController.addError(e);
-      sp.setString(PreferenceKeys.keyUserVerify, null);
+      userSp.setString(PreferenceKeys.keyUserVerify, null);
     });
   }
 }

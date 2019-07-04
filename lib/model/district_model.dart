@@ -34,7 +34,7 @@ class DistrictModel extends ChangeNotifier {
       return;
     }
     _currentDistrict = newValue;
-    sp.setInt(
+    userSp.setInt(
         KEY_CURRENT_DISTRICT_INDEX, _allDistrictList.indexOf(_currentDistrict));
     if (old != null) {
       showToast("切换小区成功 ${_currentDistrict.districtName}",
@@ -53,7 +53,7 @@ class DistrictModel extends ChangeNotifier {
       if (resp.success) {
         allDistricts = resp.data;
       }
-      var index = sp.getInt(KEY_CURRENT_DISTRICT_INDEX) ?? 0;
+      var index = userSp.getInt(KEY_CURRENT_DISTRICT_INDEX) ?? 0;
       if (_allDistrictList.length > index && index >= 0) {
         currentDistrict = _allDistrictList[index];
       } else if (_allDistrictList.length > 1) {

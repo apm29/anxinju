@@ -138,13 +138,13 @@ class DioUtil {
                     : ContentType.parse(VALUE_HEADER_CONTENT_TYPE),
                 headers: addAuthorization
                     ? {
-                        KEY_HEADER_TOKEN: sp.getString(KEY_TOKEN),
+                        KEY_HEADER_TOKEN: userSp.getString(KEY_TOKEN),
                         KEY_HEADER_REGISTRATION_ID:
-                            sp.getString(PreferenceKeys.keyRegistrationId),
+                            userSp.getString(PreferenceKeys.keyRegistrationId),
                       }
                     : {
                         KEY_HEADER_REGISTRATION_ID:
-                            sp.getString(PreferenceKeys.keyRegistrationId),
+                            userSp.getString(PreferenceKeys.keyRegistrationId),
                       }),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
