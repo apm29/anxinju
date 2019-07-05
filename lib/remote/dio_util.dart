@@ -127,8 +127,9 @@ class DioUtil {
     DataType dataType = DataType.JSON,
     bool formData = false,
     bool addAuthorization = true,
+    String desc = "",
   }) async {
-    print('post $path');
+    print('post $BASE_URL$path $data');
     return _dioInstance
         .post<Map<String, dynamic>>(path,
             data: !formData ? data : FormData.from(data),
@@ -140,11 +141,11 @@ class DioUtil {
                     ? {
                         KEY_HEADER_TOKEN: userSp.getString(KEY_TOKEN),
                         KEY_HEADER_REGISTRATION_ID:
-                            userSp.getString(PreferenceKeys.keyRegistrationId),
+                            userSp.getString(KEY_REGISTRATION_ID),
                       }
                     : {
                         KEY_HEADER_REGISTRATION_ID:
-                            userSp.getString(PreferenceKeys.keyRegistrationId),
+                            userSp.getString(KEY_REGISTRATION_ID),
                       }),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
@@ -153,7 +154,6 @@ class DioUtil {
         print(response.data);
         print('---------RESP-END----------');
       }
-
       String _status, _text, _token;
       dynamic _data;
       if (response.statusCode == HttpStatus.ok ||
@@ -185,11 +185,11 @@ class DioUtil {
         }
         return baseResponse;
       } else {
-        return BaseResponse<T>("0", null, "请求失败:${response.statusCode}", null);
+        return BaseResponse<T>("0", null, "$desc 请求失败:${response.statusCode}", null);
       }
     }).catchError((Object error, StackTrace trace) {
       debugPrint(error.toString());
-      return BaseResponse<T>("0", null, "请求失败:${getErrorHint(error)}", null);
+      return BaseResponse<T>("0", null, "$desc 请求失败:${getErrorHint(error)}", null);
     });
   }
 
@@ -203,6 +203,8 @@ class DioUtil {
         default:
           errMessage = error.message;
       }
+    } else if(error is DioError){
+      errMessage = error.message.toString();
     }
     return error is DioError ? (errMessage) : error.toString();
   }
@@ -233,7 +235,6 @@ class DioUtil {
   void downloadFile(String apkUrl, Function onProgress) async {
     var status = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.storage);
-    print('$status');
     if (status == PermissionStatus.granted) {
       await _doDownload(apkUrl, onProgress);
     } else {

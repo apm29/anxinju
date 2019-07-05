@@ -39,11 +39,6 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders = [
-                JPUSH_PKGNAME : applicationId,
-                JPUSH_APPKEY : "a175ef122d6568c5bec7cd53", // NOTE: JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
-        ]
 
     }
 
@@ -56,13 +51,12 @@ android {
             keyPassword "anxinju"
 
         }
-//        debug{
-//            storeFile file("anxinjudebug.keystore")
-//            storePassword "anxinju"
-//            keyAlias "anxinju"
-//            keyPassword "anxinju"
-//
-//        }
+        debug{
+            storeFile file("anxinjudebug.keystore")
+            storePassword "anxinju"
+            keyAlias "anxinju"
+            keyPassword "anxinju"
+        }
     }
 
     buildTypes {
@@ -74,16 +68,29 @@ android {
             manifestPlaceholders+=[
                     "appName":"安心居测试"
             ]
-            //applicationIdSuffix ".test"
+            applicationIdSuffix ".test"
+            manifestPlaceholders += [
+                    "appName":"安心居测试",
+                    JPUSH_PKGNAME : "com.spark.zj.ease.life.test",
+                    JPUSH_APPKEY : "97231a51b205ee25a51322ff", // NOTE: JPush 上注册的包名对应的 Appkey.
+                    JPUSH_CHANNEL : "developer-default-test", //暂时填写默认值即可.
+
+                    AMAP_KEY:"3bbdc6e60e1d5a7d3b3065768ddf5d27",
+            ]
         }
         release {
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             ndk{
                 abiFilters 'armeabi-v7a'//,'x86','arm64-v8a'
             }
-            manifestPlaceholders+=[
-                    "appName":"安心居测试"
+            manifestPlaceholders += [
+                    "appName":"安心居",
+                    JPUSH_PKGNAME : "com.spark.zj.ease.life",
+                    JPUSH_APPKEY : "a175ef122d6568c5bec7cd53", // NOTE: JPush 上注册的包名对应的 Appkey.
+                    JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
+
+                    AMAP_KEY:"96169736f17c9c6a458012f744167f00",
             ]
         }
     }

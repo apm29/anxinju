@@ -37,8 +37,7 @@ class _SplashPageState extends State<SplashPage> {
                                 borderSide:
                                     BorderSide(color: Colors.greenAccent),
                                 onPressed: () {
-                                  appSp.setBool(
-                                      PreferenceKeys.keyFirstEntryTag, false);
+                                  userSp.setBool(KEY_FIRST_ENTRY_TAG, false);
                                   Navigator.of(context)
                                       .pushReplacementNamed("/");
                                 },

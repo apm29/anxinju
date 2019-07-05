@@ -23,16 +23,16 @@ class BottomBar extends StatelessWidget {
                       : Colors.grey,
                 ),
                 title: Text("主页")),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  "images/search.png",
-                  width: 24,
-                  height: 24,
-                  color: currentPage == PAGE_SEARCH
-                      ? Colors.blueAccent
-                      : Colors.grey,
-                ),
-                title: Text("搜索")),
+//            BottomNavigationBarItem(
+//                icon: Image.asset(
+//                  "images/search.png",
+//                  width: 24,
+//                  height: 24,
+//                  color: currentPage == PAGE_SEARCH
+//                      ? Colors.blueAccent
+//                      : Colors.grey,
+//                ),
+//                title: Text("搜索")),
 //        BottomNavigationBarItem(
 //            icon: Icon(
 //              Icons.message,
@@ -41,10 +41,9 @@ class BottomBar extends StatelessWidget {
 //            ),
 //            title: Text("消息")),
             BottomNavigationBarItem(
-                icon: Image.asset(
-                  "images/mine.png",
-                  width: 24,
-                  height: 24,
+                icon: Icon(
+                  Icons.person,
+                  size: 24,
                   color: currentPage == PAGE_MINE
                       ? Colors.blueAccent
                       : Colors.grey,

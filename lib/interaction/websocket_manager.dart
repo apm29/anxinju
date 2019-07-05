@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/persistance/db_manager.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:ease_life/remote/api.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:web_socket_channel/io.dart';
@@ -146,7 +148,7 @@ class WebSocketManager {
   ConnectStatus connectStatus = ConnectStatus.DISCONNECTED;
   StreamSubscription beatStreamSubscription;
 
-  WebSocketManager(dynamic group) {
+  WebSocketManager(dynamic group,BuildContext context) {
     _commandController.add(Message("初始化聊天室",
         type: MessageType.COMMAND, status: ConnectStatus.WAIT));
     //连接websocket
@@ -180,15 +182,16 @@ class WebSocketManager {
     }).then((_) {
       //发送登录信息
       // ok 2
-      _sendLoginMessage();
+      _sendLoginMessage(context);
     }).catchError((e) {
-      _sendLoginMessage();
+      _sendLoginMessage(context);
     });
   }
 
-  void _sendLoginMessage() {
+  void _sendLoginMessage(BuildContext context) {
+    var token = UserModel.of(context).token;
     var data =
-        '{"type":"userInit", "mytoken" : "${getToken()}", "group" : "${config.group}", "cAppId":"${config.appId}" , "userinfo_param":"${getToken()}"}';
+        '{"type":"userInit", "mytoken" : "$token", "group" : "${config.group}", "cAppId":"${config.appId}" , "userinfo_param":"$token"}';
     print(' <----------- $data');
     print(' ---config--- $config');
     _channel.sink.add(data);

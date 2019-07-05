@@ -14,7 +14,7 @@ export 'providers/providers.dart';
 export 'ui/index.dart';
 export 'ui/widget/index.dart';
 export 'interaction/simple_bridge.dart';
-export 'res/strings.dart';
+export 'res/configs.dart';
 export 'package:flutter/services.dart';
 export 'package:flutter_sms/flutter_sms.dart';
 export 'package:flutter_sound/flutter_sound.dart';

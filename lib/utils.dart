@@ -10,8 +10,6 @@ import 'model/user_verify_status_model.dart';
 //  Color(0xfffebf1f),
 //];
 
-typedef OnFileProcess = Function(Future<File>);
-
 Future<File> showImageSourceDialog(
     BuildContext context, VoidCallback onValue) async {
   FocusScope.of(context).requestFocus(FocusNode());
@@ -29,10 +27,9 @@ Future<File> showImageSourceDialog(
                       children: <Widget>[
                         InkWell(
                           onTap: () {
-                            showPicker().then((f){
+                            showPicker().then((f) {
                               Navigator.of(context).pop(f);
                             });
-
                           },
                           child: Container(
                             width: constraint.biggest.width,
@@ -43,7 +40,7 @@ Future<File> showImageSourceDialog(
                         ),
                         InkWell(
                             onTap: () {
-                              showCameraPicker().then((f){
+                              showCameraPicker().then((f) {
                                 Navigator.of(context).pop(f);
                               });
                             },
@@ -140,59 +137,12 @@ Widget buildVisitor(BuildContext context) {
   );
 }
 
-Widget buildError(BuildContext context, Object err) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.of(context).pushNamed(LoginPage.routeName);
-    },
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(
-            Icons.sms_failed,
-            color: Colors.blue,
-            size: 40,
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          Text(
-            "$err",
-            style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 18,
-                color: Colors.grey[700]),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+
 
 Future<Location> getLocation() async {
   return AMapLocation().getLocation(LocationClientOptions());
 }
 
-///
-/// 先获取index数据在导航到指定的webview
-///
-void routeToWebIndex(BuildContext context, String indexId,
-    {bool refresh = true}) {
-  getIndex(refresh).then((list) {
-    return list.firstWhere((index) {
-      return index.area == "mine";
-    }, orElse: () {
-      return null;
-    });
-  }).then((index) {
-    if (index == null) {
-      Fluttertoast.showToast(msg: "获取路由数据失败");
-    } else {
-      routeToWeb(context, indexId, index);
-    }
-  });
-}
 
 List<Index> indexInfo;
 
@@ -295,8 +245,8 @@ Widget buildCertificationDialog(BuildContext context, VoidCallback onCancel,
             Future.delayed(Duration(milliseconds: 500), () {
               return Api.getUserInfo().then((baseResp) {
                 if (baseResp.success) {
-                  BlocProviders.of<ApplicationBloc>(context)
-                      .login(baseResp.data);
+                  UserModel.of(context)
+                      .login(baseResp.data, baseResp.token, context);
                 }
               });
             });
@@ -307,117 +257,11 @@ Widget buildCertificationDialog(BuildContext context, VoidCallback onCancel,
   );
 }
 
-///显示未认证弹框
-showCertificationDialog(BuildContext context) {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return buildCertificationDialog(context, () {
-          Navigator.of(context).popUntil((r) {
-            return r.settings.name == MainPage.routeName;
-          });
-        }, showQuit: false);
-      });
-}
 
-///先检查是否登录,再检查是否认证,未认证用户会弹出认证弹框
-bool checkIfCertificated(BuildContext context) {
-  if (!isLogin()) {
-    Navigator.of(context).pushNamed(LoginPage.routeName);
-    return false;
-  }
-  if (!isVerified()) {
-    Fluttertoast.showToast(msg: "请先完成${Strings.hostClass}认证");
-    showCertificationDialog(context);
-    return false;
-  } else {
-    return true;
-  }
-}
 
-void showAuthDialog(BuildContext context, Index indexInfo) {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Row(
-            children: <Widget>[
-              Icon(
-                Icons.warning,
-                color: Colors.blue,
-              ),
-              Text("无可用${Strings.roomClass}")
-            ],
-          ),
-          content: Text.rich(TextSpan(children: [
-            TextSpan(
-              text:
-                  "您当前选择的${Strings.districtClass},名下还没有认证${Strings.roomClass},请选择重新认证,申请成为成员或者切换${Strings.districtClass}\r\n如果您已经申请,请在",
-            ),
-            TextSpan(
-                text: "申请记录",
-                style: TextStyle(color: Colors.blue),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    var indexWhere = indexInfo.menu
-                        .indexWhere((i) => i.id == WebIndexID.SHEN_QING_JI_LU);
-                    if (indexWhere < 0) {
-                      ///先pop再路由,否则dialog的context找不到listener
-                      Navigator.of(context).pop(WebIndexID.SHEN_QING_JI_LU);
-                    } else {
-                      Navigator.of(context).pop();
-                      routeToWeb(
-                          context, WebIndexID.SHEN_QING_JI_LU, indexInfo);
-                    }
-                  }),
-            TextSpan(
-              text: "查看申请进度",
-            ),
-          ])),
-          actions: <Widget>[
-            FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  "取消",
-                  style: TextStyle(color: Colors.blueGrey),
-                )),
-            FlatButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(UserDetailAuthPage.routeName);
-                },
-                child: Text("重新认证")),
-            FlatButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(MemberApplyPage.routeName);
-                },
-                child: Text("前往申请")),
-          ],
-        );
-      }).then((value) {
-    if (value == WebIndexID.SHEN_QING_JI_LU) {
-      routeToWebByCache(context, PAGE_MINE,
-          indexId: WebIndexID.SHEN_QING_JI_LU);
-    }
-    //获取当前用户信息
-    Future.delayed(Duration(milliseconds: 500), () {
-      return Api.getUserInfo().then((baseResp) {
-        if (baseResp.success) {
-          BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
-        }
-      });
-    });
-  });
-}
 
-///导航到指定页面
-/// 发起者Widget ---> MainPage(NotificationListener) --> WebView
-void routeToWebByCache(BuildContext context, int mainIndex, {String indexId}) {
-  (IndexNotification(mainIndex)..indexId = indexId).dispatch(context);
-}
+
+
 
 GlobalKey<UpdateDialogState> updateDialogKey = GlobalKey();
 
@@ -452,14 +296,12 @@ void showUpdateDialog(BuildContext context, UpgradeInfo info) {
       });
 }
 
-
-
 ///----------------------------------------------------NEW FUNCTION------------------------------------------------///
 
 Future toWebPage(BuildContext context, String indexId,
     {Map<String, dynamic> params,
-      bool checkHasHouse = false,
-      bool checkFaceVerified = true}) async {
+    bool checkHasHouse = false,
+    bool checkFaceVerified = true}) async {
   var userVerifyStatusModel = UserVerifyStatusModel.of(context);
   var userModel = UserModel.of(context);
   if (checkFaceVerified || checkHasHouse) {
@@ -489,9 +331,8 @@ Future routeDirectlyToWebPage(
         return menu.id == indexId;
       }, orElse: () => null);
       if (menuItem != null) {
-        return Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_){
-              return WebViewExample(menuItem.url);
+        return Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+          return WebViewExample(menuItem.url);
         }));
       }
     }
@@ -531,7 +372,7 @@ Future showApplyHouseDialog(BuildContext context) async {
             ),
             FlatButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed("/apply");
+                Navigator.of(context).pushReplacementNamed(MemberApplyPage.routeName);
               },
               child: Text("前往申请"),
             ),
@@ -556,7 +397,8 @@ Future showFaceVerifyDialog(BuildContext context) async {
             ),
             FlatButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed(UserDetailAuthPage.routeName);
+                Navigator.of(context)
+                    .pushReplacementNamed(UserDetailAuthPage.routeName);
               },
               child: Text("实名验证"),
             ),

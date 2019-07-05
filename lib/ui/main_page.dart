@@ -3,12 +3,13 @@ import 'package:ease_life/model/announcement_model.dart';
 import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
+import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 
 const int PAGE_HOME = 0;
-const int PAGE_SEARCH = 1;
+const int PAGE_SEARCH = 11;
 const int PAGE_MESSAGE = 21;
-const int PAGE_MINE = 2;
+const int PAGE_MINE = 1;
 
 class MainPage extends StatefulWidget {
   static String routeName = "/";
@@ -26,9 +27,6 @@ class MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     initPlatformState(context);
-    if (mounted) {
-      BlocProviders.of<ApplicationBloc>(context).getUserTypes();
-    }
 
     if (Platform.isAndroid)
       FlutterBugly.init(
@@ -86,14 +84,36 @@ class MainPageState extends State<MainPage> {
               color: Colors.grey[200],
               child: buildContent(context),
             ),
+            floatingActionButton: Consumer<UserModel>(
+              builder: (BuildContext context, UserModel userModel, Widget child) {
+                return Offstage(
+                  offstage: !userModel.isLogin,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        ChatRoomPage.routeName,
+                        arguments: {"group": "1", "title": "紧急呼叫"},
+                      );
+                    },
+                    mini: true,
+                    child: Icon(Icons.call),
+                  ),
+                );
+              },
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             bottomNavigationBar:
                 buildBottomNavigationBar(indexModel.currentIndex),
           ),
           onRefresh: () async {
             UserModel.of(context).tryLoginWithLocalToken();
+            await UserModel.of(context).tryFetchUserInfoAndLogin();
             await AnnouncementModel.of(context).tryFetchAllAnnouncement();
             await DistrictModel.of(context).tryFetchCurrentDistricts();
             await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+            await MainIndexModel.of(context).tryFetchIndexJson(evict: true);
+            await MainIndexModel.of(context).tryGetCurrentLocation();
+            await UserRoleModel.of(context).tryFetchUserRoleTypes();
             return;
           },
         );
@@ -173,17 +193,5 @@ class MainPageState extends State<MainPage> {
         ),
       ),
     );
-  }
-}
-
-class IndexNotification extends Notification {
-  final int index;
-  String indexId;
-
-  IndexNotification(this.index);
-
-  @override
-  String toString() {
-    return 'IndexNotification{index: $index, indexId: $indexId}';
   }
 }

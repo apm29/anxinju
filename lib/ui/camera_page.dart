@@ -1,4 +1,8 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/model/district_model.dart';
+import 'package:ease_life/model/user_model.dart';
+import 'package:ease_life/model/user_role_model.dart';
+import 'package:ease_life/model/user_verify_status_model.dart';
 
 class FaceIdPage extends StatefulWidget {
   static String routeName = "/faceId";
@@ -167,6 +171,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
         BlocProviders.of<CameraBloc>(context)
             .changeStatus(CAMERA_STATUS.PICTURE_STILL);
         await verify(file, argument);
+        refreshUserState();
       } else if (argument['takePic'] == true) {
         faceRecognizeKey.currentState.startLoading();
         Directory directory = await getTemporaryDirectory();
@@ -186,10 +191,10 @@ class _FaceIdPageState extends State<FaceIdPage> {
 
   Future verify(File file, Map argument) async {
     file = await rotateWithExifAndCompress(file);
-    var resp = await Api.uploadPic(file.path);
+    var fileResp = await Api.uploadPic(file.path);
     //var base64 = await getImageBase64(file);
     BaseResponse<UserVerifyInfo> baseResponse =
-        await Api.verify(resp.data.orginPicPath, argument['idCard'],argument['isAgain']);
+        await Api.verify(fileResp.data.orginPicPath, argument['idCard'],argument['isAgain']);
     faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
     if (baseResponse.success) {
@@ -198,7 +203,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
       UserVerifyInfo userVerifyInfo = baseResponse.data;
       ///有房认证
       if (userVerifyInfo.rows != null && userVerifyInfo.rows.length > 0) {
-        showDialog(
+        return showDialog(
             context: context,
             builder: (context) {
               return SimpleDialog(
@@ -214,16 +219,12 @@ class _FaceIdPageState extends State<FaceIdPage> {
                   );
                 }).toList(),
               );
-            }).then((v) {
-
-          ///认证之后不管是否成功都更新userInfo 和 房屋列表
-          refreshUserState((){
-            Navigator.of(context).pop(baseResponse.text);
-          });
+            }).then((_){
+              Navigator.of(context).pop();
         });
       } else {
         ///无房用户,导向成员申请
-        showDialog(
+        return showDialog(
             barrierDismissible: false,
             context: context,
             builder: (context) {
@@ -233,23 +234,18 @@ class _FaceIdPageState extends State<FaceIdPage> {
                 actions: <Widget>[
                   FlatButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamed(MemberApplyPage.routeName);
                       },
                       child: Text("申请成为成员")),
                 ],
               );
-            }).then((_) {
-
-          ///认证之后不管是否成功都更新userInfo 和 房屋列表
-          refreshUserState((){
-            Navigator.of(context).pushReplacementNamed(MemberApplyPage.routeName);
-          });
-        });
+            });
       }
     } else {
       ///认证出错
-      showDialog(
+      return showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (context) {
             return AlertDialog(
               title: Text("错误"),
@@ -257,33 +253,27 @@ class _FaceIdPageState extends State<FaceIdPage> {
               actions: <Widget>[
                 FlatButton(
                     onPressed: () {
+                      BlocProviders.of<CameraBloc>(context)
+                          .changeStatus(CAMERA_STATUS.PICTURE_STILL);
                       Navigator.of(context).pop();
                     },
                     child: Text("好的"))
               ],
             );
-          }).then((v) {
-
-        ///认证之后不管是否成功都更新userInfo 和 房屋列表
-        refreshUserState((){
-          Navigator.of(context).pop(baseResponse.text);
-        });
-
-      });
+          });
     }
 
   }
 
-  void refreshUserState(VoidCallback callback) async{
+  void refreshUserState() async{
      ///认证之后不管是否成功都更新userInfo 和 房屋列表
     var baseResp = await Api.getUserInfo();
     if(baseResp.success) {
-      BlocProviders.of<ApplicationBloc>(context).login(baseResp.data);
-      BlocProviders.of<ApplicationBloc>(context).getMyUserTypes();
-      BlocProviders.of<ApplicationBloc>(context).clearDistrictAndGetCurrentDistrict();
+      UserModel.of(context).login(baseResp.data, baseResp.token, context);
+      UserRoleModel.of(context).tryFetchUserRoleTypes();
+      DistrictModel.of(context).tryFetchCurrentDistricts();
     }
-    BlocProviders.of<ApplicationBloc>(context).tryRefreshUserVerifyStatus();
-    callback();
+    UserVerifyStatusModel.of(context)..tryFetchVerifyStatusPeriodically(context);
   }
 }
 

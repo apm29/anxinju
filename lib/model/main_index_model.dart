@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'package:amap_base_location/amap_base_location.dart';
+import 'package:oktoast/oktoast.dart';
 import '../index.dart';
 
 class MainIndexModel extends ChangeNotifier {
@@ -14,6 +15,7 @@ class MainIndexModel extends ChangeNotifier {
 
   MainIndexModel() {
     tryFetchIndexJson();
+    tryGetCurrentLocation();
   }
 
   static MainIndexModel of(BuildContext context) {
@@ -22,7 +24,7 @@ class MainIndexModel extends ChangeNotifier {
 
   List<Index> _index;
 
-  List<Index> get index => _index??[];
+  List<Index> get index => _index ?? [];
 
   Future<List<Index>> tryFetchIndex() async {
     if (_index == null) {
@@ -37,8 +39,8 @@ class MainIndexModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Index>> tryFetchIndexJson({bool evictCache = true}) async {
-    if (!evictCache) {
+  Future<List<Index>> tryFetchIndexJson({bool evict = true}) async {
+    if (!evict) {
       return _readFromSpThenNet();
     } else {
       return _fetchIndexFromNet();
@@ -62,6 +64,29 @@ class MainIndexModel extends ChangeNotifier {
       userSp.setString(KEY_JSON_MENU_INDEX, "[${list.join(",")}]");
       index = list;
       return list;
+    });
+  }
+
+  Future tryGetCurrentLocation() async {
+    var permissionStatus = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.location);
+    if (permissionStatus != PermissionStatus.granted) {
+      var status = await PermissionHandler()
+          .requestPermissions([PermissionGroup.location]);
+      if (status[PermissionGroup.location] == PermissionStatus.granted) {
+        return _doLocate();
+      }
+    } else {
+      return _doLocate();
+    }
+  }
+
+  Future _doLocate() {
+    return AMapLocation()
+        .getLocation(
+            LocationClientOptions(locationMode: LocationMode.Hight_Accuracy))
+        .then((location) {
+      print('$location');
     });
   }
 }

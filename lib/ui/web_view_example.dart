@@ -1,8 +1,8 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:rxdart/rxdart.dart';
 
-//import 'package:geolocator/geolocator.dart';
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
 <head>
@@ -854,9 +854,12 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void doGetToken(dynamic data) {
-    if (isLogin()) {
+    var userModel = UserModel.of(context);
+    var districtModel = DistrictModel.of(context);
+    var districtId = districtModel.getCurrentDistrictId();
+    if (userModel.isLogin) {
       var javascriptString =
-          '${data["callbackName"]}("${UserModel.of(context).token}","${getCurrentDistrictId()}","${data["backRoute"]}")';
+          '${data["callbackName"]}("${userModel.token}","$districtId","${data["backRoute"]}")';
 
       print('$javascriptString');
 
@@ -872,7 +875,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           return null;
         }
         var javascriptString =
-            '${data["callbackName"]}("${UserModel.of(context).token}","${getCurrentDistrictId()}","${data["backRoute"]}")';
+            '${data["callbackName"]}("${userModel.token}","$districtId","${data["backRoute"]}")';
 
         controller.evaluateJavascript(javascriptString);
       });

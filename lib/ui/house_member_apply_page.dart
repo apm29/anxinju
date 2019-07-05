@@ -1,5 +1,5 @@
 import 'package:ease_life/index.dart';
-import 'package:ease_life/res/strings.dart';
+import 'package:ease_life/res/configs.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'dart:async';

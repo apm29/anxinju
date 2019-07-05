@@ -151,7 +151,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       title = arguments['title'];
       group = arguments['group'];
       if (manager == null) {
-        manager = WebSocketManager(group);
+        manager = WebSocketManager(group,context);
         manager.messageStream.listen((message) {
           setState(() {
             messages.insert(0, message);

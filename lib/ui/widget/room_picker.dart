@@ -1,4 +1,4 @@
-import 'package:ease_life/res/strings.dart';
+import 'package:ease_life/res/configs.dart';
 import 'package:flutter/material.dart';
 
 import '../../index.dart';

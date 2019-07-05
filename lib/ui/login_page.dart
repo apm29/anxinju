@@ -313,7 +313,6 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
             cancelToken: cancelToken)
         : await Api.login(controllerMobile.text, controllerPassword.text,
             cancelToken: cancelToken);
-    print('${baseResp.text}');
     loadingLoginKey.currentState?.stopLoading();
     Fluttertoast.showToast(msg: baseResp.text);
     print('$baseResp');

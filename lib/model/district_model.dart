@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -26,9 +27,9 @@ class DistrictModel extends ChangeNotifier {
   int randomId = 0;
   DistrictDetail _currentDistrict;
 
-  DistrictDetail get currentDistrict => _currentDistrict;
+  DistrictDetail get _mCurrentDistrict => _currentDistrict;
 
-  set currentDistrict(DistrictDetail newValue) {
+  set _mCurrentDistrict(DistrictDetail newValue) {
     var old = _currentDistrict;
     if (newValue == _currentDistrict) {
       return;
@@ -47,17 +48,18 @@ class DistrictModel extends ChangeNotifier {
     tryFetchCurrentDistricts();
   }
 
-
   Future tryFetchCurrentDistricts() async {
     return Api.findAllDistrict().then((resp) {
       if (resp.success) {
         allDistricts = resp.data;
+      } else {
+        showToast(resp.text);
       }
       var index = userSp.getInt(KEY_CURRENT_DISTRICT_INDEX) ?? 0;
       if (_allDistrictList.length > index && index >= 0) {
-        currentDistrict = _allDistrictList[index];
+        _mCurrentDistrict = _allDistrictList[index];
       } else if (_allDistrictList.length > 1) {
-        currentDistrict = _allDistrictList[0];
+        _mCurrentDistrict = _allDistrictList[0];
       }
       return;
     });
@@ -79,10 +81,31 @@ class DistrictModel extends ChangeNotifier {
   }
 
   int getCurrentDistrictIndex() {
-    return allDistricts.indexOf(currentDistrict);
+    return allDistricts.indexOf(_mCurrentDistrict);
   }
 
   static DistrictModel of(BuildContext context) {
     return Provider.of<DistrictModel>(context, listen: false);
+  }
+
+  String getCurrentDistrictName({String ifError = "获取小区列表失败"}) {
+    return _mCurrentDistrict?.districtName ?? ifError;
+  }
+
+  isSelected(int index) {
+    return _mCurrentDistrict == allDistricts[index];
+  }
+
+  void selectCurrentDistrict(int index, BuildContext context) {
+    _mCurrentDistrict = allDistricts[index];
+    UserVerifyStatusModel.of(context).tryFetchHouseList(getCurrentDistrictId());
+  }
+
+  int getCurrentDistrictId() {
+    return _mCurrentDistrict?.districtId;
+  }
+
+  int countOfDistricts() {
+    return allDistricts?.length??0;
   }
 }

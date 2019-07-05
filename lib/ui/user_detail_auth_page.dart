@@ -55,13 +55,12 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: isReAuth
-                      ? Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("您已经经过认证,重新认证不可修改身份证信息"),
-                        )
-                      : Container(),
-                ),
+                    child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(isReAuth
+                      ? "您已经经过认证,重新认证不可修改身份证信息"
+                      : "身份证一旦进入认证环节将不可修改,请谨慎填写"),
+                )),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),

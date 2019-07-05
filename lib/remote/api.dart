@@ -9,38 +9,44 @@ import 'dio_util.dart';
 class Api {
   static CancelToken defaultToken = CancelToken();
 
-  static Future<BaseResponse<UserInfoWrapper>> login(String userName,
-      String password,
+  static Future<BaseResponse<UserInfoWrapper>> login(
+      String userName, String password,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
-        path: "/permission/login",
-        jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
-        data: {
-          "userName": userName,
-          "password": password,
-        },
-        cancelToken: cancelToken);
+      path: "/permission/login",
+      jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
+      data: {
+        "userName": userName,
+        "password": password,
+      },
+      desc: "登录",
+      cancelToken: cancelToken,
+    );
   }
 
-  static Future<BaseResponse<UserInfoWrapper>> fastLogin(String mobile,
-      String verifyCode,
+  static Future<BaseResponse<UserInfoWrapper>> fastLogin(
+      String mobile, String verifyCode,
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfoWrapper>(
-        path: "/permission/fastLogin",
-        jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
-        data: {
-          "mobile": mobile,
-          "verifyCode": verifyCode,
-        },
-        cancelToken: cancelToken);
+      path: "/permission/fastLogin",
+      jsonProcessor: (json) => UserInfoWrapper.fromJson(json),
+      data: {
+        "mobile": mobile,
+        "verifyCode": verifyCode,
+      },
+      desc: "登录",
+      cancelToken: cancelToken,
+    );
   }
 
   static Future<BaseResponse<UserInfo>> getUserInfo(
       {CancelToken cancelToken}) async {
     return DioUtil().postAsync<UserInfo>(
-        path: "/permission/user/getUserInfo",
-        jsonProcessor: (json) => UserInfo.fromJson(json),
-        cancelToken: cancelToken);
+      path: "/permission/user/getUserInfo",
+      jsonProcessor: (json) => UserInfo.fromJson(json),
+      desc: "获取用户信息",
+      cancelToken: cancelToken,
+    );
   }
 
   ///type  0 注册 ,其他登录
@@ -50,11 +56,12 @@ class Api {
         path: "/permission/user/getVerifyCode",
         jsonProcessor: (dynamic json) => null,
         data: {"mobile": mobile, "type": type},
+        desc: "发送短信",
         cancelToken: cancelToken);
   }
 
-  static register(String mobile, String smsCode, String password,
-      String userName) async {
+  static register(
+      String mobile, String smsCode, String password, String userName) async {
     return DioUtil().postAsync<Object>(
       path: "/permission/user/register",
       jsonProcessor: (dynamic json) => null,
@@ -64,23 +71,25 @@ class Api {
         "password": password,
         "code": smsCode,
       },
+      desc: "注册",
     );
   }
 
   static Future<BaseResponse<List<DistrictDetail>>> findAllDistrict() async {
     BaseResponse<List<DistrictDetail>> baseResponse =
-    await DioUtil().postAsync<List<DistrictDetail>>(
-        path: "/business/district/findDistrictInfo",
-        jsonProcessor: (dynamic json) {
-          if (json is List) {
-            return json.map((j) {
-              return DistrictDetail.fromJson(j);
-            }).toList();
-          }
-          return null;
-        },
-        data: {},
-        dataType: DataType.LIST);
+        await DioUtil().postAsync<List<DistrictDetail>>(
+            path: "/business/district/findDistrictInfo",
+            jsonProcessor: (dynamic json) {
+              if (json is List) {
+                return json.map((j) {
+                  return DistrictDetail.fromJson(j);
+                }).toList();
+              }
+              return null;
+            },
+            data: {},
+            desc: "获取小区列表",
+            dataType: DataType.LIST);
 
     return baseResponse;
   }
@@ -88,35 +97,29 @@ class Api {
   /*
    *  前端发送photo、idCard，
    */
-  static Future<BaseResponse> verifyUserFace(String imageUrl,
-      String idCard) async {
+  static Future<BaseResponse> verifyUserFace(
+      String imageUrl, String idCard) async {
     return await DioUtil().postAsync(
-        path: "/permission/userCertification/verify",
-        data: {"photo": imageUrl, "idCard": idCard});
+      path: "/permission/userCertification/verify",
+      data: {"photo": imageUrl, "idCard": idCard},
+      desc: "验证用户身份",
+    );
   }
 
-  static Future<BaseResponse<UserVerifyInfo>> verify(String imageUrl,
-      String idCard, bool isAgain
-      ) async {
+  static Future<BaseResponse<UserVerifyInfo>> verify(
+      String imageUrl, String idCard, bool isAgain) async {
     return await DioUtil().postAsync(
-        path: "/permission/userCertification/verify",
-        jsonProcessor: (j) {
-          return UserVerifyInfo.fromJson(j);
-        },
-        data: {
-          "photo": imageUrl,
-          "idCard": idCard,
-          "isAgain": isAgain ? 1 : 0,
-        });
-  }
-
-  /*
-   * 获取用户认证状态
-   * 返回的都为正确结果,显示text
-   */
-  static Future<BaseResponse> getUserVerification() async {
-    return await DioUtil()
-        .postAsync(path: "/permission/userCertification/getMyVerify");
+      path: "/permission/userCertification/verify",
+      jsonProcessor: (j) {
+        return UserVerifyInfo.fromJson(j);
+      },
+      data: {
+        "photo": imageUrl,
+        "idCard": idCard,
+        "isAgain": isAgain ? 1 : 0,
+      },
+      desc: "验证用户身份",
+    );
   }
 
   /*
@@ -128,6 +131,7 @@ class Api {
       jsonProcessor: (jsonMap) {
         return UserDetail.fromJson(jsonMap);
       },
+      desc: "获取用户详情",
     );
   }
 
@@ -136,13 +140,14 @@ class Api {
    * userId,用户id:带上id为修改,不带id为新增详情
    * myName
    */
-  static Future<BaseResponse> saveUserDetail({String userId,
-    String myName,
-    String sex,
-    String phone,
-    String nickName,
-    String avatar,
-    String idCard}) async {
+  static Future<BaseResponse> saveUserDetail(
+      {String userId,
+      String myName,
+      String sex,
+      String phone,
+      String nickName,
+      String avatar,
+      String idCard}) async {
     var dataMap = {
       "myName": myName,
       "sex": sex,
@@ -155,16 +160,21 @@ class Api {
       dataMap["userId"] = userId;
     }
     return await DioUtil().postAsync(
-        path: "/permission/userDetail/saveUserDetail", data: dataMap);
+      path: "/permission/userDetail/saveUserDetail",
+      data: dataMap,
+      desc: "保存用户信息",
+    );
   }
 
   static Future<BaseResponse<FileDetail>> uploadFile(String path) async {
     var baseResponse = await DioUtil().postAsync<FileDetail>(
-        path: "/business/upload/uploadFile",
-        data: {"file": UploadFileInfo(File(path), "file")},
-        jsonProcessor: (s) => FileDetail.fromJson(s),
-        dataType: DataType.JSON,
-        formData: true);
+      path: "/business/upload/uploadFile",
+      data: {"file": UploadFileInfo(File(path), "file")},
+      jsonProcessor: (s) => FileDetail.fromJson(s),
+      dataType: DataType.JSON,
+      formData: true,
+      desc: "上传文件",
+    );
     return baseResponse;
   }
 
@@ -172,26 +182,30 @@ class Api {
     print('file path : $path');
     var file = File(path);
     var baseResponse = await DioUtil().postAsync<ImageDetail>(
-        path: "/business/upload/uploadPic",
-        data: {"pic": UploadFileInfo(file, file.path)},
-        jsonProcessor: (s) => ImageDetail.fromJson(s),
-        dataType: DataType.JSON,
-        formData: true);
+      path: "/business/upload/uploadPic",
+      data: {"pic": UploadFileInfo(file, file.path)},
+      jsonProcessor: (s) => ImageDetail.fromJson(s),
+      dataType: DataType.JSON,
+      formData: true,
+      desc: "上传图片",
+    );
     return baseResponse;
   }
 
   static Future<BaseResponse<List<AnnouncementType>>> getAllNoticeType() async {
     return DioUtil().postAsync(
-        path: "/business/noticeDict/getAllType",
-        jsonProcessor: (json) {
-          if (json is List) {
-            return json.map((j) {
-              return AnnouncementType.fromJson(j);
-            }).toList();
-          }
-          return null;
-        },
-        dataType: DataType.LIST);
+      path: "/business/noticeDict/getAllType",
+      jsonProcessor: (json) {
+        if (json is List) {
+          return json.map((j) {
+            return AnnouncementType.fromJson(j);
+          }).toList();
+        }
+        return null;
+      },
+      dataType: DataType.LIST,
+      desc: "获取通知公告类型",
+    );
   }
 
   static Future<BaseResponse<List<Announcement>>> getNewNotice(
@@ -207,13 +221,14 @@ class Api {
         return null;
       },
       data: {
-        "noticeType": list
+        "noticeType": (list ?? [])
             .map((notice) {
-          return notice.typeId;
-        })
+              return notice.typeId;
+            })
             .toList()
             .join(",")
       },
+      desc: "获取通知公告",
       dataType: DataType.LIST,
       addAuthorization: false,
     );
@@ -225,74 +240,86 @@ class Api {
 
   static Future<BaseResponse<List<UserType>>> getUserType(String userId) {
     return DioUtil().postAsync(
-        path: "/permission/UserRole/findUserRole",
-        jsonProcessor: (json) {
-          if (json is List) {
-            return json.map((j) {
-              return UserType.fromJson(j);
-            }).toList();
-          }
-          return [];
-        },
-        dataType: DataType.LIST,
-        data: {"userId": userId});
+      path: "/permission/UserRole/findUserRole",
+      jsonProcessor: (json) {
+        if (json is List) {
+          return json.map((j) {
+            return UserType.fromJson(j);
+          }).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      data: {"userId": userId},
+      desc: "获取用户类型",
+    );
   }
 
   static Future<BaseResponse<List<String>>> getBuildings(int districtId) async {
     return DioUtil().postAsync(
-        path: "/business/housedictInfo1/getAllBuilding1",
-        jsonProcessor: (s) {
-          if (s is List) {
-            return s.map((i) => i.toString()).toList();
-          }
-          return [];
-        },
-        dataType: DataType.LIST,
-        data: {"districtId": districtId});
+      path: "/business/housedictInfo1/getAllBuilding1",
+      jsonProcessor: (s) {
+        if (s is List) {
+          return s.map((i) => i.toString()).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      data: {"districtId": districtId},
+      desc: "获取建筑列表",
+    );
   }
 
-  static Future<BaseResponse<List<String>>> getUnits(int districtId,
-      String building) async {
+  static Future<BaseResponse<List<String>>> getUnits(
+      int districtId, String building) async {
     return DioUtil().postAsync(
-        path: "/business/housedictInfo1/getAllUnit1",
-        jsonProcessor: (s) {
-          if (s is List) {
-            return s.map((i) => i.toString()).toList();
-          }
-          return [];
-        },
-        dataType: DataType.LIST,
-        data: {
-          "districtId": districtId,
-          "building": building,
-        });
+      path: "/business/housedictInfo1/getAllUnit1",
+      jsonProcessor: (s) {
+        if (s is List) {
+          return s.map((i) => i.toString()).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      data: {
+        "districtId": districtId,
+        "building": building,
+      },
+      desc: "获取单元列表",
+    );
   }
 
-  static Future<BaseResponse<List<String>>> getRooms(int districtId,
-      String building, String unit) async {
+  static Future<BaseResponse<List<String>>> getRooms(
+      int districtId, String building, String unit) async {
     return DioUtil().postAsync(
-        path: "/business/housedictInfo1/getAllRoom1",
-        jsonProcessor: (s) {
-          if (s is List) {
-            return s.map((i) => i.toString()).toList();
-          }
-          return [];
-        },
-        dataType: DataType.LIST,
-        data: {
-          "districtId": districtId,
-          "building": building,
-          "unit": unit,
-        });
+      path: "/business/housedictInfo1/getAllRoom1",
+      jsonProcessor: (s) {
+        if (s is List) {
+          return s.map((i) => i.toString()).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      data: {
+        "districtId": districtId,
+        "building": building,
+        "unit": unit,
+      },
+      desc: "获取房间列表",
+    );
   }
 
-  static Future<BaseResponse> applyMember(String address, int districtId,
-      String name) async {
-    return DioUtil().postAsync(path: "/business/member/applyMember", data: {
-      "districtId": districtId,
-      "addr": address,
-      "name": name,
-    });
+  static Future<BaseResponse> applyMember(
+      String address, int districtId, String name) async {
+    return DioUtil().postAsync(
+      path: "/business/member/applyMember",
+      data: {
+        "districtId": districtId,
+        "addr": address,
+        "name": name,
+      },
+      desc: "申请成为成员",
+    );
   }
 
   static Future<BaseResponse<List<HouseDetail>>> getMyHouse(int districtId) {
@@ -308,22 +335,25 @@ class Api {
         return [];
       },
       dataType: DataType.LIST,
+      desc: "获取当前小区房屋列表",
     );
   }
 
   static Future<BaseResponse<List<UserType>>> getUserTypeWithOutId() {
     return DioUtil().postAsync(
-        path: "/permission/UserRole/findUserRole",
-        jsonProcessor: (json) {
-          if (json is List) {
-            return json.map((j) {
-              return UserType.fromJson(j);
-            }).toList();
-          }
-          return [];
-        },
-        dataType: DataType.LIST,
-        data: {});
+      path: "/permission/UserRole/findUserRole",
+      jsonProcessor: (json) {
+        if (json is List) {
+          return json.map((j) {
+            return UserType.fromJson(j);
+          }).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      data: {},
+      desc: "确认用户类型",
+    );
   }
 
   static Future<BaseResponse<List>> getMyApplyList(
@@ -336,17 +366,19 @@ class Api {
       map["status"] = status;
     }
     return DioUtil().postAsync(
-        path: "/business/member/getMyApplyList",
-        jsonProcessor: (jsonString) {
-          if (jsonString is List) {
-            return jsonString.map((j) {
-              return UserType.fromJson(j);
-            }).toList();
-          }
-          return [];
-        },
-        dataType: DataType.LIST,
-        data: map);
+      path: "/business/member/getMyApplyList",
+      jsonProcessor: (jsonString) {
+        if (jsonString is List) {
+          return jsonString.map((j) {
+            return UserType.fromJson(j);
+          }).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      data: map,
+      desc: "获取申请列表",
+    );
   }
 
   static Future<BaseResponse> faceCompare(String imageBase64, String idCard) {
@@ -356,12 +388,34 @@ class Api {
     );
   }
 
-  static Future<BaseResponse<UserVerifyStatus>> getUserVerify(){
+  static Future<BaseResponse<UserVerifyStatus>> getUserVerify() {
     return DioUtil().postAsync(
       path: "/permission/userCertification/getMyVerify",
-      jsonProcessor: (s){
+      jsonProcessor: (s) {
         return UserVerifyStatus.fromJson(s);
-      }
+      },
+      desc: "获取用户验证状态",
+    );
+  }
+
+  static Future<BaseResponse<List<NotificationMessage>>>
+      getNotificationMessage(int page, int rows) {
+    return DioUtil().postAsync(
+      path: "/business/MessageCenter/getMyMessage",
+      data: {
+        "page":page,
+        "rows":rows,
+      },
+      jsonProcessor: (s) {
+        if (s is List) {
+          return s.map((json) {
+            return NotificationMessage.fromJson(json);
+          }).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      desc: "获取用户通知",
     );
   }
 }
@@ -369,16 +423,17 @@ class Api {
 class ApiKf {
   static Future<BaseResponse<AudioUploadInfo>> uploadAudio(File file) {
     return DioUtil().postAsync(
-        path: "/Php/Home/UploadFile/upVoiceFileAjax",
-        data: {
-          "upfile": UploadFileInfo(
-              file, file.path, contentType: ContentType.binary),
-        },
-        jsonProcessor: (s) {
-          return AudioUploadInfo.fromJson(s);
-        },
-        dataType: DataType.JSON,
-        formData: true
+      path: "/Php/Home/UploadFile/upVoiceFileAjax",
+      data: {
+        "upfile":
+            UploadFileInfo(file, file.path, contentType: ContentType.binary),
+      },
+      jsonProcessor: (s) {
+        return AudioUploadInfo.fromJson(s);
+      },
+      dataType: DataType.JSON,
+      formData: true,
+      desc: "上传音频",
     );
   }
 }

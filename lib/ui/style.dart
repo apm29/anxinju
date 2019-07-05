@@ -4,6 +4,7 @@ final ThemeData defaultThemeData = ThemeData(
   brightness: Brightness.light,
   primaryColor: Colors.blue,
   primaryColorBrightness: Brightness.light,
+  platform: TargetPlatform.iOS,
   appBarTheme: AppBarTheme(
     brightness: Brightness.light,
     color: Colors.white,

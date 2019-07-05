@@ -74,12 +74,12 @@ class _LocationSwitchWidgetState extends State<LocationSwitchWidget>
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     var isSelected =
-                        model.currentDistrict == model.allDistricts[index];
+                        model.isSelected(index);
                     return ListTile(
                       title: Text(model.getDistrictName(index)),
                       subtitle: Text(model.getDistrictAddress(index)),
                       onTap: () {
-                        model.currentDistrict = model.allDistricts[index];
+                        model.selectCurrentDistrict(index, context);
                         Navigator.of(context).pop();
                       },
                       selected: isSelected,
@@ -91,7 +91,7 @@ class _LocationSwitchWidgetState extends State<LocationSwitchWidget>
                       ),
                     );
                   },
-                  itemCount: model.allDistricts.length,
+                  itemCount: model.countOfDistricts(),
                 );
               },
             );

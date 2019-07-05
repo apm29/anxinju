@@ -3,7 +3,7 @@ import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
-import 'package:ease_life/res/strings.dart';
+import 'package:ease_life/res/configs.dart';
 import 'package:ease_life/ui/widget/refresh_hint_widget.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -31,10 +31,11 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
       builder: (BuildContext context, DistrictModel value, Widget child) {
         bool isLogin = UserModel.of(context).isLogin;
         bool isVerified = UserVerifyStatusModel.of(context).isVerified();
+        String verifyText = UserVerifyStatusModel.of(context).getVerifyText();
         var textString = isLogin
             ? isVerified
-                ? value.currentDistrict?.districtName ?? "无小区"
-                : "未认证"
+                ? value.getCurrentDistrictName()
+                : verifyText
             : "未登录";
         return FlatButton.icon(
             onPressed: () {
@@ -42,7 +43,7 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                   ? toLogin()
                   : isVerified
                       ? showDistrictMenu(context)
-                      : showCertificationDialog(context);
+                      : showFaceVerifyDialog(context);
             },
             icon: Icon(
               Icons.location_on,
@@ -75,13 +76,12 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                 return ListView.builder(
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    var isSelected =
-                        model.currentDistrict == model.allDistricts[index];
+                    var isSelected = model.isSelected(index);
                     return ListTile(
                       title: Text(model.getDistrictName(index)),
                       subtitle: Text(model.getDistrictAddress(index)),
                       onTap: () {
-                        model.currentDistrict = model.allDistricts[index];
+                        model.selectCurrentDistrict(index,context);
                         Navigator.of(context).pop();
                       },
                       selected: isSelected,
@@ -93,7 +93,7 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                       ),
                     );
                   },
-                  itemCount: model.allDistricts.length,
+                  itemCount: model.countOfDistricts(),
                 );
               },
             );

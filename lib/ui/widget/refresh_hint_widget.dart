@@ -35,8 +35,11 @@ class _RefreshHintWidgetState extends State<RefreshHintWidget>
   Widget build(BuildContext context) {
     return FlatButton.icon(
         onPressed: () async{
+          _controller.reset();
           _controller.forward();
           await widget?.onPress?.call();
+          await Future.delayed(Duration(seconds: 1));
+          _controller.reset();
         },
         icon: RotationTransition(
           turns: _controller,

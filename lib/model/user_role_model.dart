@@ -50,7 +50,6 @@ class UserRoleModel extends ChangeNotifier {
     if (_types == null || _types.length == 0) {
       return false;
     }
-    print('------------> $types');
     return _types.firstWhere((e) {
           return "1" == e.roleCode || "3" == e.roleCode;
         }, orElse: ()=>null) !=

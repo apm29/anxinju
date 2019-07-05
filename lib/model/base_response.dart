@@ -530,6 +530,27 @@ class UserVerifyStatus {
   ///
   int code;
 
+  String getDesc(){
+    switch(code){
+      case 0:
+        return "未认证";
+      case 1:
+        return "名下有房,人脸认证中";
+      case 2:
+        return "名下无房,人脸认证中";
+      case 3:
+        return "名下有房,人脸认证成功";
+      case 4:
+        return "名下无房,人脸认证成功";
+      case 5:
+        return "名下有房,人脸认证失败";
+      case 6:
+        return "名下无房,人脸认证失败";
+      default:
+        return null;
+    }
+  }
+
   UserVerifyStatus({this.code});
 
   UserVerifyStatus.fromJson(Map<String, dynamic> json) {
@@ -583,8 +604,60 @@ class UserVerifyStatus {
 
   @override
   String toString() {
-    return '{"code": $code}';
+    return '{"code": $code  ${getDesc()}}';
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is UserVerifyStatus &&
+              runtimeType == other.runtimeType &&
+              code == other.code;
+
+  @override
+  int get hashCode => code.hashCode;
+
+
+}
+
+class NotificationMessage {
+  int id;
+  String userId;
+  String sendMsg;
+  Null title;
+  int type;
+  String picUrl;
+  String createTime;
+
+  NotificationMessage(
+      {this.id,
+        this.userId,
+        this.sendMsg,
+        this.title,
+        this.type,
+        this.picUrl,
+        this.createTime});
+
+  NotificationMessage.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['userId'];
+    sendMsg = json['sendMsg'];
+    title = json['title'];
+    type = json['type'];
+    picUrl = json['picUrl'];
+    createTime = json['createTime'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['userId'] = this.userId;
+    data['sendMsg'] = this.sendMsg;
+    data['title'] = this.title;
+    data['type'] = this.type;
+    data['picUrl'] = this.picUrl;
+    data['createTime'] = this.createTime;
+    return data;
+  }
 }
 

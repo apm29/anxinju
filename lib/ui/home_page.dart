@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       builder: (BuildContext context,
                                           DistrictModel value, Widget child) {
                                         return Text(
-                                          "${value.currentDistrict?.districtName ?? ""}${Strings.appName}服务平台\n共建共享我们的家园",
+                                          "${value.getCurrentDistrictName(ifError: "")}${Strings.appName}服务平台\n共建共享我们的家园",
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               color: Colors.white,
@@ -94,8 +94,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             children: <Widget>[
                               GestureDetector(
                                 onTap: () {
-                                  toWebPage(
-                                      context, WebIndexID.FANG_KE_GUAN_LI);
+                                  toWebPage(context, WebIndexID.FANG_KE_GUAN_LI,
+                                      checkHasHouse: true);
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
@@ -274,7 +274,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 indicatorColor: const Color(0xFF16A702),
                 mainTitle: "智慧物业",
                 subTitle: "Intelligent Property",
-                onPressed: () {},
               ),
             ),
             SliverToBoxAdapter(
@@ -293,6 +292,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         color: const Color(0xFF16A702),
                         title: "通知公告",
                         indexId: WebIndexID.TONG_ZHI_TONG_GAO,
+                        checkIsFaceVerified: false,
                       ),
                       HomeChip(
                         title: "访客系统",
@@ -300,102 +300,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         checkIsFaceVerified: true,
                         checkHasHouse: true,
                       ),
-//                                  HomeChip(
-//                                      title: "在线缴费",
-//                                      indexId: "zxjf",
-//                                      index: indexInfo),
                       HomeChip(
                         title: "车辆管理",
                         indexId: WebIndexID.CHE_LIANG_GUAN_LI,
-                        checkIsFaceVerified: true,
+                        checkIsFaceVerified: false,
                       ),
                       HomeChip(
                         title: "维护报修",
                         indexId: WebIndexID.WEI_HU_BAO_XIU,
-                        checkIsFaceVerified: true,
+                        checkIsFaceVerified: false,
                       ),
-//                                  HomeChip(
-//                                      title: "暂住申报",
-//                                      indexId: "zzsb",
-//                                      index: indexInfo),
-//                      Container(
-//                        height: 12,
-//                      ),
-//                      Row(
-//                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                        children: <Widget>[
-//                          Column(
-//                            mainAxisAlignment: MainAxisAlignment.start,
-//                            crossAxisAlignment: CrossAxisAlignment.start,
-//                            children: list2.map((s) {
-//                              return Text(
-//                                s,
-//                                style:
-//                                    TextStyle(fontSize: ScreenUtil().setSp(30)),
-//                              );
-//                            }).toList(),
-//                          ),
-//                          Image.asset(
-//                            "images/ic_intelli_prop.png",
-//                            color: Color(0xFF8BFF87),
-//                            width: ScreenUtil().setWidth(185),
-//                          ),
-//                        ],
-//                      )
                     ],
                   ),
                 ),
               ),
             ),
 
-//                        SliverToBoxAdapter(
-//                          child: HomeTitleSliver(
-//                            indicatorColor: const Color(0xFFFD6B07),
-//                            mainTitle: "商业服务",
-//                            subTitle: "Business Service",
-//                            onPressed: () {},
-//                          ),
-//                        ),
-//                        SliverToBoxAdapter(
-//                          child: Material(
-//                            type: MaterialType.card,
-//                            elevation: 1,
-//                            child: Container(
-//                              padding: EdgeInsets.symmetric(
-//                                vertical: ScreenUtil().setHeight(58),
-//                                horizontal: ScreenUtil().setWidth(58),
-//                              ),
-//                              color: Colors.white,
-//                              child: Wrap(
-//                                children: <Widget>[
-//                                  HomeChip(
-//                                      color: const Color(0xFFFD6B07),
-//                                      title: "附近商家",
-//                                      indexId: "fjsj",
-//                                      index: indexInfo),
-//                                  HomeChip(
-//                                      title: "加盟商家",
-//                                      indexId: "jmsj",
-//                                      index: indexInfo),
-//                                  HomeChip(
-//                                      title: "促销活动",
-//                                      indexId: "cxhd",
-//                                      index: indexInfo),
-//                                  HomeChip(
-//                                      title: "保安公司",
-//                                      indexId: "bags",
-//                                      index: indexInfo),
-//                                ],
-//                              ),
-//                            ),
-//                          ),
-//                        ),
+//
 
             SliverToBoxAdapter(
               child: HomeTitleSliver(
                 mainTitle: "安全管家",
                 subTitle: "Security Manager",
-                onPressed: () {},
               ),
             ),
             SliverToBoxAdapter(
@@ -410,60 +336,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   color: Colors.white,
                   child: Wrap(
                     children: <Widget>[
-//                                  HomeChip(
-//                                      color: const Color(0xFF000078),
-//                                      title: "网上110",
-//                                      indexId: "ws110",
-//                                      index: indexInfo),
-//                                  HomeChip(
-//                                      title: "暨阳警方",
-//                                      indexId: "jyjf",
-//                                      index: indexInfo),
-//                                  HomeChip(
-//                                      title: "越警管家",
-//                                      indexId: "yjgj",
-//                                      index: indexInfo),
                       HomeChip(
                         color: const Color(0xFF000078),
                         title: "警务查询",
                         indexId: WebIndexID.JING_WU_CHA_XUN,
+                        checkIsFaceVerified: false,
                       ),
-//                                  HomeChip(
-//                                      title: "便民地图",
-//                                      indexId: "bmdt",
-//                                      index: indexInfo),
                       HomeChip(
                         title: "巡更管理",
                         indexId: WebIndexID.XUN_GENG_GUAN_LI,
+                        checkHasHouse: true,
+                        checkIsFaceVerified: false,
                       ),
-//                                  HomeChip(
-//                                      title: "纠纷化解",
-//                                      indexId: "jfhj",
-//                                      index: indexInfo),
-//                      Container(
-//                        height: 12,
-//                      ),
-//                      Row(
-//                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                        children: <Widget>[
-//                          Column(
-//                            mainAxisAlignment: MainAxisAlignment.start,
-//                            crossAxisAlignment: CrossAxisAlignment.start,
-//                            children: list1.map((s) {
-//                              return Text(
-//                                s,
-//                                style:
-//                                    TextStyle(fontSize: ScreenUtil().setSp(30)),
-//                              );
-//                            }).toList(),
-//                          ),
-//                          Image.asset(
-//                            "images/ic_safe_manager.png",
-//                            color: Colors.blue[300],
-//                            width: ScreenUtil().setWidth(185),
-//                          ),
-//                        ],
-//                      )
                     ],
                   ),
                 ),
@@ -475,7 +359,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 indicatorColor: const Color(0xFFCD0004),
                 mainTitle: "共建共享",
                 subTitle: "Co-construction & Sharing",
-                onPressed: () {},
               ),
             ),
             SliverToBoxAdapter(
@@ -490,54 +373,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   color: Colors.white,
                   child: Wrap(
                     children: <Widget>[
-//                                  HomeChip(
-//                                      color: const Color(0xFFCD0004),
-//                                      title: "业主问政",
-//                                      indexId: "yzwz",
-//                                      index: indexInfo),
                       HomeChip(
                         color: const Color(0xFFCD0004),
                         title: "功德栏",
                         indexId: WebIndexID.GONG_DE_LAN,
+                        checkIsFaceVerified: false,
                       ),
                       HomeChip(
                         title: "义警活动",
                         indexId: WebIndexID.YI_JING_HUO_DONG,
+                        checkIsFaceVerified: false,
                       ),
-//                                  HomeChip(
-//                                      title: "闲置交换",
-//                                      indexId: "xzjh",
-//                                      index: indexInfo),
                       HomeChip(
                         title: "慈善公益",
                         indexId: WebIndexID.CI_SHAN_GONG_YI,
+                        checkIsFaceVerified: false,
                       ),
                       HomeChip(
-                          title: "小区活动", indexId: WebIndexID.XIAO_QU_HUO_DONG),
-//                      Container(
-//                        height: 12,
-//                      ),
-//                      Row(
-//                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                        children: <Widget>[
-//                          Column(
-//                            mainAxisAlignment: MainAxisAlignment.start,
-//                            crossAxisAlignment: CrossAxisAlignment.start,
-//                            children: list3.map((s) {
-//                              return Text(
-//                                s,
-//                                style:
-//                                    TextStyle(fontSize: ScreenUtil().setSp(30)),
-//                              );
-//                            }).toList(),
-//                          ),
-//                          Image.asset(
-//                            "images/ic_co_construction.png",
-//                            color: Color(0xFFFEAFB2),
-//                            width: ScreenUtil().setWidth(185),
-//                          ),
-//                        ],
-//                      )
+                        title: "小区活动",
+                        indexId: WebIndexID.XIAO_QU_HUO_DONG,
+                        checkIsFaceVerified: false,
+                      ),
                     ],
                   ),
                 ),

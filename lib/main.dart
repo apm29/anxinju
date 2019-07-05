@@ -1,5 +1,6 @@
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
+import 'package:ease_life/ui/notification_message_page.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'index.dart';
@@ -17,16 +18,9 @@ JPush jPush = JPush();
 void main() async {
   //sp初始化
   userSp = await SharedPreferences.getInstance();
-  appSp = await SharedPreferences.getInstance();
   await AMap.init(Configs.AMapKey);
   //相机初始化
   cameras = await availableCameras();
-//  runZoned(() {
-//
-//  }, onError: (e, s) {
-//    debugPrint(e.toString());
-//    debugPrint(s.toString());
-//  });
   FlutterBugly.postCatchedException(() {
     runApp(MyApp());
   });
@@ -37,7 +31,7 @@ Future<void> initPlatformState(BuildContext context) async {
   // Platform messages may fail, so we use a try/catch PlatformException.
   jPush.getRegistrationID().then((rid) {
     print("flutter getRegistrationID: $rid");
-    userSp.setString(PreferenceKeys.keyRegistrationId, rid);
+    userSp.setString(KEY_REGISTRATION_ID, rid);
   });
   jPush.applyPushAuthority(
     new NotificationSettingsIOS(sound: true, alert: true, badge: true),
@@ -62,18 +56,18 @@ Future<void> initPlatformState(BuildContext context) async {
           ///   "data":{"url":"fkgl"},
           /// }
           if (extras != null && extras["type"] == "web") {
-              Api.getIndex().then((resp) {
-                resp.forEach((index) {
-                  index.menu.forEach((menu) {
-                    if (menu.id == extras['data']['url']) {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (context) {
-                        return WebViewExample(menu.url);
-                      }));
-                    }
-                  });
+            Api.getIndex().then((resp) {
+              resp.forEach((index) {
+                index.menu.forEach((menu) {
+                  if (menu.id == extras['data']['url']) {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return WebViewExample(menu.url);
+                    }));
+                  }
                 });
               });
+            });
           }
         } catch (e, s) {
           print(e.toString());
@@ -157,48 +151,45 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider.value(value: NotificationModel()),
           ChangeNotifierProvider.value(value: UserVerifyStatusModel()),
           ChangeNotifierProvider.value(value: UserRoleModel()),
+          ChangeNotifierProvider.value(value: MessageModel()),
         ],
-        child: BlocProviders<ApplicationBloc>(
-          bloc: ApplicationBloc(),
-          child: MaterialApp(
-            theme: defaultThemeData,
-            debugShowCheckedModeBanner: false,
-            onUnknownRoute: (settings) {
-              return MaterialPageRoute(builder: (context) {
-                return NotFoundPage(routeName: settings.name);
-              });
+        child: MaterialApp(
+          theme: defaultThemeData,
+          debugShowCheckedModeBanner: false,
+          onUnknownRoute: (settings) {
+            return MaterialPageRoute(builder: (context) {
+              return NotFoundPage(routeName: settings.name);
+            });
+          },
+          routes: {
+            MainPage.routeName: (_) {
+              bool firstEntry = userSp.getBool(KEY_FIRST_ENTRY_TAG) ?? true;
+              return firstEntry ? SplashPage() : MainPage();
             },
-            routes: {
-              MainPage.routeName: (_) {
-                bool firstEntry =
-                    appSp.getBool(PreferenceKeys.keyFirstEntryTag) ??
-                        true;
-                return firstEntry ? SplashPage() : MainPage();
-              },
-              LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
-                    child: LoginPage(),
-                    bloc: LoginBloc(),
-                  ),
-              RegisterPage.routeName: (_) => RegisterPage(),
-              MemberApplyPage.routeName: (_) {
-                return MemberApplyPage();
-              },
-              PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
-              AuthorizationPage.routeName: (_) => AuthorizationPage(),
-              UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
-              FaceIdPage.routeName: (_) {
-                return BlocProviders<CameraBloc>(
-                  child: FaceIdPage(),
-                  bloc: CameraBloc(),
-                );
-              },
-              ChatRoomPage.routeName: (_) => ChatRoomPage(),
-              ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
-                    child: ContactsSelectPage(null),
-                    bloc: ContactsBloc(),
-                  ),
+            LoginPage.routeName: (_) => BlocProviders<LoginBloc>(
+                  child: LoginPage(),
+                  bloc: LoginBloc(),
+                ),
+            RegisterPage.routeName: (_) => RegisterPage(),
+            MemberApplyPage.routeName: (_) {
+              return MemberApplyPage();
             },
-          ),
+            PersonalInfoPage.routeName: (_) => PersonalInfoPage(),
+            AuthorizationPage.routeName: (_) => AuthorizationPage(),
+            UserDetailAuthPage.routeName: (_) => UserDetailAuthPage(),
+            FaceIdPage.routeName: (_) {
+              return BlocProviders<CameraBloc>(
+                child: FaceIdPage(),
+                bloc: CameraBloc(),
+              );
+            },
+            ChatRoomPage.routeName: (_) => ChatRoomPage(),
+            NotificationMessagePage.routeName: (_) => NotificationMessagePage(),
+            ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
+                  child: ContactsSelectPage(null),
+                  bloc: ContactsBloc(),
+                ),
+          },
         ),
       ),
     );

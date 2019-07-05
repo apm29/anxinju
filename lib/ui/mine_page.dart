@@ -3,6 +3,9 @@ import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
+import 'package:oktoast/oktoast.dart';
+
+import 'notification_message_page.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -35,15 +38,22 @@ class _MinePageState extends State<MinePage> {
             UserVerifyStatusModel userVerifyStatus,
             UserRoleModel roleModel,
             Widget child) {
-          if (!userModel.isLogin) {
+          //if (!userModel.isLogin) {
+          //  return buildVisitor(context);
+          //} else if (userVerifyStatus.isVerified()) {
+          //  return _buildMine(context, userModel, userVerifyStatus, roleModel);
+          //} else if (!userVerifyStatus.isVerified()) {
+          //  return _buildUnauthorized(
+          //      context, userModel, userVerifyStatus, roleModel);
+          //} else {
+          //  return buildVisitor(context);
+          //}
+
+          var isLogin = userModel.isLogin;
+          if (!isLogin) {
             return buildVisitor(context);
-          } else if (userVerifyStatus.isVerified()) {
-            return _buildMine(context, userModel, userVerifyStatus, roleModel);
-          } else if (!userVerifyStatus.isVerified()) {
-            return _buildUnauthorized(
-                context, userModel, userVerifyStatus, roleModel);
           } else {
-            return buildVisitor(context);
+            return _buildMine(context, userModel, userVerifyStatus, roleModel);
           }
         },
       ),
@@ -51,15 +61,17 @@ class _MinePageState extends State<MinePage> {
   }
 
   Widget _buildMine(BuildContext context, UserModel userModel,
-      UserVerifyStatusModel userVerifyStatus, UserRoleModel roleModel) {
-    bool isVerified = userVerifyStatus.isVerified();
-    bool hasHouse = userVerifyStatus.hasHouse();
+      UserVerifyStatusModel userVerifyStatusModel, UserRoleModel roleModel) {
+    bool isVerified = userVerifyStatusModel.isVerified();
+    bool hasHouse = userVerifyStatusModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();
     bool hasRecordPermission = roleModel.hasSocietyRecordPermission();
+    String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
     return Consumer<MainIndexModel>(
       builder: (BuildContext context, MainIndexModel value, Widget child) {
         String url = userModel.userDetail?.avatar;
-        String userName = userModel.userDetail?.nickName??userModel.userName??"";
+        String userName =
+            userModel.userDetail?.nickName ?? userModel.userName ?? "";
         return DefaultTextStyle(
           style: TextStyle(color: Colors.grey[800]),
           child: Container(
@@ -98,11 +110,8 @@ class _MinePageState extends State<MinePage> {
                                       : null,
                                 )),
                             Icon(
-                              isVerified
-                                  ? Icons.verified_user
-                                  : Icons.error,
-                              color:
-                              isVerified ? Colors.green : Colors.red,
+                              isVerified ? Icons.verified_user : Icons.error,
+                              color: isVerified ? Colors.green : Colors.red,
                               size: 12,
                             ),
                             Text(
@@ -119,16 +128,27 @@ class _MinePageState extends State<MinePage> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 12),
                                 ),
-                                padding:
-                                EdgeInsets.symmetric(horizontal: 2),
+                                padding: EdgeInsets.symmetric(horizontal: 2),
                                 decoration: BoxDecoration(
-                                    border:
-                                    Border.all(color: Colors.white),
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(4))),
+                                    border: Border.all(color: Colors.white),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4))),
                                 margin: EdgeInsets.only(left: 2),
                               ),
-                            )
+                            ),
+                            Expanded(
+                              child: Container(),
+                            ),
+                            Icon(
+                              isVerified ? Icons.verified_user : Icons.error,
+                              color: Colors.grey[400],
+                              size: 12,
+                            ),
+                            Text(
+                              '$verifyStatusDesc',
+                              textAlign: TextAlign.end,
+                              style: TextStyle(fontSize: 11),
+                            ),
                           ],
                         ),
                       ),
@@ -175,7 +195,8 @@ class _MinePageState extends State<MinePage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                toWebPage(context, WebIndexID.WO_DE_AI_CHE);
+                                toWebPage(context, WebIndexID.WO_DE_AI_CHE,
+                                    checkFaceVerified: false);
                               },
                               child: Column(
                                 children: <Widget>[
@@ -192,23 +213,15 @@ class _MinePageState extends State<MinePage> {
                       )
                     : Container(),
                 hasCommonPermission
-                    ? GestureDetector(
-                        onTap: () {
+                    ? HomeTitleSliver(
+                        leadingIcon: Image.asset('images/ic_qrcode_mini.png',
+                            width: ScreenUtil().setWidth(50)),
+                        mainTitle: "家庭通行码",
+                        onPressed: () {
                           toWebPage(context, WebIndexID.JIA_TING_TONG_XING_MA,
                               checkHasHouse: true);
                         },
-                        child: Container(
-                          color: Colors.white,
-                          padding: EdgeInsets.only(left: 15),
-                          child: HomeTitleSliver(
-                            leadingIcon: Image.asset(
-                                'images/ic_qrcode_mini.png',
-                                width: ScreenUtil().setWidth(50)),
-                            mainTitle: "家庭通行码",
-                            subTitle: "",
-                            tailText: "",
-                          ),
-                        ),
+                        notTitle: true,
                       )
                     : Container(),
                 SizedBox(
@@ -216,46 +229,48 @@ class _MinePageState extends State<MinePage> {
                 ),
                 hasHouse
                     ? Container()
-                    : GestureDetector(
-                        onTap: () {
-                          toWebPage(context, WebIndexID.SHEN_QING_JI_LU);
-                        },
-                        child: Container(
-                          color: Colors.white,
-                          padding: EdgeInsets.only(left: 15),
-                          child: HomeTitleSliver(
-                            leadingIcon: Icon(
-                              Icons.format_list_bulleted,
-                              size: ScreenUtil().setWidth(56),
-                              color: Color(0xff00007c),
-                            ),
-                            mainTitle: "历史申请记录",
-                            subTitle: "",
-                            tailText: "",
-                          ),
+                    : HomeTitleSliver(
+                        leadingIcon: Icon(
+                          Icons.format_list_bulleted,
+                          size: ScreenUtil().setWidth(56),
+                          color: Color(0xff00007c),
                         ),
+                        notTitle: true,
+                        onPressed: () {
+                          toWebPage(context, WebIndexID.SHEN_QING_JI_LU,
+                              checkFaceVerified: false);
+                        },
+                        mainTitle: "历史申请记录",
                       ),
                 !hasHouse
                     ? SizedBox(
                         height: 12,
                       )
                     : Container(),
-                GestureDetector(
-                  onTap: () {
+                HomeTitleSliver(
+                  leadingIcon: Icon(
+                    Icons.history,
+                    size: ScreenUtil().setWidth(56),
+                    color: Color(0xff00007c),
+                  ),
+                  notTitle: true,
+                  mainTitle: "历史消息",
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(NotificationMessagePage.routeName);
+                  },
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                HomeTitleSliver(
+                  leadingIcon: Image.asset('images/ic_face_id.png',
+                      width: ScreenUtil().setWidth(50)),
+                  mainTitle: "出入记录",
+                  notTitle: true,
+                  onPressed: () {
                     toWebPage(context, WebIndexID.CHU_RU_JI_LU,
                         checkHasHouse: true);
                   },
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.only(left: 15),
-                    child: HomeTitleSliver(
-                      leadingIcon: Image.asset('images/ic_face_id.png',
-                          width: ScreenUtil().setWidth(50)),
-                      mainTitle: "出入记录",
-                      subTitle: "",
-                      tailText: "",
-                    ),
-                  ),
                 ),
                 hasRecordPermission
                     ? HomeTitleSliver(
@@ -314,11 +329,14 @@ class _MinePageState extends State<MinePage> {
                                     FlutterBugly.checkUpgrade().then((_) {
                                       return FlutterBugly.getUpgradeInfo();
                                     }).then((info) {
+                                      print('$info');
                                       PackageInfo.fromPlatform()
                                           .then((packageInfo) {
-                                        if (int.parse(packageInfo.buildNumber) <
+                                        if (info!=null&&int.parse(packageInfo.buildNumber) <
                                             info.versionCode) {
                                           showUpdateDialog(context, info);
+                                        }else{
+                                          showToast("已经是最新版本");
                                         }
                                       });
                                     });

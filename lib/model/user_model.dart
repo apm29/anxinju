@@ -44,6 +44,8 @@ class UserModel extends ChangeNotifier {
       UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
       DistrictModel.of(context).tryFetchCurrentDistricts();
       UserRoleModel.of(context).tryFetchUserRoleTypes();
+      UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+      tryFetchUserDetail();
     }
     notifyListeners();
   }
@@ -53,9 +55,9 @@ class UserModel extends ChangeNotifier {
     UserRoleModel.of(context).logout();
     _userInfo = null;
     _token = null;
+    _userDetail = null;
     userSp.setString(KEY_USER_INFO, null);
     userSp.setString(KEY_TOKEN, null);
-    userSp.clear();
     DistrictModel.of(context).tryFetchCurrentDistricts();
     notifyListeners();
   }
@@ -89,6 +91,15 @@ class UserModel extends ChangeNotifier {
         userDetail = resp.data;
       }
       return null;
+    });
+  }
+
+  Future tryFetchUserInfoAndLogin() async{
+    return Api.getUserInfo().then((resp){
+      if(resp.success){
+        login(resp.data, resp.token, null);
+      }
+      return;
     });
   }
 }
