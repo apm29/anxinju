@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'base_response.dart';
 import 'package:ease_life/persistance/shared_preference_keys.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 import 'district_model.dart';
 import 'user_role_model.dart';
 import 'user_verify_status_model.dart';
@@ -67,6 +67,7 @@ class UserModel extends ChangeNotifier {
   UserModel() {
     tryLoginWithLocalToken();
     tryFetchUserDetail();
+    requestPermission();
   }
 
   void tryLoginWithLocalToken() {
@@ -103,5 +104,18 @@ class UserModel extends ChangeNotifier {
       }
       return;
     });
+  }
+
+  Future _requestPermission(PermissionGroup group) async{
+    var status = await PermissionHandler().checkPermissionStatus(group);
+    if(status == PermissionStatus.granted){
+      return null;
+    }
+    return PermissionHandler().requestPermissions([group]);
+  }
+
+  void requestPermission() async{
+    await _requestPermission(PermissionGroup.storage);
+    await _requestPermission(PermissionGroup.camera);
   }
 }

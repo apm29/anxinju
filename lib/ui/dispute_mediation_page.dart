@@ -524,7 +524,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
                               child: IntrinsicHeight(
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: disconnected
+                                    color: disconnected || widget.isFinished
                                         ? Colors.grey
                                         : Colors.white,
                                   ),

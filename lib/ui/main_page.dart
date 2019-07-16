@@ -64,8 +64,22 @@ class MainPageState extends State<MainPage> {
     super.didUpdateWidget(oldWidget);
   }
 
+  Future _requestPermission(PermissionGroup group) async{
+    var status = await PermissionHandler().checkPermissionStatus(group);
+    if(status == PermissionStatus.granted){
+      return null;
+    }
+    return PermissionHandler().requestPermissions([group]);
+  }
+
+  void requestPermission() async{
+    await _requestPermission(PermissionGroup.storage);
+    await _requestPermission(PermissionGroup.camera);
+  }
+
   @override
   Widget build(BuildContext context) {
+    requestPermission();
     ScreenUtil(width: 1080, height: 2160)..init(context);
     return WillPopScope(onWillPop: () async {
       if (_lastPressedAt == null ||

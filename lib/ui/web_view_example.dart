@@ -1,6 +1,7 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/user_model.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 const String kNavigationExamplePage = '''
@@ -840,6 +841,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     //
     //});
     rotateWithExifAndCompress(sourceFile).then((file) {
+      showToast("开始上传 ${file.path}");
       Api.uploadPic(file.absolute.path).then((BaseResponse<ImageDetail> resp) {
         if (resp.success) {
           controller.evaluateJavascript(

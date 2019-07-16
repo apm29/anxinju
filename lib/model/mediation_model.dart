@@ -145,8 +145,8 @@ class MediationApplyModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  static MediationApplyModel of(BuildContext context){
-    return Provider.of(context,listen: false);
+  static MediationApplyModel of(BuildContext context) {
+    return Provider.of(context, listen: false);
   }
 }
 
@@ -169,6 +169,9 @@ class MediationApplicationAddModel extends ChangeNotifier {
   UserInfo get current => _current;
 
   set current(UserInfo value) {
+    if (_mediatorList == null || _mediatorList.length == 0) {
+      _getMediatorList();
+    }
     _current = value;
     notifyListeners();
   }

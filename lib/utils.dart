@@ -9,10 +9,23 @@ import 'model/user_verify_status_model.dart';
 //  Color(0xff16a723),
 //  Color(0xfffebf1f),
 //];
+Future _requestPermission(PermissionGroup group) async{
+  var status = await PermissionHandler().checkPermissionStatus(group);
+  if(status == PermissionStatus.granted){
+    return null;
+  }
+  return PermissionHandler().requestPermissions([group]);
+}
 
+Future requestPermission() async{
+  await _requestPermission(PermissionGroup.storage);
+  await _requestPermission(PermissionGroup.camera);
+  return null;
+}
 Future<File> showImageSourceDialog(BuildContext context,
     {VoidCallback onValue}) async {
   FocusScope.of(context).requestFocus(FocusNode());
+  await requestPermission();
   return showModalBottomSheet<File>(
       context: context,
       builder: (context) {
@@ -74,6 +87,9 @@ Future<File> showCameraPicker() {
 ///旋转Android图片并压缩
 Future<File> rotateWithExifAndCompress(File file) async {
   if (!Platform.isWindows) {
+    if (file == null) {
+      return null;
+    }
     return FlutterImageCompress.compressAndGetFile(file.path, file.path,
         quality: 70);
 //    return FlutterImageCompress.compressWithFile(file.path,quality: 30,minHeight: 768,minWidth: 1080).then((listInt) {

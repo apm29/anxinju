@@ -9,7 +9,7 @@ class Strings {
 }
 
 class Configs {
-  static const APP_DEBUG = true;
+  static const APP_DEBUG = false;
 
   ///iOS 定位key
   static const AMapKey = "d712d41f19e76ca74b673f9d5637af8a";
