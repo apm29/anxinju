@@ -570,15 +570,14 @@ class MediationApply {
     }
   }
 
-  ///状态 1:未处理 2:无需调解 3:同意申请
   String get statusString {
     switch(status){
       case "1":
         return "未处理";
       case "2":
-        return "无需调解";
+        return "正在处理";
       case "3":
-        return "同意申请";
+        return "已完成";
       default:
         return "未知状态";
     }

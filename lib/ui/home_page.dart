@@ -345,9 +345,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 indicatorColor: const Color(0xFFCD0004),
                 mainTitle: "共建共享",
                 subTitle: "Co-construction & Sharing",
-                onPressed: () {
-                  Navigator.of(context).pushNamed(MediationApplyPage.routeName);
-                },
               ),
             ),
             SliverToBoxAdapter(

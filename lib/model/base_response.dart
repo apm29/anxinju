@@ -85,6 +85,17 @@ class UserInfo {
     data['isCertification'] = this.isCertification;
     return data;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is UserInfo &&
+              runtimeType == other.runtimeType &&
+              userId == other.userId;
+
+  @override
+  int get hashCode => userId.hashCode;
+
 }
 
 class DistrictDetail {

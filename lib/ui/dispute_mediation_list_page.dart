@@ -357,7 +357,27 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
-
+  
+  
+  @override
+  void initState() {
+    super.initState();
+    var model = MediationApplicationAddModel.of(context);
+    model.getMediatorList();
+    _titleController.text = model.title;
+    _descController.text = model.desc;
+    _addressController.text = model.address;
+    _titleController.addListener((){
+      model.title = _titleController.text;
+    });
+    _descController.addListener((){
+      model.desc = _descController.text;
+    });
+    _addressController.addListener((){
+      model.address = _addressController.text;
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -446,7 +466,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                             constraints: BoxConstraints(minWidth: 122),
                             child: Text("选择调解员:"),
                           ),
-                          DropdownButton(
+                          DropdownButton<UserInfo>(
                             iconSize: 42,
                             items: model.mediatorList
                                 .map((user) => DropdownMenuItem(
@@ -455,11 +475,11 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                                     ))
                                 .toList(),
                             onChanged: (item) {
-                              model.current = item;
+                              model.currentUser = item;
                             },
                             isDense: true,
                             hint: Text("选择调解人"),
-                            value: model.current,
+                            value: model.currentUser,
                           ),
                         ],
                       );
@@ -577,8 +597,8 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                                   var kfBaseResp = await ApiKf.mediationApply(
                                     districtId,
                                     ChatGroupConfig.APP_ID,
-                                    value.current.userName,
-                                    value.current.userId,
+                                    value.currentUser.userName,
+                                    value.currentUser.userId,
                                     _titleController.text,
                                     _descController.text,
                                     _addressController.text,

@@ -8,6 +8,7 @@ typedef ProcessRawJson<T> = T Function(dynamic);
 
 const KEY_HEADER_TOKEN = "Authorization";
 const KEY_HEADER_REGISTRATION_ID = "RegistrationId";
+const KEY_HEADER_DEVICE_TOKEN = "DeviceToken";
 const VALUE_HEADER_CONTENT_TYPE = "application/x-www-form-urlencoded";
 const VALUE_HEADER_CONTENT_TYPE_FORM = "multipart/form-data";
 const BASE_URL = Configs.BaseUrl;
@@ -16,7 +17,7 @@ class DioUtil {
   Dio _dioInstance;
   bool inDebug = false;
   bool proxyHttp = false;
-  bool printLog = false;
+  bool printLog = true;
 
   DioUtil._() {
     init();
@@ -144,11 +145,15 @@ class DioUtil {
                         KEY_HEADER_REGISTRATION_ID:
                             userSp.getString(KEY_REGISTRATION_ID),
                         "isIOS": Platform.isIOS,
+                        KEY_HEADER_DEVICE_TOKEN:
+                            userSp.getString(KEY_DEVICE_TOKEN),
                       }
                     : {
                         KEY_HEADER_REGISTRATION_ID:
                             userSp.getString(KEY_REGISTRATION_ID),
                         "isIOS": Platform.isIOS,
+                        KEY_HEADER_DEVICE_TOKEN:
+                            userSp.getString(KEY_DEVICE_TOKEN),
                       }),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {

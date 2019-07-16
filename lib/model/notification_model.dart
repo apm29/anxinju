@@ -1,3 +1,4 @@
+import 'package:ease_life/model/user_model.dart';
 import 'package:fake_push/fake_push.dart';
 
 import '../index.dart';
@@ -42,6 +43,8 @@ class NotificationModel extends ChangeNotifier {
 
     _receiveDeviceToken = _push.receiveDeviceToken().listen((String data) {
       print('deviceToken:$data');
+      userSp.setString(KEY_DEVICE_TOKEN, data);
+      UserModel.of(context).tryFetchUserInfoAndLogin();
     });
     _receiveMessage = _push.receiveMessage().listen((Message msg) {
       print('Message:$msg');

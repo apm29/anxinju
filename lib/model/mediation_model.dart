@@ -152,9 +152,14 @@ class MediationApplyModel extends ChangeNotifier {
 
 class MediationApplicationAddModel extends ChangeNotifier {
   MediationApplicationAddModel() {
-    _getMediatorList();
+    getMediatorList();
   }
 
+  
+  String desc;
+  String title;
+  String address;
+  
   List<UserInfo> _mediatorList = [];
 
   List<UserInfo> get mediatorList => _mediatorList;
@@ -166,20 +171,22 @@ class MediationApplicationAddModel extends ChangeNotifier {
 
   UserInfo _current;
 
-  UserInfo get current => _current;
+  UserInfo get currentUser => _current;
 
-  set current(UserInfo value) {
+  set currentUser(UserInfo value) {
     if (_mediatorList == null || _mediatorList.length == 0) {
-      _getMediatorList();
+      getMediatorList();
     }
     _current = value;
     notifyListeners();
   }
 
-  Future _getMediatorList() async {
+  Future getMediatorList() async {
     var resp = await Api.getMediatorUserList();
     if (resp.success) {
       mediatorList = resp.data;
+    }else{
+      showToast(resp.text);
     }
   }
 
@@ -207,7 +214,7 @@ class MediationApplicationAddModel extends ChangeNotifier {
   }
 
   bool validate() {
-    var name = current != null;
+    var name = currentUser != null;
     if (!name) {
       showToast("调解人不可为空");
     }
@@ -215,8 +222,14 @@ class MediationApplicationAddModel extends ChangeNotifier {
   }
 
   void reset() {
-    _mediatorList = [];
     _images = [];
     _current = null;
+    address =null;
+    title =null;
+    desc =null;
+  }
+
+  static MediationApplicationAddModel of(BuildContext context) {
+    return Provider.of<MediationApplicationAddModel>(context,listen: false);
   }
 }
