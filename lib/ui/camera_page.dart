@@ -193,14 +193,15 @@ class _FaceIdPageState extends State<FaceIdPage> {
     file = await rotateWithExifAndCompress(file);
     var fileResp = await Api.uploadPic(file.path);
     //var base64 = await getImageBase64(file);
-    BaseResponse<UserVerifyInfo> baseResponse =
-        await Api.verify(fileResp.data.orginPicPath, argument['idCard'],argument['isAgain']);
+    BaseResponse<UserVerifyInfo> baseResponse = await Api.verify(
+        fileResp.data.orginPicPath, argument['idCard'], argument['isAgain']);
     faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
     if (baseResponse.success) {
       print(baseResponse.text);
       //Navigator.of(context).pop(baseResponse.text);
       UserVerifyInfo userVerifyInfo = baseResponse.data;
+
       ///有房认证
       if (userVerifyInfo.rows != null && userVerifyInfo.rows.length > 0) {
         return showDialog(
@@ -217,11 +218,17 @@ class _FaceIdPageState extends State<FaceIdPage> {
                       textAlign: TextAlign.center,
                     ),
                   );
-                }).toList(),
+                }).toList()
+                  ..add(Padding(
+                    padding: EdgeInsets.all(2),
+                    child: FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("返回主页")),
+                  )),
               );
-            }).then((_){
-              Navigator.of(context).pop();
-        });
+            });
       } else {
         ///无房用户,导向成员申请
         return showDialog(
@@ -230,11 +237,17 @@ class _FaceIdPageState extends State<FaceIdPage> {
             builder: (context) {
               return AlertDialog(
                 title: Text("没有数据"),
-                content: Text("您的名下没有的${Strings.roomClass}"),
+                content: Text("您的名下没有${Strings.roomClass}"),
                 actions: <Widget>[
                   FlatButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed(MemberApplyPage.routeName);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("返回主页")),
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushNamed(MemberApplyPage.routeName);
                       },
                       child: Text("申请成为成员")),
                 ],
@@ -253,8 +266,6 @@ class _FaceIdPageState extends State<FaceIdPage> {
               actions: <Widget>[
                 FlatButton(
                     onPressed: () {
-                      BlocProviders.of<CameraBloc>(context)
-                          .changeStatus(CAMERA_STATUS.PICTURE_STILL);
                       Navigator.of(context).pop();
                     },
                     child: Text("好的"))
@@ -262,18 +273,20 @@ class _FaceIdPageState extends State<FaceIdPage> {
             );
           });
     }
-
   }
 
-  void refreshUserState() async{
-     ///认证之后不管是否成功都更新userInfo 和 房屋列表
+  void refreshUserState() async {
+    ///认证之后不管是否成功都更新userInfo 和 房屋列表
     var baseResp = await Api.getUserInfo();
-    if(baseResp.success) {
+
+    if (baseResp.success) {
       UserModel.of(context).login(baseResp.data, baseResp.token, context);
       UserRoleModel.of(context).tryFetchUserRoleTypes();
       DistrictModel.of(context).tryFetchCurrentDistricts();
     }
-    UserVerifyStatusModel.of(context)..tryFetchVerifyStatusPeriodically(context);
+    await UserVerifyStatusModel.of(context).tryFetchVerifyStatusPeriodically(context);
+    Navigator.of(context)
+        .popUntil((r) => r.settings.name == MainPage.routeName);
   }
 }
 

@@ -63,15 +63,16 @@ class _MinePageState extends State<MinePage> {
   Widget _buildMine(BuildContext context, UserModel userModel,
       UserVerifyStatusModel userVerifyStatusModel, UserRoleModel roleModel) {
     bool isVerified = userVerifyStatusModel.isVerified();
+    bool notVerify = userVerifyStatusModel.isNotVerified();
     bool hasHouse = userVerifyStatusModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();
     bool hasRecordPermission = roleModel.hasSocietyRecordPermission();
     String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
+    String url = userModel.userDetail?.avatar;
+    String userName =
+        userModel.userName ?? userModel.userDetail?.nickName ?? "";
     return Consumer<MainIndexModel>(
       builder: (BuildContext context, MainIndexModel value, Widget child) {
-        String url = userModel.userDetail?.avatar;
-        String userName =
-            userModel.userDetail?.nickName ?? userModel.userName ?? "";
         return DefaultTextStyle(
           style: TextStyle(color: Colors.grey[800]),
           child: Container(
@@ -120,11 +121,11 @@ class _MinePageState extends State<MinePage> {
                             ),
                             InkWell(
                               onTap: () {
-                                showReAuthDialog(context);
+                                showReAuthDialog(context, notVerify);
                               },
                               child: Container(
                                 child: Text(
-                                  "重新认证",
+                                  notVerify ? "未认证" : "重新认证",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 12),
                                 ),
@@ -256,7 +257,8 @@ class _MinePageState extends State<MinePage> {
                   notTitle: true,
                   mainTitle: "历史消息",
                   onPressed: () {
-                    Navigator.of(context).pushNamed(NotificationMessagePage.routeName);
+                    Navigator.of(context)
+                        .pushNamed(NotificationMessagePage.routeName);
                   },
                 ),
                 SizedBox(
@@ -318,69 +320,56 @@ class _MinePageState extends State<MinePage> {
                   children: <Widget>[
                     Platform.isAndroid
                         ? Expanded(
-                            child: Container(
-                            color: Colors.white,
-                            padding: EdgeInsets.all(12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                InkWell(
-                                  onTap: () {
-                                    FlutterBugly.checkUpgrade().then((_) {
-                                      return FlutterBugly.getUpgradeInfo();
-                                    }).then((info) {
-                                      print('$info');
-                                      PackageInfo.fromPlatform()
-                                          .then((packageInfo) {
-                                        if (info!=null&&int.parse(packageInfo.buildNumber) <
-                                            info.versionCode) {
-                                          showUpdateDialog(context, info);
-                                        }else{
-                                          showToast("已经是最新版本");
-                                        }
-                                      });
-                                    });
-                                  },
-                                  splashColor: Colors.lightGreen,
-                                  child: Container(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.autorenew,
-                                          color: Colors.lightGreen,
-                                        ),
-                                        Text("检查更新")
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: EaseIconButton(
+                            onPressed: () {
+                              FlutterBugly.checkUpgrade().then((_) {
+                                return FlutterBugly.getUpgradeInfo();
+                              }).then((info) {
+                                print('$info');
+                                PackageInfo.fromPlatform().then((packageInfo) {
+                                  if (info != null &&
+                                      int.parse(packageInfo.buildNumber) <
+                                          info.versionCode) {
+                                    showUpdateDialog(context, info);
+                                  } else {
+                                    showToast("已经是最新版本");
+                                  }
+                                });
+                              });
+                            },
+                            iconData: Icons.cached,
+                            buttonLabel: "检查更新",
+                            iconColor: Colors.green,
                           ))
                         : Container(),
                     Expanded(
-                      child: Container(
-                        color: Colors.white,
-                        padding: EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                UserModel.of(context).logout(context);
-                              },
-                              child: Column(
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.exit_to_app,
-                                    color: Colors.red,
-                                  ),
-                                  Text("退出登录")
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: EaseIconButton(
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("退出"),
+                                  content: Text("确定退出安心居吗?"),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        }, child: Text("取消")),
+                                    FlatButton(
+                                        onPressed: () {
+                                          if(Navigator.of(context).pop()){
+                                            UserModel.of(context).logout(context);
+                                          }
+                                        },
+                                        child: Text("退出")),
+                                  ],
+                                );
+                              });
+                        },
+                        buttonLabel: "退出登录",
+                        iconData: Icons.exit_to_app,
+                        iconColor: Colors.red,
                       ),
                     ),
                   ],
@@ -396,7 +385,7 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  void showReAuthDialog(BuildContext context) {
+  void showReAuthDialog(BuildContext context, bool notVerify) {
     showDialog(
         context: context,
         builder: (context) {
@@ -407,10 +396,12 @@ class _MinePageState extends State<MinePage> {
                   Icons.warning,
                   color: Colors.blue,
                 ),
-                Text("重新认证")
+                Text(notVerify ? "认证" : "重新认证")
               ],
             ),
-            content: Text("重新认证个人信息将会覆盖已认证信息,请谨慎操作!"),
+            content: Text(notVerify
+                ? "前往认证个人信息,身份证信息填写后不可修改,请谨慎操作"
+                : "重新认证个人信息将会覆盖已认证信息,请谨慎操作!"),
             actions: <Widget>[
               FlatButton(
                   onPressed: () {
@@ -421,11 +412,12 @@ class _MinePageState extends State<MinePage> {
                     style: TextStyle(color: Colors.blueGrey),
                   )),
               FlatButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushReplacementNamed(UserDetailAuthPage.routeName);
-                  },
-                  child: Text("重新认证")),
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushReplacementNamed(UserDetailAuthPage.routeName);
+                },
+                child: Text(notVerify ? "认证" : "重新认证"),
+              ),
             ],
           );
         });

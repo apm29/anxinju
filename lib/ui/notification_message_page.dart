@@ -58,6 +58,10 @@ class MessageModel extends ChangeNotifier {
     _list.clear();
     return loadMore();
   }
+
+  static MessageModel of(BuildContext context) {
+    return Provider.of<MessageModel>(context);
+  }
 }
 
 class _NotificationMessagePageState extends State<NotificationMessagePage> {
@@ -85,7 +89,16 @@ class _NotificationMessagePageState extends State<NotificationMessagePage> {
                 itemBuilder: (context, index) {
                   if (index == value.list.length) {
                     return value.noMore
-                        ? Container()
+                        ? index == 0
+                            ? Container(
+                                alignment: Alignment.center,
+                                constraints: BoxConstraints(minHeight: 200),
+                                child: Text(
+                                  "暂无消息",
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                            : Container()
                         : value.isLoading
                             ? Container(
                                 alignment: Alignment.center,
@@ -97,7 +110,7 @@ class _NotificationMessagePageState extends State<NotificationMessagePage> {
                                   value.loadMore();
                                 },
                                 icon: Icon(Icons.cached),
-                                label: Text("Load More"),
+                                label: Text("加载更多"),
                               );
                   }
                   var message = value.list[index];
@@ -114,7 +127,8 @@ class _NotificationMessagePageState extends State<NotificationMessagePage> {
                         elevation: 1,
                         child: Container(
                           alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: 18,vertical: 12),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 12),
                           child: Text("${message.id} ${message.sendMsg}"),
                         ),
                       ),

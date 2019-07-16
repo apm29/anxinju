@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ease_life/remote/api.dart';
+import 'package:ease_life/ui/notification_message_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +46,7 @@ class UserModel extends ChangeNotifier {
       DistrictModel.of(context).tryFetchCurrentDistricts();
       UserRoleModel.of(context).tryFetchUserRoleTypes();
       UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+      MessageModel.of(context).refresh();
       tryFetchUserDetail();
     }
     notifyListeners();

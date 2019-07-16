@@ -119,19 +119,20 @@ class DioUtil {
   ///
   ///
 
-  Future<BaseResponse<T>> postAsync<T>({
-    String path,
-    ProcessRawJson jsonProcessor,
-    Map<String, dynamic> data,
-    CancelToken cancelToken,
-    DataType dataType = DataType.JSON,
-    bool formData = false,
-    bool addAuthorization = true,
-    String desc = "",
-  }) async {
+  Future<BaseResponse<T>> postAsync<T>(
+      {String path,
+      ProcessRawJson jsonProcessor,
+      Map<String, dynamic> data,
+      CancelToken cancelToken,
+      DataType dataType = DataType.JSON,
+      bool formData = false,
+      bool addAuthorization = true,
+      String desc = "",
+      ProgressCallback onSendProgress}) async {
     print('post $BASE_URL$path $data');
     return _dioInstance
         .post<Map<String, dynamic>>(path,
+            onSendProgress: onSendProgress,
             data: !formData ? data : FormData.from(data),
             options: RequestOptions(
                 contentType: formData
@@ -142,10 +143,12 @@ class DioUtil {
                         KEY_HEADER_TOKEN: userSp.getString(KEY_TOKEN),
                         KEY_HEADER_REGISTRATION_ID:
                             userSp.getString(KEY_REGISTRATION_ID),
+                        "isIOS": Platform.isIOS,
                       }
                     : {
                         KEY_HEADER_REGISTRATION_ID:
                             userSp.getString(KEY_REGISTRATION_ID),
+                        "isIOS": Platform.isIOS,
                       }),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
@@ -185,11 +188,13 @@ class DioUtil {
         }
         return baseResponse;
       } else {
-        return BaseResponse<T>("0", null, "$desc 请求失败:${response.statusCode}", null);
+        return BaseResponse<T>(
+            "0", null, "$desc 请求失败:${response.statusCode}", null);
       }
     }).catchError((Object error, StackTrace trace) {
       debugPrint(error.toString());
-      return BaseResponse<T>("0", null, "$desc 请求失败:${getErrorHint(error)}", null);
+      return BaseResponse<T>(
+          "0", null, "$desc 请求失败:${getErrorHint(error)}", null);
     });
   }
 
@@ -203,7 +208,7 @@ class DioUtil {
         default:
           errMessage = error.message;
       }
-    } else if(error is DioError){
+    } else if (error is DioError) {
       errMessage = error.message.toString();
     }
     return error is DioError ? (errMessage) : error.toString();

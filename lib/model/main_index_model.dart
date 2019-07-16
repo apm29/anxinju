@@ -86,7 +86,6 @@ class MainIndexModel extends ChangeNotifier {
         .getLocation(
             LocationClientOptions(locationMode: LocationMode.Hight_Accuracy))
         .then((location) {
-      print('$location');
     });
   }
 }

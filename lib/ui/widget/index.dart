@@ -14,3 +14,4 @@ export 'text_picker_widget.dart';
 export 'ticker_widget.dart';
 export 'update_dialog.dart';
 export 'bubble.dart';
+export 'ease_widget.dart';

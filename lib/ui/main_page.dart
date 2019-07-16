@@ -26,7 +26,7 @@ class MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    initPlatformState(context);
+//    initPlatformState(context);
 
     if (Platform.isAndroid)
       FlutterBugly.init(
@@ -85,14 +85,15 @@ class MainPageState extends State<MainPage> {
               child: buildContent(context),
             ),
             floatingActionButton: Consumer<UserModel>(
-              builder: (BuildContext context, UserModel userModel, Widget child) {
+              builder:
+                  (BuildContext context, UserModel userModel, Widget child) {
                 return Offstage(
                   offstage: !userModel.isLogin,
                   child: FloatingActionButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed(
                         ChatRoomPage.routeName,
-                        arguments: {"group": "1", "title": "紧急呼叫"},
+                        arguments: {"group": "25", "title": "紧急呼叫"},
                       );
                     },
                     mini: true,
@@ -164,13 +165,6 @@ class MainPageState extends State<MainPage> {
                 Navigator.of(context).pushNamed(FaceIdPage.routeName);
               },
               child: Text("人脸识别界面"),
-            ),
-            OutlineButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(ChatRoomPage.routeName,
-                    arguments: {"group": "1", "title": "紧急呼救"});
-              },
-              child: Text("紧急呼救"),
             ),
             OutlineButton(
               onPressed: () {

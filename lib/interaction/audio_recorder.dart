@@ -17,6 +17,9 @@ import '../index.dart';
 
 class AudioRecorder {
   FlutterSound _flutterSound = FlutterSound();
+
+
+  FlutterSound get flutterSound => _flutterSound;
   static AudioRecorder _instance;
 
   AudioRecorder._() {
@@ -401,6 +404,9 @@ class _AudioMessageTileState extends State<AudioMessageTile> {
       return DateFormat('ss').format(
               DateTime.fromMillisecondsSinceEpoch(position?.floor() ?? 0)) +
           '"';
+    }
+    if(widget.duration == null || widget.duration == 0){
+      return "点击播放";
     }
     return DateFormat('ss').format(DateTime.fromMillisecondsSinceEpoch(
             widget.duration?.floor() ?? 0)) +

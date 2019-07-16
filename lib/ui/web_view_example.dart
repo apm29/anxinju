@@ -428,6 +428,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                       onWebViewCreated: (WebViewController webViewController) {
                         _controller.complete(webViewController);
                         controller = webViewController;
+                        controller.clearCache();
                       },
                       // ignore: prefer_collection_literals
                       javascriptChannels: <JavascriptChannel>[
@@ -750,10 +751,10 @@ class _WebViewExampleState extends State<WebViewExample> {
     if (_focusNode2.hasFocus) {
       if (!refocus) FocusScope.of(context).requestFocus(_focusNode1);
       //FocusScope.of(context).requestFocus(_focusNode);
-      if (!_focusNode1.hasFocus) {
-        //hideAndroidKeyboard();
-        showAndroidKeyboard();
-      }
+      //if (!_focusNode1.hasFocus) {
+      //  //hideAndroidKeyboard();
+      //  showAndroidKeyboard();
+      //}
       //把初始文本设置给隐藏TextField
       String initText = data['initText'];
       var selectionStart = data['selectionStart'];
@@ -767,7 +768,6 @@ class _WebViewExampleState extends State<WebViewExample> {
       if (selectionStart is int) {
         start = selectionEnd;
       }
-      print(selectionEnd);
       textController1.value = TextEditingValue(
         text: initText,
         selection: TextSelection(baseOffset: start, extentOffset: end),
@@ -777,10 +777,10 @@ class _WebViewExampleState extends State<WebViewExample> {
     } else {
       if (!refocus) FocusScope.of(context).requestFocus(_focusNode2);
       //FocusScope.of(context).requestFocus(_focusNode);
-      if (!_focusNode2.hasFocus) {
-        //hideAndroidKeyboard();
-        showAndroidKeyboard();
-      }
+      //if (!_focusNode2.hasFocus) {
+      //  //hideAndroidKeyboard();
+      //  showAndroidKeyboard();
+      //}
       //把初始文本设置给隐藏TextField
       String initText = data['initText'];
       var selectionStart = data['selectionStart'];
@@ -805,7 +805,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
-    showImageSourceDialog(context, () {
+    showImageSourceDialog(context, onValue: () {
       FocusScope.of(context).requestFocus(FocusNode());
     }).then((file) {
       processFileAndNotify(file, callbackName);

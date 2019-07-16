@@ -40,7 +40,7 @@ class ChatMessage {
     this.sendTime = map[columnSendTime];
   }
 
-  ChatMessage.fromMessage(Message message) {
+  ChatMessage.fromMessage(WSMessage message) {
     this.content = message.content;
     this.type = message.type;
     this.status = message.status;
@@ -52,8 +52,8 @@ class ChatMessage {
     this.sendTime = message.sendTime;
   }
 
-  Message toMessage() {
-    return Message(content,
+  WSMessage toMessage() {
+    return WSMessage(content,
         type: type,
         status: status,
         duration: duration?.toDouble(),

@@ -82,7 +82,6 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                       subtitle: Text(model.getDistrictAddress(index)),
                       onTap: () {
                         model.selectCurrentDistrict(index,context);
-                        Navigator.of(context).pop();
                       },
                       selected: isSelected,
                       leading: Visibility(

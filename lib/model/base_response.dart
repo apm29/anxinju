@@ -535,17 +535,17 @@ class UserVerifyStatus {
       case 0:
         return "未认证";
       case 1:
-        return "名下有房,人脸认证中";
+        return "名下有房,\n人脸认证中";
       case 2:
-        return "名下无房,人脸认证中";
+        return "名下无房,\n人脸认证中";
       case 3:
-        return "名下有房,人脸认证成功";
+        return "名下有房,\n人脸认证成功";
       case 4:
-        return "名下无房,人脸认证成功";
+        return "名下无房,\n人脸认证成功";
       case 5:
-        return "名下有房,人脸认证失败";
+        return "名下有房,\n人脸认证失败";
       case 6:
-        return "名下无房,人脸认证失败";
+        return "名下无房,\n人脸认证失败";
       default:
         return null;
     }
@@ -596,7 +596,7 @@ class UserVerifyStatus {
         text = "认证失败";
         break;
       default:
-        text = "--";
+        text = "未认证";
         break;
     }
     return text;

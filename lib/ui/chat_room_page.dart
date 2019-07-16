@@ -3,81 +3,6 @@ import 'package:ease_life/interaction/audio_recorder.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:intl/intl.dart';
 
-List<String> faces = [
-  "[微笑]",
-  "[嘻嘻]",
-  "[哈哈]",
-  "[可爱]",
-  "[可怜]",
-  "[挖鼻]",
-  "[吃惊]",
-  "[害羞]",
-  "[挤眼]",
-  "[闭嘴]",
-  "[鄙视]",
-  "[爱你]",
-  "[泪]",
-  "[偷笑]",
-  "[亲亲]",
-  "[生病]",
-  "[太开心]",
-  "[白眼]",
-  "[右哼哼]",
-  "[左哼哼]",
-  "[嘘]",
-  "[衰]",
-  "[委屈]",
-  "[吐]",
-  "[哈欠]",
-  "[抱抱]",
-  "[怒]",
-  "[疑问]",
-  "[馋嘴]",
-  "[拜拜]",
-  "[思考]",
-  "[汗]",
-  "[困]",
-  "[睡]",
-  "[钱]",
-  "[失望]",
-  "[酷]",
-  "[色]",
-  "[哼]",
-  "[鼓掌]",
-  "[晕]",
-  "[悲伤]",
-  "[抓狂]",
-  "[黑线]",
-  "[阴险]",
-  "[怒骂]",
-  "[互粉]",
-  "[心]",
-  "[伤心]",
-  "[猪头]",
-  "[熊猫]",
-  "[兔子]",
-  "[ok]",
-  "[耶]",
-  "[good]",
-  "[NO]",
-  "[赞]",
-  "[来]",
-  "[弱]",
-  "[草泥马]",
-  "[神马]",
-  "[囧]",
-  "[浮云]",
-  "[给力]",
-  "[围观]",
-  "[威武]",
-  "[奥特曼]",
-  "[礼物]",
-  "[钟]",
-  "[话筒]",
-  "[蜡烛]",
-  "[蛋糕]"
-];
-
 class ChatRoomPage extends StatefulWidget {
   static String routeName = "/chat";
 
@@ -95,7 +20,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   WebSocketManager manager;
 
-  Observable<Message> get commandMessageStream => manager.commandMessageStream;
+  Observable<WSMessage> get commandMessageStream => manager.commandMessageStream;
 
   TextEditingController _inputController = TextEditingController();
   ScrollController _listViewController = ScrollController();
@@ -105,7 +30,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Observable<bool> get _emotionVisibilityStream =>
       _emotionIconController.stream;
   FocusNode _editFocusNode = FocusNode();
-  List<Message> messages = [];
+  List<WSMessage> messages = [];
 
   @override
   void initState() {
@@ -187,7 +112,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               color: Colors.grey[400],
               height: 0.3,
             ),
-            StreamBuilder<Message>(
+            StreamBuilder<WSMessage>(
                 stream: commandMessageStream,
                 builder: (context, snapshot) {
                   if ((snapshot.data?.status ?? ConnectStatus.WAIT) !=
@@ -233,7 +158,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   Expanded buildMessageList() {
     return Expanded(
-      child: StreamBuilder<Message>(
+      child: StreamBuilder<WSMessage>(
           stream: commandMessageStream,
           builder: (context, snapshot) {
             if ((snapshot.data?.status ?? ConnectStatus.WAIT) ==
@@ -315,7 +240,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  Widget buildMessageBody(BuildContext context, Message message, bool send) {
+  Widget buildMessageBody(BuildContext context, WSMessage message, bool send) {
     switch (message.type) {
       case MessageType.TEXT:
         return buildText(context, message, send);
@@ -334,7 +259,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     return buildText(context, message, send);
   }
 
-  Widget buildText(BuildContext context, Message message, bool send) {
+  Widget buildText(BuildContext context, WSMessage message, bool send) {
     var allMatches = RegExp(r"face\[.*?\]").allMatches(message.content);
     List<Widget> children = [];
     int lastStart = 0;
@@ -400,7 +325,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  String _getMessageSendTime(Message message) {
+  String _getMessageSendTime(WSMessage message) {
     var time = DateTime.fromMillisecondsSinceEpoch(message.sendTime);
     if (isToday(time)) {
       return DateFormat("HH:mm:ss").format(time);
@@ -413,7 +338,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     return time.difference(DateTime.now()).inDays < 1;
   }
 
-  Widget buildAudio(BuildContext context, Message message, bool send) {
+  Widget buildAudio(BuildContext context, WSMessage message, bool send) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment:
@@ -425,7 +350,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  Widget buildImage(BuildContext context, Message message, bool send) {
+  Widget buildImage(BuildContext context, WSMessage message, bool send) {
     var rawUrl = message.content.substring(4, message.content.length - 1);
     var url;
     if (!rawUrl.startsWith("http")) {
@@ -490,7 +415,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  Widget _buildTimeText(Message message) {
+  Widget _buildTimeText(WSMessage message) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 12),
       child: Text(
@@ -500,8 +425,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  StreamBuilder<Message> buildStatusPart() {
-    return StreamBuilder<Message>(
+  StreamBuilder<WSMessage> buildStatusPart() {
+    return StreamBuilder<WSMessage>(
       builder: (_, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data.type == MessageType.COMMAND) {
@@ -633,7 +558,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   void _doSendAudio(RecordDetail recordDetail) {
     ApiKf.uploadAudio(File(recordDetail.path)).then((resp) {
       if (resp.success) {
-        var message = Message(resp.data.url,
+        var message = WSMessage(resp.data.url,
             type: MessageType.AUDIO, duration: recordDetail.duration);
         manager.sendMessage(message).then((success) {
           if (success) {
@@ -659,7 +584,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       Fluttertoast.showToast(msg: "请输入文字");
       return;
     }
-    var message = Message(_inputController.text);
+    var message = WSMessage(_inputController.text);
     _inputController.text = "";
     _editFocusNode.unfocus();
     manager.sendMessage(message).then((success) {
@@ -674,11 +599,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void _doSendImage() {
-    showImageSourceDialog(context, () {}).then((sourceFile) {
+    showImageSourceDialog(context).then((sourceFile) {
       rotateWithExifAndCompress(sourceFile).then((f) {
         Api.uploadPic(f.path).then((resp) {
           if (resp.success) {
-            var message = Message("img[${resp.data.orginPicPath}]",
+            var message = WSMessage("img[${resp.data.orginPicPath}]",
                 type: MessageType.IMAGE);
             manager.sendMessage(message).then((success) {
               if (success) {

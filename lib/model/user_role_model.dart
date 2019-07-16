@@ -11,7 +11,6 @@ class UserRoleModel extends ChangeNotifier {
 
   set types(List<UserType> value) {
     _types = value;
-    print('${types.join()}');
     notifyListeners();
   }
 
@@ -23,6 +22,7 @@ class UserRoleModel extends ChangeNotifier {
     return Api.getUserTypeWithOutId().then((resp) {
       if (resp.success) {
         types = resp.data;
+        print('${types.join()}');
       }
       return null;
     });

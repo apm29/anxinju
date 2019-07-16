@@ -1,5 +1,9 @@
 import 'dart:math';
 
+import 'package:ease_life/model/announcement_model.dart';
+import 'package:ease_life/model/main_index_model.dart';
+import 'package:ease_life/model/user_model.dart';
+import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:flutter/foundation.dart';
@@ -96,9 +100,15 @@ class DistrictModel extends ChangeNotifier {
     return _mCurrentDistrict == allDistricts[index];
   }
 
-  void selectCurrentDistrict(int index, BuildContext context) {
+  void selectCurrentDistrict(int index, BuildContext context) async{
     _mCurrentDistrict = allDistricts[index];
     UserVerifyStatusModel.of(context).tryFetchHouseList(getCurrentDistrictId());
+
+    await UserModel.of(context).tryFetchUserInfoAndLogin();
+    await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+    await MainIndexModel.of(context).tryGetCurrentLocation();
+    await UserRoleModel.of(context).tryFetchUserRoleTypes();
+    Navigator.of(context).pop();
   }
 
   int getCurrentDistrictId() {

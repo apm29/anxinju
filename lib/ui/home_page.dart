@@ -2,6 +2,9 @@ import 'package:ease_life/index.dart';
 import 'package:ease_life/model/announcement_model.dart';
 import 'package:ease_life/model/district_model.dart';
 
+import 'dispute_mediation_list_page.dart';
+import 'dispute_mediation_page.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -90,84 +93,39 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ],
                           ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              GestureDetector(
-                                onTap: () {
-                                  toWebPage(context, WebIndexID.FANG_KE_GUAN_LI,
-                                      checkHasHouse: true);
+                              EaseIconButton(
+                                onPressed: () {
+                                  toWebPage(
+                                    context,
+                                    WebIndexID.FANG_KE_GUAN_LI,
+                                    checkHasHouse: true,
+                                  );
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      SizedBox(
-                                          width: ScreenUtil().setWidth(100),
-                                          height: ScreenUtil().setWidth(100),
-                                          child: Image.asset(
-                                            "images/ic_visitor_manager.png",
-                                          )),
-                                      Text("访客管理")
-                                    ],
-                                  ),
-                                ),
+                                assetImageUrl: "images/ic_visitor_manager.png",
+                                buttonLabel: "访客管理",
                               ),
-                              GestureDetector(
-                                onTap: () {
+                              EaseIconButton(
+                                onPressed: () {
                                   toWebPage(context, WebIndexID.ZHAO_WU_YE);
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      SizedBox(
-                                          width: ScreenUtil().setWidth(100),
-                                          height: ScreenUtil().setWidth(100),
-                                          child: Image.asset(
-                                            "images/ic_property_manager.png",
-                                          )),
-                                      Text("找物业")
-                                    ],
-                                  ),
-                                ),
+                                assetImageUrl: "images/ic_property_manager.png",
+                                buttonLabel: "找物业",
                               ),
-                              GestureDetector(
-                                onTap: () {
+                              EaseIconButton(
+                                onPressed: () {
                                   toWebPage(context, WebIndexID.ZHAO_SHE_QU);
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      SizedBox(
-                                          width: ScreenUtil().setWidth(100),
-                                          height: ScreenUtil().setWidth(100),
-                                          child: Image.asset(
-                                            "images/ic_society_manage.png",
-                                          )),
-                                      Text("找社区")
-                                    ],
-                                  ),
-                                ),
+                                assetImageUrl: "images/ic_society_manage.png",
+                                buttonLabel: "找社区",
                               ),
-                              GestureDetector(
-                                onTap: () {
+                              EaseIconButton(
+                                onPressed: () {
                                   toWebPage(context, WebIndexID.ZHAO_JING_CHA);
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      SizedBox(
-                                          width: ScreenUtil().setWidth(100),
-                                          height: ScreenUtil().setWidth(100),
-                                          child: Image.asset(
-                                            "images/ic_police_manage.png",
-                                          )),
-                                      Text("找警察")
-                                    ],
-                                  ),
-                                ),
+                                assetImageUrl: "images/ic_police_manage.png",
+                                buttonLabel: "找警察",
                               ),
                             ],
                           ),
@@ -214,47 +172,51 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             return Column(
                               children:
                                   announcementModel.announcements.map((detail) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) {
-                                      return WebViewExample(
-                                          "$BASE_URL#/contentDetails?contentId=${detail.noticeId}");
-                                    }));
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(7.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          child: Text(
-                                            announcementModel
-                                                .typeTitleByDetail(detail),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
+                                return Material(
+                                  color: Colors.white,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) {
+                                        return WebViewExample(
+                                            "$BASE_URL#/contentDetails?contentId=${detail.noticeId}");
+                                      }));
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(7.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            child: Text(
+                                              announcementModel
+                                                  .typeTitleByDetail(detail),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                            decoration: BoxDecoration(
+                                                color: colors[
+                                                    detail.noticeType %
+                                                        colors.length],
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(8))),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              detail.noticeTitle,
+                                              style: TextStyle(fontSize: 14),
+                                              textAlign: TextAlign.start,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
-                                          decoration: BoxDecoration(
-                                              color: colors[detail.noticeType %
-                                                  colors.length],
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(8))),
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            detail.noticeTitle,
-                                            style: TextStyle(fontSize: 14),
-                                            textAlign: TextAlign.start,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 );
@@ -310,6 +272,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         indexId: WebIndexID.WEI_HU_BAO_XIU,
                         checkIsFaceVerified: false,
                       ),
+                      HomeChip(
+                        title: "便民地图",
+                        indexId: WebIndexID.BIAN_MIN_DI_TU,
+                        checkIsFaceVerified: false,
+                      ),
+                      HomeChip(
+                        title: "纠纷调解",
+                        checkLogin: true,
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(MediationListPage.routeName);
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -359,6 +334,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 indicatorColor: const Color(0xFFCD0004),
                 mainTitle: "共建共享",
                 subTitle: "Co-construction & Sharing",
+                onPressed: (){
+                  Navigator.of(context).pushNamed(MediationApplyPage.routeName);
+                },
               ),
             ),
             SliverToBoxAdapter(

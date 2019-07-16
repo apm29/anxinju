@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:ease_life/model/base_response.dart';
 import '../index.dart';
 import 'dio_util.dart';
+import 'kf_dio_utils.dart';
 
 class Api {
   static CancelToken defaultToken = CancelToken();
@@ -178,17 +179,18 @@ class Api {
     return baseResponse;
   }
 
-  static Future<BaseResponse<ImageDetail>> uploadPic(String path) async {
+  static Future<BaseResponse<ImageDetail>> uploadPic(String path,
+      {ProgressCallback onSendProgress}) async {
     print('file path : $path');
     var file = File(path);
     var baseResponse = await DioUtil().postAsync<ImageDetail>(
-      path: "/business/upload/uploadPic",
-      data: {"pic": UploadFileInfo(file, file.path)},
-      jsonProcessor: (s) => ImageDetail.fromJson(s),
-      dataType: DataType.JSON,
-      formData: true,
-      desc: "上传图片",
-    );
+        path: "/business/upload/uploadPic",
+        data: {"pic": UploadFileInfo(file, file.path)},
+        jsonProcessor: (s) => ImageDetail.fromJson(s),
+        dataType: DataType.JSON,
+        formData: true,
+        desc: "上传图片",
+        onSendProgress: onSendProgress);
     return baseResponse;
   }
 
@@ -398,13 +400,13 @@ class Api {
     );
   }
 
-  static Future<BaseResponse<List<NotificationMessage>>>
-      getNotificationMessage(int page, int rows) {
+  static Future<BaseResponse<List<NotificationMessage>>> getNotificationMessage(
+      int page, int rows) {
     return DioUtil().postAsync(
       path: "/business/MessageCenter/getMyMessage",
       data: {
-        "page":page,
-        "rows":rows,
+        "page": page,
+        "rows": rows,
       },
       jsonProcessor: (s) {
         if (s is List) {
@@ -418,10 +420,27 @@ class Api {
       desc: "获取用户通知",
     );
   }
+
+  static Future<BaseResponse<List<UserInfo>>> getMediatorUserList() {
+    return DioUtil().postAsync(
+      path: "/permission/UserRole/findUserRole",
+      data: {"roleCode": "20"},
+      jsonProcessor: (s) {
+        if (s is List) {
+          return s.map((json) {
+            return UserInfo.fromJson(json);
+          }).toList();
+        }
+        return [];
+      },
+      dataType: DataType.LIST,
+      desc: "获取调解员列表",
+    );
+  }
 }
 
 class ApiKf {
-  static Future<BaseResponse<AudioUploadInfo>> uploadAudio(File file) {
+  static Future<BaseResponse<AudioUploadInfo>> uploadAudio(File file) async {
     return DioUtil().postAsync(
       path: "/Php/Home/UploadFile/upVoiceFileAjax",
       data: {
@@ -434,6 +453,98 @@ class ApiKf {
       dataType: DataType.JSON,
       formData: true,
       desc: "上传音频",
+    );
+  }
+
+  static Future<KFBaseResp<MediationMessagePageData>> getMediationChatLog(
+    String districtId,
+    int page,
+    int pageNum,
+    String cAppId,
+    String chatRoomId,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/custRoomApi/roomChatLog",
+      processor: (s) {
+        return MediationMessagePageData.fromJson(s);
+      },
+      formData: {
+        "district_id": districtId,
+        "page": page,
+        "pagenum": pageNum,
+        "cAppId": cAppId,
+        "chatroom_id": chatRoomId,
+      },
+    );
+  }
+
+  static Future<KFBaseResp<MediationRecordPageData>> getMediationList(
+    String districtId,
+    int page,
+    int pageNum,
+    bool completedMediation,
+    String cAppId,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/custRoomApi/roomLogCustlist",
+      processor: (s) {
+        return MediationRecordPageData.fromJson(s);
+      },
+      formData: {
+        "district_id": districtId,
+        "page": page,
+        "pagenum": pageNum,
+        "isfinish": completedMediation ? 1 : 0,
+        "cAppId": cAppId,
+      },
+    );
+  }
+
+  static Future<KFBaseResp<MediationApplyPageData>> getMediationApplyList(
+    String districtId,
+    int page,
+    int pageNum,
+    String cAppId,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/custRoomApi/applyMediateCustList",
+      processor: (s) {
+        return MediationApplyPageData.fromJson(s);
+      },
+      formData: {
+        "district_id": districtId,
+        "page": page,
+        "pagenum": pageNum,
+        "cAppId": cAppId,
+      },
+    );
+  }
+
+  static Future<KFBaseResp> mediationApply(
+    String districtId,
+    String cAppId,
+    String acceptUserName,
+    String acceptUserId,
+    String title,
+    String description,
+    String address,
+    List<String> images,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/custRoomApi/applyMediateAdd",
+      processor: (s) {
+        return null;
+      },
+      formData: {
+        "district_id": districtId,
+        "accept_user_name": acceptUserName,
+        "accept_user_id": acceptUserId,
+        "cAppId": cAppId,
+        "title": title,
+        "description": description,
+        "address": address,
+        "images": images,
+      },
     );
   }
 }

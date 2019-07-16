@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:ease_life/res/configs.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/persistance/db_manager.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
@@ -108,7 +108,7 @@ class Msg {
 
 enum MessageType { TEXT, IMAGE, AUDIO, VIDEO, COMMAND }
 
-class Message {
+class WSMessage {
   String content;
   MessageType type;
   ConnectStatus status;
@@ -124,7 +124,7 @@ class Message {
   String group;
   int sendTime;
 
-  Message(this.content,
+  WSMessage(this.content,
       {this.type = MessageType.TEXT,
       this.status,
       this.duration,
@@ -148,13 +148,13 @@ class WebSocketManager {
   ConnectStatus connectStatus = ConnectStatus.DISCONNECTED;
   StreamSubscription beatStreamSubscription;
 
-  WebSocketManager(dynamic group,BuildContext context) {
-    _commandController.add(Message("初始化聊天室",
+  WebSocketManager(dynamic group, BuildContext context) {
+    _commandController.add(WSMessage("初始化聊天室",
         type: MessageType.COMMAND, status: ConnectStatus.WAIT));
     //连接websocket
     try {
       //ws://220.191.225.209:7001 正式
-      _channel = IOWebSocketChannel.connect("ws://60.190.188.139:9508");
+      _channel = IOWebSocketChannel.connect(Configs.APP_DEBUG?"ws://60.190.188.139:9508":"ws://220.191.225.209:7001");
     } catch (e) {
       _sendDisconnectedCommand("连接聊天服务器失败");
     }
@@ -209,12 +209,12 @@ class WebSocketManager {
 
   ///发送连接失败信息
   void _sendDisconnectedCommand(String message) {
-    return _commandController.add(Message(message,
+    return _commandController.add(WSMessage(message,
         type: MessageType.COMMAND, status: ConnectStatus.DISCONNECTED));
   }
 
   void _sendReconnectedCommand(String message) {
-    return _commandController.add(Message(message,
+    return _commandController.add(WSMessage(message,
         type: MessageType.COMMAND, status: ConnectStatus.WAIT));
   }
 
@@ -236,7 +236,7 @@ class WebSocketManager {
           config.kfName = response.data.kfName;
           connectStatus = ConnectStatus.CONNECTED;
 
-          _commandController.add(Message("${response.toString()}",
+          _commandController.add(WSMessage("${response.toString()}",
               type: MessageType.COMMAND,
               status: ConnectStatus.CONNECTED,
               fromName: response.data.kfName,
@@ -260,11 +260,11 @@ class WebSocketManager {
               rawContent.endsWith("]")) {
             messageType = MessageType.IMAGE;
           }
-          var message = Message("${response.data.msg.content}",
+          var message = WSMessage("${response.data.msg.content}",
               type: messageType,
               status: ConnectStatus.CONNECTED,
               fromName: response.data.kfName,
-              fromAvatar: response.data.msg.avatar??"",
+              fromAvatar: response.data.msg.avatar ?? "",
               fromId: config.kfId,
               group: config.group,
               toId: config.userId,
@@ -285,7 +285,7 @@ class WebSocketManager {
   }
 
   ///发送一个消息
-  Future<bool> sendMessage(Message message) async {
+  Future<bool> sendMessage(WSMessage message) async {
     String data = "";
     bool success = false;
     if (message.type == MessageType.TEXT) {
@@ -309,7 +309,7 @@ class WebSocketManager {
       message.toId = config.kfId;
       message.fromName = config.userName;
       message.group = config.group;
-      message.fromAvatar = config.userAvatar??"";
+      message.fromAvatar = config.userAvatar ?? "";
       message.sendTime = DateTime.now().millisecondsSinceEpoch;
       print('------------$message');
       ChatMessageProvider().add(ChatMessage.fromMessage(message)).then((c) {
@@ -319,12 +319,12 @@ class WebSocketManager {
     return success;
   }
 
-  BehaviorSubject<Message> _commandController = BehaviorSubject();
-  BehaviorSubject<Message> _messageController = BehaviorSubject();
+  BehaviorSubject<WSMessage> _commandController = BehaviorSubject();
+  BehaviorSubject<WSMessage> _messageController = BehaviorSubject();
 
-  Observable<Message> get commandMessageStream => _commandController.stream;
+  Observable<WSMessage> get commandMessageStream => _commandController.stream;
 
-  Observable<Message> get messageStream => _messageController.stream;
+  Observable<WSMessage> get messageStream => _messageController.stream;
 
   ///登出
   void dispose() {

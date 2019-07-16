@@ -58,8 +58,7 @@ class UserVerifyStatusModel extends ChangeNotifier {
 
   StreamSubscription subscription;
 
-  void tryFetchVerifyStatusPeriodically(BuildContext context) {
-    _showHint(context);
+  Future tryFetchVerifyStatusPeriodically(BuildContext context) async {
     subscription?.cancel();
     tryFetchVerifyStatus().then((_) {
       subscription = Observable.periodic(
@@ -68,10 +67,11 @@ class UserVerifyStatusModel extends ChangeNotifier {
         tryFetchVerifyStatus();
       });
     });
+    return _showHint(context);
   }
 
-  void _showHint(BuildContext context) {
-    showDialog(
+  Future _showHint(BuildContext context) async {
+    return showDialog(
         barrierDismissible: true,
         context: context,
         builder: (context) {
@@ -121,5 +121,9 @@ class UserVerifyStatusModel extends ChangeNotifier {
 
   String getVerifyText() {
     return status?.getVerifyText() ?? "未认证";
+  }
+
+  bool isNotVerified() {
+    return (status?.code ?? -1) <= 0;
   }
 }

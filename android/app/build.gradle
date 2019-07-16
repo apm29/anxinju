@@ -65,9 +65,6 @@ android {
             ndk{
                 abiFilters 'armeabi-v7a','x86','arm64-v8a'
             }
-            manifestPlaceholders+=[
-                    "appName":"安心居测试"
-            ]
             applicationIdSuffix ".test"
             manifestPlaceholders += [
                     "appName":"安心居测试",
@@ -76,14 +73,26 @@ android {
                     JPUSH_CHANNEL : "developer-default-test", //暂时填写默认值即可.
 
                     AMAP_KEY:"3bbdc6e60e1d5a7d3b3065768ddf5d27",
+
+                    XG_ACCESS_ID    : '2100338246',
+                    XG_ACCESS_KEY   : 'AK4VLU28Z35H',
+                    XG_ACCESS_SCHEME: '信鸽统一打开APP行为SCHEME',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
+                    HW_APPID        : '100923553',
+                    XIAOMI_APPID    : '2882303761518057536',
+                    XIAOMI_APPKEY   : '5551805774536',
+                    PACKAGE_NAME    : "com.spark.zj.ease.life.test",// 小米通道
             ]
+
         }
         release {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
             ndk{
-                abiFilters 'armeabi-v7a'//,'x86','arm64-v8a'
+                //abiFilters 'armeabi-v7a,arm64-v8a'//,'x86','arm64-v8a'
+                //abiFilters 'armeabi-v7a'
+                abiFilters 'arm64-v8a'//'armeabi-v7a'//,'x86'//,
             }
+
             manifestPlaceholders += [
                     "appName":"安心居",
                     JPUSH_PKGNAME : "com.spark.zj.ease.life",
@@ -91,6 +100,14 @@ android {
                     JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
 
                     AMAP_KEY:"96169736f17c9c6a458012f744167f00",
+
+                    XG_ACCESS_ID    : '2100338440',
+                    XG_ACCESS_KEY   : 'A848BSWXD64I',
+                    XG_ACCESS_SCHEME: '信鸽统一打开APP行为SCHEME',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
+                    HW_APPID        : '100923807',
+                    XIAOMI_APPID    : '2882303761518057630',
+                    XIAOMI_APPKEY   : '5811805785630',
+                    PACKAGE_NAME    : "com.spark.zj.ease.life",// 小米通道
             ]
         }
     }

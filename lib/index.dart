@@ -20,7 +20,6 @@ export 'package:flutter_sms/flutter_sms.dart';
 export 'package:flutter_sound/flutter_sound.dart';
 export 'package:camera/camera.dart';
 export 'package:shared_preferences/shared_preferences.dart';
-export 'package:jpush_flutter/jpush_flutter.dart';
 export 'dart:async';
 export 'dart:convert';
 export 'dart:io';

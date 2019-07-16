@@ -10,8 +10,8 @@ import 'model/user_verify_status_model.dart';
 //  Color(0xfffebf1f),
 //];
 
-Future<File> showImageSourceDialog(
-    BuildContext context, VoidCallback onValue) async {
+Future<File> showImageSourceDialog(BuildContext context,
+    {VoidCallback onValue}) async {
   FocusScope.of(context).requestFocus(FocusNode());
   return showModalBottomSheet<File>(
       context: context,
@@ -57,7 +57,7 @@ Future<File> showImageSourceDialog(
               );
             });
       }).then((v) {
-    onValue();
+    if (onValue != null) onValue.call();
     return v;
   });
 }
@@ -69,8 +69,6 @@ Future<File> showPicker() {
 Future<File> showCameraPicker() {
   return ImagePicker.pickImage(source: ImageSource.camera);
 }
-
-void startAudioRecord() {}
 
 ///只能作用于带exif的image
 ///旋转Android图片并压缩
@@ -91,8 +89,12 @@ Future<File> rotateWithExifAndCompress(File file) async {
       return null;
     }
     //通过exif旋转图片
-    return FlutterExifRotation.rotateImage(path: file.path);
+    //return FlutterExifRotation.rotateImage(path: file.path);
+    return file;
   }).then((f) {
+    if (f == null) {
+      return null;
+    }
     //压缩图片
     return FlutterImageCompress.compressWithFile(
       f.path,
@@ -137,34 +139,8 @@ Widget buildVisitor(BuildContext context) {
   );
 }
 
-
-
 Future<Location> getLocation() async {
   return AMapLocation().getLocation(LocationClientOptions());
-}
-
-
-List<Index> indexInfo;
-
-Future<List<Index>> getIndex(bool refresh) {
-  return (refresh || indexInfo == null || indexInfo.length == 0)
-      ? Api.getIndex().then((v) {
-          indexInfo = v;
-          return v;
-        })
-      : Future.value(indexInfo);
-}
-
-void routeToWeb(BuildContext context, String id, Index index) {
-  var indexWhere = index.menu.indexWhere((i) => i.id == id);
-  if (indexWhere < 0) {
-    Fluttertoast.showToast(msg: "无效路由");
-    return;
-  }
-  var url = index.menu[indexWhere].url;
-  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-    return WebViewExample(url);
-  }));
 }
 
 ///选择住房 幢-单元-房间号
@@ -256,12 +232,6 @@ Widget buildCertificationDialog(BuildContext context, VoidCallback onCancel,
     ),
   );
 }
-
-
-
-
-
-
 
 GlobalKey<UpdateDialogState> updateDialogKey = GlobalKey();
 
@@ -372,7 +342,8 @@ Future showApplyHouseDialog(BuildContext context) async {
             ),
             FlatButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed(MemberApplyPage.routeName);
+                Navigator.of(context)
+                    .pushReplacementNamed(MemberApplyPage.routeName);
               },
               child: Text("前往申请"),
             ),
@@ -382,27 +353,58 @@ Future showApplyHouseDialog(BuildContext context) async {
 }
 
 Future showFaceVerifyDialog(BuildContext context) async {
+  var colorFaceButton = Colors.blue;
+
   return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("提醒"),
-          content: Text("您还未通过人脸对比,点击实名验证按钮前往认证"),
+          title: Text(
+            "人脸核验未通过,只能使用部分功能",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.blueGrey,
+            ),
+          ),
           actions: <Widget>[
             FlatButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("取消"),
+              textColor: Colors.blueGrey,
+              child: Text(
+                "暂不认证",
+                maxLines: 1,
+              ),
             ),
-            FlatButton(
-              onPressed: () {
+          ],
+          content: Container(
+            margin: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              border: Border.all(color: colorFaceButton),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            child: ListTile(
+              leading: Icon(
+                Icons.fingerprint,
+                size: 40,
+                color: colorFaceButton,
+              ),
+              title: Text("录入人脸照片",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: colorFaceButton)),
+              subtitle:
+                  Text("一键录入,简单高效", style: TextStyle(color: colorFaceButton)),
+              trailing: Icon(
+                Icons.arrow_forward,
+                color: colorFaceButton,
+              ),
+              onTap: () {
                 Navigator.of(context)
                     .pushReplacementNamed(UserDetailAuthPage.routeName);
               },
-              child: Text("实名验证"),
             ),
-          ],
+          ),
         );
       });
 }

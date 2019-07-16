@@ -43,7 +43,6 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
       body: Consumer<UserModel>(
         builder: (BuildContext context, UserModel userModel, Widget child) {
           bool isReAuth = (userModel.userDetail?.idCard ?? "").isNotEmpty;
-          print('${userModel.userDetail}');
           _idCardController.text = userModel.userDetail?.idCard;
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16),
