@@ -464,7 +464,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                           if (_streamSubscription != null)
                             _streamSubscription.cancel();
                           _streamSubscription = Observable.periodic(
-                              Duration(seconds: 2), (i) => i).listen((i) {
+                              Duration(seconds: 5), (i) => i).listen((i) {
                             imeConfig();
                           });
                         }
@@ -750,11 +750,10 @@ class _WebViewExampleState extends State<WebViewExample> {
     bool refocus = data['refocus'] as bool;
     if (_focusNode2.hasFocus) {
       if (!refocus) FocusScope.of(context).requestFocus(_focusNode1);
-      //FocusScope.of(context).requestFocus(_focusNode);
-      //if (!_focusNode1.hasFocus) {
-      //  //hideAndroidKeyboard();
-      //  showAndroidKeyboard();
-      //}
+      if (!_focusNode1.hasFocus) {
+        //hideAndroidKeyboard();
+        showAndroidKeyboard();
+      }
       //把初始文本设置给隐藏TextField
       String initText = data['initText'];
       var selectionStart = data['selectionStart'];
@@ -776,11 +775,10 @@ class _WebViewExampleState extends State<WebViewExample> {
       FocusScope.of(context).requestFocus(_focusNode1);
     } else {
       if (!refocus) FocusScope.of(context).requestFocus(_focusNode2);
-      //FocusScope.of(context).requestFocus(_focusNode);
-      //if (!_focusNode2.hasFocus) {
-      //  //hideAndroidKeyboard();
-      //  showAndroidKeyboard();
-      //}
+      if (!_focusNode2.hasFocus) {
+        //hideAndroidKeyboard();
+        showAndroidKeyboard();
+      }
       //把初始文本设置给隐藏TextField
       String initText = data['initText'];
       var selectionStart = data['selectionStart'];

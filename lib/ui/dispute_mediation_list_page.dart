@@ -147,7 +147,7 @@ class _MediationListPageState extends State<MediationListPage>
           },
           child: ListTile(
             title: Text("${data.title}(${data.result})"),
-            subtitle: Text(data.description),
+            subtitle: Text(data.description??""),
             contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
             leading: Icon(
               data.mediationFinished ? Icons.check : Icons.access_time,
@@ -585,6 +585,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                                     value.images,
                                   );
                                   if (kfBaseResp.success) {
+                                    value.reset();
                                     Navigator.of(context).pop();
                                   }
                                   showToast(kfBaseResp.text);

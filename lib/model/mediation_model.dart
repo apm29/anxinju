@@ -50,7 +50,7 @@ class MediationRunningModel extends ChangeNotifier {
       page += 1;
     }
     loading = false;
-
+    print('$running');
     notifyListeners();
   }
 }
@@ -209,5 +209,11 @@ class MediationApplicationAddModel extends ChangeNotifier {
       showToast("调解人不可为空");
     }
     return name;
+  }
+
+  void reset() {
+    _mediatorList = [];
+    _images = [];
+    _current = null;
   }
 }

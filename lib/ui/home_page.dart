@@ -1,6 +1,7 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/announcement_model.dart';
 import 'package:ease_life/model/district_model.dart';
+import 'package:ease_life/model/user_verify_status_model.dart';
 
 import 'dispute_mediation_list_page.dart';
 import 'dispute_mediation_page.dart';
@@ -281,6 +282,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         title: "纠纷调解",
                         checkLogin: true,
                         onPressed: () {
+                          var userVerifyStatusModel =
+                              UserVerifyStatusModel.of(context);
+                          if (!userVerifyStatusModel.isVerified()) {
+                            showFaceVerifyDialog(context);
+                            return;
+                          }
+                          if (!userVerifyStatusModel.hasHouse()) {
+                            showApplyHouseDialog(context);
+                            return;
+                          }
                           Navigator.of(context)
                               .pushNamed(MediationListPage.routeName);
                         },
@@ -334,7 +345,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 indicatorColor: const Color(0xFFCD0004),
                 mainTitle: "共建共享",
                 subTitle: "Co-construction & Sharing",
-                onPressed: (){
+                onPressed: () {
                   Navigator.of(context).pushNamed(MediationApplyPage.routeName);
                 },
               ),
