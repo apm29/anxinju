@@ -67,7 +67,6 @@ class _FaceIdPageState extends State<FaceIdPage> {
           ? Stack(
               children: <Widget>[
                 LayoutBuilder(builder: (_, constraint) {
-                  print('$constraint');
                   return SizedBox(
                     width: constraint.biggest.width,
                     child: AspectRatio(
@@ -83,7 +82,6 @@ class _FaceIdPageState extends State<FaceIdPage> {
                 Align(
                   alignment: Alignment.topCenter,
                   child: LayoutBuilder(builder: (_, constraint) {
-                    print('$constraint');
                     return SizedBox(
                       width: constraint.biggest.width,
                       child: ClipOval(
@@ -198,7 +196,6 @@ class _FaceIdPageState extends State<FaceIdPage> {
     faceRecognizeKey.currentState.stopLoading();
     Fluttertoast.showToast(msg: baseResponse.text);
     if (baseResponse.success) {
-      print(baseResponse.text);
       //Navigator.of(context).pop(baseResponse.text);
       UserVerifyInfo userVerifyInfo = baseResponse.data;
 
@@ -240,10 +237,11 @@ class _FaceIdPageState extends State<FaceIdPage> {
                 content: Text("您的名下没有${Strings.roomClass}"),
                 actions: <Widget>[
                   FlatButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("返回主页")),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("返回主页"),
+                  ),
                   FlatButton(
                       onPressed: () {
                         Navigator.of(context)
@@ -284,7 +282,8 @@ class _FaceIdPageState extends State<FaceIdPage> {
       UserRoleModel.of(context).tryFetchUserRoleTypes();
       DistrictModel.of(context).tryFetchCurrentDistricts();
     }
-    await UserVerifyStatusModel.of(context).tryFetchVerifyStatusPeriodically(context);
+    await UserVerifyStatusModel.of(context)
+        .tryFetchVerifyStatusPeriodically(context);
     Navigator.of(context)
         .popUntil((r) => r.settings.name == MainPage.routeName);
   }

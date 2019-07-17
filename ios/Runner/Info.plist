@@ -73,11 +73,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>XG_ACCESS_ID</key>
+	<string>2200338779</string>
+	<key>XG_ACCESS_KEY</key>
+	<string>I79GQQ2DY51P</string>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-	<key>XG_ACCESS_ID</key>
-    <string>2200338779</string>
-    <key>XG_ACCESS_KEY</key>
-    <string>I79GQQ2DY51P</string>
 </dict>
 </plist>

@@ -328,12 +328,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         indexId: WebIndexID.JING_WU_CHA_XUN,
                         checkIsFaceVerified: false,
                       ),
-                      HomeChip(
-                        title: "巡更管理",
-                        indexId: WebIndexID.XUN_GENG_GUAN_LI,
-                        checkHasHouse: true,
-                        checkIsFaceVerified: false,
-                      ),
+                      //HomeChip(
+                      //  title: "巡更管理",
+                      //  indexId: WebIndexID.XUN_GENG_GUAN_LI,
+                      //  checkHasHouse: true,
+                      //  checkIsFaceVerified: false,
+                      //),
                     ],
                   ),
                 ),
@@ -387,7 +387,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
             SliverToBoxAdapter(
               child: Container(
-                height: 10,
+                height: 50,
               ),
             ),
           ],

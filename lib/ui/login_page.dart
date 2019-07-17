@@ -315,7 +315,6 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
             cancelToken: cancelToken);
     loadingLoginKey.currentState?.stopLoading();
     Fluttertoast.showToast(msg: baseResp.text);
-    print('$baseResp');
     if (baseResp.success) {
       UserModel.of(context)
           .login(baseResp.data.userInfo, baseResp.token, context);

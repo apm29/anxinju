@@ -63,7 +63,6 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
           builder: (BuildContext context, DistrictModel model, Widget child) {
             return BottomSheet(
               onClosing: () {
-                print('onClose');
               },
               builder: (context) {
                 if (!model.hasData) {

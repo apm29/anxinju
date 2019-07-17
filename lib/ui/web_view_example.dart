@@ -442,10 +442,6 @@ class _WebViewExampleState extends State<WebViewExample> {
                         print('allowing navigation to $request');
                         if (_streamSubscription != null)
                           _streamSubscription.cancel();
-//            if(!request.url.startsWith("http")){
-//              return NavigationDecision.prevent;
-//            }
-//                _focusNode.unfocus();
                         return NavigationDecision.navigate;
                       },
                       onPageFinished: (String url) {
@@ -461,13 +457,13 @@ class _WebViewExampleState extends State<WebViewExample> {
                           titleController.add(title);
                         });
                         if (Platform.isAndroid) {
-                          imeConfig();
-                          if (_streamSubscription != null)
-                            _streamSubscription.cancel();
-                          _streamSubscription = Observable.periodic(
-                              Duration(seconds: 5), (i) => i).listen((i) {
-                            imeConfig();
-                          });
+                          //imeConfig();
+                          //if (_streamSubscription != null)
+                          //  _streamSubscription.cancel();
+                          //_streamSubscription = Observable.periodic(
+                          //    Duration(seconds: 5), (i) => i).listen((i) {
+                          //  imeConfig();
+                          //});
                         }
                       },
                     ),
@@ -695,7 +691,6 @@ class _WebViewExampleState extends State<WebViewExample> {
       if (v != null && v is ImageDetail) {
         var javascriptString =
             "${jsonMap['callbackName']}('${v.orginPicPath}','${v.thumbnailPath}')";
-        print("======>$javascriptString");
         controller.evaluateJavascript(javascriptString);
       } else {
         var javascriptStringCancel = "${jsonMap['callbackCancel']}()";
@@ -793,7 +788,6 @@ class _WebViewExampleState extends State<WebViewExample> {
       if (selectionStart is int) {
         start = selectionEnd;
       }
-      print(selectionEnd);
       textController2.value = TextEditingValue(
         text: initText,
         selection: TextSelection(baseOffset: start, extentOffset: end),
@@ -804,9 +798,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
-    showImageSourceDialog(context, onValue: () {
-      FocusScope.of(context).requestFocus(FocusNode());
-    }).then((file) {
+    showImageSourceDialog(context,).then((file) {
       processFileAndNotify(file, callbackName);
     });
   }
@@ -926,7 +918,6 @@ class _WebViewExampleState extends State<WebViewExample> {
    * 显示Alert对话框
    */
   void doShowAlertDialog(Map<String, dynamic> data, BuildContext context) {
-    print("showAlert");
     String content = data['content'];
     String title = data['title'];
     String callbackName = data['callbackName'];
@@ -949,7 +940,6 @@ class _WebViewExampleState extends State<WebViewExample> {
         }).then((param) {
       FocusScope.of(context).requestFocus(FocusNode());
       var javascriptString = '$callbackName("$param")';
-      print(javascriptString);
       controller.evaluateJavascript(javascriptString);
     });
   }

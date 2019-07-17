@@ -36,7 +36,7 @@ android {
         applicationId "com.spark.zj.ease.life"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode flutterVersionCode.toInteger()
+        versionCode flutterVersionCode.toInteger() *10000 + Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

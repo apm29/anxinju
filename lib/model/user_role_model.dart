@@ -22,7 +22,6 @@ class UserRoleModel extends ChangeNotifier {
     return Api.getUserTypeWithOutId().then((resp) {
       if (resp.success) {
         types = resp.data;
-        print('${types.join()}');
       }
       return null;
     });

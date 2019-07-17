@@ -103,19 +103,21 @@ class MainPageState extends State<MainPage> {
                   (BuildContext context, UserModel userModel, Widget child) {
                 return Offstage(
                   offstage: !userModel.isLogin,
-                  child: FloatingActionButton(
+                  child: FloatingActionButton.extended(
                     onPressed: () {
                       Navigator.of(context).pushNamed(
                         ChatRoomPage.routeName,
                         arguments: {"group": "25", "title": "紧急呼叫"},
                       );
                     },
-                    mini: true,
-                    child: Icon(Icons.call),
+                    isExtended: true,
+                    icon: Icon(Icons.chat),
+                    label: Text("紧急呼叫"),
                   ),
                 );
               },
             ),
+            floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             bottomNavigationBar:
                 buildBottomNavigationBar(indexModel.currentIndex),

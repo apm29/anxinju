@@ -1,4 +1,5 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/model/app_info_model.dart';
 import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
@@ -66,7 +67,7 @@ class _MinePageState extends State<MinePage> {
     bool notVerify = userVerifyStatusModel.isNotVerified();
     bool hasHouse = userVerifyStatusModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();
-    bool hasRecordPermission = roleModel.hasSocietyRecordPermission();
+    bool hasRecordPermission = false;//roleModel.hasSocietyRecordPermission();
     String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
     String url = userModel.userDetail?.avatar;
     String userName =
@@ -355,11 +356,13 @@ class _MinePageState extends State<MinePage> {
                                     FlatButton(
                                         onPressed: () {
                                           Navigator.of(context).pop();
-                                        }, child: Text("取消")),
+                                        },
+                                        child: Text("取消")),
                                     FlatButton(
                                         onPressed: () {
-                                          if(Navigator.of(context).pop()){
-                                            UserModel.of(context).logout(context);
+                                          if (Navigator.of(context).pop()) {
+                                            UserModel.of(context)
+                                                .logout(context);
                                           }
                                         },
                                         child: Text("退出")),
@@ -373,6 +376,17 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Consumer<AppInfoModel>(
+                  builder:
+                      (BuildContext context, AppInfoModel value, Widget child) {
+                    return Center(
+                      child: Text(value.appInfoString,style: Theme.of(context).textTheme.caption,),
+                    );
+                  },
                 ),
                 SizedBox(
                   height: 50,

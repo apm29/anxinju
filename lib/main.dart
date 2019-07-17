@@ -6,6 +6,7 @@ import 'package:oktoast/oktoast.dart';
 
 import 'index.dart';
 import 'model/announcement_model.dart';
+import 'model/app_info_model.dart';
 import 'model/district_model.dart';
 import 'model/home_end_scroll_model.dart';
 import 'model/main_index_model.dart';
@@ -166,7 +167,8 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider.value(value: UserVerifyStatusModel()),
           ChangeNotifierProvider.value(value: UserRoleModel()),
           ChangeNotifierProvider.value(value: MessageModel()),
-          ChangeNotifierProvider.value(value: ChatRoomPageStatusModel())
+          ChangeNotifierProvider.value(value: ChatRoomPageStatusModel()),
+          ChangeNotifierProvider.value(value: AppInfoModel()),
         ],
         child: MaterialApp(
           theme: defaultThemeData,
