@@ -40,7 +40,9 @@ class DistrictModel extends ChangeNotifier {
     }
     _currentDistrict = newValue;
     userSp.setInt(
-        KEY_CURRENT_DISTRICT_INDEX, _allDistrictList.indexOf(_currentDistrict));
+      KEY_CURRENT_DISTRICT_INDEX,
+      _allDistrictList.indexOf(_currentDistrict),
+    );
     if (old != null) {
       showToast("切换小区成功 ${_currentDistrict.districtName}",
           dismissOtherToast: true);
@@ -100,7 +102,7 @@ class DistrictModel extends ChangeNotifier {
     return _mCurrentDistrict == allDistricts[index];
   }
 
-  void selectCurrentDistrict(int index, BuildContext context) async{
+  void selectCurrentDistrict(int index, BuildContext context) async {
     _mCurrentDistrict = allDistricts[index];
     UserVerifyStatusModel.of(context).tryFetchHouseList(getCurrentDistrictId());
 
@@ -116,6 +118,6 @@ class DistrictModel extends ChangeNotifier {
   }
 
   int countOfDistricts() {
-    return allDistricts?.length??0;
+    return allDistricts?.length ?? 0;
   }
 }

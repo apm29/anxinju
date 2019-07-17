@@ -79,6 +79,8 @@ dependencies:
   oktoast: ^2.1.9
   fake_push: ^0.5.0
 
+  url_launcher: ^ 5.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

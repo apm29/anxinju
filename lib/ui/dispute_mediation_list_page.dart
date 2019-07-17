@@ -28,42 +28,63 @@ class _MediationListPageState extends State<MediationListPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("纠纷调解"),
-        actions: <Widget>[
-          Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                onPressed: () {
-                  _doAddApply(context).then((_) {
-                    MediationApplyModel.of(context)
-                        .getApplyMediation(context, true);
-                  });
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor: Colors.blue,
+            title: Text(
+              "纠纷调解",
+              style: TextStyle(color: Colors.white),
+            ),
+            brightness: Brightness.dark,
+            iconTheme: IconThemeData(color: Colors.white),
+            actions: <Widget>[
+              Builder(
+                builder: (BuildContext context) {
+                  return IconButton(
+                    onPressed: () {
+                      _doAddApply(context).then((_) {
+                        MediationApplyModel.of(context)
+                            .getApplyMediation(context, true);
+                      });
+                    },
+                    icon: Icon(Icons.add),
+                    tooltip: "添加纠纷调解申请",
+                  );
                 },
-                icon: Icon(Icons.add),
-                tooltip: "添加纠纷调解申请",
-              );
-            },
-          )
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          TabBar(
-            controller: _tabController,
-            tabs: [
-              Tab(
-                text: "进行中",
-              ),
-              Tab(
-                text: "已完成",
-              ),
-              Tab(
-                text: "申请列表",
-              ),
+              )
             ],
+            elevation: 4,
+            forceElevated: true,
+            floating: true,
+            bottom: TabBar(
+              controller: _tabController,
+              indicatorColor: Colors.deepOrangeAccent,
+              labelColor: Colors.white,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  )),
+              tabs: [
+                Tab(
+                  text: "进行中",
+                  icon: Icon(Icons.av_timer, color: Colors.white),
+                ),
+                Tab(
+                  text: "已完成",
+                  icon: Icon(Icons.check, color: Colors.white),
+                ),
+                Tab(
+                  text: "申请列表",
+                  icon: Icon(Icons.list, color: Colors.white),
+                ),
+              ],
+              isScrollable: true,
+            ),
           ),
-          Expanded(
+          SliverFillRemaining(
             child: Consumer3<MediationHistoryModel, MediationRunningModel,
                 MediationApplyModel>(
               builder: (BuildContext context,
@@ -147,7 +168,7 @@ class _MediationListPageState extends State<MediationListPage>
           },
           child: ListTile(
             title: Text("${data.title}(${data.result})"),
-            subtitle: Text(data.description??""),
+            subtitle: Text(data.description ?? ""),
             contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
             leading: Icon(
               data.mediationFinished ? Icons.check : Icons.access_time,
@@ -357,8 +378,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
-  
-  
+
   @override
   void initState() {
     super.initState();
@@ -367,17 +387,17 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
     _titleController.text = model.title;
     _descController.text = model.desc;
     _addressController.text = model.address;
-    _titleController.addListener((){
+    _titleController.addListener(() {
       model.title = _titleController.text;
     });
-    _descController.addListener((){
+    _descController.addListener(() {
       model.desc = _descController.text;
     });
-    _addressController.addListener((){
+    _addressController.addListener(() {
       model.address = _addressController.text;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

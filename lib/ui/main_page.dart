@@ -5,6 +5,7 @@ import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const int PAGE_HOME = 0;
 const int PAGE_SEARCH = 11;

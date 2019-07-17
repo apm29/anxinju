@@ -362,6 +362,7 @@ class _AudioMessageTileState extends State<AudioMessageTile> {
           if (messageLength > MediaQuery.of(context).size.width / 1.5) {
             messageLength = MediaQuery.of(context).size.width / 1.5;
           }
+          bool noDuration = widget.duration == null || widget.duration  == 0;
           return GestureDetector(
             onTap: () {
               if (playing) {
@@ -372,7 +373,7 @@ class _AudioMessageTileState extends State<AudioMessageTile> {
             },
             child: Container(
               constraints: BoxConstraints.tight(
-                  Size(messageLength, ScreenUtil().setHeight(130))),
+                  Size(noDuration?double.infinity:messageLength, ScreenUtil().setHeight(130))),
               decoration: BoxDecoration(
                   color: playing
                       ? Colors.lightBlueAccent

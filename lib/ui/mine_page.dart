@@ -67,7 +67,7 @@ class _MinePageState extends State<MinePage> {
     bool notVerify = userVerifyStatusModel.isNotVerified();
     bool hasHouse = userVerifyStatusModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();
-    bool hasRecordPermission = false;//roleModel.hasSocietyRecordPermission();
+    bool hasRecordPermission = roleModel.hasSocietyRecordPermission();
     String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
     String url = userModel.userDetail?.avatar;
     String userName =

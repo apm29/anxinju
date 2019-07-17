@@ -1,3 +1,6 @@
+import 'package:oktoast/oktoast.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'index.dart';
 import 'model/main_index_model.dart';
 import 'model/user_model.dart';
@@ -423,4 +426,13 @@ Future showFaceVerifyDialog(BuildContext context) async {
           ),
         );
       });
+}
+
+
+Future makePhoneCall(String number)async{
+  var urlString = "tel:$number";
+  if(await canLaunch(urlString)){
+    return launch(urlString,enableJavaScript: true,enableDomStorage: true);
+  }
+  return showToast("无法呼叫 $number");
 }
