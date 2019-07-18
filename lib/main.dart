@@ -207,14 +207,14 @@ class MyApp extends StatelessWidget {
                 ),
             MediationListPage.routeName: (context) => MultiProvider(
                   providers: [
-                    ChangeNotifierProvider.value(
-                      value: MediationHistoryModel(context),
+                    ChangeNotifierProvider(
+                      builder: (context)=>MediationHistoryModel(context),
                     ),
-                    ChangeNotifierProvider.value(
-                      value: MediationRunningModel(context),
+                    ChangeNotifierProvider(
+                      builder: (context)=>MediationRunningModel(context),
                     ),
-                    ChangeNotifierProvider.value(
-                      value: MediationApplyModel(context),
+                    ChangeNotifierProvider(
+                      builder: (context)=>MediationApplyModel(context),
                     ),
                   ],
                   child: MediationListPage(),

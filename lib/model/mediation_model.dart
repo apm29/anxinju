@@ -170,15 +170,15 @@ class MediationApplicationAddModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  UserInfo _current;
+  UserInfo _currentMediator;
 
-  UserInfo get currentUser => _current;
+  UserInfo get currentMediator => _currentMediator;
 
-  set currentUser(UserInfo value) {
+  set currentMediator(UserInfo value) {
     if (_mediatorList == null || _mediatorList.length == 0) {
       getMediatorList();
     }
-    _current = value;
+    _currentMediator = value;
     notifyListeners();
   }
 
@@ -197,10 +197,10 @@ class MediationApplicationAddModel extends ChangeNotifier {
   HouseDetail _currentHouse;
 
 
-  UserInfo get current => _current;
+  UserInfo get current => _currentMediator;
 
   set current(UserInfo value) {
-    _current = value;
+    _currentMediator = value;
   }
 
   List<HouseDetail> get houseList => _houseList;
@@ -232,7 +232,7 @@ class MediationApplicationAddModel extends ChangeNotifier {
   }
 
   bool validate() {
-    var name = currentUser != null;
+    var name = currentMediator != null;
     if (!name) {
       showToast("调解人不可为空");
     }
@@ -241,7 +241,7 @@ class MediationApplicationAddModel extends ChangeNotifier {
 
   void reset() {
     _images = [];
-    _current = null;
+    _currentMediator = null;
     address =null;
     title =null;
     desc =null;

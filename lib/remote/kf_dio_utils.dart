@@ -131,7 +131,7 @@ class KfDioUtil {
             (count, total) {
           ///默认发送进度
         };
-    print('$path');
+    print('${Configs.KFBaseUrl}$path');
     ToastFuture toastFuture;
     if (showProgress) {
       toastFuture = showLoadingWidget(loadingText);

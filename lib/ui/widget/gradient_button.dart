@@ -10,11 +10,15 @@ class GradientButton extends StatefulWidget {
   final PressCallback onPressed;
   final bool unconstrained;
 
+  final double borderRadius;
+
+  final EdgeInsetsGeometry padding;
+
   GradientButton(
     this.child, {
     this.gradient,
     @required this.onPressed,
-    this.unconstrained = true,
+    this.unconstrained = true, this.borderRadius = 3, this.padding,
   }) : assert(onPressed != null);
 
   @override
@@ -50,7 +54,7 @@ class _GradientButtonState extends State<GradientButton> {
                 blurRadius: 1.5,
               ),
             ],
-            borderRadius: BorderRadius.all(Radius.circular(3))),
+            borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius))),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -86,7 +90,7 @@ class _GradientButtonState extends State<GradientButton> {
                           constraints:
                               BoxConstraints(minHeight: 32.0, minWidth: 72.0),
                           padding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                              widget.padding??EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                         ),
                       ),
                       opacity: _loading ? 0 : 1,
