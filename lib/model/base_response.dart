@@ -89,13 +89,12 @@ class UserInfo {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is UserInfo &&
-              runtimeType == other.runtimeType &&
-              userId == other.userId;
+      other is UserInfo &&
+          runtimeType == other.runtimeType &&
+          userId == other.userId;
 
   @override
   int get hashCode => userId.hashCode;
-
 }
 
 class DistrictDetail {
@@ -507,8 +506,17 @@ class HouseDetail {
     data['passCode'] = this.passCode;
     return data;
   }
-}
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HouseDetail &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
+}
 
 class AudioUploadInfo {
   String key;
@@ -541,8 +549,8 @@ class UserVerifyStatus {
   ///
   int code;
 
-  String getDesc(){
-    switch(code){
+  String getDesc() {
+    switch (code) {
       case 0:
         return "未认证";
       case 1:
@@ -574,17 +582,17 @@ class UserVerifyStatus {
     return data;
   }
 
-  bool hasHouse(){
-    return code == 1 || code == 3 || code == 5 ;
+  bool hasHouse() {
+    return code == 1 || code == 3 || code == 5;
   }
 
-  bool isVerified(){
-    return code == 3 || code == 4 ;
+  bool isVerified() {
+    return code == 3 || code == 4;
   }
 
-  String getVerifyText(){
+  String getVerifyText() {
     String text;
-    switch(code){
+    switch (code) {
       case 0:
         text = "未认证";
         break;
@@ -621,14 +629,12 @@ class UserVerifyStatus {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is UserVerifyStatus &&
-              runtimeType == other.runtimeType &&
-              code == other.code;
+      other is UserVerifyStatus &&
+          runtimeType == other.runtimeType &&
+          code == other.code;
 
   @override
   int get hashCode => code.hashCode;
-
-
 }
 
 class NotificationMessage {
@@ -642,12 +648,12 @@ class NotificationMessage {
 
   NotificationMessage(
       {this.id,
-        this.userId,
-        this.sendMsg,
-        this.title,
-        this.type,
-        this.picUrl,
-        this.createTime});
+      this.userId,
+      this.sendMsg,
+      this.title,
+      this.type,
+      this.picUrl,
+      this.createTime});
 
   NotificationMessage.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -671,4 +677,3 @@ class NotificationMessage {
     return data;
   }
 }
-

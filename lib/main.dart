@@ -154,7 +154,6 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider.value(value: AnnouncementModel()),
           ChangeNotifierProvider.value(value: AppThemeModel()),
           ChangeNotifierProvider.value(value: DistrictModel()),
-          ChangeNotifierProvider.value(value: MediationApplicationAddModel()),
           ChangeNotifierProvider.value(value: HomeEndScrollModel()),
           ListenableProvider<NotificationModel>(
             builder: (BuildContext context) {
@@ -220,7 +219,9 @@ class MyApp extends StatelessWidget {
                   ],
                   child: MediationListPage(),
                 ),
-            MediationApplyPage.routeName: (context) => MediationApplyPage(),
+            MediationApplyPage.routeName: (context) => ChangeNotifierProvider(child: MediationApplyPage(),builder: (context){
+              return MediationApplicationAddModel(context);
+            },),
           },
         ),
       ),

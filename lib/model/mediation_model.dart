@@ -151,8 +151,9 @@ class MediationApplyModel extends ChangeNotifier {
 }
 
 class MediationApplicationAddModel extends ChangeNotifier {
-  MediationApplicationAddModel() {
+  MediationApplicationAddModel(BuildContext context) {
     getMediatorList();
+    getHouseList(context);
   }
 
   
@@ -191,6 +192,23 @@ class MediationApplicationAddModel extends ChangeNotifier {
   }
 
   List<String> _images = [];
+  List<HouseDetail> _houseList = [];
+
+  HouseDetail _currentHouse;
+
+
+  UserInfo get current => _current;
+
+  set current(UserInfo value) {
+    _current = value;
+  }
+
+  List<HouseDetail> get houseList => _houseList;
+
+  set houseList(List<HouseDetail> value) {
+    _houseList = value;
+    notifyListeners();
+  }
 
   List<String> get images => _images;
 
@@ -229,7 +247,25 @@ class MediationApplicationAddModel extends ChangeNotifier {
     desc =null;
   }
 
+  void getHouseList(BuildContext context) async{
+    var districtId = DistrictModel.of(context).getCurrentDistrictId();
+    var resp = await Api.getMyHouse(districtId);
+    if(resp.success){
+      houseList.clear();
+      houseList.addAll(resp.data);
+      notifyListeners();
+    }
+  }
+
   static MediationApplicationAddModel of(BuildContext context) {
     return Provider.of<MediationApplicationAddModel>(context,listen: false);
   }
+
+  HouseDetail get currentHouse => _currentHouse;
+
+  set currentHouse(HouseDetail value) {
+    _currentHouse = value;
+    notifyListeners();
+  }
+
 }

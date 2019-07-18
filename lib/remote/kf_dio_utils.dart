@@ -550,8 +550,8 @@ class MediationApply {
     address = json['address'];
   }
 
-  static const List<Color> colorList = [
-    Colors.redAccent,
+  static  final List<Color> colorList = [
+    Colors.deepOrange[400],
     Colors.lightGreen,
     Colors.lightBlue,
     Colors.deepOrange,

@@ -2,6 +2,7 @@ import 'package:ease_life/index.dart';
 import 'package:ease_life/model/mediation_model.dart';
 import 'package:ease_life/remote/kf_dio_utils.dart';
 import 'package:ease_life/ui/widget/gradient_button.dart';
+import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:ease_life/model/district_model.dart';
 import 'dispute_mediation_page.dart';
@@ -149,7 +150,17 @@ class _MediationListPageState extends State<MediationListPage>
     );
   }
 
+  final dateFormat = DateFormat("yyyy-MM-dd HH:mm");
+
   Widget _buildMediationTile(MediationRecord data) {
+    var title = (data.title == null || data.title.isEmpty) ? "无标题" : data.title;
+    var result = (data.mediationFinished) ? data.result : "未完成";
+    var desc = (data.description == null || data.description.isEmpty)
+        ? "未提交描述信息"
+        : data.description;
+
+    var time = dateFormat.format(
+        DateTime.fromMillisecondsSinceEpoch(int.parse(data.startTime) * 1000));
     return Container(
       margin: EdgeInsets.all(4),
       child: Material(
@@ -162,20 +173,19 @@ class _MediationListPageState extends State<MediationListPage>
               return DisputeMediationPage(
                 chatRoomId: data.chatRoomId,
                 isFinished: data.mediationFinished,
-                title: data.title,
+                title: title,
               );
             }));
           },
           child: ListTile(
-            title: Text("${data.title}(${data.result})"),
-            subtitle: Text(data.description ?? ""),
+            title: Text("$title($result)"),
+            subtitle: Text("开始时间:$time"),
             contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
             leading: Icon(
               data.mediationFinished ? Icons.check : Icons.access_time,
               color: Colors.lightGreen,
             ),
-            trailing: Text(
-                "开始时间:${DateTime.fromMillisecondsSinceEpoch(int.parse(data.startTime) * 1000)}"),
+            trailing: Text(desc),
           ),
         ),
       ),
@@ -271,61 +281,79 @@ class _MediationListPageState extends State<MediationListPage>
         color: Colors.white,
         elevation: 1,
         borderRadius: BorderRadius.all(Radius.circular(5)),
-        child: InkWell(
-          onTap: () {},
-          child: Container(
-              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+        child: Container(
+            padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            child: Theme(
+              data:
+                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                title: Column(
+                backgroundColor: Colors.white,
+                trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          data.title,
-                          style: Theme.of(context).textTheme.title,
-                        ),
-                        Expanded(child: Container()),
-                        Text(
-                          data.statusString,
-                          style: TextStyle(color: data.statusColor),
-                        ),
-                      ],
+                    Text(
+                      "点击查看详情",
+                      style: Theme.of(context).textTheme.caption,
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text("申请人: "),
-                        Text(data.applyUserName),
-                        Expanded(child: Container()),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text("申请时间: "),
-                        Text(data.date),
-                        Expanded(child: Container()),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text("申请人地址: "),
-                        Text(data.address),
-                        Expanded(child: Container()),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text("受理人: "),
-                        Text(data.acceptUserName),
-                        Expanded(child: Container()),
-                      ],
-                    ),
+                    Icon(Icons.expand_more)
                   ],
+                ),
+                title: DefaultTextStyle(
+                  style: Theme.of(context).textTheme.caption,
+                  overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text.rich(
+                        TextSpan(
+                          style: Theme.of(context).textTheme.subtitle,
+                          text: data.title,
+                          children: [
+                            TextSpan(
+                              text: "(${data.statusString})",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle
+                                  .copyWith(color: data.statusColor),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text("申请人: "),
+                          Text(data.applyUserName),
+                          Expanded(child: Container()),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text("申请时间: "),
+                          Text(data.date),
+                          Expanded(child: Container()),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text("申请人地址: "),
+                          Text(data.address),
+                          Expanded(child: Container()),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text("受理人: "),
+                          Text(data.acceptUserName),
+                          Expanded(child: Container()),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 children: <Widget>[
                   Row(
@@ -341,12 +369,23 @@ class _MediationListPageState extends State<MediationListPage>
                         child: Wrap(
                           alignment: WrapAlignment.start,
                           children: data.images.map((url) {
-                            return SizedBox(
-                              height: MediaQuery.of(context).size.width / 4,
-                              width: MediaQuery.of(context).size.width / 4,
-                              child: Image.network(
-                                url,
-                                fit: BoxFit.cover,
+                            return InkWell(
+                              onTap: () {
+                                Navigator.of(context)
+                                    .push(MaterialPageRoute(builder: (context) {
+                                  return PicturePage(url);
+                                }));
+                              },
+                              child: SizedBox(
+                                height: MediaQuery.of(context).size.width / 4,
+                                width: MediaQuery.of(context).size.width / 4,
+                                child: Hero(
+                                  tag: url,
+                                  child: Image.network(
+                                    url,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
                             );
                           }).toList(),
@@ -355,8 +394,8 @@ class _MediationListPageState extends State<MediationListPage>
                     ],
                   )
                 ],
-              )),
-        ),
+              ),
+            )),
       ),
     );
   }
@@ -382,20 +421,6 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
   @override
   void initState() {
     super.initState();
-    var model = MediationApplicationAddModel.of(context);
-    model.getMediatorList();
-    _titleController.text = model.title;
-    _descController.text = model.desc;
-    _addressController.text = model.address;
-    _titleController.addListener(() {
-      model.title = _titleController.text;
-    });
-    _descController.addListener(() {
-      model.desc = _descController.text;
-    });
-    _addressController.addListener(() {
-      model.address = _addressController.text;
-    });
   }
 
   @override
@@ -412,234 +437,268 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
             child: Form(
               autovalidate: true,
               key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
+              child: Material(
+                elevation: 1,
+                color: Colors.white,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 18),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                        constraints: BoxConstraints(minWidth: 122),
-                        child: Text("调解标题:"),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          key: ValueKey("title"),
-                          validator: (s) =>
-                              (s.length >= 4) ? null : "标题长度必须大于等于4个字符",
-                          decoration: InputDecoration(
-                            helperText: "标题",
-                          ),
-                          controller: _titleController,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        constraints: BoxConstraints(minWidth: 122),
-                        child: Text("调解描述:"),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          key: ValueKey("desc"),
-                          validator: (s) =>
-                              (s.length >= 10) ? null : "描述长度必须大于等于10字符",
-                          decoration: InputDecoration(
-                            helperText: "描述",
-                          ),
-                          controller: _descController,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        constraints: BoxConstraints(minWidth: 122),
-                        child: Text("申请人住址:"),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          key: ValueKey("addr"),
-                          validator: (s) =>
-                              (s.length >= 6) ? null : "申请人住址长度必须大于等于6字符",
-                          decoration: InputDecoration(
-                            helperText: "申请人住址",
-                          ),
-                          controller: _addressController,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Consumer<MediationApplicationAddModel>(
-                    builder: (BuildContext context,
-                        MediationApplicationAddModel model, Widget child) {
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      Row(
                         children: <Widget>[
                           Container(
                             constraints: BoxConstraints(minWidth: 122),
-                            child: Text("选择调解员:"),
+                            child: Text("调解标题:"),
                           ),
-                          DropdownButton<UserInfo>(
-                            iconSize: 42,
-                            items: model.mediatorList
-                                .map((user) => DropdownMenuItem(
-                                      child: Text(user.userName),
-                                      value: user,
-                                    ))
-                                .toList(),
-                            onChanged: (item) {
-                              model.currentUser = item;
-                            },
-                            isDense: true,
-                            hint: Text("选择调解人"),
-                            value: model.currentUser,
+                          Expanded(
+                            child: TextFormField(
+                              key: ValueKey("title"),
+                              validator: (s) =>
+                                  (s.length >= 4) ? null : "标题长度必须大于等于4个字符",
+                              decoration: InputDecoration(
+                                helperText: "标题",
+                              ),
+                              controller: _titleController,
+                            ),
                           ),
                         ],
-                      );
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text("点击加号添加图片描述:"),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Consumer<MediationApplicationAddModel>(
-                    builder: (BuildContext context,
-                        MediationApplicationAddModel model, Widget child) {
-                      List<Widget> list = model.images
-                          .map(
-                            (url) => Container(
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            constraints: BoxConstraints(minWidth: 122),
+                            child: Text("调解描述:"),
+                          ),
+                          Expanded(
+                            child: TextFormField(
+                              key: ValueKey("desc"),
+                              validator: (s) =>
+                                  (s.length >= 10) ? null : "描述长度必须大于等于10字符",
+                              decoration: InputDecoration(
+                                helperText: "描述",
+                              ),
+                              controller: _descController,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 36,
+                      ),
+                      Divider(),
+                      SizedBox(
+                        height: 36,
+                      ),
+                      Consumer<MediationApplicationAddModel>(
+                        builder: (BuildContext context,
+                            MediationApplicationAddModel model, Widget child) {
+                          return Row(
+                            children: <Widget>[
+                              Container(
+                                constraints: BoxConstraints(minWidth: 122),
+                                child: Text("申请人住址:"),
+                              ),
+                              Expanded(
+                                child: DropdownButton<HouseDetail>(
+                                  isExpanded: true,
+                                  iconSize: 42,
+                                  items: model.houseList
+                                      .map((user) => DropdownMenuItem(
+                                            child: Text(user.addr),
+                                            value: user,
+                                          ))
+                                      .toList(),
+                                  onChanged: (item) {
+                                    model.currentHouse = item;
+                                  },
+                                  isDense: true,
+                                  hint: Text("选择申请人住址"),
+                                  value: model.currentHouse,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      Consumer<MediationApplicationAddModel>(
+                        builder: (BuildContext context,
+                            MediationApplicationAddModel model, Widget child) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                constraints: BoxConstraints(minWidth: 122),
+                                child: Text("选择调解员:"),
+                              ),
+                              Expanded(
+                                child: DropdownButton<UserInfo>(
+                                  isExpanded: true,
+                                  iconSize: 42,
+                                  items: model.mediatorList
+                                      .map((user) => DropdownMenuItem(
+                                            child: Text(user.userName),
+                                            value: user,
+                                          ))
+                                      .toList(),
+                                  onChanged: (item) {
+                                    model.currentUser = item;
+                                  },
+                                  isDense: true,
+                                  hint: Text("选择调解人"),
+                                  value: model.currentUser,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      SizedBox(
+                        height: 36,
+                      ),
+                      Divider(),
+                      SizedBox(
+                        height: 36,
+                      ),
+                      Text("点击加号添加图片描述:"),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Consumer<MediationApplicationAddModel>(
+                        builder: (BuildContext context,
+                            MediationApplicationAddModel model, Widget child) {
+                          List<Widget> list = model.images
+                              .map(
+                                (url) => Container(
+                                  height: MediaQuery.of(context).size.width / 4,
+                                  width: MediaQuery.of(context).size.width / 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.all(8),
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Positioned.fill(
+                                        child: Image.network(
+                                          url,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment(1, -1),
+                                        child: IconButton(
+                                          icon: Icon(
+                                            Icons.remove_circle,
+                                            color: Colors.red[400],
+                                          ),
+                                          onPressed: () {
+                                            model.remove(url);
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                              .toList();
+                          list.add(
+                            Container(
                               height: MediaQuery.of(context).size.width / 4,
                               width: MediaQuery.of(context).size.width / 4,
+                              margin: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   width: 0.5,
                                 ),
                               ),
-                              margin: EdgeInsets.all(8),
-                              child: Stack(
-                                children: <Widget>[
-                                  Positioned.fill(
-                                    child: Image.network(
-                                      url,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder: (BuildContext context,
-                                          Widget child,
-                                          ImageChunkEvent loadingProgress) {
-                                        if (loadingProgress == null)
-                                          return child;
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            value: loadingProgress
-                                                        .expectedTotalBytes !=
-                                                    null
-                                                ? loadingProgress
-                                                        .cumulativeBytesLoaded /
-                                                    loadingProgress
-                                                        .expectedTotalBytes
-                                                : null,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment(1, -1),
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.remove_circle,
-                                        color: Colors.red[400],
-                                      ),
-                                      onPressed: () {
-                                        model.remove(url);
-                                      },
-                                    ),
-                                  )
-                                ],
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.add,
+                                  size: 60,
+                                ),
+                                onPressed: () {
+                                  showImageSourceDialog(context).then((file) {
+                                    model.uploadImage(file.path);
+                                  });
+                                },
                               ),
                             ),
-                          )
-                          .toList();
-                      list.add(
-                        Container(
-                          height: MediaQuery.of(context).size.width / 4,
-                          width: MediaQuery.of(context).size.width / 4,
-                          margin: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 0.5,
-                            ),
-                          ),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.add,
-                              size: 60,
-                            ),
-                            onPressed: () {
-                              showImageSourceDialog(context).then((file) {
-                                model.uploadImage(file.path);
-                              });
-                            },
-                          ),
-                        ),
-                      );
-                      return Wrap(
-                        children: list,
-                      );
-                    },
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Consumer<MediationApplicationAddModel>(
-                    builder: (BuildContext context,
-                        MediationApplicationAddModel value, Widget child) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          GradientButton(
-                            Text("提交"),
-                            onPressed: () async {
-                              if (_formKey.currentState.validate()) {
-                                if (value.validate()) {
-                                  var districtId = DistrictModel.of(context)
-                                      .getCurrentDistrictId()
-                                      .toString();
-                                  var kfBaseResp = await ApiKf.mediationApply(
-                                    districtId,
-                                    ChatGroupConfig.APP_ID,
-                                    value.currentUser.userName,
-                                    value.currentUser.userId,
-                                    _titleController.text,
-                                    _descController.text,
-                                    _addressController.text,
-                                    value.images,
-                                  );
-                                  if (kfBaseResp.success) {
-                                    value.reset();
-                                    Navigator.of(context).pop();
+                          );
+                          return Wrap(
+                            children: list,
+                          );
+                        },
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Consumer<MediationApplicationAddModel>(
+                        builder: (BuildContext context,
+                            MediationApplicationAddModel value, Widget child) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              GradientButton(
+                                Text("提交"),
+                                onPressed: () async {
+                                  if (_formKey.currentState.validate()) {
+                                    if (value.validate()) {
+                                      var districtId = DistrictModel.of(context)
+                                          .getCurrentDistrictId()
+                                          .toString();
+                                      var kfBaseResp =
+                                          await ApiKf.mediationApply(
+                                        districtId,
+                                        ChatGroupConfig.APP_ID,
+                                        value.currentUser.userName,
+                                        value.currentUser.userId,
+                                        _titleController.text,
+                                        _descController.text,
+                                        _addressController.text,
+                                        value.images,
+                                      );
+                                      if (kfBaseResp.success) {
+                                        value.reset();
+                                        Navigator.of(context).pop();
+                                      }
+                                      showToast(kfBaseResp.text);
+                                    }
+                                  } else {
+                                    showToast("请您按提示输入");
                                   }
-                                  showToast(kfBaseResp.text);
-                                }
-                              } else {
-                                showToast("请您按提示输入");
-                              }
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  )
-                ],
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

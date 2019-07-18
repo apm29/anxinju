@@ -3,6 +3,8 @@ import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/cupertino.dart';
 
 const String kNavigationExamplePage = '''
 <!DOCTYPE html><html>
@@ -798,7 +800,9 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
-    showImageSourceDialog(context,).then((file) {
+    showImageSourceDialog(
+      context,
+    ).then((file) {
       processFileAndNotify(file, callbackName);
     });
   }
@@ -989,22 +993,47 @@ class _WebViewExampleState extends State<WebViewExample> {
     });
   }
 
-  void doSendSms(BuildContext context, Map<String, dynamic> jsonMap) {
-    FlutterSms.canSendSMS().then((canSend) {
-      if (canSend) {
-        List<String> contact;
-        var originData = jsonMap['contact'];
-        if (originData is List) {
-          contact = originData.map<String>((d) => d.toString()).toList();
-        } else {
-          contact = [originData.toString()];
-        }
-        print('$contact');
-        FlutterSms.sendSMS(message: jsonMap['content'], recipients: contact);
-      } else {
-        Fluttertoast.showToast(msg: "当前设备不支持发送短信");
-      }
-    });
+  void doSendSms(BuildContext context, Map<String, dynamic> jsonMap) async {
+    var originData = jsonMap['contact'];
+    var content = jsonMap['content'];
+//    FlutterSms.canSendSMS().then((canSend) {
+//      if (canSend) {
+//        List<String> contact;
+//        if (originData is List) {
+//          contact = originData.map<String>((d) => d.toString()).toList();
+//        } else {
+//          contact = [originData.toString()];
+//        }
+//        print('$contact');
+//        FlutterSms.sendSMS(message: content, recipients: contact);
+//      } else {
+//        Fluttertoast.showToast(msg: "当前设备不支持发送短信");
+//      }
+//    });
+    var urlString = 'sms:$originData?body=$content';
+    var urlStringShort = 'sms:$originData';
+    if (await canLaunch(urlString)) {
+      launch(urlString);
+    } else if (await canLaunch(urlStringShort)) {
+      Clipboard.setData(ClipboardData(text: content));
+      showDialog(
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: Text("提示"),
+              content: Text("当前设备不支持直接发送短信,短信内容已经复制到剪切板"),
+              actions: <Widget>[
+                CupertinoDialogAction(child: Text("好的"),onPressed: (){
+                  Navigator.of(context).pop();
+                },)
+              ],
+            );
+          }).then((_) {
+        launch(urlStringShort);
+      });
+    } else {
+      showToast("当前设备不支持发送短信");
+    }
   }
 }
 
