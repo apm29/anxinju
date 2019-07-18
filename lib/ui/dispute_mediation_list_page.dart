@@ -458,7 +458,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                         steps: [
                           Step(
                               title: Text("提交申请"),
-                              content: Icon(Icons.check),
+                              content: Container(),
                               state: StepState.editing),
                           Step(
                               title: Text("管理员审核"),
@@ -473,9 +473,6 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                           return Container();
                         },
                       ),
-                    ),
-                    SizedBox(
-                      height: 18,
                     ),
                     Container(
                       constraints: BoxConstraints(minWidth: 122),
