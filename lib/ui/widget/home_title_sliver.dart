@@ -10,7 +10,7 @@ class HomeTitleSliver extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget leadingIcon;
   final bool notTitle;
-
+  final double elevation;
   HomeTitleSliver({
     this.leadingIcon,
     this.indicatorColor = const Color(0xFF000078),
@@ -19,12 +19,15 @@ class HomeTitleSliver extends StatelessWidget {
     this.tailText = "更多",
     this.onPressed,
     this.notTitle = false,
-  });
+
+    Key key, this.elevation = 0,
+  }):super(key:key);
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: notTitle ? Colors.white : null,
+      elevation: elevation??0,
       child: InkWell(
         onTap: onPressed,
         child: Row(

@@ -278,9 +278,9 @@ class _FaceIdPageState extends State<FaceIdPage> {
     var baseResp = await Api.getUserInfo();
 
     if (baseResp.success) {
-      UserModel.of(context).login(baseResp.data, baseResp.token, context);
-      UserRoleModel.of(context).tryFetchUserRoleTypes();
-      DistrictModel.of(context).tryFetchCurrentDistricts();
+      await UserModel.of(context).login(baseResp.data, baseResp.token, context);
+      await UserRoleModel.of(context).tryFetchUserRoleTypes(context);
+      await DistrictModel.of(context).tryFetchCurrentDistricts();
     }
     await UserVerifyStatusModel.of(context)
         .tryFetchVerifyStatusPeriodically(context);

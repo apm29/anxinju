@@ -443,7 +443,11 @@ class UserType {
 
   @override
   String toString() {
-    return 'UserType{id: $id, userId: $userId, roleCode: $roleCode}';
+    return 'UserType{roleCode: $roleCode,id: $id, userId: $userId}';
+  }
+
+  bool isPropertyRole() {
+    return roleCode == "1";
   }
 }
 

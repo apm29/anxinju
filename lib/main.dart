@@ -33,114 +33,6 @@ void main() async {
   });
 }
 
-// Platform messages are asynchronous, so we initialize in an async method.
-//Future<void> initPlatformState(BuildContext context) async {
-//  // Platform messages may fail, so we use a try/catch PlatformException.
-//  jPush.getRegistrationID().then((rid) {
-//    print("flutter getRegistrationID: $rid");
-//    userSp.setString(KEY_REGISTRATION_ID, rid);
-//  });
-//  jPush.applyPushAuthority(
-//    new NotificationSettingsIOS(sound: true, alert: true, badge: true),
-//  );
-//
-//  try {
-//    jPush.addEventHandler(
-//      onReceiveNotification: (Map<String, dynamic> message) async {
-//        print("flutter onReceiveNotification: $message");
-//      },
-//      onOpenNotification: (Map<String, dynamic> message) async {
-//        try {
-//          Map<dynamic, dynamic> extras = getExtrasByPlatform(message);
-//          Map<String, String> extrasMap = {};
-//          extras.forEach((k, v) {
-//            extrasMap.putIfAbsent(k.toString(), () => v.toString());
-//          });
-//          print('EXTRAS ===> $extras');
-//
-//          /// "extra":{
-//          ///   "type":"web",
-//          ///   "data":{"url":"fkgl"},
-//          /// }
-//          if (extras != null && extras["type"] == "web") {
-//            Api.getIndex().then((resp) {
-//              resp.forEach((index) {
-//                index.menu.forEach((menu) {
-//                  if (menu.id == extras['data']['url']) {
-//                    Navigator.of(context)
-//                        .push(MaterialPageRoute(builder: (context) {
-//                      return WebViewExample(menu.url);
-//                    }));
-//                  }
-//                });
-//              });
-//            });
-//          }
-//        } catch (e, s) {
-//          print(e.toString());
-//          print(s.toString());
-//        }
-//      },
-//      onReceiveMessage: (Map<String, dynamic> message) async {
-//        print("flutter onReceiveMessage: $message");
-////        try {
-////          var myExtras = message["message"];
-////          print('EXTRAS ====> $myExtras');
-////          print('EXTRAS ====> ${myExtras.runtimeType}');
-////          Map<String, dynamic> myMap = json.decode(myExtras);
-////          print('EXTRAS ====> $myMap');
-////          var fireDate = DateTime.fromMillisecondsSinceEpoch(
-////              DateTime.now().millisecondsSinceEpoch + 1000);
-////          Map<String, String> extrasMap = {};
-////          myMap.forEach((k, v) {
-////            extrasMap.putIfAbsent(k, () => v.toString());
-////          });
-////          print('EXTRAS ====> $extrasMap');
-////          var localNotification = LocalNotification(
-////              id: DateTime.now().millisecondsSinceEpoch % 1000000,
-////              title: myMap['title'],
-////              buildId: 1,
-////              content: myMap['content'],
-////              fireTime: fireDate,
-////              subtitle: myMap['subtitle'],
-////              // 该参数只有在 iOS 有效
-////              badge: 1,
-////              // 该参数只有在 iOS 有效
-////              extras:
-////                  message['extras'] // 设置 extras ，extras 需要是 Map<String, String>
-////              );
-////          jPush.sendLocalNotification(localNotification).then((res) {
-////            print('SEND ====> $res');
-////          });
-////        } catch (e) {
-////          print(e);
-////        }
-//      },
-//    );
-//
-//    jPush.setup(
-//      appKey: Configs.JPushKey,
-//      channel: "developer-default",
-//      production: false,
-//      debug: true,
-//    );
-//  } catch (e) {
-//    print('$e');
-//  }
-//}
-
-getExtrasByPlatform(Map<String, dynamic> message) {
-  if (Platform.isAndroid) {
-    return json.decode(message['extras'][getExtras()]);
-  } else {
-    return message['extras'];
-  }
-}
-
-String getExtras() {
-  return 'cn.jpush.android.EXTRA';
-}
-
 class MyApp extends StatelessWidget {
   MyApp();
 
@@ -149,12 +41,12 @@ class MyApp extends StatelessWidget {
     return OKToast(
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider.value(value: MainIndexModel()),
-          ChangeNotifierProvider.value(value: UserModel()),
-          ChangeNotifierProvider.value(value: AnnouncementModel()),
-          ChangeNotifierProvider.value(value: AppThemeModel()),
-          ChangeNotifierProvider.value(value: DistrictModel()),
-          ChangeNotifierProvider.value(value: HomeEndScrollModel()),
+          ChangeNotifierProvider(builder: (context) => MainIndexModel()),
+          ChangeNotifierProvider(builder: (context) => UserModel()),
+          ChangeNotifierProvider(builder: (context) => AnnouncementModel()),
+          ChangeNotifierProvider(builder: (context) => AppThemeModel()),
+          ChangeNotifierProvider(builder: (context) => DistrictModel()),
+          ChangeNotifierProvider(builder: (context) => HomeEndScrollModel()),
           ListenableProvider<NotificationModel>(
             builder: (BuildContext context) {
               return NotificationModel(context);
@@ -163,11 +55,11 @@ class MyApp extends StatelessWidget {
               value.dispose();
             },
           ),
-          ChangeNotifierProvider.value(value: UserVerifyStatusModel()),
-          ChangeNotifierProvider.value(value: UserRoleModel()),
-          ChangeNotifierProvider.value(value: MessageModel()),
-          ChangeNotifierProvider.value(value: ChatRoomPageStatusModel()),
-          ChangeNotifierProvider.value(value: AppInfoModel()),
+          ChangeNotifierProvider(builder: (context) => UserVerifyStatusModel()),
+          ChangeNotifierProvider(builder: (context) => UserRoleModel(context)),
+          ChangeNotifierProvider(builder: (context) => MessageModel()),
+          ChangeNotifierProvider(builder: (context) => ChatRoomPageStatusModel()),
+          ChangeNotifierProvider(builder: (context) => AppInfoModel()),
         ],
         child: MaterialApp(
           theme: defaultThemeData,
@@ -208,20 +100,23 @@ class MyApp extends StatelessWidget {
             MediationListPage.routeName: (context) => MultiProvider(
                   providers: [
                     ChangeNotifierProvider(
-                      builder: (context)=>MediationHistoryModel(context),
+                      builder: (context) => MediationHistoryModel(context),
                     ),
                     ChangeNotifierProvider(
-                      builder: (context)=>MediationRunningModel(context),
+                      builder: (context) => MediationRunningModel(context),
                     ),
                     ChangeNotifierProvider(
-                      builder: (context)=>MediationApplyModel(context),
+                      builder: (context) => MediationApplyModel(context),
                     ),
                   ],
                   child: MediationListPage(),
                 ),
-            MediationApplyPage.routeName: (context) => ChangeNotifierProvider(child: MediationApplyPage(),builder: (context){
-              return MediationApplicationAddModel(context);
-            },),
+            MediationApplyPage.routeName: (context) => ChangeNotifierProvider(
+                  child: MediationApplyPage(),
+                  builder: (context) {
+                    return MediationApplicationAddModel(context);
+                  },
+                ),
           },
         ),
       ),

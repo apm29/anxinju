@@ -44,41 +44,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         maxLengthEnforced: true,
                         maxLength: 11,
                         decoration: InputDecoration(
-                          hintText: "输入电话号码",
-                          labelText: "电话号码",
+                          hintText: "输入手机号",
+                          labelText: "手机号",
                           border: OutlineInputBorder(),
                         ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(6),
-                      padding: EdgeInsets.all(6),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              key: ValueKey("sms"),
-                              controller: _smsCodeController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                hintText: "输入验证码",
-                                labelText: "验证码",
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            constraints: BoxConstraints(
-                                minWidth: ScreenUtil().setWidth(300)
-                            ),
-                            child: TickerWidget(
-                                key: ticker,
-                                textInitial: "发送验证码",
-                                onPressed: () {
-                                  sendSms();
-                                }),
-                          )
-                        ],
                       ),
                     ),
                     Container(
@@ -120,6 +89,37 @@ class _RegisterPageState extends State<RegisterPage> {
                           labelText: "确认密码",
                           border: OutlineInputBorder(),
                         ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(6),
+                      padding: EdgeInsets.all(6),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              key: ValueKey("sms"),
+                              controller: _smsCodeController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                hintText: "输入验证码",
+                                labelText: "验证码",
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            constraints: BoxConstraints(
+                                minWidth: ScreenUtil().setWidth(300)
+                            ),
+                            child: TickerWidget(
+                                key: ticker,
+                                textInitial: "发送验证码",
+                                onPressed: () {
+                                  sendSms();
+                                }),
+                          )
+                        ],
                       ),
                     ),
                   ],

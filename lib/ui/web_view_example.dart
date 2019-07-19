@@ -293,6 +293,19 @@ const String kNavigationExamplePage = '''
 </html>
 ''';
 
+class WebModel extends ChangeNotifier {
+  int _historyLength = 0;
+
+  int get historyLength => _historyLength;
+
+  set historyLength(int value) {
+    _historyLength = value;
+    notifyListeners();
+  }
+
+  bool get hasCloseButton => _historyLength >= 2;
+}
+
 class WebViewExample extends StatefulWidget {
   final String initUrl;
 
@@ -330,153 +343,191 @@ class _WebViewExampleState extends State<WebViewExample> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (await controller.canGoBack()) {
-          controller.goBack();
-          return false;
-        } else {
-          return true;
-        }
-      },
-      child: Scaffold(
+    return ChangeNotifierProvider(
+      child: WillPopScope(
+        onWillPop: () async {
+          if (await controller.canGoBack()) {
+            controller.goBack();
+            return false;
+          } else {
+            return true;
+          }
+        },
+        child: Scaffold(
 //        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          title: StreamBuilder<Object>(
-              stream: titleController.stream,
-              builder: (context, snapshot) {
-                return Text(snapshot.data ?? Strings.appName);
-              }),
-          centerTitle: true,
-          // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-          leading: FutureBuilder<WebViewController>(
-              future: _controller.future,
-              builder: (context, snapShot) {
-                bool webViewReady = snapShot.hasData && snapShot.data != null;
-                return IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
-                  onPressed: !webViewReady
-                      ? null
-                      : () async {
-                          if (await controller.canGoBack()) {
-                            controller.goBack();
-                          } else {
-                            Navigator.of(context).pop();
-                            return;
+          appBar: AppBar(
+            title: StreamBuilder<Object>(
+                stream: titleController.stream,
+                builder: (context, snapshot) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Consumer<WebModel>(
+                        builder: (BuildContext context, WebModel value,
+                            Widget child) {
+                          return value.hasCloseButton
+                              ? IconButton(
+                                  icon: Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  })
+                              : Container();
+                        },
+                      ),
+                      Expanded(
+                        child: Text(snapshot.data ?? Strings.appName,textAlign: TextAlign.center,),
+                      ),
+                    ],
+                  );
+                }),
+            // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
+            leading: FutureBuilder<WebViewController>(
+                future: _controller.future,
+                builder: (context, snapShot) {
+                  bool webViewReady = snapShot.hasData && snapShot.data != null;
+                  return IconButton(
+                    icon: const Icon(Icons.arrow_back_ios),
+                    onPressed: !webViewReady
+                        ? null
+                        : () async {
+                            if (await controller.canGoBack()) {
+                              controller.goBack();
+                            } else {
+                              Navigator.of(context).pop();
+                              return;
+                            }
+                          },
+                  );
+                }),
+            actions: <Widget>[
+//          NavigationControls(_controller.future),
+              DistrictInfoButton(),
+              //SampleMenu(_controller.future, () {
+              //  FocusScope.of(context).requestFocus(FocusNode());
+              //}),
+            ],
+          ),
+          body: Column(
+            children: <Widget>[
+              Expanded(
+                child: Builder(builder: (BuildContext context) {
+                  return Stack(
+                    children: <Widget>[
+                      TextField(
+                        autofocus: false,
+                        focusNode: _focusNode1,
+                        controller: textController1,
+                        onChanged: (text) {
+                          controller.evaluateJavascript('''
+                           if(current != null){
+                            current.value = '${textController1.text}';
+                            current.selectionStart = ${textController1.selection.start};
+                            current.selectionEnd = ${textController1.selection.end};
+                            current.dispatchEvent(new Event('input'));
+                           }
+                          ''');
+                        },
+                        onSubmitted: (text) {
+                          controller.evaluateJavascript('''
+                          if(current != null)
+                            current.submit();
+                          ''');
+                          _focusNode1.unfocus();
+                        },
+                      ),
+                      TextField(
+                        autofocus: false,
+                        focusNode: _focusNode2,
+                        controller: textController2,
+                        onChanged: (text) {
+                          controller.evaluateJavascript('''
+                           if(current != null){
+                            current.value = '${textController2.text}';
+                            current.selectionStart = ${textController2.selection.start};
+                            current.selectionEnd = ${textController2.selection.end};
+                            current.dispatchEvent(new Event('input'));
+                           }
+                          ''');
+                        },
+                        onSubmitted: (text) {
+                          controller.evaluateJavascript('''
+                          if(current != null)
+                            current.submit();
+                          ''');
+                          _focusNode2.unfocus();
+                        },
+                      ),
+                      WebView(
+                        initialUrl: widget.initUrl ?? 'https://flutter.dev',
+                        javascriptMode: JavascriptMode.unrestricted,
+                        onWebViewCreated:
+                            (WebViewController webViewController) {
+                          _controller.complete(webViewController);
+                          controller = webViewController;
+                          controller.clearCache();
+                        },
+                        // ignore: prefer_collection_literals
+                        javascriptChannels: <JavascriptChannel>[
+                          _toasterJavascriptChannel(context),
+                          _dialogJavascriptChannel(context),
+                          _filerJavascriptChannel(context),
+                          _userJavascriptChannel(context)
+                        ].toSet(),
+                        navigationDelegate: (NavigationRequest request) {
+                          print('allowing navigation to $request');
+                          if (_streamSubscription != null)
+                            _streamSubscription.cancel();
+                          return NavigationDecision.navigate;
+                        },
+                        onPageFinished: (String url) {
+                          print('Page finished loading: $url');
+                          controller
+                              .evaluateJavascript(
+                                  'document.getElementsByTagName("title")[0].innerText')
+                              .then((title) {
+                            title = title.replaceAll('"', "");
+                            if (title == "null" || title == "undefined") {
+                              title = null;
+                            }
+                            titleController.add(title);
+                          });
+
+                          controller
+                              ?.evaluateJavascript('window.history.length;')
+                              ?.then((s) {
+                            var length = 0;
+                            try {
+                              length = int.parse(s);
+                            } catch (e) {
+                              print(e);
+                            }
+                            var webModel =
+                                Provider.of<WebModel>(context, listen: false);
+                            webModel.historyLength = length;
+                          });
+                          if (Platform.isAndroid) {
+                            //imeConfig();
+                            //if (_streamSubscription != null)
+                            //  _streamSubscription.cancel();
+                            //_streamSubscription = Observable.periodic(
+                            //    Duration(seconds: 5), (i) => i).listen((i) {
+                            //  imeConfig();
+                            //});
                           }
                         },
-                );
-              }),
-          actions: <Widget>[
-//          NavigationControls(_controller.future),
-            DistrictInfoButton(),
-            //SampleMenu(_controller.future, () {
-            //  FocusScope.of(context).requestFocus(FocusNode());
-            //}),
-          ],
-        ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Builder(builder: (BuildContext context) {
-                return Stack(
-                  children: <Widget>[
-                    TextField(
-                      autofocus: false,
-                      focusNode: _focusNode1,
-                      controller: textController1,
-                      onChanged: (text) {
-                        controller.evaluateJavascript('''
-                         if(current != null){
-                          current.value = '${textController1.text}';
-                          current.selectionStart = ${textController1.selection.start};
-                          current.selectionEnd = ${textController1.selection.end};
-                          current.dispatchEvent(new Event('input'));
-                         }
-                        ''');
-                      },
-                      onSubmitted: (text) {
-                        controller.evaluateJavascript('''
-                        if(current != null)
-                          current.submit();
-                        ''');
-                        _focusNode1.unfocus();
-                      },
-                    ),
-                    TextField(
-                      autofocus: false,
-                      focusNode: _focusNode2,
-                      controller: textController2,
-                      onChanged: (text) {
-                        controller.evaluateJavascript('''
-                         if(current != null){
-                          current.value = '${textController2.text}';
-                          current.selectionStart = ${textController2.selection.start};
-                          current.selectionEnd = ${textController2.selection.end};
-                          current.dispatchEvent(new Event('input'));
-                         }
-                        ''');
-                      },
-                      onSubmitted: (text) {
-                        controller.evaluateJavascript('''
-                        if(current != null)
-                          current.submit();
-                        ''');
-                        _focusNode2.unfocus();
-                      },
-                    ),
-                    WebView(
-                      initialUrl: widget.initUrl ?? 'https://flutter.dev',
-                      javascriptMode: JavascriptMode.unrestricted,
-                      onWebViewCreated: (WebViewController webViewController) {
-                        _controller.complete(webViewController);
-                        controller = webViewController;
-                        controller.clearCache();
-                      },
-                      // ignore: prefer_collection_literals
-                      javascriptChannels: <JavascriptChannel>[
-                        _toasterJavascriptChannel(context),
-                        _dialogJavascriptChannel(context),
-                        _filerJavascriptChannel(context),
-                        _userJavascriptChannel(context)
-                      ].toSet(),
-                      navigationDelegate: (NavigationRequest request) {
-                        print('allowing navigation to $request');
-                        if (_streamSubscription != null)
-                          _streamSubscription.cancel();
-                        return NavigationDecision.navigate;
-                      },
-                      onPageFinished: (String url) {
-                        print('Page finished loading: $url');
-                        controller
-                            .evaluateJavascript(
-                                'document.getElementsByTagName("title")[0].innerText')
-                            .then((title) {
-                          title = title.replaceAll('"', "");
-                          if (title == "null" || title == "undefined") {
-                            title = null;
-                          }
-                          titleController.add(title);
-                        });
-                        if (Platform.isAndroid) {
-                          //imeConfig();
-                          //if (_streamSubscription != null)
-                          //  _streamSubscription.cancel();
-                          //_streamSubscription = Observable.periodic(
-                          //    Duration(seconds: 5), (i) => i).listen((i) {
-                          //  imeConfig();
-                          //});
-                        }
-                      },
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ],
-        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ],
+          ),
 //        floatingActionButton: favoriteButton(),
+        ),
       ),
+      builder: (BuildContext context) {
+        return WebModel();
+      },
     );
   }
 
@@ -1023,9 +1074,12 @@ class _WebViewExampleState extends State<WebViewExample> {
               title: Text("提示"),
               content: Text("当前设备不支持直接发送短信,短信内容已经复制到剪切板"),
               actions: <Widget>[
-                CupertinoDialogAction(child: Text("好的"),onPressed: (){
-                  Navigator.of(context).pop();
-                },)
+                CupertinoDialogAction(
+                  child: Text("好的"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
               ],
             );
           }).then((_) {

@@ -1,6 +1,7 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/user_model.dart';
+import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:ease_life/res/configs.dart';
@@ -12,7 +13,6 @@ import '../../utils.dart';
 typedef DistrictCallback = void Function(DistrictDetail);
 
 class DistrictInfoButton extends StatefulWidget {
-
   const DistrictInfoButton({Key key}) : super(key: key);
 
   @override
@@ -30,12 +30,12 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
     return Consumer<DistrictModel>(
       builder: (BuildContext context, DistrictModel value, Widget child) {
         bool isLogin = UserModel.of(context).isLogin;
-        bool isVerified = UserVerifyStatusModel.of(context).isVerified();
+        UserRoleModel roleModel = UserRoleModel.of(context,listen: true);
+        bool isVerified = UserVerifyStatusModel.of(context).isVerified() ||
+            (roleModel.currentRole?.isPropertyRole()??false);
         String verifyText = UserVerifyStatusModel.of(context).getVerifyText();
         var textString = isLogin
-            ? isVerified
-                ? value.getCurrentDistrictName()
-                : verifyText
+            ? isVerified ? value.getCurrentDistrictName() : verifyText
             : "未登录";
         return FlatButton.icon(
             onPressed: () {
@@ -54,16 +54,15 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
     );
   }
 
-  void showDistrictMenu(BuildContext context) {
+  void showDistrictMenu(BuildContext parentContext) {
     showModalBottomSheet(
-      context: context,
+      context: parentContext,
       isScrollControlled: true,
       builder: (context) {
         return Consumer<DistrictModel>(
           builder: (BuildContext context, DistrictModel model, Widget child) {
             return BottomSheet(
-              onClosing: () {
-              },
+              onClosing: () {},
               builder: (context) {
                 if (!model.hasData) {
                   return RefreshHintWidget(
@@ -80,7 +79,8 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                       title: Text(model.getDistrictName(index)),
                       subtitle: Text(model.getDistrictAddress(index)),
                       onTap: () {
-                        model.selectCurrentDistrict(index,context);
+                        model.selectCurrentDistrict(index, parentContext);
+                        Navigator.of(context).pop();
                       },
                       selected: isSelected,
                       leading: Visibility(
@@ -100,8 +100,6 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
       },
     );
   }
-
-
 
   toLogin() {
     Navigator.of(context).pushNamed("/login");

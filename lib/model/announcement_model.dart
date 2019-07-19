@@ -65,7 +65,7 @@ class AnnouncementModel extends ChangeNotifier {
   String get typesString =>
       _announcementTypes?.map((e) => e?.typeId)?.toList()?.join(",") ?? "";
 
-  List<Announcement> get announcements => _announcementList ?? [];
+  List<Announcement> get announcements =>_announcementList ?? [];
 
   List<AnnouncementType> get announcementTypes => _announcementTypes ?? [];
 

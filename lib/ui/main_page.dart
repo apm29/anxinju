@@ -65,15 +65,15 @@ class MainPageState extends State<MainPage> {
     super.didUpdateWidget(oldWidget);
   }
 
-  Future _requestPermission(PermissionGroup group) async{
+  Future _requestPermission(PermissionGroup group) async {
     var status = await PermissionHandler().checkPermissionStatus(group);
-    if(status == PermissionStatus.granted){
+    if (status == PermissionStatus.granted) {
       return null;
     }
     return PermissionHandler().requestPermissions([group]);
   }
 
-  void requestPermission() async{
+  void requestPermission() async {
     await _requestPermission(PermissionGroup.storage);
     await _requestPermission(PermissionGroup.camera);
   }
@@ -112,8 +112,8 @@ class MainPageState extends State<MainPage> {
                       );
                     },
                     isExtended: true,
-                    icon: Icon(Icons.chat),
-                    label: Text("紧急呼叫"),
+                    icon: Icon(Icons.chat,size: 12,),
+                    label: Text("紧急呼叫",style: TextStyle(fontSize: 12),),
                   ),
                 );
               },
@@ -131,7 +131,7 @@ class MainPageState extends State<MainPage> {
             await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
             await MainIndexModel.of(context).tryFetchIndexJson(evict: true);
             await MainIndexModel.of(context).tryGetCurrentLocation();
-            await UserRoleModel.of(context).tryFetchUserRoleTypes();
+            await UserRoleModel.of(context).tryFetchUserRoleTypes(context,dispatchUser: false);
             return;
           },
         );

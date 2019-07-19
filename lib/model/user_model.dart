@@ -34,7 +34,7 @@ class UserModel extends ChangeNotifier {
 
   bool get isLogin => userId != null && token != null;
 
-  void login(UserInfo info, String token, BuildContext context) {
+  Future login(UserInfo info, String token, BuildContext context) async{
     _userInfo = info;
     _token = token;
     userSp.setString(KEY_USER_INFO, info.toString());
@@ -42,14 +42,18 @@ class UserModel extends ChangeNotifier {
 
     ///重新获取验证状态/获取小区
     if (context != null) {
-      UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
-      DistrictModel.of(context).tryFetchCurrentDistricts();
-      UserRoleModel.of(context).tryFetchUserRoleTypes();
-      UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
-      MessageModel.of(context).refresh();
-      tryFetchUserDetail();
+      await refreshUserData(context);
     }
     notifyListeners();
+  }
+
+  Future refreshUserData(BuildContext context) async{
+    await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+    await DistrictModel.of(context).tryFetchCurrentDistricts();
+    await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+    await UserRoleModel.of(context).tryFetchUserRoleTypes(context);
+    await MessageModel.of(context).refresh();
+    await tryFetchUserDetail();
   }
 
   void logout(BuildContext context) {
@@ -100,9 +104,9 @@ class UserModel extends ChangeNotifier {
   Future tryFetchUserInfoAndLogin() async{
     return Api.getUserInfo().then((resp){
       if(resp.success){
-        login(resp.data, resp.token, null);
+        return login(resp.data, resp.token, null);
       }
-      return;
+      return null;
     });
   }
 

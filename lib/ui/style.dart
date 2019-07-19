@@ -18,4 +18,7 @@ final ThemeData defaultThemeData = ThemeData(
       ),
     ),
   ),
+  iconTheme: IconThemeData(
+    color: Colors.blue
+  ),
 );

@@ -46,6 +46,7 @@ class WebIndexID {
   static const YI_JING_HUO_DONG = "yjhd";
   static const CI_SHAN_GONG_YI = "csgy";
   static const XIAO_QU_HUO_DONG = "xqhd";
+  static const XIAN_ZHI_JIAO_HUAN = "xzjh";
 
   ///
   static const WO_DE_FANG_WU = "wdfw";

@@ -29,7 +29,8 @@ class HomeChip extends StatelessWidget {
     this.checkHasHouse = false,
     this.wrap = false,
     this.checkLogin = false,
-  }) : assert(checkIsFaceVerified != null),assert(checkLogin!=null);
+    Key key,
+  }) : assert(checkIsFaceVerified != null),assert(checkLogin!=null),super(key:key);
 
   void route(String id, BuildContext context) {
     toWebPage(

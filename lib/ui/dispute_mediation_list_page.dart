@@ -432,8 +432,10 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
       bottomNavigationBar: _buildBottomAction(),
     );
   }
+  static const double kVerticalPadding = 8;
 
   Widget _buildBody(BuildContext context, Color filledColor) {
+
     return ApplyStepperWidget(
       child: Container(
         child: Form(
@@ -457,7 +459,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                     child: Text("调解标题:"),
                   ),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   SizedBox(
                     height: ScreenUtil().setHeight(154),
@@ -477,11 +479,11 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                     ),
                   ),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   Divider(),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   Container(
                     constraints: BoxConstraints(minWidth: 122),
@@ -490,7 +492,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                     ),
                   ),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   SizedBox(
                     height: ScreenUtil().setHeight(480),
@@ -514,18 +516,18 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                     ),
                   ),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   Divider(),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   Container(
                     constraints: BoxConstraints(minWidth: 122),
                     child: Text("申请人住址:"),
                   ),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   Consumer<MediationApplicationAddModel>(
                     builder: (BuildContext context,
@@ -536,7 +538,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                         decoration: BoxDecoration(
                           color: model.currentHouse != null
                               ? filledColor
-                              : null,
+                              : Colors.transparent,
                           border: Border.all(color: Colors.grey[500]),
                           borderRadius: BorderRadius.all(
                             Radius.circular(6),
@@ -578,14 +580,14 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                     },
                   ),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   Container(
                     constraints: BoxConstraints(minWidth: 122),
                     child: Text("调解员:"),
                   ),
                   SizedBox(
-                    height: 8,
+                    height: kVerticalPadding,
                   ),
                   Consumer<MediationApplicationAddModel>(
                     builder: (BuildContext context,
@@ -639,15 +641,15 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                     },
                   ),
                   SizedBox(
-                    height: 12,
+                    height: kVerticalPadding,
                   ),
                   Divider(),
                   SizedBox(
-                    height: 12,
+                    height: kVerticalPadding,
                   ),
                   Text("点击加号添加图片描述:"),
                   SizedBox(
-                    height: 12,
+                    height: kVerticalPadding,
                   ),
                   Consumer<MediationApplicationAddModel>(
                     builder: (BuildContext context,
@@ -664,7 +666,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                             border: Border.all(
                                 width: 0.5, color: Colors.blue[200]),
                           ),
-                          margin: EdgeInsets.all(8),
+                          margin: EdgeInsets.all(kVerticalPadding),
                           child: Stack(
                             children: <Widget>[
                               Positioned.fill(
@@ -715,7 +717,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                         Container(
                           height: MediaQuery.of(context).size.width / 4,
                           width: MediaQuery.of(context).size.width / 4,
-                          margin: EdgeInsets.all(8),
+                          margin: EdgeInsets.all(kVerticalPadding),
                           decoration: BoxDecoration(
                             border: Border.all(
                               width: 0.5,

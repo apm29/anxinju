@@ -1,5 +1,6 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/app_info_model.dart';
+import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
@@ -7,6 +8,7 @@ import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'notification_message_page.dart';
+import 'widget/gradient_button.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -29,43 +31,257 @@ class _MinePageState extends State<MinePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("我的"),
-        centerTitle: true,
         automaticallyImplyLeading: false,
         actions: buildActions(context),
       ),
-      body: Consumer3<UserModel, UserVerifyStatusModel, UserRoleModel>(
+      body: Consumer4<UserModel, UserVerifyStatusModel, UserRoleModel,
+          DistrictModel>(
         builder: (BuildContext context,
             UserModel userModel,
             UserVerifyStatusModel userVerifyStatus,
             UserRoleModel roleModel,
+            DistrictModel districtModel,
             Widget child) {
-          //if (!userModel.isLogin) {
-          //  return buildVisitor(context);
-          //} else if (userVerifyStatus.isVerified()) {
-          //  return _buildMine(context, userModel, userVerifyStatus, roleModel);
-          //} else if (!userVerifyStatus.isVerified()) {
-          //  return _buildUnauthorized(
-          //      context, userModel, userVerifyStatus, roleModel);
-          //} else {
-          //  return buildVisitor(context);
-          //}
-
           var isLogin = userModel.isLogin;
           if (!isLogin) {
             return buildVisitor(context);
-          } else {
-            return _buildMine(context, userModel, userVerifyStatus, roleModel);
           }
+          return AnimatedSwitcher(
+            duration: Duration(seconds: 1),
+            child: roleModel.currentRole.isPropertyRole()
+                ? _buildPropertyMine(context, userModel, userVerifyStatus,
+                    roleModel, districtModel)
+                : _buildCommonMine(context, userModel, userVerifyStatus,
+                    roleModel, districtModel),
+            switchInCurve: Curves.fastOutSlowIn,
+            switchOutCurve: Curves.fastOutSlowIn,
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: child,
+              );
+            },
+          );
         },
       ),
     );
   }
 
-  Widget _buildMine(BuildContext context, UserModel userModel,
-      UserVerifyStatusModel userVerifyStatusModel, UserRoleModel roleModel) {
-    bool isVerified = userVerifyStatusModel.isVerified();
+  Widget _buildPropertyMine(
+    BuildContext context,
+    UserModel userModel,
+    UserVerifyStatusModel userVerifyStatusModel,
+    UserRoleModel roleModel,
+    DistrictModel districtModel,
+  ) {
+    bool isVerified = userVerifyStatusModel.isVerified() ||
+        roleModel.currentRole.isPropertyRole();
+    String url = userModel.userDetail?.avatar;
+    String userName =
+        userModel.userName ?? userModel.userDetail?.nickName ?? "";
+    return DefaultTextStyle(
+      style: TextStyle(color: Colors.blueGrey),
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Stack(
+              alignment: Alignment.topCenter,
+              children: <Widget>[
+                Container(
+                  height: ScreenUtil().setHeight(420),
+                  width: MediaQuery.of(context).size.width,
+                  child: FadeInImage.assetNetwork(
+                    fit: BoxFit.cover,
+                    placeholder: "images/ic_banner_mine.png",
+                    image: districtModel.getDistrictPic(
+                      districtModel.getCurrentDistrictIndex(),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                      top: ScreenUtil().setHeight(210), left: 16, right: 16),
+                  height: 135,
+                  width: MediaQuery.of(context).size.width,
+                  child: Material(
+                    elevation: 1,
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8),
+                    ),
+                    child: Container(
+                      margin: EdgeInsets.only(top: ScreenUtil().setHeight(100)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          EaseIconGradientButton(
+                            1,
+                            "我的设置",
+                            () {
+                              showToast("未完成");
+                            },
+                            Icons.settings,
+                          ),
+                          EaseIconGradientButton(
+                            2,
+                            "我的消息",
+                            () {
+                              showToast("未完成");
+                            },
+                            Icons.message,
+                          ),
+                          EaseIconGradientButton(
+                            3,
+                            "我的爱车",
+                            () {
+                              toWebPage(context, WebIndexID.WO_DE_AI_CHE,
+                                  checkFaceVerified: false);
+                            },
+                            Icons.directions_car,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: ScreenUtil().setHeight(210) - ScreenUtil().setHeight(90),
+                  left: 42,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        constraints: BoxConstraints.tight(Size(
+                          ScreenUtil().setHeight(180),
+                          ScreenUtil().setHeight(180),
+                        )),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey[200],
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(width: 2, color: Colors.white),
+                        ),
+                        child: url != null
+                            ? Image.network(
+                                url,
+                                fit: BoxFit.cover,
+                              )
+                            : Icon(
+                                Icons.person_outline,
+                                color: Colors.white,
+                              ),
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Text(
+                        userName,
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Container(
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              isVerified ? Icons.verified_user : Icons.error,
+                              color: isVerified ? Colors.green : Colors.red,
+                              size: 12,
+                            ),
+                            Text(
+                              "物业人员",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blueGrey[400]),
+                            borderRadius: BorderRadius.all(Radius.circular(4))),
+                        margin: EdgeInsets.only(left: 2),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 24,
+            ),
+            EaseTile(
+              title: "出入记录",
+              iconData: Icons.list,
+              onPressed: () {
+                toWebPage(context, WebIndexID.CHU_RU_JI_LU,
+                    checkFaceVerified: false);
+              },
+            ),
+            EaseTile(
+              title: "巡更管理",
+              iconData: Icons.map,
+              onPressed: () {
+                toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
+                    checkFaceVerified: false);
+              },
+            ),
+            EaseTile(
+              title: "出入记录",
+              iconData: Icons.directions_run,
+              onPressed: () {
+                toWebPage(context, WebIndexID.CHU_RU_JI_LU,
+                    checkFaceVerified: false);
+              },
+            ),
+            EaseTile(
+              title: "访客系统",
+              iconData: Icons.group_add,
+              onPressed: () {
+                toWebPage(context, WebIndexID.FANG_KE_XI_TONG,
+                    checkFaceVerified: false);
+              },
+            ),
+            EaseTile(
+              title: "检查更新",
+              iconData: Icons.cached,
+              onPressed: () {
+               _doCheckUpdate(context);
+              },
+            ),
+            SizedBox(
+              height: ScreenUtil().setHeight(16),
+            ),
+            _buildVersionInfo(),
+            SizedBox(
+              height: ScreenUtil().setHeight(80),
+            ),
+
+            GradientButton(
+              Text("登出"),
+              onPressed: () async {
+                await doLogout(context);
+              },
+            ),
+
+            SizedBox(
+              height: ScreenUtil().setHeight(700),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommonMine(
+    BuildContext context,
+    UserModel userModel,
+    UserVerifyStatusModel userVerifyStatusModel,
+    UserRoleModel roleModel,
+    DistrictModel districtModel,
+  ) {
+    bool isVerified = userVerifyStatusModel.isVerified() ||
+        roleModel.currentRole.isPropertyRole();
+    ;
     bool notVerify = userVerifyStatusModel.isNotVerified();
-    bool hasHouse = userVerifyStatusModel.hasHouse();
+    bool hasHouse = districtModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();
     bool hasRecordPermission = roleModel.hasSocietyRecordPermission();
     String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
@@ -82,7 +298,7 @@ class _MinePageState extends State<MinePage> {
             color: Colors.grey[200],
             alignment: Alignment.center,
             child: ListView(
-              key: PageStorageKey("mine"),
+              key: PageStorageKey("MINE_PAGE"),
               children: <Widget>[
                 SizedBox(
                   height: 12,
@@ -323,20 +539,7 @@ class _MinePageState extends State<MinePage> {
                         ? Expanded(
                             child: EaseIconButton(
                             onPressed: () {
-                              FlutterBugly.checkUpgrade().then((_) {
-                                return FlutterBugly.getUpgradeInfo();
-                              }).then((info) {
-                                print('$info');
-                                PackageInfo.fromPlatform().then((packageInfo) {
-                                  if (info != null &&
-                                      int.parse(packageInfo.buildNumber) <
-                                          info.versionCode) {
-                                    showUpdateDialog(context, info);
-                                  } else {
-                                    showToast("已经是最新版本");
-                                  }
-                                });
-                              });
+                              _doCheckUpdate(context);
                             },
                             iconData: Icons.cached,
                             buttonLabel: "检查更新",
@@ -346,29 +549,7 @@ class _MinePageState extends State<MinePage> {
                     Expanded(
                       child: EaseIconButton(
                         onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text("退出"),
-                                  content: Text("确定退出安心居吗?"),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text("取消")),
-                                    FlatButton(
-                                        onPressed: () {
-                                          if (Navigator.of(context).pop()) {
-                                            UserModel.of(context)
-                                                .logout(context);
-                                          }
-                                        },
-                                        child: Text("退出")),
-                                  ],
-                                );
-                              });
+                          doLogout(context);
                         },
                         buttonLabel: "退出登录",
                         iconData: Icons.exit_to_app,
@@ -380,14 +561,7 @@ class _MinePageState extends State<MinePage> {
                 SizedBox(
                   height: 20,
                 ),
-                Consumer<AppInfoModel>(
-                  builder:
-                      (BuildContext context, AppInfoModel value, Widget child) {
-                    return Center(
-                      child: Text(value.appInfoString,style: Theme.of(context).textTheme.caption,),
-                    );
-                  },
-                ),
+                _buildVersionInfo(),
                 SizedBox(
                   height: 50,
                 ),
@@ -397,6 +571,61 @@ class _MinePageState extends State<MinePage> {
         );
       },
     );
+  }
+
+  void _doCheckUpdate(BuildContext context) {
+    FlutterBugly.checkUpgrade().then((_) {
+      return FlutterBugly.getUpgradeInfo();
+    }).then((info) {
+      print('$info');
+      PackageInfo.fromPlatform().then((packageInfo) {
+        if (info != null &&
+            int.parse(packageInfo.buildNumber) <
+                info.versionCode) {
+          showUpdateDialog(context, info);
+        } else {
+          showToast("已经是最新版本");
+        }
+      });
+    });
+  }
+
+  Consumer<AppInfoModel> _buildVersionInfo() {
+    return Consumer<AppInfoModel>(
+      builder: (BuildContext context, AppInfoModel value, Widget child) {
+        return Center(
+          child: Text(
+            value.appInfoString,
+            style: Theme.of(context).textTheme.caption,
+          ),
+        );
+      },
+    );
+  }
+
+  Future doLogout(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("退出"),
+            content: Text("确定退出安心居吗?"),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("取消")),
+              FlatButton(
+                  onPressed: () {
+                    if (Navigator.of(context).pop()) {
+                      UserModel.of(context).logout(context);
+                    }
+                  },
+                  child: Text("退出")),
+            ],
+          );
+        });
   }
 
   void showReAuthDialog(BuildContext context, bool notVerify) {
@@ -441,26 +670,22 @@ class _MinePageState extends State<MinePage> {
   buildActions(BuildContext context) {
     return <Widget>[
       DistrictInfoButton(),
+      Consumer<UserRoleModel>(
+        builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
+          return roleModel.hasSwitch
+              ? FlatButton.icon(
+                  icon: Icon(
+                    Icons.repeat,
+                    color: Colors.blue,
+                  ),
+                  onPressed: () {
+                    roleModel.switchRole();
+                  },
+                  label: Text("${roleModel.switchString}"),
+                )
+              : Container();
+        },
+      ),
     ];
-  }
-
-  ///未认证
-  Widget _buildUnauthorized(
-    BuildContext context,
-    UserModel userModel,
-    UserVerifyStatusModel userVerifyStatus,
-    UserRoleModel roleModel,
-  ) {
-    return Stack(
-      children: <Widget>[
-        AbsorbPointer(
-          absorbing: true,
-          child: _buildMine(context, userModel, userVerifyStatus, roleModel),
-        ),
-        buildCertificationDialog(context, () {
-          MainIndexModel.of(context).currentIndex = PAGE_HOME;
-        })
-      ],
-    );
   }
 }

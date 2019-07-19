@@ -2,6 +2,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'index.dart';
+import 'model/district_model.dart';
 import 'model/main_index_model.dart';
 import 'model/user_model.dart';
 import 'model/user_verify_status_model.dart';
@@ -293,6 +294,7 @@ Future toWebPage(BuildContext context, String indexId,
     bool checkFaceVerified = true}) async {
   var userVerifyStatusModel = UserVerifyStatusModel.of(context);
   var userModel = UserModel.of(context);
+  var districtModel = DistrictModel.of(context);
   if (checkFaceVerified || checkHasHouse) {
     if (!userModel.isLogin) {
       return Navigator.of(context).pushNamed("/login");
@@ -304,7 +306,7 @@ Future toWebPage(BuildContext context, String indexId,
     }
   }
   if (checkHasHouse) {
-    if (!userVerifyStatusModel.hasHouse()) {
+    if (!districtModel.hasHouse()) {
       return showApplyHouseDialog(context);
     }
   }

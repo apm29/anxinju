@@ -74,9 +74,9 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
                   builder: (context, contactsSnap) {
                     if (contactsSnap.hasError ||
                         !contactsSnap.hasData ||
-                        contactsSnap.data.length == 0) {
+                        (contactsSnap.data?.length??0) == 0) {
                       return Center(
-                        child: Text("未获取到联系人信息"),
+                        child: Text("没有权限或\n未获取到联系人",textAlign: TextAlign.center,),
                       );
                     } else {
                       var list = contactsSnap.data.where((i) {

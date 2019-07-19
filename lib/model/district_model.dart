@@ -68,6 +68,8 @@ class DistrictModel extends ChangeNotifier {
         _mCurrentDistrict = _allDistrictList[0];
       }
       return;
+    }).then((_){
+      tryFetchHouseList(getCurrentDistrictId());
     });
   }
 
@@ -102,15 +104,13 @@ class DistrictModel extends ChangeNotifier {
     return _mCurrentDistrict == allDistricts[index];
   }
 
-  void selectCurrentDistrict(int index, BuildContext context) async {
+  Future selectCurrentDistrict(int index, BuildContext context) async {
     _mCurrentDistrict = allDistricts[index];
-    UserVerifyStatusModel.of(context).tryFetchHouseList(getCurrentDistrictId());
-
+    await tryFetchHouseList(getCurrentDistrictId());
     await UserModel.of(context).tryFetchUserInfoAndLogin();
     await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
     await MainIndexModel.of(context).tryGetCurrentLocation();
-    await UserRoleModel.of(context).tryFetchUserRoleTypes();
-    Navigator.of(context).pop();
+    await UserRoleModel.of(context).tryFetchUserRoleTypes(context,dispatchUser: false);
   }
 
   int getCurrentDistrictId() {
@@ -119,5 +119,32 @@ class DistrictModel extends ChangeNotifier {
 
   int countOfDistricts() {
     return allDistricts?.length ?? 0;
+  }
+
+  List<HouseDetail> _housesInCurrentDistrict;
+
+  List<HouseDetail> get housesInCurrentDistrict => _housesInCurrentDistrict;
+
+  set housesInCurrentDistrict(List<HouseDetail> value) {
+    if (listEquals(_housesInCurrentDistrict, value)) {
+      return;
+    }
+    _housesInCurrentDistrict = value;
+    notifyListeners();
+  }
+
+  ///身份证名下有房,或者当前小区有房子接纳user为成员
+  bool hasHouse() {
+    return (housesInCurrentDistrict != null &&
+        housesInCurrentDistrict.length > 0);
+  }
+
+  Future tryFetchHouseList(int districtId) {
+    return Api.getMyHouse(districtId).then((resp) {
+      if (resp.success) {
+        housesInCurrentDistrict = resp.data;
+      }
+      return;
+    });
   }
 }

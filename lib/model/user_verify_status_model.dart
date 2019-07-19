@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ease_life/remote/api.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class UserVerifyStatusModel extends ChangeNotifier {
   }
 
   UserVerifyStatusModel() {
-    tryFetchVerifyStatus();
+    //tryFetchVerifyStatus();
   }
 
   Future tryFetchVerifyStatus() async {
@@ -33,24 +34,6 @@ class UserVerifyStatusModel extends ChangeNotifier {
         status = resp.data;
       } else {
         showToast(resp.text);
-      }
-      return;
-    });
-  }
-
-  List<HouseDetail> _housesInCurrentDistrict;
-
-  List<HouseDetail> get housesInCurrentDistrict => _housesInCurrentDistrict;
-
-  set housesInCurrentDistrict(List<HouseDetail> value) {
-    _housesInCurrentDistrict = value;
-    notifyListeners();
-  }
-
-  Future tryFetchHouseList(int districtId) {
-    return Api.getMyHouse(districtId).then((resp) {
-      if (resp.success) {
-        housesInCurrentDistrict = resp.data;
       }
       return;
     });
@@ -105,12 +88,6 @@ class UserVerifyStatusModel extends ChangeNotifier {
 
   bool isVerified() {
     return status?.isVerified() ?? false;
-  }
-
-  ///身份证名下有房,或者当前小区有房子接纳user为成员
-  bool hasHouse() {
-    return (status?.hasHouse() ?? false) ||
-        (housesInCurrentDistrict != null && housesInCurrentDistrict.length > 0);
   }
 
   void logout() {
