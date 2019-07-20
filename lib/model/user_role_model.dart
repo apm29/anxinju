@@ -59,7 +59,6 @@ class UserRoleModel extends ChangeNotifier {
       return false;
     }
     var commonRole = getFirstRoleUserByCode("2,4,5");
-    var hasHouse = DistrictModel.of(context).hasHouse();
     if (commonRole != null && uncommonRole != null ) {
       return true;
     }

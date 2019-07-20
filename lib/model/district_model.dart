@@ -82,6 +82,9 @@ class DistrictModel extends ChangeNotifier {
   }
 
   String getDistrictPic(int index) {
+    if(index<0||index>=allDistricts.length){
+      return "http://files.ciih.net/M00/07/2B/wKjIo10VonaAVHnyACnnGqMJ8mQ375.png";
+    }
     var pic = allDistricts[index]?.districtPic;
     return (pic == null || pic.isEmpty)
         ? "http://files.ciih.net/M00/07/2B/wKjIo10VonaAVHnyACnnGqMJ8mQ375.png"

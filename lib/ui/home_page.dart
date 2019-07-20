@@ -26,7 +26,6 @@ class HomePage extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(17)),
         child: ListView(
           key: PageStorageKey("HOME_PAGE"),
-          physics: AlwaysScrollableScrollPhysics(),
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(top: 10),
@@ -121,7 +120,6 @@ class HomePage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Padding(
@@ -154,55 +152,11 @@ class HomePage extends StatelessWidget {
                               ),
                             );
                           }
-                          return Wrap(
-                            children: announcementModel.announcements.map((detail){
-                              return Material(
-                                color: Colors.white,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) {
-                                          return WebViewExample(
-                                              "$BASE_URL#/contentDetails?contentId=${detail.noticeId}");
-                                        }));
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(7.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          child: Text(
-                                            announcementModel
-                                                .typeTitleByDetail(detail),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                            ),
-                                          ),
-                                          decoration: BoxDecoration(
-                                              color: colors[detail.noticeType %
-                                                  colors.length],
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(8))),
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            detail.noticeTitle,
-                                            style: Theme.of(context).textTheme.caption,
-                                            textAlign: TextAlign.start,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
+                          return Column(
+                            children:
+                                announcementModel.announcements.map((detail) {
+                              return _buildAnnouncementTile(
+                                  context, detail, announcementModel);
                             }).toList(),
                           );
                         },
@@ -229,29 +183,29 @@ class HomePage extends StatelessWidget {
                 color: Colors.white,
                 child: Wrap(
                   children: <Widget>[
-                    HomeChip(
+                    const HomeChip(
                       color: const Color(0xFF16A702),
                       title: "通知公告",
                       indexId: WebIndexID.TONG_ZHI_TONG_GAO,
                       checkIsFaceVerified: false,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "访客系统",
                       indexId: WebIndexID.FANG_KE_XI_TONG,
                       checkIsFaceVerified: true,
                       checkHasHouse: true,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "车辆管理",
                       indexId: WebIndexID.CHE_LIANG_GUAN_LI,
                       checkIsFaceVerified: false,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "维护报修",
                       indexId: WebIndexID.WEI_HU_BAO_XIU,
                       checkIsFaceVerified: false,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "便民地图",
                       indexId: WebIndexID.BIAN_MIN_DI_TU,
                       checkIsFaceVerified: false,
@@ -297,13 +251,13 @@ class HomePage extends StatelessWidget {
                 color: Colors.white,
                 child: Wrap(
                   children: <Widget>[
-                    HomeChip(
+                    const HomeChip(
                       color: const Color(0xFF000078),
                       title: "警务查询",
                       indexId: WebIndexID.JING_WU_CHA_XUN,
                       checkIsFaceVerified: false,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "巡更管理",
                       indexId: WebIndexID.XUN_GENG_GUAN_LI,
                       checkHasHouse: true,
@@ -330,23 +284,23 @@ class HomePage extends StatelessWidget {
                 color: Colors.white,
                 child: Wrap(
                   children: <Widget>[
-                    HomeChip(
+                    const HomeChip(
                       color: const Color(0xFFCD0004),
                       title: "功德栏",
                       indexId: WebIndexID.GONG_DE_LAN,
                       checkIsFaceVerified: false,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "义警活动",
                       indexId: WebIndexID.YI_JING_HUO_DONG,
                       checkIsFaceVerified: false,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "慈善公益",
                       indexId: WebIndexID.CI_SHAN_GONG_YI,
                       checkIsFaceVerified: false,
                     ),
-                    HomeChip(
+                    const HomeChip(
                       title: "小区活动",
                       indexId: WebIndexID.XIAO_QU_HUO_DONG,
                       checkIsFaceVerified: false,
@@ -356,14 +310,73 @@ class HomePage extends StatelessWidget {
                       indexId: WebIndexID.XIAN_ZHI_JIAO_HUAN,
                       checkIsFaceVerified: false,
                     ),
+                    HomeChip(
+                      title: "业主问政",
+                      indexId: WebIndexID.YE_ZHU_WEN_ZHENG,
+                      checkHasHouse: false,
+                    ),
                   ],
                 ),
               ),
             ),
             Container(
-              height: 50,
+              height: 80,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Material _buildAnnouncementTile(BuildContext context, Announcement detail,
+      AnnouncementModel announcementModel) {
+    return Material(
+      color: Colors.white,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) {
+                return WebViewExample(
+                  "$BASE_URL#/contentDetails?contentId=${detail.noticeId}",
+                );
+              },
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(7.0),
+          child: Row(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  announcementModel.typeTitleByDetail(detail),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  color: colors[detail.noticeType % colors.length],
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(8),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Text(
+                  detail.noticeTitle,
+                  style: Theme.of(context).textTheme.caption,
+                  textAlign: TextAlign.start,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

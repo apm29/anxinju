@@ -63,6 +63,8 @@ class WebIndexID {
   static const XUN_LUO_JI_LU = "xljl";
 
   static const BIAN_MIN_DI_TU = "bmdt";
+
+  static const YE_ZHU_WEN_ZHENG = "yzwz";
 }
 
 

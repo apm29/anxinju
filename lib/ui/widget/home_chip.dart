@@ -19,7 +19,7 @@ class HomeChip extends StatelessWidget {
   final bool checkLogin;
   final bool wrap;
 
-  HomeChip({
+  const HomeChip({
     @required this.title,
     this.onPressed,
     this.color = Colors.white,

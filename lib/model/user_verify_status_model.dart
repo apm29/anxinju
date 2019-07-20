@@ -25,7 +25,7 @@ class UserVerifyStatusModel extends ChangeNotifier {
   }
 
   UserVerifyStatusModel() {
-    //tryFetchVerifyStatus();
+    tryFetchVerifyStatus();
   }
 
   Future tryFetchVerifyStatus() async {

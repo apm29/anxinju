@@ -1,6 +1,8 @@
 package com.example.ease_life;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.inputmethod.InputMethodManager;
 
@@ -36,5 +38,9 @@ public class MainActivity extends FlutterActivity {
                     }
                 }
         );
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
     }
 }

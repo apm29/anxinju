@@ -147,18 +147,16 @@ class MainPageState extends State<MainPage> {
     ///监听主页面切换
     return Consumer<MainIndexModel>(
       builder: (BuildContext context, MainIndexModel indexModel, Widget child) {
-        switch (indexModel.currentIndex) {
-          case PAGE_HOME:
-            return HomePage();
-          case PAGE_SEARCH:
-            return buildTestPage();
-          case PAGE_MESSAGE:
-            return MessagePage();
-          case PAGE_MINE:
-            return MinePage();
-          default:
-            throw Exception("无效索引");
-        }
+        return IndexedStack(
+          children: <Widget>[
+            HomePage(),
+            MinePage(),
+            buildTestPage(),
+            MessagePage(),
+
+          ],
+          index: indexModel.currentIndex,
+        );
       },
     );
   }

@@ -48,7 +48,7 @@ class _MinePageState extends State<MinePage> {
           }
           return AnimatedSwitcher(
             duration: Duration(seconds: 1),
-            child: roleModel.currentRole.isPropertyRole()
+            child: roleModel.currentRole?.isPropertyRole() ?? false
                 ? _buildPropertyMine(context, userModel, userVerifyStatus,
                     roleModel, districtModel)
                 : _buildCommonMine(context, userModel, userVerifyStatus,
@@ -79,192 +79,194 @@ class _MinePageState extends State<MinePage> {
     String url = userModel.userDetail?.avatar;
     String userName =
         userModel.userName ?? userModel.userDetail?.nickName ?? "";
-    return DefaultTextStyle(
-      style: TextStyle(color: Colors.blueGrey),
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Stack(
-              alignment: Alignment.topCenter,
-              children: <Widget>[
-                Container(
-                  height: ScreenUtil().setHeight(420),
-                  width: MediaQuery.of(context).size.width,
-                  child: FadeInImage.assetNetwork(
-                    fit: BoxFit.cover,
-                    placeholder: "images/ic_banner_mine.png",
-                    image: districtModel.getDistrictPic(
-                      districtModel.getCurrentDistrictIndex(),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(
-                      top: ScreenUtil().setHeight(210), left: 16, right: 16),
-                  height: 135,
-                  width: MediaQuery.of(context).size.width,
-                  child: Material(
-                    elevation: 1,
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(8),
-                    ),
-                    child: Container(
-                      margin: EdgeInsets.only(top: ScreenUtil().setHeight(100)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          EaseIconGradientButton(
-                            1,
-                            "我的设置",
-                            () {
-                              showToast("未完成");
-                            },
-                            Icons.settings,
-                          ),
-                          EaseIconGradientButton(
-                            2,
-                            "我的消息",
-                            () {
-                              showToast("未完成");
-                            },
-                            Icons.message,
-                          ),
-                          EaseIconGradientButton(
-                            3,
-                            "我的爱车",
-                            () {
-                              toWebPage(context, WebIndexID.WO_DE_AI_CHE,
-                                  checkFaceVerified: false);
-                            },
-                            Icons.directions_car,
-                          ),
-                        ],
+    return Container(
+      color: Colors.grey[100],
+      child: DefaultTextStyle(
+        style: TextStyle(color: Colors.blueGrey),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Stack(
+                alignment: Alignment.topCenter,
+                children: <Widget>[
+                  Container(
+                    height: ScreenUtil().setHeight(420),
+                    width: MediaQuery.of(context).size.width,
+                    child: FadeInImage.assetNetwork(
+                      fit: BoxFit.cover,
+                      placeholder: "images/banner_home_back.webp",
+                      image: districtModel.getDistrictPic(
+                        districtModel.getCurrentDistrictIndex(),
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  top: ScreenUtil().setHeight(210) - ScreenUtil().setHeight(90),
-                  left: 42,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Container(
-                        constraints: BoxConstraints.tight(Size(
-                          ScreenUtil().setHeight(180),
-                          ScreenUtil().setHeight(180),
-                        )),
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey[200],
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          border: Border.all(width: 2, color: Colors.white),
-                        ),
-                        child: url != null
-                            ? Image.network(
-                                url,
-                                fit: BoxFit.cover,
-                              )
-                            : Icon(
-                                Icons.person_outline,
-                                color: Colors.white,
-                              ),
+                  Container(
+                    margin: EdgeInsets.only(
+                        top: ScreenUtil().setHeight(210), left: 16, right: 16),
+                    height: 135,
+                    width: MediaQuery.of(context).size.width,
+                    child: Material(
+                      elevation: 1,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8),
                       ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        userName,
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Container(
+                      child: Container(
+                        margin: EdgeInsets.only(top: ScreenUtil().setHeight(100)),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
-                            Icon(
-                              isVerified ? Icons.verified_user : Icons.error,
-                              color: isVerified ? Colors.green : Colors.red,
-                              size: 12,
+                            EaseIconGradientButton(
+                              1,
+                              "我的设置",
+                              () {
+                                showToast("未完成");
+                              },
+                              Icons.settings,
                             ),
-                            Text(
-                              "物业人员",
-                              style: TextStyle(fontSize: 12),
+                            EaseIconGradientButton(
+                              2,
+                              "我的消息",
+                              () {
+                                Navigator.of(context)
+                                    .pushNamed(NotificationMessagePage.routeName);
+                              },
+                              Icons.message,
+                            ),
+                            EaseIconGradientButton(
+                              3,
+                              "我的爱车",
+                              () {
+                                toWebPage(context, WebIndexID.WO_DE_AI_CHE,
+                                    checkFaceVerified: false);
+                              },
+                              Icons.directions_car,
                             ),
                           ],
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blueGrey[400]),
-                            borderRadius: BorderRadius.all(Radius.circular(4))),
-                        margin: EdgeInsets.only(left: 2),
                       ),
-                    ],
+                    ),
                   ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 24,
-            ),
-            EaseTile(
-              title: "出入记录",
-              iconData: Icons.list,
-              onPressed: () {
-                toWebPage(context, WebIndexID.CHU_RU_JI_LU,
-                    checkFaceVerified: false);
-              },
-            ),
-            EaseTile(
-              title: "巡更管理",
-              iconData: Icons.map,
-              onPressed: () {
-                toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
-                    checkFaceVerified: false);
-              },
-            ),
-            EaseTile(
-              title: "出入记录",
-              iconData: Icons.directions_run,
-              onPressed: () {
-                toWebPage(context, WebIndexID.CHU_RU_JI_LU,
-                    checkFaceVerified: false);
-              },
-            ),
-            EaseTile(
-              title: "访客系统",
-              iconData: Icons.group_add,
-              onPressed: () {
-                toWebPage(context, WebIndexID.FANG_KE_XI_TONG,
-                    checkFaceVerified: false);
-              },
-            ),
-            EaseTile(
-              title: "检查更新",
-              iconData: Icons.cached,
-              onPressed: () {
-               _doCheckUpdate(context);
-              },
-            ),
-            SizedBox(
-              height: ScreenUtil().setHeight(16),
-            ),
-            _buildVersionInfo(),
-            SizedBox(
-              height: ScreenUtil().setHeight(80),
-            ),
-
-            GradientButton(
-              Text("登出"),
-              onPressed: () async {
-                await doLogout(context);
-              },
-            ),
-
-            SizedBox(
-              height: ScreenUtil().setHeight(700),
-            )
-          ],
+                  Positioned(
+                    top: ScreenUtil().setHeight(210) - ScreenUtil().setHeight(90),
+                    left: 42,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          constraints: BoxConstraints.tight(Size(
+                            ScreenUtil().setHeight(180),
+                            ScreenUtil().setHeight(180),
+                          )),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey[200],
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            border: Border.all(width: 2, color: Colors.white),
+                          ),
+                          child: url != null
+                              ? Image.network(
+                                  url,
+                                  fit: BoxFit.cover,
+                                )
+                              : Icon(
+                                  Icons.person_outline,
+                                  color: Colors.white,
+                                ),
+                        ),
+                        SizedBox(
+                          width: 12,
+                        ),
+                        Text(
+                          userName,
+                        ),
+                        SizedBox(
+                          width: 12,
+                        ),
+                        Container(
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                isVerified ? Icons.verified_user : Icons.error,
+                                color: isVerified ? Colors.green : Colors.red,
+                                size: 12,
+                              ),
+                              Text(
+                                "物业人员",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blueGrey[400]),
+                              borderRadius: BorderRadius.all(Radius.circular(4))),
+                          margin: EdgeInsets.only(left: 2),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              EaseTile(
+                title: "出入记录",
+                iconData: Icons.list,
+                onPressed: () {
+                  toWebPage(context, WebIndexID.CHU_RU_JI_LU,
+                      checkFaceVerified: false);
+                },
+              ),
+              EaseTile(
+                title: "巡更管理",
+                iconData: Icons.map,
+                onPressed: () {
+                  toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
+                      checkFaceVerified: false);
+                },
+              ),
+              EaseTile(
+                title: "出入记录",
+                iconData: Icons.directions_run,
+                onPressed: () {
+                  toWebPage(context, WebIndexID.CHU_RU_JI_LU,
+                      checkFaceVerified: false);
+                },
+              ),
+              EaseTile(
+                title: "访客系统",
+                iconData: Icons.group_add,
+                onPressed: () {
+                  toWebPage(context, WebIndexID.FANG_KE_XI_TONG,
+                      checkFaceVerified: false);
+                },
+              ),
+              EaseTile(
+                title: "检查更新",
+                iconData: Icons.cached,
+                onPressed: () {
+                  _doCheckUpdate(context);
+                },
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(16),
+              ),
+              _buildVersionInfo(),
+              SizedBox(
+                height: ScreenUtil().setHeight(80),
+              ),
+              GradientButton(
+                Text("登出"),
+                onPressed: () async {
+                  await doLogout(context);
+                },
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(700),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -278,8 +280,7 @@ class _MinePageState extends State<MinePage> {
     DistrictModel districtModel,
   ) {
     bool isVerified = userVerifyStatusModel.isVerified() ||
-        roleModel.currentRole.isPropertyRole();
-    ;
+        (roleModel.currentRole?.isPropertyRole()??false);
     bool notVerify = userVerifyStatusModel.isNotVerified();
     bool hasHouse = districtModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();
@@ -309,7 +310,7 @@ class _MinePageState extends State<MinePage> {
                     children: <Widget>[
                       Positioned.fill(
                         child: Image.asset(
-                          "images/ic_banner_mine.png",
+                          "images/banner_home_back.webp",
                           fit: BoxFit.fill,
                           height: ScreenUtil().setHeight(350),
                         ),
@@ -516,12 +517,12 @@ class _MinePageState extends State<MinePage> {
                           child: Wrap(
                             alignment: WrapAlignment.start,
                             children: <Widget>[
-                              HomeChip(
+                              const HomeChip(
                                 color: const Color(0xff00007c),
                                 title: "访客记录",
                                 indexId: WebIndexID.FANG_KE_JI_LU,
                               ),
-                              HomeChip(
+                              const HomeChip(
                                 title: "巡逻记录",
                                 indexId: WebIndexID.XUN_LUO_JI_LU,
                               ),
@@ -563,7 +564,7 @@ class _MinePageState extends State<MinePage> {
                 ),
                 _buildVersionInfo(),
                 SizedBox(
-                  height: 50,
+                  height: 80,
                 ),
               ],
             ),
@@ -580,8 +581,7 @@ class _MinePageState extends State<MinePage> {
       print('$info');
       PackageInfo.fromPlatform().then((packageInfo) {
         if (info != null &&
-            int.parse(packageInfo.buildNumber) <
-                info.versionCode) {
+            int.parse(packageInfo.buildNumber) < info.versionCode) {
           showUpdateDialog(context, info);
         } else {
           showToast("已经是最新版本");

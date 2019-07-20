@@ -428,7 +428,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   StreamBuilder<WSMessage> buildStatusPart() {
     return StreamBuilder<WSMessage>(
       builder: (_, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data!=null) {
           if (snapshot.data.type == MessageType.COMMAND) {
             return Container(
               alignment: Alignment.center,
