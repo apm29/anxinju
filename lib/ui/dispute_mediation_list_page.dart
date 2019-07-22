@@ -179,8 +179,24 @@ class _MediationListPageState extends State<MediationListPage>
             }));
           },
           child: ListTile(
-            title: Text("$title($result)"),
-            subtitle: Text("开始时间:$time"),
+            title: Text.rich(
+              TextSpan(
+                style: Theme.of(context).textTheme.subtitle,
+                text: title,
+                children: [
+                  TextSpan(
+                    text: "($result)",
+                    style: Theme.of(context).textTheme.subtitle.copyWith(
+                          color: data.statusColor,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            subtitle: Text(
+              "开始时间:$time",
+              style: Theme.of(context).textTheme.caption,
+            ),
             contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
             leading: Icon(
               data.mediationFinished ? Icons.check : Icons.access_time,
@@ -347,40 +363,88 @@ class _MediationListPageState extends State<MediationListPage>
                   ),
                 ),
                 children: <Widget>[
-                  Row(
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(left: 24),
-                        child: Text("图片描述:"),
+                      Divider(
+                        color: Colors.grey[300],
+                        indent: 24,
+                        endIndent: 48,
                       ),
-                      SizedBox(
-                        width: 12,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(left: 24),
+                            child: Text("文字描述: "),
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          Expanded(
+                            child: Text(
+                              data.description,
+                              maxLines: 1000,
+                              style: Theme.of(context).textTheme.caption,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Wrap(
-                          alignment: WrapAlignment.start,
-                          children: data.images.map((url) {
-                            return InkWell(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(builder: (context) {
-                                  return PicturePage(url);
-                                }));
-                              },
-                              child: SizedBox(
-                                height: MediaQuery.of(context).size.width / 4,
-                                width: MediaQuery.of(context).size.width / 4,
-                                child: Hero(
-                                  tag: url,
-                                  child: Image.network(
-                                    url,
-                                    fit: BoxFit.cover,
+                      Divider(
+                        color: Colors.grey[300],
+                        indent: 24,
+                        endIndent: 48,
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(left: 24),
+                            child: Text("图片描述:"),
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          (data.images == null || data.images.length == 0)
+                              ? Text(
+                                  "暂无图片",
+                                  style: Theme.of(context).textTheme.caption,
+                                )
+                              : Expanded(
+                                  child: Wrap(
+                                    alignment: WrapAlignment.start,
+                                    children: data.images.map((url) {
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                            return PicturePage(url);
+                                          }));
+                                        },
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          child: Hero(
+                                            tag: url,
+                                            child: Image.network(
+                                              url,
+                                              fit: BoxFit.cover,
+                                              loadingBuilder: imagePlaceHolder,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
                                   ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                        ],
                       ),
                     ],
                   )
@@ -422,9 +486,8 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
         backgroundColor: Colors.blue,
         title: Text(
           "添加调解申请",
-          style: Theme.of(context).textTheme.title.copyWith(
-            color: Colors.white
-          ),
+          style:
+              Theme.of(context).textTheme.title.copyWith(color: Colors.white),
         ),
         elevation: 0,
       ),
@@ -432,20 +495,18 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
       bottomNavigationBar: _buildBottomAction(),
     );
   }
+
   static const double kVerticalPadding = 8;
 
   Widget _buildBody(BuildContext context, Color filledColor) {
-
     return ApplyStepperWidget(
       child: Container(
         child: Form(
           key: _formKey,
           autovalidate: true,
           child: Material(
-            textStyle: Theme.of(context)
-                .textTheme
-                .body1
-                .copyWith(color: Colors.blue),
+            textStyle:
+                Theme.of(context).textTheme.body1.copyWith(color: Colors.blue),
             elevation: 1,
             color: Colors.white,
             child: Container(
@@ -467,12 +528,11 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                       key: ValueKey("title"),
                       style: Theme.of(context).textTheme.body1,
                       validator: (s) =>
-                      (s.length >= 4) ? null : "标题长度必须大于等于4个字符",
+                          (s.length >= 4) ? null : "标题长度必须大于等于4个字符",
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         fillColor: filledColor,
-                        filled:
-                        _formKey.currentState?.validate() ?? false,
+                        filled: _formKey.currentState?.validate() ?? false,
                       ),
                       controller: _titleController,
                       maxLength: 20,
@@ -501,12 +561,11 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                       style: Theme.of(context).textTheme.body1,
                       key: ValueKey("desc"),
                       validator: (s) =>
-                      (s.length >= 10) ? null : "描述长度必须大于等于10字符",
+                          (s.length >= 10) ? null : "描述长度必须大于等于10字符",
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         fillColor: filledColor,
-                        filled:
-                        _formKey.currentState?.validate() ?? false,
+                        filled: _formKey.currentState?.validate() ?? false,
                       ),
                       controller: _descController,
                       maxLength: 140,
@@ -531,8 +590,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                   ),
                   Consumer<MediationApplicationAddModel>(
                     builder: (BuildContext context,
-                        MediationApplicationAddModel model,
-                        Widget child) {
+                        MediationApplicationAddModel model, Widget child) {
                       return Container(
                         height: ScreenUtil().setHeight(116),
                         decoration: BoxDecoration(
@@ -550,18 +608,16 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                           iconSize: 36,
                           items: model.houseList
                               .map((user) => DropdownMenuItem(
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8.0),
-                              child: Text(
-                                user.addr,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .body1,
-                              ),
-                            ),
-                            value: user,
-                          ))
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        user.addr,
+                                        style:
+                                            Theme.of(context).textTheme.body1,
+                                      ),
+                                    ),
+                                    value: user,
+                                  ))
                               .toList(),
                           onChanged: (item) {
                             model.currentHouse = item;
@@ -591,8 +647,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                   ),
                   Consumer<MediationApplicationAddModel>(
                     builder: (BuildContext context,
-                        MediationApplicationAddModel model,
-                        Widget child) {
+                        MediationApplicationAddModel model, Widget child) {
                       return Container(
                         height: ScreenUtil().setHeight(116),
                         decoration: BoxDecoration(
@@ -610,19 +665,18 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                           iconSize: 36,
                           items: model.mediatorList
                               .map((user) => DropdownMenuItem(
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8.0),
-                              child: Text(
-                                user.userName,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .body1
-                                    .copyWith(),
-                              ),
-                            ),
-                            value: user,
-                          ))
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        user.userName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .body1
+                                            .copyWith(),
+                                      ),
+                                    ),
+                                    value: user,
+                                  ))
                               .toList(),
                           onChanged: (item) {
                             model.currentMediator = item;
@@ -653,65 +707,44 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                   ),
                   Consumer<MediationApplicationAddModel>(
                     builder: (BuildContext context,
-                        MediationApplicationAddModel model,
-                        Widget child) {
+                        MediationApplicationAddModel model, Widget child) {
                       List<Widget> list = model.images
                           .map(
-                            (url) => Container(
-                          height:
-                          MediaQuery.of(context).size.width / 4,
-                          width:
-                          MediaQuery.of(context).size.width / 4,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 0.5, color: Colors.blue[200]),
-                          ),
-                          margin: EdgeInsets.all(kVerticalPadding),
-                          child: Stack(
-                            children: <Widget>[
-                              Positioned.fill(
-                                child: Image.network(
-                                  url,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent
-                                      loadingProgress) {
-                                    if (loadingProgress == null)
-                                      return child;
-                                    return Center(
-                                      child:
-                                      CircularProgressIndicator(
-                                        value: loadingProgress
-                                            .expectedTotalBytes !=
-                                            null
-                                            ? loadingProgress
-                                            .cumulativeBytesLoaded /
-                                            loadingProgress
-                                                .expectedTotalBytes
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                ),
+                            (url) {
+                              return Container(
+                              height: MediaQuery.of(context).size.width / 4,
+                              width: MediaQuery.of(context).size.width / 4,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 0.5, color: Colors.blue[200]),
                               ),
-                              Align(
-                                alignment: Alignment(1, -1),
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.remove_circle,
-                                    color: Colors.red[400],
+                              margin: EdgeInsets.all(kVerticalPadding),
+                              child: Stack(
+                                children: <Widget>[
+                                  Positioned.fill(
+                                    child: Image.network(
+                                      url,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: imagePlaceHolder,
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    model.remove(url);
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      )
+                                  Align(
+                                    alignment: Alignment(1, -1),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.red[400],
+                                      ),
+                                      onPressed: () {
+                                        model.remove(url);
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                            },
+                          )
                           .toList();
                       list.add(
                         Container(
@@ -771,7 +804,9 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                   ),
                 ),
                 gradient: LinearGradient(colors: [
-                    Colors.redAccent,Colors.deepOrange,Colors.redAccent
+                  Colors.redAccent,
+                  Colors.deepOrange,
+                  Colors.redAccent
                 ]),
                 unconstrained: false,
                 borderRadius: 0,

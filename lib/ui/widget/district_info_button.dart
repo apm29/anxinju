@@ -29,12 +29,13 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
   Widget build(BuildContext context) {
     return Consumer<DistrictModel>(
       builder: (BuildContext context, DistrictModel value, Widget child) {
-        bool isLogin = UserModel.of(context).isLogin;
-        UserRoleModel roleModel = UserRoleModel.of(context,listen: true);
-        bool isVerified = UserVerifyStatusModel.of(context).isVerified() ||
-            (roleModel.currentRole?.isPropertyRole()??false);
-        String verifyText = UserVerifyStatusModel.of(context).getVerifyText();
-        var textString = isLogin
+        final bool isLogin = UserModel.of(context).isLogin;
+        final UserRoleModel roleModel = UserRoleModel.of(context,listen: true);
+        final UserVerifyStatusModel verifyStatusModel = UserVerifyStatusModel.of(context);
+        final bool isVerified = verifyStatusModel.isVerified() ||
+            (roleModel.isOnPropertyDuty);
+        final String verifyText = verifyStatusModel.getVerifyText();
+        final String textString = isLogin
             ? isVerified ? value.getCurrentDistrictName() : verifyText
             : "未登录";
         return FlatButton.icon(

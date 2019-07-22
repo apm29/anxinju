@@ -7,9 +7,14 @@ import 'package:ease_life/persistance/db_manager.dart';
 import 'package:ease_life/persistance/shared_preferences.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:soundpool/soundpool.dart';
+
+import '../utils.dart';
 
 enum ConnectStatus { DISCONNECTED, WAIT, CONNECTED }
 
@@ -222,6 +227,9 @@ class WebSocketManager {
     //登录信息验证
     var response = ConnectResponse.fromJson(json.decode(data));
     print('-----------> ${json.decode(data)}');
+
+    playMessageSound();
+
     //ok 3
     switch (response.messageType) {
       case "serviceLogOut":
@@ -283,6 +291,7 @@ class WebSocketManager {
         break;
     }
   }
+
 
   ///发送一个消息
   Future<bool> sendMessage(WSMessage message) async {

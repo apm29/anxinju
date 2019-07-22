@@ -5,7 +5,9 @@ import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
+import 'package:ease_life/ui/setting_page.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'notification_message_page.dart';
 import 'widget/gradient_button.dart';
@@ -46,9 +48,10 @@ class _MinePageState extends State<MinePage> {
           if (!isLogin) {
             return buildVisitor(context);
           }
+          var isOnPropertyDuty = roleModel.isOnPropertyDuty;
           return AnimatedSwitcher(
             duration: Duration(seconds: 1),
-            child: roleModel.currentRole?.isPropertyRole() ?? false
+            child: isOnPropertyDuty
                 ? _buildPropertyMine(context, userModel, userVerifyStatus,
                     roleModel, districtModel)
                 : _buildCommonMine(context, userModel, userVerifyStatus,
@@ -75,7 +78,7 @@ class _MinePageState extends State<MinePage> {
     DistrictModel districtModel,
   ) {
     bool isVerified = userVerifyStatusModel.isVerified() ||
-        roleModel.currentRole.isPropertyRole();
+        roleModel.isOnPropertyDuty;
     String url = userModel.userDetail?.avatar;
     String userName =
         userModel.userName ?? userModel.userDetail?.nickName ?? "";
@@ -106,7 +109,7 @@ class _MinePageState extends State<MinePage> {
                     height: 135,
                     width: MediaQuery.of(context).size.width,
                     child: Material(
-                      elevation: 1,
+                      elevation: 3,
                       color: Colors.white,
                       borderRadius: BorderRadius.all(
                         Radius.circular(8),
@@ -120,7 +123,8 @@ class _MinePageState extends State<MinePage> {
                               1,
                               "我的设置",
                               () {
-                                showToast("未完成");
+                                Navigator.of(context)
+                                    .pushNamed(SettingPage.routeName);
                               },
                               Icons.settings,
                             ),
@@ -211,36 +215,25 @@ class _MinePageState extends State<MinePage> {
                 height: 24,
               ),
               EaseTile(
-                title: "出入记录",
-                iconData: Icons.list,
-                onPressed: () {
-                  toWebPage(context, WebIndexID.CHU_RU_JI_LU,
-                      checkFaceVerified: false);
-                },
-              ),
-              EaseTile(
                 title: "巡更管理",
                 iconData: Icons.map,
                 onPressed: () {
                   toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
                       checkFaceVerified: false);
                 },
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(vertical: 16,horizontal: 12),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
               ),
               EaseTile(
-                title: "出入记录",
-                iconData: Icons.directions_run,
+                title: "通知通告",
+                iconData: Icons.announcement,
                 onPressed: () {
-                  toWebPage(context, WebIndexID.CHU_RU_JI_LU,
+                  toWebPage(context, WebIndexID.TONG_ZHI_TONG_GAO,
                       checkFaceVerified: false);
                 },
-              ),
-              EaseTile(
-                title: "访客系统",
-                iconData: Icons.group_add,
-                onPressed: () {
-                  toWebPage(context, WebIndexID.FANG_KE_XI_TONG,
-                      checkFaceVerified: false);
-                },
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(vertical: 16,horizontal: 12),
               ),
               EaseTile(
                 title: "检查更新",
@@ -248,6 +241,9 @@ class _MinePageState extends State<MinePage> {
                 onPressed: () {
                   _doCheckUpdate(context);
                 },
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(vertical: 16,horizontal: 12),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
               ),
               SizedBox(
                 height: ScreenUtil().setHeight(16),
@@ -279,8 +275,7 @@ class _MinePageState extends State<MinePage> {
     UserRoleModel roleModel,
     DistrictModel districtModel,
   ) {
-    bool isVerified = userVerifyStatusModel.isVerified() ||
-        (roleModel.currentRole?.isPropertyRole()??false);
+    bool isVerified = userVerifyStatusModel.isVerified();
     bool notVerify = userVerifyStatusModel.isNotVerified();
     bool hasHouse = districtModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();

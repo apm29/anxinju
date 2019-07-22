@@ -22,10 +22,10 @@ class GradientButton extends StatefulWidget {
   }) : assert(onPressed != null);
 
   @override
-  _GradientButtonState createState() => _GradientButtonState();
+  GradientButtonState createState() => GradientButtonState();
 }
 
-class _GradientButtonState extends State<GradientButton> {
+class GradientButtonState extends State<GradientButton> {
   bool _loading = false;
   final int _kDelayMilli = 600;
   Timer delayCancelTimer;

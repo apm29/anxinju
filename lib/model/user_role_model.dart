@@ -1,4 +1,6 @@
 import 'package:ease_life/remote/api.dart';
+import 'package:flutter/foundation.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -10,9 +12,12 @@ class UserRoleModel extends ChangeNotifier {
 
   List<UserType> get types => _types ?? [];
 
-  get switchString => (currentRole?.isPropertyRole()??false) ? "物业版" : "用户版";
+  get switchString => (currentRole?.isPropertyRole() ?? false) ? "物业版" : "用户版";
 
   set types(List<UserType> value) {
+    if(listEquals(value,_types)){
+      return;
+    }
     _types = value;
     notifyListeners();
   }
@@ -59,7 +64,7 @@ class UserRoleModel extends ChangeNotifier {
       return false;
     }
     var commonRole = getFirstRoleUserByCode("2,4,5");
-    if (commonRole != null && uncommonRole != null ) {
+    if (commonRole != null && uncommonRole != null) {
       return true;
     }
     return false;
@@ -88,13 +93,28 @@ class UserRoleModel extends ChangeNotifier {
   UserType get currentRole => _currentRole;
 
   set currentRole(UserType value) {
+    if(value == _currentRole){
+      return;
+    }
     _currentRole = value;
+    //切换到物业人员时提示
+    if(isOnPropertyDuty) {
+      showToast("切换角色成功:${_currentRole.roleName}");
+    }
     notifyListeners();
   }
 
   bool _hasSwitch = false;
 
-  bool get hasSwitch => _hasSwitch;
+  bool get hasSwitch {
+    //return _hasSwitch;
+    return false;
+  }
+
+  bool get isOnPropertyDuty {
+   // return currentRole?.isPropertyRole() ?? false;
+    return false;
+  }
 
   set hasSwitch(bool value) {
     if (value == _hasSwitch) {
@@ -104,7 +124,7 @@ class UserRoleModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  static UserRoleModel of(BuildContext context,{bool listen = false}) {
+  static UserRoleModel of(BuildContext context, {bool listen = false}) {
     return Provider.of<UserRoleModel>(context, listen: listen);
   }
 
@@ -153,9 +173,9 @@ class UserRoleModel extends ChangeNotifier {
   }
 
   void switchRole() {
-    if(currentRole.isPropertyRole()){
+    if (currentRole.isPropertyRole()) {
       currentRole = getFirstRoleUserByCode("2,4,5");
-    }else{
+    } else {
       currentRole = getFirstRoleUserByCode("1");
     }
   }

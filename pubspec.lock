@@ -583,6 +583,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  soundpool:
+    dependency: "direct main"
+    description:
+      name: soundpool
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.5.3"
   source_gen:
     dependency: transitive
     description:

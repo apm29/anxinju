@@ -2,6 +2,8 @@ import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/ui/dispute_mediation_list_page.dart';
 import 'package:ease_life/ui/notification_message_page.dart';
+import 'package:ease_life/ui/service_chat_page.dart';
+import 'package:ease_life/ui/setting_page.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'index.dart';
@@ -12,6 +14,7 @@ import 'model/home_end_scroll_model.dart';
 import 'model/main_index_model.dart';
 import 'model/mediation_model.dart';
 import 'model/notification_model.dart';
+import 'model/service_chat_model.dart';
 import 'model/theme_model.dart';
 import 'model/user_model.dart';
 import 'ui/dispute_mediation_page.dart';
@@ -55,10 +58,13 @@ class MyApp extends StatelessWidget {
                 value.dispose();
               },
             ),
-            ChangeNotifierProvider(builder: (context) => UserVerifyStatusModel()),
-            ChangeNotifierProvider(builder: (context) => UserRoleModel(context)),
+            ChangeNotifierProvider(
+                builder: (context) => UserVerifyStatusModel()),
+            ChangeNotifierProvider(
+                builder: (context) => UserRoleModel(context)),
             ChangeNotifierProvider(builder: (context) => MessageModel()),
-            ChangeNotifierProvider(builder: (context) => ChatRoomPageStatusModel()),
+            ChangeNotifierProvider(
+                builder: (context) => ChatRoomPageStatusModel()),
             ChangeNotifierProvider(builder: (context) => AppInfoModel()),
           ],
           child: MaterialApp(
@@ -92,7 +98,9 @@ class MyApp extends StatelessWidget {
                 );
               },
               ChatRoomPage.routeName: (_) => ChatRoomPage(),
-              NotificationMessagePage.routeName: (_) => NotificationMessagePage(),
+              SettingPage.routeName: (_) => SettingPage(),
+              NotificationMessagePage.routeName: (_) =>
+                  NotificationMessagePage(),
               ContactsSelectPage.routeName: (_) => BlocProviders<ContactsBloc>(
                     child: ContactsSelectPage(null),
                     bloc: ContactsBloc(),
@@ -117,6 +125,12 @@ class MyApp extends StatelessWidget {
                       return MediationApplicationAddModel(context);
                     },
                   ),
+              ServiceChatPage.routeName: (context) => ChangeNotifierProvider(
+                    child: ServiceChatPage(),
+                    builder: (context) {
+                      return ServiceChatModel();
+                    },
+                  )
             },
           ),
         ),

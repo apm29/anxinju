@@ -80,6 +80,7 @@ dependencies:
   fake_push: ^0.5.0
 
   url_launcher: ^ 5.1.0
+  soundpool: ^0.5.3
 
 dev_dependencies:
   flutter_test:

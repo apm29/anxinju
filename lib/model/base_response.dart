@@ -449,6 +449,17 @@ class UserType {
   bool isPropertyRole() {
     return roleCode == "1";
   }
+
+  String get roleName {
+    switch (roleCode) {
+      case "1":
+        return "物业人员";
+      case "3":
+        return "民警";
+      default:
+        return "普通用户";
+    }
+  }
 }
 
 class HouseDetail {

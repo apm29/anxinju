@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:ease_life/res/configs.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:device_info/device_info.dart';
 import 'package:package_info/package_info.dart';
 
@@ -13,6 +13,9 @@ class AppInfoModel extends ChangeNotifier {
   String get appName => _appName??"安心居";
 
   set appName(String value) {
+    if(value == _appName){
+      return;
+    }
     _appName = value;
     notifyListeners();
   }
@@ -20,6 +23,9 @@ class AppInfoModel extends ChangeNotifier {
   String get versionCode => _versionCode;
 
   set versionCode(String value) {
+    if(value == _versionCode){
+      return;
+    }
     _versionCode = value;
     notifyListeners();
   }
@@ -27,6 +33,9 @@ class AppInfoModel extends ChangeNotifier {
   String get versionName => _versionName;
 
   set versionName(String value) {
+    if(value == _versionName){
+      return;
+    }
     _versionName = value;
     notifyListeners();
   }
@@ -38,8 +47,10 @@ class AppInfoModel extends ChangeNotifier {
   Future doGetDeviceInfo() async {
     if (Platform.isAndroid) {
       AndroidDeviceInfo deviceInfo = await DeviceInfoPlugin().androidInfo;
+      print('$deviceInfo');
     } else if (Platform.isIOS) {
       IosDeviceInfo iosDeviceInfo = await DeviceInfoPlugin().iosInfo;
+      print('$iosDeviceInfo');
     }
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     versionName = packageInfo.version;
@@ -48,6 +59,6 @@ class AppInfoModel extends ChangeNotifier {
   }
 
   String get appInfoString {
-    return "$appName $versionName ($versionCode)";
+    return "$appName $versionName ($versionCode)${Configs.APP_DEBUG?"测试网":""}";
   }
 }

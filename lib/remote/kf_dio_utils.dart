@@ -44,8 +44,8 @@ class KfDioUtil {
     ));
     //设置代理
     if (proxyHttp)
-      (_dio.httpClientAdapter as DefaultHttpClientAdapter)
-          .onHttpClientCreate = (client) {
+      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (client) {
         // config the http client
         client.findProxy = (uri) {
           //proxy all request to localhost:8888
@@ -66,7 +66,7 @@ class KfDioUtil {
             print('=======>${req.data.runtimeType}');
             if (req.data.runtimeType != FormData) {
               debugPrint("    Data:${req.data}");
-            }else{
+            } else {
               debugPrint("  Data:${req.data}");
             }
 
@@ -76,13 +76,12 @@ class KfDioUtil {
             debugPrint("REQUEST:");
             debugPrint("===========================================");
             debugPrint(
-                "  Method:${resp.request.method},Url:${resp.request.baseUrl +
-                    resp.request.path}");
+                "  Method:${resp.request.method},Url:${resp.request.baseUrl + resp.request.path}");
             debugPrint("  Headers:${resp.request.headers}");
             debugPrint("  QueryParams:${resp.request.queryParameters}");
             if (resp.request.data.runtimeType != FormData) {
               debugPrint("  Data:${resp.request.data}");
-            } else{
+            } else {
               debugPrint("  Data:${resp.request.data}");
             }
             debugPrint("  -------------------------");
@@ -107,7 +106,8 @@ class KfDioUtil {
       );
   }
 
-  Future<KFBaseResp<T>> post<T>(String path, {
+  Future<KFBaseResp<T>> post<T>(
+    String path, {
     @required JsonProcessor<T> processor,
     Map<String, dynamic> formData,
     CancelToken cancelToken,
@@ -124,11 +124,11 @@ class KfDioUtil {
     toastMsg = toastMsg ?? false;
     cancelToken = cancelToken ?? CancelToken();
     onReceiveProgress = onReceiveProgress ??
-            (count, total) {
+        (count, total) {
           ///默认接收进度
         };
     onSendProgress = onSendProgress ??
-            (count, total) {
+        (count, total) {
           ///默认发送进度
         };
     print('${Configs.KFBaseUrl}$path');
@@ -143,7 +143,7 @@ class KfDioUtil {
       options: RequestOptions(
         responseType: ResponseType.json,
         headers: {KEY_HEADER_TOKEN: userSp.getString(KEY_TOKEN)},
-        contentType:ContentType.json,
+        contentType: ContentType.json,
       ),
       cancelToken: cancelToken,
       onSendProgress: onSendProgress,
@@ -308,22 +308,23 @@ class MediationRecord {
   String endTime;
   String finished;
 
-  MediationRecord({this.id,
-    this.chatRoomId,
-    this.userId,
-    this.userName,
-    this.userType,
-    this.content,
-    this.districtId,
-    this.appId,
-    this.kfId,
-    this.title,
-    this.result,
-    this.description,
-    this.applyId,
-    this.startTime,
-    this.endTime,
-    this.finished});
+  MediationRecord(
+      {this.id,
+      this.chatRoomId,
+      this.userId,
+      this.userName,
+      this.userType,
+      this.content,
+      this.districtId,
+      this.appId,
+      this.kfId,
+      this.title,
+      this.result,
+      this.description,
+      this.applyId,
+      this.startTime,
+      this.endTime,
+      this.finished});
 
   MediationRecord.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -365,14 +366,23 @@ class MediationRecord {
     return data;
   }
 
+  static final List<Color> colorList = [
+    Colors.deepOrange[400],
+    Colors.lightGreen,
+    Colors.lightBlue,
+    Colors.deepOrange,
+  ];
+
+  Color get statusColor {
+    return mediationFinished ? colorList[1] : colorList[0];
+  }
+
   @override
   String toString() {
     return 'Rows{id: $id, chatRoomId: $chatRoomId, userId: $userId, userName: $userName, userType: $userType, content: $content, districtId: $districtId, appId: $appId, kfId: $kfId, title: $title, result: $result, description: $description, applyId: $applyId, startTime: $startTime, endTime: $endTime, finished: $finished}';
   }
 
   bool get mediationFinished => finished == '1';
-
-
 }
 
 class MediationMessagePageData {
@@ -418,15 +428,16 @@ class MediationMessage {
   String avatar;
   String timeLine;
 
-  MediationMessage({this.id,
-    this.userId,
-    this.userName,
-    this.districtId,
-    this.appId,
-    this.content,
-    this.chatRoomId,
-    this.avatar,
-    this.timeLine});
+  MediationMessage(
+      {this.id,
+      this.userId,
+      this.userName,
+      this.districtId,
+      this.appId,
+      this.content,
+      this.chatRoomId,
+      this.avatar,
+      this.timeLine});
 
   MediationMessage.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -521,18 +532,18 @@ class MediationApply {
 
   MediationApply(
       {this.id,
-        this.applyUserName,
-        this.applyUserId,
-        this.acceptUserName,
-        this.acceptUserId,
-        this.title,
-        this.images,
-        this.description,
-        this.status,
-        this.districtId,
-        this.appId,
-        this.date,
-        this.address});
+      this.applyUserName,
+      this.applyUserId,
+      this.acceptUserName,
+      this.acceptUserId,
+      this.title,
+      this.images,
+      this.description,
+      this.status,
+      this.districtId,
+      this.appId,
+      this.date,
+      this.address});
 
   MediationApply.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -550,7 +561,7 @@ class MediationApply {
     address = json['address'];
   }
 
-  static  final List<Color> colorList = [
+  static final List<Color> colorList = [
     Colors.deepOrange[400],
     Colors.lightGreen,
     Colors.lightBlue,
@@ -558,7 +569,7 @@ class MediationApply {
   ];
 
   Color get statusColor {
-    switch(status){
+    switch (status) {
       case "1":
         return colorList[0];
       case "2":
@@ -571,7 +582,7 @@ class MediationApply {
   }
 
   String get statusString {
-    switch(status){
+    switch (status) {
       case "1":
         return "未处理";
       case "2":
@@ -605,8 +616,4 @@ class MediationApply {
   String toString() {
     return 'MediationApply{id: $id, applyUserName: $applyUserName, applyUserId: $applyUserId, acceptUserName: $acceptUserName, acceptUserId: $acceptUserId, title: $title, images: $images, description: $description, status: $status, districtId: $districtId, appId: $appId, date: $date, address: $address}';
   }
-
-
 }
-
-

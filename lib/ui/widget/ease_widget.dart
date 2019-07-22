@@ -124,29 +124,33 @@ class EaseTile extends StatelessWidget {
   final IconData iconData;
   final VoidCallback onPressed;
   final int badge;
-
+  final EdgeInsetsGeometry margin;
+  final EdgeInsetsGeometry padding;
+  final BorderRadiusGeometry borderRadius;
+  final double iconSize;
   const EaseTile(
-      {Key key, this.title, this.iconData, this.onPressed, this.badge = 0})
+      {Key key, this.title, this.iconData, this.onPressed, this.badge = 0, this.margin, this.borderRadius, this.padding, this.iconSize = 30})
       : super(key: key);
 
   static  double kBadgeSize = ScreenUtil().setWidth(0);
   @override
   Widget build(BuildContext context) {
 
-    return InkWell(
-      onTap: onPressed ?? () {},
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-        child: Material(
-          elevation: 1,
-          color: Colors.white,
+    return Container(
+      margin: margin??EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+      child: Material(
+        elevation: 2,
+        borderRadius: borderRadius,
+        color: Colors.white,
+        child: InkWell(
+          onTap: onPressed ?? () {},
           child: Stack(
             children: <Widget>[
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: padding??EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
                   children: <Widget>[
-                    Icon(iconData),
+                    Icon(iconData,size: iconSize,),
                     SizedBox(
                       width: 16,
                     ),

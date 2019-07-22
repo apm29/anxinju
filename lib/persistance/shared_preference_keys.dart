@@ -9,3 +9,4 @@ const String KEY_USER_INFO = "key_user_info";
 const String KEY_CURRENT_DISTRICT_INDEX = "key_current_district_index";
 const String KEY_JSON_MENU_INDEX = "key_json_menu_index";
 const String KEY_CURRENT_THEME_INDEX = "key_current_theme_index";
+const String KEY_MESSAGE_SOUND = "KEY_MESSAGE_SOUND";

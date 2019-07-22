@@ -195,6 +195,9 @@ class DisputeMediationModel extends ChangeNotifier {
     print('<<<<< RECV <---- ${data.toString()}');
     Map<String, dynamic> map = json.decode(data);
     ChatMessage chatMessage = ChatMessage.fromJson(map);
+
+    playMessageSound();
+
     if (chatMessage.code == 200) {
       switch (chatMessage.messageType) {
         case "chatConnect":

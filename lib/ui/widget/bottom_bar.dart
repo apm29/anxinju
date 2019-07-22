@@ -1,5 +1,6 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/main_index_model.dart';
+import 'package:ease_life/model/user_role_model.dart';
 
 import '../main_page.dart';
 
@@ -15,14 +16,25 @@ class BottomBar extends StatelessWidget {
         return BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.home,
-                  size: 24,
-                  color: currentPage == PAGE_HOME
-                      ? Colors.blueAccent
-                      : Colors.grey,
-                ),
-                title: Text("主页")),
+              icon: Consumer<UserRoleModel>(
+                builder: (BuildContext context, UserRoleModel roleModel,
+                    Widget child) {
+                  return Icon(
+                    roleModel.isOnPropertyDuty ? Icons.call : Icons.home,
+                    size: 24,
+                    color: currentPage == PAGE_HOME
+                        ? Colors.blueAccent
+                        : Colors.grey,
+                  );
+                },
+              ),
+              title: Consumer<UserRoleModel>(
+                builder: (BuildContext context, UserRoleModel roleModel,
+                    Widget child) {
+                  return roleModel.isOnPropertyDuty ? Text("紧急呼叫") : Text("主页");
+                },
+              ),
+            ),
 //            BottomNavigationBarItem(
 //                icon: Image.asset(
 //                  "images/search.png",

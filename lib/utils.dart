@@ -1,4 +1,5 @@
 import 'package:oktoast/oktoast.dart';
+import 'package:soundpool/soundpool.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'index.dart';
@@ -13,19 +14,20 @@ import 'model/user_verify_status_model.dart';
 //  Color(0xff16a723),
 //  Color(0xfffebf1f),
 //];
-Future _requestPermission(PermissionGroup group) async{
+Future _requestPermission(PermissionGroup group) async {
   var status = await PermissionHandler().checkPermissionStatus(group);
-  if(status == PermissionStatus.granted){
+  if (status == PermissionStatus.granted) {
     return null;
   }
   return PermissionHandler().requestPermissions([group]);
 }
 
-Future requestPermission() async{
+Future requestPermission() async {
   await _requestPermission(PermissionGroup.storage);
   await _requestPermission(PermissionGroup.camera);
   return null;
 }
+
 Future<File> showImageSourceDialog(BuildContext context,
     {VoidCallback onValue}) async {
   FocusScope.of(context).requestFocus(FocusNode());
@@ -130,28 +132,36 @@ Future<File> rotateWithExifAndCompress(File file) async {
 }
 
 Widget buildVisitor(BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.of(context).pushNamed(LoginPage.routeName);
-    },
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  return Container(
+    alignment: Alignment.center,
+    child: InkWell(
+      onTap: () {
+        Navigator.of(context).pushNamed(LoginPage.routeName);
+      },
+      child: Row(
         children: <Widget>[
-          Icon(
-            Icons.sms_failed,
-            color: Colors.blue,
-            size: 40,
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          Text(
-            "未登录,点击登录",
-            style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 18,
-                color: Colors.grey[700]),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Icon(
+                  Icons.sms_failed,
+                  color: Colors.blue,
+                  size: 40,
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Text(
+                  "未登录,点击登录",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 18,
+                      color: Colors.grey[700]),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -430,11 +440,36 @@ Future showFaceVerifyDialog(BuildContext context) async {
       });
 }
 
-
-Future makePhoneCall(String number)async{
+Future makePhoneCall(String number) async {
   var urlString = "tel:$number";
-  if(await canLaunch(urlString)){
-    return launch(urlString,enableJavaScript: true,enableDomStorage: true);
+  if (await canLaunch(urlString)) {
+    return launch(urlString, enableJavaScript: true, enableDomStorage: true);
   }
   return showToast("无法呼叫 $number");
 }
+
+Future playMessageSound() async {
+  if(userSp.getBool(KEY_MESSAGE_SOUND)!=true){
+    return;
+  }
+  Soundpool pool = Soundpool(streamType: StreamType.notification);
+  int soundId = await rootBundle
+      .load("images/message_arrive.mp3")
+      .then((ByteData soundData) {
+    return pool.load(soundData);
+  });
+  int streamId = await pool.play(soundId);
+}
+
+Function imagePlaceHolder =
+    (BuildContext context, Widget child, ImageChunkEvent loadingProgress) {
+  if (loadingProgress == null) return child;
+  return Center(
+    child: CircularProgressIndicator(
+      value: loadingProgress.expectedTotalBytes != null
+          ? loadingProgress.cumulativeBytesLoaded /
+              loadingProgress.expectedTotalBytes
+          : null,
+    ),
+  );
+};

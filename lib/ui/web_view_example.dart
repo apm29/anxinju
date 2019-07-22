@@ -357,29 +357,15 @@ class _WebViewExampleState extends State<WebViewExample> {
 //        resizeToAvoidBottomInset: true,
           appBar: AppBar(
             title: StreamBuilder<Object>(
-                stream: titleController.stream,
-                builder: (context, snapshot) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Consumer<WebModel>(
-                        builder: (BuildContext context, WebModel value,
-                            Widget child) {
-                          return value.hasCloseButton
-                              ? IconButton(
-                                  icon: Icon(Icons.close),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  })
-                              : Container();
-                        },
-                      ),
-                      Expanded(
-                        child: Text(snapshot.data ?? Strings.appName,textAlign: TextAlign.center,),
-                      ),
-                    ],
-                  );
-                }),
+              stream: titleController.stream,
+              builder: (context, snapshot) {
+                return Text(
+                  snapshot.data ?? Strings.appName,
+                  textAlign: TextAlign.center,
+                );
+              },
+              initialData: null,
+            ),
             // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
             leading: FutureBuilder<WebViewController>(
                 future: _controller.future,
@@ -402,6 +388,18 @@ class _WebViewExampleState extends State<WebViewExample> {
             actions: <Widget>[
 //          NavigationControls(_controller.future),
               DistrictInfoButton(),
+              Consumer<WebModel>(
+                builder:
+                    (BuildContext context, WebModel value, Widget child) {
+                  return value.hasCloseButton
+                      ? IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      })
+                      : Container();
+                },
+              ),
               //SampleMenu(_controller.future, () {
               //  FocusScope.of(context).requestFocus(FocusNode());
               //}),
@@ -506,6 +504,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                             webModel.historyLength = length;
                           });
                           if (Platform.isAndroid) {
+                            hideKeyBoardOnTap();
                             //imeConfig();
                             //if (_streamSubscription != null)
                             //  _streamSubscription.cancel();
@@ -529,6 +528,36 @@ class _WebViewExampleState extends State<WebViewExample> {
         return WebModel();
       },
     );
+  }
+
+  void hideKeyBoardOnTap() {
+    controller.evaluateJavascript('''
+      var cells = document.getElementsByClassName('cell-value text-right text-truncate');
+      for (var i = 0; i < cells.length; i++) {
+         cells[i].addEventListener('click', (e) => {
+           var json = {
+             "funcName": "requestFocusout",
+           };
+           var param = JSON.stringify(json);
+           UserState.postMessage(param);
+           console.log(e);
+         })
+       }
+       
+       var inputs = document.getElementsByTagName('input');
+      for (var i = 0; i < inputs.length; i++) {
+        if(inputs[i].readOnly == true){
+         inputs[i].addEventListener('click', (e) => {
+           var json = {
+             "funcName": "requestFocusout",
+           };
+           var param = JSON.stringify(json);
+           UserState.postMessage(param);
+           console.log(e);
+         })
+         }
+       }
+    ''');
   }
 
   void imeConfig() async {
@@ -712,7 +741,7 @@ class _WebViewExampleState extends State<WebViewExample> {
               doOnTextEdit(context, jsonMap['data']);
               break;
             case "requestFocusout":
-              _focusNode1.unfocus();
+              hideAndroidKeyboard();
               break;
             case "uploadFile":
               doUploadFile(jsonMap['data']['callbackName']);
@@ -851,6 +880,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   }
 
   void compressAndUpload(String callbackName, BuildContext context) async {
+    hideAndroidKeyboard();
     showImageSourceDialog(
       context,
     ).then((file) {

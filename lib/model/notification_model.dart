@@ -12,6 +12,19 @@ class NotificationModel extends ChangeNotifier {
 
   int _unreadNotificationCount = 1;
 
+  bool _messageSound = true;
+
+  bool get messageSound => _messageSound;
+
+  set messageSound(bool value) {
+    if(value == _messageSound){
+      return;
+    }
+    _messageSound = value;
+    userSp.setBool(KEY_MESSAGE_SOUND,_messageSound);
+    notifyListeners();
+  }
+
   set unreadNotificationCount(int count) {
     if (_unreadNotificationCount == count) {
       return;
@@ -30,6 +43,7 @@ class NotificationModel extends ChangeNotifier {
 
   NotificationModel(BuildContext context) {
     startListen(context);
+    messageSound = userSp.getBool(KEY_MESSAGE_SOUND)??true;
   }
 
   static NotificationModel of(BuildContext context) {

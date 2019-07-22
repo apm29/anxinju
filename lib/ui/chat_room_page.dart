@@ -6,7 +6,10 @@ import 'package:intl/intl.dart';
 class ChatRoomPage extends StatefulWidget {
   static String routeName = "/chat";
 
-  ChatRoomPage({Key key}) : super(key: key);
+  final String group;
+  final String title;
+
+  ChatRoomPage({Key key, this.group, this.title}) : super(key: key);
 
   @override
   _ChatRoomPageState createState() => _ChatRoomPageState();
@@ -20,7 +23,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   WebSocketManager manager;
 
-  Observable<WSMessage> get commandMessageStream => manager.commandMessageStream;
+  Observable<WSMessage> get commandMessageStream =>
+      manager.commandMessageStream;
 
   TextEditingController _inputController = TextEditingController();
   ScrollController _listViewController = ScrollController();
@@ -35,28 +39,63 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    var arguments = ModalRoute.of(context).settings.arguments;
+    if (arguments is Map) {
+      title = arguments['title'];
+      group = arguments['group'];
+    } else {
+      title = widget.title;
+      group = widget.group;
+    }
+
     _editFocusNode.addListener(() {
       if (_editFocusNode.hasFocus) {
         emotionIcon = false;
         _emotionIconController.add(emotionIcon);
       }
     });
+    if (manager == null) {
+      initManager();
+    }
+  }
 
+  void initManager() {
+    manager = WebSocketManager(group, context);
+    manager.messageStream.listen((message) {
+      setState(() {
+        messages.insert(0, message);
+        _listViewController.animateTo(0,
+            duration: Duration(seconds: 1), curve: Curves.ease);
+      });
+      switch (message.type) {
+        case MessageType.TEXT:
+          break;
+        case MessageType.IMAGE:
+          break;
+        case MessageType.AUDIO:
+          break;
+        case MessageType.VIDEO:
+          break;
+        case MessageType.COMMAND:
+          break;
+      }
+    });
     Api.getUserInfo().then((resp) {
       if (resp.success) {
         ChatMessageProvider().open().then((db) {
-          var arguments = ModalRoute.of(context).settings.arguments;
-          if (arguments is Map) {
-            group = arguments['group'];
-            db.getAll(group, resp.data.userId).then((list) {
-              var added = list.map((chatMessage) {
-                return chatMessage.toMessage();
-              }).toList();
-              setState(() {
-                messages.addAll(added);
-              });
+          db.getAll(group, resp.data.userId).then((list) {
+            var added = list.map((chatMessage) {
+              return chatMessage.toMessage();
+            }).toList();
+            setState(() {
+              messages.addAll(added);
             });
-          }
+          });
         });
       }
     });
@@ -71,38 +110,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    var arguments = ModalRoute.of(context).settings.arguments;
-    if (arguments is Map) {
-      title = arguments['title'];
-      group = arguments['group'];
-      if (manager == null) {
-        manager = WebSocketManager(group,context);
-        manager.messageStream.listen((message) {
-          setState(() {
-            messages.insert(0, message);
-            _listViewController.animateTo(0,
-                duration: Duration(seconds: 1), curve: Curves.ease);
-          });
-          switch (message.type) {
-            case MessageType.TEXT:
-              break;
-            case MessageType.IMAGE:
-              break;
-            case MessageType.AUDIO:
-              break;
-            case MessageType.VIDEO:
-              break;
-            case MessageType.COMMAND:
-              break;
-          }
-        });
-      }
-    }
     return DefaultTextStyle(
       style: TextStyle(fontFamily: "SoukouMincho"),
       child: Scaffold(
         appBar: AppBar(
           title: Text(title),
+          actions: <Widget>[
+            FlatButton.icon(
+              onPressed: () {
+                manager?.dispose();
+                initManager();
+              },
+              icon: Icon(Icons.repeat),
+              label: Text("重连"),
+            )
+          ],
         ),
         body: Column(
           children: <Widget>[
@@ -113,20 +135,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               height: 0.3,
             ),
             StreamBuilder<WSMessage>(
-                stream: commandMessageStream,
-                builder: (context, snapshot) {
-                  if ((snapshot.data?.status ?? ConnectStatus.WAIT) !=
-                      ConnectStatus.CONNECTED) {
-                    return AbsorbPointer(
-                      child: Container(
-                        color: Color(0x33333333),
-                        child: buildInputPart(disabled: true),
-                      ),
-                    );
-                  }
-                  return buildInputPart(disabled: false);
-                }),
+              stream: commandMessageStream,
+              builder: (context, snapshot) {
+                if ((snapshot.data?.status ?? ConnectStatus.WAIT) !=
+                    ConnectStatus.CONNECTED) {
+                  return AbsorbPointer(
+                    child: Container(
+                      color: Color(0x33333333),
+                      child: buildInputPart(disabled: true),
+                    ),
+                  );
+                }
+                return buildInputPart(disabled: false);
+              },
+              initialData: null,
+            ),
             StreamBuilder<bool>(
+              initialData: false,
               stream: _emotionVisibilityStream,
               builder: (context, snapshot) {
                 bool visible = snapshot.data ?? false;
@@ -159,84 +184,85 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Expanded buildMessageList() {
     return Expanded(
       child: StreamBuilder<WSMessage>(
-          stream: commandMessageStream,
-          builder: (context, snapshot) {
-            if ((snapshot.data?.status ?? ConnectStatus.WAIT) ==
-                ConnectStatus.WAIT) {
-              return Center(child: CircularProgressIndicator());
-            }
-            return GestureDetector(
-              onTap: () {
-                _editFocusNode.unfocus();
-                emotionIcon = false;
-                _emotionIconController.add(emotionIcon);
-              },
-              child: Stack(
-                children: <Widget>[
-                  Positioned.fill(
-                    child: ListView.builder(
-                      controller: _listViewController,
-                      physics: AlwaysScrollableScrollPhysics(),
-                      reverse: true,
-                      itemCount: messages.length,
-                      itemBuilder: (
-                        context,
-                        index,
-                      ) {
-                        var message = messages[index];
-                        var child;
-                        if (message.fromId == manager.config.kfId) {
-                          child = Row(
-                            children: <Widget>[
-                              SizedBox(
-                                width: 6,
-                              ),
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    "${Configs.KFBaseUrl}${message.fromAvatar}"),
-                              ),
-                              Flexible(
-                                child:
-                                    buildMessageBody(context, message, false),
-                              ),
-                            ],
-                          );
-                        } else {
-                          child = Row(
-                            children: <Widget>[
-                              Flexible(
-                                flex: 1000,
-                                child: Container(),
-                              ),
-                              buildMessageBody(context, message, true),
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    manager.config.userAvatar ?? ""),
-                                child: manager.config.userAvatar == null
-                                    ? Icon(
-                                        Icons.perm_identity,
-                                        color: Colors.white,
-                                      )
-                                    : Container(),
-                              ),
-                              SizedBox(
-                                width: 6,
-                              ),
-                            ],
-                          );
-                        }
-                        return child;
-                      },
-                    ),
+        stream: commandMessageStream,
+        builder: (context, snapshot) {
+          if ((snapshot.data?.status ?? ConnectStatus.WAIT) ==
+              ConnectStatus.WAIT) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return GestureDetector(
+            onTap: () {
+              _editFocusNode.unfocus();
+              emotionIcon = false;
+              _emotionIconController.add(emotionIcon);
+            },
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: ListView.builder(
+                    controller: _listViewController,
+                    physics: AlwaysScrollableScrollPhysics(),
+                    reverse: true,
+                    itemCount: messages.length,
+                    itemBuilder: (
+                      context,
+                      index,
+                    ) {
+                      var message = messages[index];
+                      var child;
+                      if (message.fromId == manager.config.kfId) {
+                        child = Row(
+                          children: <Widget>[
+                            SizedBox(
+                              width: 6,
+                            ),
+                            CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  "${Configs.KFBaseUrl}${message.fromAvatar}"),
+                            ),
+                            Flexible(
+                              child: buildMessageBody(context, message, false),
+                            ),
+                          ],
+                        );
+                      } else {
+                        child = Row(
+                          children: <Widget>[
+                            Flexible(
+                              flex: 1000,
+                              child: Container(),
+                            ),
+                            buildMessageBody(context, message, true),
+                            CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(manager.config.userAvatar ?? ""),
+                              child: manager.config.userAvatar == null
+                                  ? Icon(
+                                      Icons.perm_identity,
+                                      color: Colors.white,
+                                    )
+                                  : Container(),
+                            ),
+                            SizedBox(
+                              width: 6,
+                            ),
+                          ],
+                        );
+                      }
+                      return child;
+                    },
                   ),
-                  Align(
-                    child: AudioHintWidget(),
-                    alignment: Alignment.center,
-                  ),
-                ],
-              ),
-            );
-          }),
+                ),
+                Align(
+                  child: AudioHintWidget(),
+                  alignment: Alignment.center,
+                ),
+              ],
+            ),
+          );
+        },
+        initialData: null,
+      ),
     );
   }
 
@@ -428,7 +454,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   StreamBuilder<WSMessage> buildStatusPart() {
     return StreamBuilder<WSMessage>(
       builder: (_, snapshot) {
-        if (snapshot.hasData && snapshot.data!=null) {
+        if (snapshot.hasData && snapshot.data != null) {
           if (snapshot.data.type == MessageType.COMMAND) {
             return Container(
               alignment: Alignment.center,
@@ -455,6 +481,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         }
       },
       stream: commandMessageStream,
+      initialData: null,
     );
   }
 
@@ -528,14 +555,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     },
                     padding: EdgeInsets.all(0),
                     icon: StreamBuilder<bool>(
-                        stream: _emotionVisibilityStream,
-                        builder: (context, snapshot) {
-                          bool visible = snapshot.data ?? false;
-                          return Icon(
-                            Icons.insert_emoticon,
-                            color: visible ? Colors.lightBlue : Colors.black,
-                          );
-                        })),
+                      stream: _emotionVisibilityStream,
+                      builder: (context, snapshot) {
+                        bool visible = snapshot.data ?? false;
+                        return Icon(
+                          Icons.insert_emoticon,
+                          color: visible ? Colors.lightBlue : Colors.black,
+                        );
+                      },
+                      initialData: false,
+                    )),
             audio
                 ? Container()
                 : IconButton(

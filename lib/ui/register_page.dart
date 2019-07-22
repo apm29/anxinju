@@ -1,8 +1,8 @@
 import 'package:ease_life/index.dart';
+import 'package:ease_life/ui/widget/gradient_button.dart';
 
 class RegisterPage extends StatefulWidget {
-
-  static String routeName="/register";
+  static String routeName = "/register";
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -16,135 +16,247 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _confirmController = TextEditingController();
   TextEditingController _userNameController = TextEditingController();
   GlobalKey<LoadingStateWidgetState> register = GlobalKey();
+  static const double kInputHeight = 158;
+  static const double kMarginHorizontal = 18;
+  static const double kInputContentPadding = 8;
 
   @override
   Widget build(BuildContext context) {
+    TextStyle kInputLabelTheme = Theme.of(context)
+        .textTheme
+        .caption
+        .copyWith(fontSize: 15, color: Colors.blueGrey[800]);
+
+    TextStyle kInputHintTheme =
+        Theme.of(context).textTheme.caption.copyWith(fontSize: 15);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text("注册"),
-      ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-
             Card(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(6),
-                      padding: EdgeInsets.all(6),
-                      child: TextField(
-                        key: ValueKey("name"),
-                        controller: _mobileController,
-                        maxLengthEnforced: true,
-                        maxLength: 11,
-                        decoration: InputDecoration(
-                          hintText: "输入手机号",
-                          labelText: "手机号",
-                          border: OutlineInputBorder(),
+              margin: EdgeInsets.symmetric(
+                  horizontal: ScreenUtil().setWidth(100),
+                  vertical: MediaQuery.of(context).padding.top + 32),
+              elevation: 12,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.transparent,
+                        ),
+                        onPressed: null,
+                      ),
+                      Expanded(
+                        child: Text(
+                          "新用户注册",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.title,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                        maxHeight: ScreenUtil().setHeight(kInputHeight) + 32),
+                    margin: EdgeInsets.only(
+                        left: kMarginHorizontal,
+                        top: 32,
+                        right: kMarginHorizontal),
+                    child: TextField(
+                      key: ValueKey("USER_MOBILE"),
+                      controller: _mobileController,
+                      maxLengthEnforced: true,
+                      maxLength: 11,
+                      decoration: InputDecoration(
+                        hintText: "输入手机号",
+                        labelText: "手机号",
+                        contentPadding: EdgeInsets.all(kInputContentPadding),
+                        labelStyle: kInputLabelTheme,
+                        hintStyle: kInputHintTheme,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    indent: 16,
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                        maxHeight: ScreenUtil().setHeight(kInputHeight)),
+                    margin: EdgeInsets.only(
+                        left: kMarginHorizontal,
+                        top: 12,
+                        right: kMarginHorizontal),
+                    child: TextField(
+                      key: ValueKey("USER_NAME"),
+                      controller: _userNameController,
+                      decoration: InputDecoration(
+                        hintText: "输入用户名",
+                        labelText: "用户名",
+                        contentPadding: EdgeInsets.all(kInputContentPadding),
+                        labelStyle: kInputLabelTheme,
+                        hintStyle: kInputHintTheme,
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                        suffixIcon: InkWell(
+                          onTap: () {
+                            _userNameController.clear();
+                          },
+                          child: Icon(
+                            Icons.close,
+                            size: 14,
+                          ),
                         ),
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.all(6),
-                      padding: EdgeInsets.all(6),
-                      child: TextField(
-                        key: ValueKey("userName"),
-                        controller: _userNameController,
-                        decoration: InputDecoration(
-                          hintText: "输入用户名",
-                          labelText: "用户名",
-                          border: OutlineInputBorder(),
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                        maxHeight: ScreenUtil().setHeight(kInputHeight)),
+                    margin: EdgeInsets.only(
+                        left: kMarginHorizontal,
+                        top: 12,
+                        right: kMarginHorizontal),
+                    child: TextField(
+                      key: ValueKey("pass"),
+                      obscureText: true,
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        hintText: "输入密码",
+                        labelText: "输入密码",
+                        contentPadding: EdgeInsets.all(kInputContentPadding),
+                        labelStyle: kInputLabelTheme,
+                        hintStyle: kInputHintTheme,
+                        border: OutlineInputBorder(),
+                        suffixIcon: InkWell(
+                          onTap: () {
+                            _passwordController.clear();
+                          },
+                          child: Icon(
+                            Icons.close,
+                            size: 14,
+                          ),
                         ),
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.all(6),
-                      padding: EdgeInsets.all(6),
-                      child: TextField(
-                        key: ValueKey("pass"),
-                        obscureText: true,
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          hintText: "输入密码",
-                          labelText: "输入密码",
-                          border: OutlineInputBorder(),
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                        maxHeight: ScreenUtil().setHeight(kInputHeight)),
+                    margin: EdgeInsets.only(
+                        left: kMarginHorizontal,
+                        top: 12,
+                        right: kMarginHorizontal),
+                    child: TextField(
+                      key: ValueKey("PASS_CONFIRM"),
+                      obscureText: true,
+                      controller: _confirmController,
+                      decoration: InputDecoration(
+                        hintText: "重复密码",
+                        labelText: "重复密码",
+                        contentPadding: EdgeInsets.all(kInputContentPadding),
+                        labelStyle: kInputLabelTheme,
+                        hintStyle: kInputHintTheme,
+                        border: OutlineInputBorder(),
+                        suffixIcon: InkWell(
+                          onTap: () {
+                            _confirmController.clear();
+                          },
+                          child: Icon(
+                            Icons.close,
+                            size: 14,
+                          ),
                         ),
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.all(6),
-                      padding: EdgeInsets.all(6),
-                      child: TextField(
-                        key: ValueKey("paconfirm"),
-                        obscureText: true,
-                        controller: _confirmController,
-                        decoration: InputDecoration(
-                          hintText: "确认密码",
-                          labelText: "确认密码",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(6),
-                      padding: EdgeInsets.all(6),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              key: ValueKey("sms"),
-                              controller: _smsCodeController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                hintText: "输入验证码",
-                                labelText: "验证码",
-                                border: OutlineInputBorder(),
-                              ),
+                  ),
+                  Divider(
+                    indent: 16,
+                    height: 32,
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                        maxHeight: ScreenUtil().setHeight(kInputHeight)),
+                    margin: EdgeInsets.only(
+                        left: kMarginHorizontal,
+                        top: 12,
+                        right: kMarginHorizontal,
+                        bottom: 32),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextField(
+                            key: ValueKey("sms"),
+                            controller: _smsCodeController,
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              hintText: "输入验证码",
+                              labelText: "验证码",
+                              contentPadding:
+                                  EdgeInsets.all(kInputContentPadding),
+                              labelStyle: kInputLabelTheme,
+                              hintStyle: kInputHintTheme,
+                              border: OutlineInputBorder(),
                             ),
                           ),
-                          Container(
-                            constraints: BoxConstraints(
-                                minWidth: ScreenUtil().setWidth(300)
-                            ),
-                            child: TickerWidget(
-                                key: ticker,
-                                textInitial: "发送验证码",
-                                onPressed: () {
-                                  sendSms();
-                                }),
-                          )
-                        ],
-                      ),
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                              minWidth: ScreenUtil().setWidth(300)),
+                          child: TickerWidget(
+                              key: ticker,
+                              textInitial: "发送验证码",
+                              onPressed: () {
+                                sendSms();
+                              }),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.all(12),
-              child: LoadingStateWidget(
-                key: register,
-                child: RaisedButton(
-                  onPressed: () {
-                    doRegister();
-                  },
-                  color: Colors.blue,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal:18.0),
-                    child: Text("注册",style: TextStyle(
-                      color: Colors.white
-                    ),),
                   ),
-                ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: GradientButton(
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: kInputContentPadding),
+                            child: Text(
+                              "注册",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                          unconstrained: false,
+                          borderRadius: 0,
+                          onPressed: () async {
+                            await doRegister();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-
+            Text(
+              "注册即视为同意${Strings.appName}服务平台用户协议",
+              style: Theme.of(context).textTheme.caption,
+              textAlign: TextAlign.start,
+            )
           ],
         ),
       ),
@@ -157,7 +269,8 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     ticker.currentState?.startLoading();
-    BaseResponse<Object> baseResp = await Api.sendSms(_mobileController.text,0);
+    BaseResponse<Object> baseResp =
+        await Api.sendSms(_mobileController.text, 0);
     Fluttertoast.showToast(msg: baseResp.text);
     ticker.currentState?.stopLoading();
     if (baseResp.success) {
@@ -166,7 +279,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void doRegister() async {
+  Future doRegister() async {
     if (_mobileController.text.isEmpty) {
       Fluttertoast.showToast(msg: "请填写电话");
       return;
@@ -207,5 +320,6 @@ class _RegisterPageState extends State<RegisterPage> {
       //注册成功
       Navigator.of(context).pop();
     }
+    return;
   }
 }

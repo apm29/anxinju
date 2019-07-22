@@ -99,11 +99,11 @@ class MainPageState extends State<MainPage> {
               color: Colors.grey[200],
               child: buildContent(context),
             ),
-            floatingActionButton: Consumer<UserModel>(
+            floatingActionButton: Consumer2<UserModel,UserRoleModel>(
               builder:
-                  (BuildContext context, UserModel userModel, Widget child) {
+                  (BuildContext context, UserModel userModel,UserRoleModel userRoleModel, Widget child) {
                 return Offstage(
-                  offstage: !userModel.isLogin,
+                  offstage: !userModel.isLogin || userRoleModel.isOnPropertyDuty,
                   child: FloatingActionButton.extended(
                     onPressed: () {
                       Navigator.of(context).pushNamed(
