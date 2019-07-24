@@ -449,7 +449,7 @@ Future makePhoneCall(String number) async {
 }
 
 Future playMessageSound() async {
-  if(userSp.getBool(KEY_MESSAGE_SOUND)!=true){
+  if((userSp.getBool(KEY_MESSAGE_SOUND)??true)!=true){
     return;
   }
   Soundpool pool = Soundpool(streamType: StreamType.notification);
@@ -457,6 +457,8 @@ Future playMessageSound() async {
       .load("images/message_arrive.mp3")
       .then((ByteData soundData) {
     return pool.load(soundData);
+  }).catchError((e){
+    print(e.toString());
   });
   int streamId = await pool.play(soundId);
 }

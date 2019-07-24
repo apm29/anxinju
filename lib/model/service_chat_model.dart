@@ -5,6 +5,7 @@ import 'package:ease_life/interaction/websocket_manager.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:ease_life/res/configs.dart';
+import 'package:ease_life/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/io.dart';
@@ -47,7 +48,6 @@ class ServiceChatModel extends ChangeNotifier {
     notifyListeners();
   }
 
-
   double get fraction => _progress / 100;
 
   set progress(int value) {
@@ -61,8 +61,6 @@ class ServiceChatModel extends ChangeNotifier {
     _uploadingHint = value;
     notifyListeners();
   }
-
-
 
   bool get connected => connectionState == ConnectStatus.CONNECTED;
 
@@ -78,7 +76,25 @@ class ServiceChatModel extends ChangeNotifier {
   IChatUser _chatSelf;
   IChatUser _currentChatUser;
 
-  IChatUser get currentChatUser => _currentChatUser ?? _currentChatUsers.first;
+  IChatUser get currentChatUser {
+    if (_currentChatUsers.length == 0) {
+      return null;
+    }
+    return _currentChatUser ?? _currentChatUsers.first;
+  }
+
+  int get currentIndex {
+    if (currentChatUsers.length == 0) {
+      return 0;
+    }
+    return currentChatUsers.toList().indexOf(currentChatUser);
+  }
+
+  set currentChatUser(IChatUser value) {
+    _currentChatUser = value;
+    read(value);
+    notifyListeners();
+  }
 
   ConnectStatus _connectionState = ConnectStatus.WAIT;
 
@@ -89,8 +105,6 @@ class ServiceChatModel extends ChangeNotifier {
   IOWebSocketChannel get currentChannel => _currentChannel;
 
   Set<IChatUser> get currentChatUsers => _currentChatUsers ?? Set();
-
-  get userCount => currentChatUsers.length;
 
   IChatUser get chatSelf => _chatSelf;
 
@@ -170,20 +184,34 @@ class ServiceChatModel extends ChangeNotifier {
           break;
         case "connect":
           var userInfo = dataMap['data']['user_info'];
-          _currentChatUsers.add(
+          var add = _currentChatUsers.add(
             ChatUser(
               userInfo['id'],
               userInfo['avatar'],
               userInfo['name'],
             ),
           );
+          print('add user:$add');
           break;
         case "delUser":
           _currentChatUsers
               .removeWhere((user) => user.userId == dataMap['data']['id']);
+          if (_currentChatUsers.length > 0)
+            currentChatUser = _currentChatUsers.first;
           break;
         case "chatMessage":
           var message = dataMap['data']['msg'];
+          var add = _currentChatUsers.add(
+            ChatUser(
+              message['id'],
+              message['avatar'],
+              message['name'],
+            ),
+          );
+          print('add user:$add');
+          var userId2 = currentChatUser?.userId;
+          var message2 = message['id'];
+          print('${userId2 == message2}');
           _messages.insert(
             0,
             ChatMessage(
@@ -193,8 +221,10 @@ class ServiceChatModel extends ChangeNotifier {
               userAvatar: message['avatar'],
               time: message['time'],
               content: message['content'],
+              read: userId2 == message2,
             ),
           );
+          playMessageSound();
           break;
       }
       _connectionState = ConnectStatus.CONNECTED;
@@ -211,9 +241,20 @@ class ServiceChatModel extends ChangeNotifier {
       0,
       message,
     );
-
-    print('${_messages.join('\n')}');
     notifyListeners();
+  }
+
+  int unread(String userId) {
+    return messages(userId)
+        .where((message) => message.read == false)
+        .toList()
+        .length;
+  }
+
+  void read(IChatUser value) {
+    messages(value.userId).forEach((msg) {
+      msg.read = true;
+    });
   }
 }
 
@@ -235,7 +276,7 @@ abstract class IChatUser {
   int get hashCode => userId.hashCode;
 
   String get userAvatarUrl {
-    if (userAvatar.startsWith("http")) {
+    if (userAvatar?.startsWith("http") == true) {
       return userAvatar;
     } else {
       return "${Configs.KFBaseUrl}$userAvatar";
@@ -250,6 +291,7 @@ class ChatMessage {
   final String content;
   final String senderId;
   final String receiverId;
+  bool read;
 
   ChatMessage({
     this.userName,
@@ -258,11 +300,12 @@ class ChatMessage {
     this.content,
     this.senderId,
     this.receiverId,
+    this.read = false,
   });
 
   @override
   String toString() {
-    return 'ChatMessage{userName: $userName, userAvatar: $userAvatar, time: $time, content: $content, senderId: $senderId, receiverId: $receiverId}';
+    return 'ChatMessage{userName: $userName, userAvatar: $userAvatar, time: $time, content: $content, senderId: $senderId, receiverId: $receiverId, read: $read}';
   }
 }
 

@@ -35,7 +35,8 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     return Consumer<ServiceChatModel>(
       builder: (BuildContext context, ServiceChatModel serviceChatModel,
           Widget child) {
-        if (serviceChatModel.userCount == 0) {
+        var userCount = serviceChatModel.currentChatUsers.length;
+        if (userCount == 0) {
           return SafeArea(
             child: Column(
               children: <Widget>[
@@ -49,65 +50,106 @@ class _ServiceChatPageState extends State<ServiceChatPage>
             ),
           );
         }
-        return DefaultTabController(
-          length: serviceChatModel.userCount,
-          child: CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                backgroundColor: Colors.blue,
-                title: Text(
-                  "正在与${serviceChatModel.currentChatUser.userName}交流",
-                  style: TextStyle(color: Colors.white),
-                ),
-                brightness: Brightness.dark,
-                iconTheme: IconThemeData(color: Colors.white),
-                elevation: 3,
-                centerTitle: false,
-                bottom: TabBar(
-                  labelColor: Colors.white,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                      color: Colors.green[200],
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      )),
-                  tabs: serviceChatModel.currentChatUsers
-                      .map((user) => Tab(
-                    child: Row(
+        var tabController = TabController(
+          length: userCount,
+          vsync: this,
+          initialIndex: serviceChatModel.currentIndex,
+        );
+        return CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              backgroundColor: Colors.blue,
+              title: Text(
+                "正在与${serviceChatModel.currentChatUser.userName}交流",
+                style: TextStyle(color: Colors.white),
+              ),
+              brightness: Brightness.dark,
+              iconTheme: IconThemeData(color: Colors.white),
+              elevation: 3,
+              centerTitle: false,
+              bottom: TabBar(
+                key: PageStorageKey(1090),
+                controller: tabController,
+
+                indicatorSize: TabBarIndicatorSize.tab,
+                onTap: (index) {
+                  serviceChatModel.currentChatUser =
+                      serviceChatModel.currentChatUsers.toList()[index];
+                },
+                indicator: BoxDecoration(
+                    color: Colors.red[200],
+                    shape: BoxShape.rectangle,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(8))),
+                tabs: serviceChatModel.currentChatUsers.map((user) {
+                  var unread = serviceChatModel.unread(user.userId);
+                  return Tab(
+                    child: Stack(
                       children: <Widget>[
-                        SizedBox(
-                          height: ScreenUtil().setHeight(60),
-                          width: ScreenUtil().setHeight(60),
-                          child: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              user.userAvatarUrl,
-                            ),
+                        Align(
+                          child: Row(
+                            children: <Widget>[
+                              SizedBox(
+                                height: ScreenUtil().setHeight(60),
+                                width: ScreenUtil().setHeight(60),
+                                child: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                    user.userAvatarUrl,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: ScreenUtil().setHeight(20),
+                              ),
+                              Text(
+                                user.userName,
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
                           ),
                         ),
-                        Text(
-                          user.userName,
-                        )
+                        Positioned.fill(
+                          child: unread == 0
+                              ? Container()
+                              : Align(
+                                  alignment: Alignment.topRight,
+                                  child: Container(
+                                    padding: EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.red,
+                                    ),
+                                    child: Text(
+                                      unread.toString(),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                        ),
                       ],
                     ),
-                  ))
-                      .toList(),
-                  isScrollable: serviceChatModel.userCount > 3,
-                ),
-                pinned: true,
+                  );
+                }).toList(),
+                isScrollable: true, //serviceChatModel.userCount > 3,
               ),
-              SliverFillRemaining(
-                child: _buildContent(context, serviceChatModel),
-              )
-            ],
-          ),
+              pinned: true,
+            ),
+            SliverFillRemaining(
+              child: _buildContent(
+                context,
+                serviceChatModel,
+                tabController,
+              ),
+            )
+          ],
         );
       },
     );
   }
 
-  Widget _buildContent(
-      BuildContext context, ServiceChatModel serviceChatModel) {
-    final int userCount = ServiceChatModel.of(context).userCount;
+  Widget _buildContent(BuildContext context, ServiceChatModel serviceChatModel,
+      TabController tabController) {
+    final int userCount = ServiceChatModel.of(context).currentChatUsers.length;
     final bool disconnected = ServiceChatModel.of(context).disconnected;
     if (userCount == 0) {
       return Column(
@@ -125,12 +167,15 @@ class _ServiceChatPageState extends State<ServiceChatPage>
       children: <Widget>[
         Expanded(
           child: TabBarView(
+            controller: tabController,
+            key: PageStorageKey(1090),
+            physics: NeverScrollableScrollPhysics(),
             children: serviceChatModel.currentChatUsers
                 .map((user) => Stack(
                       children: <Widget>[
                         Container(
+                          color: Colors.grey[200],
                           child: ListView(
-                            shrinkWrap: true,
                             reverse: true,
                             children: serviceChatModel
                                 .messages(user.userId)
@@ -170,12 +215,13 @@ class _ServiceChatPageState extends State<ServiceChatPage>
           height: 0.3,
         ),
         _buildConnectStatusBar(disconnected),
-        _buildInputPart(disconnected),
+        _buildInputPart(disconnected, tabController),
       ],
     );
   }
 
-  Consumer<ServiceChatModel> _buildInputPart(bool disconnected) {
+  Consumer<ServiceChatModel> _buildInputPart(
+      bool disconnected, TabController tabController) {
     return Consumer<ServiceChatModel>(
       builder: (BuildContext context, ServiceChatModel value, Widget child) {
         bool audio = value.audioInput;
@@ -193,31 +239,17 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                   padding: EdgeInsets.all(16),
                   child: Row(
                     children: <Widget>[
-                      InkWell(
-                        onTap: () {
+                      audio
+                          ? Container()
+                          : IconButton(
+                        onPressed: () {
                           _editFocusNode.unfocus();
-                          value.switchAudio();
+                          value.switchEmoji();
                         },
-                        child: Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  margin: EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(8),
-                                    ),
-                                  ),
-                                  child: Transform.rotate(
-                                      angle: audio ? 0 : 3.14 / 2,
-                                      child: Icon(!audio
-                                          ? Icons.wifi
-                                          : Icons.message))),
-                            ),
-                          ],
+                        padding: EdgeInsets.all(0),
+                        icon: Icon(
+                          Icons.insert_emoticon,
+                          color: emoji ? Colors.lightBlue : Colors.black,
                         ),
                       ),
                       Expanded(
@@ -226,17 +258,19 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                                 _doSendAudio(context, recordDetail);
                               })
                             : SizedBox(
-                                height: ScreenUtil().setHeight(120),
+                                height: ScreenUtil().setHeight(80),
                                 child: TextField(
+
                                   focusNode: _editFocusNode,
                                   enabled: !disconnected,
                                   controller: _inputController,
                                   maxLines: 100,
                                   textInputAction: TextInputAction.send,
                                   decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.all(3),
-                                    border: OutlineInputBorder(),
+                                    border: InputBorder.none,
                                     fillColor: Colors.red,
+                                    hintText: "说点什么",
+                                    hasFloatingPlaceholder: false,
                                   ),
                                   onSubmitted: (content) {
                                     _doSendMessage(context);
@@ -249,19 +283,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                             _doSendImage(context);
                           },
                           icon: Icon(Icons.image)),
-                      audio
-                          ? Container()
-                          : IconButton(
-                              onPressed: () {
-                                _editFocusNode.unfocus();
-                                value.switchEmoji();
-                              },
-                              padding: EdgeInsets.all(0),
-                              icon: Icon(
-                                Icons.insert_emoticon,
-                                color: emoji ? Colors.lightBlue : Colors.black,
-                              ),
-                            ),
+
                       audio
                           ? Container()
                           : IconButton(
@@ -275,7 +297,30 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                                   color:
                                       disconnected ? Colors.grey : Colors.black,
                                 ),
-                              )),
+                              ),
+                            ),
+                      InkWell(
+                        onTap: () {
+                          _editFocusNode.unfocus();
+                          value.switchAudio();
+                        },
+                        child: Column(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                margin: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.blueAccent,
+                                ),
+                                child: Icon(!audio ? Icons.mic : Icons.message,color: Colors.white,),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -332,6 +377,14 @@ class _ServiceChatPageState extends State<ServiceChatPage>
               color: disconnected ? Colors.white : Colors.green,
             ),
           ),
+          disconnected
+              ? FlatButton.icon(
+                  onPressed: () {
+                    ServiceChatModel.of(context).reconnect(context);
+                  },
+                  icon: Icon(Icons.cached),
+                  label: Text("重连"))
+              : Container(),
         ],
       ),
     );

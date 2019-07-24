@@ -31,7 +31,7 @@ class BottomBar extends StatelessWidget {
               title: Consumer<UserRoleModel>(
                 builder: (BuildContext context, UserRoleModel roleModel,
                     Widget child) {
-                  return roleModel.isOnPropertyDuty ? Text("紧急呼叫") : Text("主页");
+                  return roleModel.isOnPropertyDuty ? Text("找物业") : Text("主页");
                 },
               ),
             ),

@@ -109,7 +109,7 @@ class MainPageState extends State<MainPage> {
                       Navigator.of(context).pushNamed(
                         EmergencyCallPage.routeName,
                         //arguments: {"group": "25", "title": "紧急呼叫"},
-                        arguments: {"group": "3", "title": "紧急呼叫"},
+                        arguments: {"group": "25", "title": "紧急呼叫"},
                       );
                     },
                     isExtended: true,

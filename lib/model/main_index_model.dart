@@ -68,16 +68,20 @@ class MainIndexModel extends ChangeNotifier {
   }
 
   Future tryGetCurrentLocation() async {
-    var permissionStatus = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.location);
-    if (permissionStatus != PermissionStatus.granted) {
-      var status = await PermissionHandler()
-          .requestPermissions([PermissionGroup.location]);
-      if (status[PermissionGroup.location] == PermissionStatus.granted) {
-        return _doLocate();
-      }
-    } else {
-      return _doLocate();
+    try {
+      var permissionStatus = await PermissionHandler()
+              .checkPermissionStatus(PermissionGroup.location);
+      if (permissionStatus != PermissionStatus.granted) {
+            var status = await PermissionHandler()
+                .requestPermissions([PermissionGroup.location]);
+            if (status[PermissionGroup.location] == PermissionStatus.granted) {
+              return _doLocate();
+            }
+          } else {
+            return _doLocate();
+          }
+    } catch (e) {
+      print(e);
     }
   }
 
