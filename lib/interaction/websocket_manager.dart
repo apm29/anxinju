@@ -159,14 +159,14 @@ class WebSocketManager {
     //连接websocket
     try {
       //ws://220.191.225.209:7001 正式
-      _channel = IOWebSocketChannel.connect(Configs.APP_DEBUG?"ws://60.190.188.139:9508":"ws://220.191.225.209:7001");
+      _channel = IOWebSocketChannel.connect(Configs.KF_EMERGENCY_WS_URL);
     } catch (e) {
       _sendDisconnectedCommand("连接聊天服务器失败");
     }
 
     //组信息
     config.group = group.toString();
-    config.appId = "YW54aW5qdS0oKSo=";
+    config.appId = Configs.KF_APP_ID;
     //监听
     _channel.stream.listen((data) {
       _processRawData(data);

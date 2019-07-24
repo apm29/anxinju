@@ -121,10 +121,8 @@ class ChatGroupRoomData {
 }
 
 class ChatGroupConfig {
-  static const String APP_ID = "YW54aW5qdS0oKSo\=";
-  String wsUrl = Configs.APP_DEBUG
-      ? "ws://60.190.188.139:9508"
-      : "ws://220.191.225.209:7001";
+  static const String APP_ID = Configs.KF_APP_ID;
+  String wsUrl = Configs.KF_EMERGENCY_WS_URL;
   final String userToken;
   final String chatRoomId;
   String appID = APP_ID;

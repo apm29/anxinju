@@ -1,6 +1,6 @@
 export 'authorization_page.dart';
 export 'camera_page.dart';
-export 'chat_room_page.dart';
+export 'emergency_call_page.dart';
 export 'contacts_select_page.dart';
 export 'home_page.dart';
 export 'house_member_apply_page.dart';

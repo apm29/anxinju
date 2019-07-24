@@ -16,7 +16,8 @@ class Configs {
   static const AMapKey = "d712d41f19e76ca74b673f9d5637af8a";
   static const BaseUrl =
       APP_DEBUG ? "http://axjtest.ciih.net/" : "http://axjdx.ciih.net/";
-
+  static const KF_EMERGENCY_WS_URL = Configs.APP_DEBUG?"ws://60.190.188.139:9508":"ws://220.191.225.209:7001";
+  static const KF_APP_ID = "YW54aW5qdS0oKSo\=";
   ///iOS 推送key
   static const JPushKey = "a175ef122d6568c5bec7cd53";
 

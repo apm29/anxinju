@@ -97,7 +97,7 @@ class MyApp extends StatelessWidget {
                   bloc: CameraBloc(),
                 );
               },
-              ChatRoomPage.routeName: (_) => ChatRoomPage(),
+              EmergencyCallPage.routeName: (_) => EmergencyCallPage(),
               SettingPage.routeName: (_) => SettingPage(),
               NotificationMessagePage.routeName: (_) =>
                   NotificationMessagePage(),
@@ -128,7 +128,7 @@ class MyApp extends StatelessWidget {
               ServiceChatPage.routeName: (context) => ChangeNotifierProvider(
                     child: ServiceChatPage(),
                     builder: (context) {
-                      return ServiceChatModel();
+                      return ServiceChatModel(context);
                     },
                   )
             },

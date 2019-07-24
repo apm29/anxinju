@@ -107,8 +107,9 @@ class MainPageState extends State<MainPage> {
                   child: FloatingActionButton.extended(
                     onPressed: () {
                       Navigator.of(context).pushNamed(
-                        ChatRoomPage.routeName,
-                        arguments: {"group": "25", "title": "紧急呼叫"},
+                        EmergencyCallPage.routeName,
+                        //arguments: {"group": "25", "title": "紧急呼叫"},
+                        arguments: {"group": "3", "title": "紧急呼叫"},
                       );
                     },
                     isExtended: true,

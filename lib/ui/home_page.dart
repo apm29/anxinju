@@ -51,7 +51,7 @@ class HomePage extends StatelessWidget {
     return ChangeNotifierProvider(
       child: ServiceChatPage(),
       builder: (context) {
-        return ServiceChatModel();
+        return ServiceChatModel(context);
       },
     );
   }

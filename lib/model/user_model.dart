@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ease_life/model/service_chat_model.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:ease_life/ui/notification_message_page.dart';
 import 'package:flutter/foundation.dart';
@@ -53,6 +54,11 @@ class UserModel extends ChangeNotifier {
     await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
     await UserRoleModel.of(context).tryFetchUserRoleTypes(context);
     await MessageModel.of(context).refresh();
+    try {
+      ServiceChatModel.of(context).reconnect(context);
+    } catch (e) {
+      print(e);
+    }
     await tryFetchUserDetail();
   }
 

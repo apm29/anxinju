@@ -3,23 +3,23 @@ import 'package:ease_life/interaction/audio_recorder.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:intl/intl.dart';
 
-class ChatRoomPage extends StatefulWidget {
+class EmergencyCallPage extends StatefulWidget {
   static String routeName = "/chat";
 
   final String group;
   final String title;
 
-  ChatRoomPage({Key key, this.group, this.title}) : super(key: key);
+  EmergencyCallPage({Key key, this.group, this.title}) : super(key: key);
 
   @override
-  _ChatRoomPageState createState() => _ChatRoomPageState();
+  _EmergencyCallPageState createState() => _EmergencyCallPageState();
 }
 
-class _ChatRoomPageState extends State<ChatRoomPage> {
+class _EmergencyCallPageState extends State<EmergencyCallPage> {
   String title;
   String group;
 
-  _ChatRoomPageState();
+  _EmergencyCallPageState();
 
   WebSocketManager manager;
 

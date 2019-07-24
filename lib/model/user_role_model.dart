@@ -107,13 +107,13 @@ class UserRoleModel extends ChangeNotifier {
   bool _hasSwitch = false;
 
   bool get hasSwitch {
-    //return _hasSwitch;
-    return false;
+    return _hasSwitch;
+    //return false;
   }
 
   bool get isOnPropertyDuty {
-   // return currentRole?.isPropertyRole() ?? false;
-    return false;
+    return currentRole?.isPropertyRole() ?? false;
+    //return false;
   }
 
   set hasSwitch(bool value) {
@@ -130,6 +130,8 @@ class UserRoleModel extends ChangeNotifier {
 
   void logout() {
     types = [];
+    _hasSwitch = false;
+    _currentRole = null;
   }
 
   bool isGuardianUser() {
