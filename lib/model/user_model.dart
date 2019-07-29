@@ -132,4 +132,8 @@ class UserModel extends ChangeNotifier {
     await _requestPermission(PermissionGroup.storage);
     await _requestPermission(PermissionGroup.camera);
   }
+
+  void updateUserDetail(UserDetail data) {
+    this.userDetail = data;
+  }
 }

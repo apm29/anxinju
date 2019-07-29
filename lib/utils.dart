@@ -1,3 +1,4 @@
+import 'package:ease_life/ui/user_profile_page.dart';
 import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:soundpool/soundpool.dart';
@@ -567,7 +568,9 @@ Widget buildChatInputPart({
                                 )
                               : Container(
                                   height: ScreenUtil().setHeight(105),
-                                  padding: EdgeInsets.only(top: ScreenUtil().setHeight(Platform.isAndroid?25:16)),
+                                  padding: EdgeInsets.only(
+                                      top: ScreenUtil().setHeight(
+                                          Platform.isAndroid ? 25 : 16)),
                                   child: TextField(
                                     focusNode: textFocusNode,
                                     enabled: !disconnected,
@@ -580,7 +583,6 @@ Widget buildChatInputPart({
                                       hintText: "说点什么",
                                       isDense: false,
                                       alignLabelWithHint: true,
-
                                     ),
                                     onSubmitted: (content) {
                                       onSendText?.call();
@@ -874,6 +876,78 @@ Widget _buildMessageUserName(ServiceChatMessage chatMessage, {self = true}) {
       backgroundImage: NetworkImage(avatar),
       child:
           noAvatar ? Text(chatMessage.userName.substring(0, 1)) : Container(),
+    ),
+  );
+}
+
+Container buildAvatar(
+  BuildContext context,
+  String url, {
+  bool circleBorder = false,
+  VoidCallback onPressed,
+  showEditBanner = false,
+}) {
+  onPressed = onPressed ??
+      () {
+        UserProfilePage.go(context);
+      };
+  return Container(
+    constraints: BoxConstraints.tight(Size(
+      ScreenUtil().setHeight(180),
+      ScreenUtil().setHeight(180),
+    )),
+    child: Material(
+      color: Colors.blueGrey[200],
+      borderRadius: circleBorder
+          ? null
+          : BorderRadius.all(
+              Radius.circular(5),
+            ),
+      elevation: 6,
+      shape: circleBorder ? CircleBorder() : null,
+      type: MaterialType.card,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          onPressed?.call();
+          SystemSound.play(SystemSoundType.click);
+        },
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: url != null
+                  ? Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                    )
+                  : Icon(
+                      Icons.person_outline,
+                      size: 32,
+                      color: Colors.white,
+                    ),
+            ),
+            showEditBanner
+                ? Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: ScreenUtil().setHeight(70),
+                      width: ScreenUtil().setHeight(180),
+                      color: Colors.black.withAlpha(100),
+                      child: Text(
+                        "修改",
+                        style: TextStyle(color: Colors.white, fontSize: 11),
+                      ),
+                    ),
+                  )
+                : Container(),
+          ],
+        ),
+      ),
     ),
   );
 }

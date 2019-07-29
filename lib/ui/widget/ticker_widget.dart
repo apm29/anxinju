@@ -12,7 +12,7 @@ class TickerWidget extends StatefulWidget {
   TickerWidget(
       {@required this.key,
       this.tickTimes = 29,
-      this.textInitial = "发送短信",
+      this.textInitial = "发送验证码",
       this.onPressed})
       : super(key: key);
 

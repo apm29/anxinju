@@ -10,7 +10,7 @@ class Strings {
 
 class Configs {
   ///debug开关,debug为true时运行测试环境
-  static const APP_DEBUG = false;
+  static const APP_DEBUG = true;
 
   ///iOS 定位key
   static const AMapKey = "d712d41f19e76ca74b673f9d5637af8a";

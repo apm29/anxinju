@@ -39,6 +39,20 @@ class BaseResponse<T> {
     sb.write('}');
     return sb.toString();
   }
+
+  BaseResponse.error({String message = "失败", T data}) {
+    this.status = "0";
+    this.data = null;
+    this.token = null;
+    this.text = message;
+  }
+
+  BaseResponse.success({String message = "成功"}) {
+    this.status = "1";
+    this.data = null;
+    this.token = null;
+    this.text = message;
+  }
 }
 
 class UserInfoWrapper {

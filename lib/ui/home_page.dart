@@ -7,6 +7,7 @@ import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/ui/service_chat_page.dart';
 import 'package:ease_life/ui/video_nineoneone_page.dart';
+import 'package:oktoast/oktoast.dart';
 
 import 'dispute_mediation_list_page.dart';
 import 'dispute_mediation_page.dart';
@@ -21,35 +22,35 @@ class HomePage extends StatelessWidget {
           appBar: isOnPropertyDuty
               ? null
               : AppBar(
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            title: Text(
-              Strings.appName,
-            ),
-            actions: <Widget>[
-              DistrictInfoButton(),
-              Consumer<UserRoleModel>(
-                builder: (BuildContext context, UserRoleModel roleModel,
-                    Widget child) {
-                  return roleModel.hasSwitch
-                      ? FlatButton.icon(
-                    icon: Icon(
-                      Icons.repeat,
-                      color: Colors.blue,
+                  // Here we take the value from the MyHomePage object that was created by
+                  // the App.build method, and use it to set our appbar title.
+                  centerTitle: true,
+                  automaticallyImplyLeading: false,
+                  title: Text(
+                    Strings.appName,
+                  ),
+                  actions: <Widget>[
+                    DistrictInfoButton(),
+                    Consumer<UserRoleModel>(
+                      builder: (BuildContext context, UserRoleModel roleModel,
+                          Widget child) {
+                        return roleModel.hasSwitch
+                            ? FlatButton.icon(
+                                icon: Icon(
+                                  Icons.repeat,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  roleModel.switchRole();
+                                  SystemSound.play(SystemSoundType.click);
+                                },
+                                label: Text("${roleModel.switchString}"),
+                              )
+                            : Container();
+                      },
                     ),
-                    onPressed: () {
-                      roleModel.switchRole();
-                      SystemSound.play(SystemSoundType.click);
-                    },
-                    label: Text("${roleModel.switchString}"),
-                  )
-                      : Container();
-                },
-              ),
-            ],
-          ),
+                  ],
+                ),
           body: AnimatedSwitcher(
             child: isOnPropertyDuty
                 ? _buildPropertyUser()
@@ -115,9 +116,7 @@ class HomePage extends StatelessWidget {
                                   builder: (BuildContext context,
                                       DistrictModel value, Widget child) {
                                     return Text(
-                                      "${value.getCurrentDistrictName(
-                                          ifError: "")}${Strings
-                                          .appName}服务平台\n共建共享我们的家园",
+                                      "${value.getCurrentDistrictName(ifError: "")}${Strings.appName}服务平台\n共建共享我们的家园",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 18),
@@ -182,8 +181,7 @@ class HomePage extends StatelessWidget {
                 children: <Widget>[
                   EaseIconButton(
                     onPressed: () {
-                      Navigator.of(context)
-                          .pushNamed(VideoNineOneOnePage.routeName);
+                      _go911(context);
                     },
                     iconData: Icons.video_call,
                     buttonLabel: "视频报警",
@@ -192,14 +190,11 @@ class HomePage extends StatelessWidget {
                     builder: (BuildContext context, UserRoleModel userRoleModel,
                         UserModel userModel, Widget child) {
                       return Offstage(
-                        offstage: !userModel.isLogin || userRoleModel.isOnPropertyDuty,
+                        offstage: !userModel.isLogin ||
+                            userRoleModel.isOnPropertyDuty,
                         child: EaseIconButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamed(
-                              EmergencyCallPage.routeName,
-                              //arguments: {"group": "25", "title": "紧急呼叫"},
-                              arguments: {"group": "25", "title": "紧急呼叫"},
-                            );
+                            _goEmergencyCall(context);
                           },
                           iconData: Icons.call,
                           buttonLabel: "紧急呼叫",
@@ -245,16 +240,13 @@ class HomePage extends StatelessWidget {
                           return Center(
                             child: Text(
                               "暂无消息",
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .caption,
+                              style: Theme.of(context).textTheme.caption,
                             ),
                           );
                         }
                         return Column(
                           children:
-                          announcementModel.announcements.map((detail) {
+                              announcementModel.announcements.map((detail) {
                             return _buildAnnouncementTile(
                                 context, detail, announcementModel);
                           }).toList(),
@@ -290,7 +282,7 @@ class HomePage extends StatelessWidget {
                     checkIsFaceVerified: false,
                   ),
                   const HomeChip(
-                    title: "访客系统",
+                    title: "访客管理",
                     indexId: WebIndexID.FANG_KE_XI_TONG,
                     checkIsFaceVerified: true,
                     checkHasHouse: true,
@@ -315,7 +307,7 @@ class HomePage extends StatelessWidget {
                     checkLogin: true,
                     onPressed: () {
                       var userVerifyStatusModel =
-                      UserVerifyStatusModel.of(context);
+                          UserVerifyStatusModel.of(context);
                       var districtModel = DistrictModel.of(context);
                       if (!userVerifyStatusModel.isVerified()) {
                         showFaceVerifyDialog(context);
@@ -432,6 +424,87 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  void _go911(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("提醒"),
+            content: Text("该功能只作为模拟视频报警使用"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "点错了",
+                  style: TextStyle(color: Colors.blueGrey),
+                ),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushReplacementNamed(VideoNineOneOnePage.routeName);
+                },
+                child: Text("继续前往"),
+              ),
+            ],
+          );
+        });
+  }
+
+  void _goEmergencyCall(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("警告 ⚠️"),
+            content: Text.rich(
+              TextSpan(
+                  text: "本功能适用于遇到偷窃、火灾等紧急情况时联系小区安保人员，\n不可随意使用",
+                  children: [
+                    //TextSpan(
+                    //  text: "法律条款",
+                    //  recognizer: TapGestureRecognizer()
+                    //    ..onTap = () {
+                    //      //showToast("暂未添加");
+                    //      toWebPage(context, "fltk",
+                    //          checkHasHouse: false, checkFaceVerified: false);
+                    //    },
+                    //  style: TextStyle(
+                    //    color: Colors.blue,
+                    //  ),
+                    //)
+                  ],
+                  style: TextStyle(
+                    fontSize: 13,
+                  )),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "点错了",
+                  style: TextStyle(color: Colors.blueGrey),
+                ),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacementNamed(
+                    EmergencyCallPage.routeName,
+                    //arguments: {"group": "25", "title": "紧急呼叫"},
+                    arguments: {"group": "25", "title": "紧急呼叫"},
+                  );
+                },
+                child: Text("确认使用"),
+              ),
+            ],
+          );
+        });
+  }
+
   Material _buildAnnouncementTile(BuildContext context, Announcement detail,
       AnnouncementModel announcementModel) {
     return Material(
@@ -475,10 +548,7 @@ class HomePage extends StatelessWidget {
               Expanded(
                 child: Text(
                   detail.noticeTitle,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .caption,
+                  style: Theme.of(context).textTheme.caption,
                   textAlign: TextAlign.start,
                   overflow: TextOverflow.ellipsis,
                 ),

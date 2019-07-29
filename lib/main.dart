@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
           ],
           child: MaterialApp(
             theme: defaultThemeData,
-            debugShowCheckedModeBanner: false,
+            debugShowCheckedModeBanner: Configs.APP_DEBUG,
             onUnknownRoute: (settings) {
               return MaterialPageRoute(builder: (context) {
                 return NotFoundPage(routeName: settings.name);

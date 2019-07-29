@@ -132,8 +132,8 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                                   : TextInputType.text,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: _fastLogin ? "电话号码" : "用户名",
-                                hintText: "输入${_fastLogin ? "电话号码" : "用户名"}",
+                                labelText: _fastLogin ? "手机号" : "用户名",
+                                hintText: "输入${_fastLogin ? "手机号" : "用户名"}",
                                 suffixIcon: InkWell(
                                   onTap: () {
                                     controllerMobile.clear();
@@ -314,7 +314,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
 
   void sendSms(BuildContext context, bool fastLogin) async {
     if (!_nameReady) {
-      Fluttertoast.showToast(msg: "请填写${fastLogin ? "电话" : "用户名"}");
+      Fluttertoast.showToast(msg: "请填写${fastLogin ? "手机号" : "用户名"}");
       return;
     }
     tickSmsKey.currentState?.startLoading();

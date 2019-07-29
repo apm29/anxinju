@@ -159,7 +159,7 @@ class _MinePageState extends State<MinePage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
-                        _buildAvatar(url),
+                        buildAvatar(context, url),
                         SizedBox(
                           width: 12,
                         ),
@@ -272,37 +272,6 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  Container _buildAvatar(String url, {bool circleBorder = false}) {
-    return Container(
-      constraints: BoxConstraints.tight(Size(
-        ScreenUtil().setHeight(180),
-        ScreenUtil().setHeight(180),
-      )),
-      child: Material(
-        color: Colors.blueGrey[200],
-        borderRadius: circleBorder
-            ? null
-            : BorderRadius.all(
-                Radius.circular(5),
-              ),
-        elevation: 6,
-        shape: circleBorder ? CircleBorder() : null,
-        type: MaterialType.card,
-        clipBehavior: Clip.hardEdge,
-        child: url != null
-            ? Image.network(
-                url,
-                fit: BoxFit.cover,
-              )
-            : Icon(
-                Icons.person_outline,
-                size: 32,
-                color: Colors.white,
-              ),
-      ),
-    );
-  }
-
   Widget _buildCommonMine(
     BuildContext context,
     UserModel userModel,
@@ -355,7 +324,11 @@ class _MinePageState extends State<MinePage> {
                               children: <Widget>[
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: _buildAvatar(url, circleBorder: true),
+                                  child: buildAvatar(
+                                    context,
+                                    url,
+                                    circleBorder: true,
+                                  ),
                                 ),
                                 Icon(
                                   isVerified

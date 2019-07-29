@@ -159,7 +159,28 @@ class Api {
     };
     if (userId != null) {
       dataMap["userId"] = userId;
+    } else if (myName != null) {
+      dataMap["myName"] = myName;
+    } else if (sex != null) {
+      dataMap["sex"] = sex;
+    } else if (phone != null) {
+      dataMap["phone"] = phone;
+    } else if (nickName != null) {
+      dataMap["nickName"] = nickName;
+    } else if (avatar != null) {
+      dataMap["avatar"] = avatar;
+    } else if (idCard != null) {
+      dataMap["idCard"] = idCard;
     }
+    return await DioUtil().postAsync(
+      path: "/permission/userDetail/saveUserDetail",
+      data: dataMap,
+      desc: "保存用户信息",
+    );
+  }
+
+  static Future<BaseResponse> saveUserDetailByMap(
+      Map dataMap) async {
     return await DioUtil().postAsync(
       path: "/permission/userDetail/saveUserDetail",
       data: dataMap,
