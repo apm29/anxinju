@@ -793,8 +793,7 @@ class _WebViewExampleState extends State<WebViewExample> {
               break;
             case "requestFocusout":
               hideAndroidKeyboard();
-              setState(() {
-              });
+              setState(() {});
               break;
             case "uploadFile":
               doUploadFile(jsonMap['data']['callbackName']);

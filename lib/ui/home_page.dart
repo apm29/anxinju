@@ -461,7 +461,7 @@ class HomePage extends StatelessWidget {
             title: Text("警告 ⚠️"),
             content: Text.rich(
               TextSpan(
-                  text: "本功能适用于遇到偷窃、火灾等紧急情况时联系小区安保人员，\n不可随意使用",
+                  text: "本功能适用于遇到偷窃、火灾等紧急情况时联系小区安保人员，不可随意使用",
                   children: [
                     //TextSpan(
                     //  text: "法律条款",

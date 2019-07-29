@@ -107,7 +107,7 @@ class _VideoNineOneOnePageState extends State<VideoNineOneOnePage> {
       AgoraRtcEngine.setupLocalVideo(viewId, VideoRenderMode.Fit);
       AgoraRtcEngine.startPreview();
       // state can access widget directly
-      AgoraRtcEngine.joinChannel(null, widget.channelName, null, 0);
+      //AgoraRtcEngine.joinChannel(null, widget.channelName, null, 0);
     });
   }
 
@@ -326,7 +326,33 @@ class _VideoNineOneOnePageState extends State<VideoNineOneOnePage> {
   }
 
   void _onCallEnd(BuildContext context) {
-    Navigator.pop(context);
+    doLogout(context);
+  }
+  Future doLogout(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("退出"),
+            content: Text("确定退出吗?"),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("取消")),
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text("退出")),
+            ],
+          );
+        }).then((v){
+          if(v){
+            Navigator.of(context).pop();
+          }
+    });
   }
 
   void _onToggleMute() {

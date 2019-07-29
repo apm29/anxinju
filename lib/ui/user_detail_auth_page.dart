@@ -1,6 +1,5 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/user_model.dart';
-import 'package:rxdart/rxdart.dart';
 
 class UserDetailAuthPage extends StatefulWidget {
   static String routeName = "/preVerify";
@@ -10,23 +9,14 @@ class UserDetailAuthPage extends StatefulWidget {
 }
 
 class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _genderController = TextEditingController();
-  TextEditingController _avatarController = TextEditingController();
   TextEditingController _idCardController = TextEditingController();
-  TextEditingController _nickNameController = TextEditingController();
-  PublishSubject<String> _avatarUploadController = PublishSubject();
-
-  Observable<String> get _avatarStream => _avatarUploadController.stream;
+  GlobalKey _keyEdit =GlobalKey();
   GlobalKey<LoadingStateWidgetState> submitButtonKey =
       GlobalKey(debugLabel: "sumbitUserDetail");
-  GlobalKey<LoadingStateWidgetState> uploadImageKey =
-      GlobalKey(debugLabel: "uploadImageAvatar");
 
   @override
   void dispose() {
     super.dispose();
-    _avatarUploadController.close();
   }
 
   @override
@@ -43,7 +33,9 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
       body: Consumer<UserModel>(
         builder: (BuildContext context, UserModel userModel, Widget child) {
           bool isReAuth = (userModel.userDetail?.idCard ?? "").isNotEmpty;
-          _idCardController.text = userModel.userDetail?.idCard;
+          if(isReAuth) {
+            _idCardController.text = userModel.userDetail?.idCard;
+          }
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: CustomScrollView(
@@ -64,13 +56,17 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      key: _keyEdit,
                       maxLength: 18,
                       enabled: !isReAuth,
                       decoration: InputDecoration(
-                          hintText: "请输入身份证",
-                          labelText: "身份证",
-                          border: OutlineInputBorder()),
+                        hintText: "请输入身份证",
+                        labelText: "身份证",
+                        border: OutlineInputBorder(),
+                      ),
                       controller: _idCardController,
+                      autocorrect: false,
+
                     ),
                   ),
                 ),

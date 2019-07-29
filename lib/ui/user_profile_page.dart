@@ -191,7 +191,7 @@ class UserProfilePage extends StatelessWidget {
                         profileModel,
                         context,
                         "sex",
-                        values: ["男", "女", "其他"],
+                        values: ["男", "女", "保密"],
                         title: "性别",
                         originText: profileModel.gender ?? response.data?.sex,
                         desc: "选择性别",
@@ -214,7 +214,6 @@ class UserProfilePage extends StatelessWidget {
 //                          profileModel.myName ?? response.data?.myName);
                     },
                   ),
-
                   ProfileTile(
                     title: "手机",
                     desc: getMaskedPhone(profileModel, response),
@@ -242,18 +241,20 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
-  String getMaskedIdCard(UserProfileModel profileModel, BaseResponse<UserDetail> response) {
+  String getMaskedIdCard(
+      UserProfileModel profileModel, BaseResponse<UserDetail> response) {
     var raw = profileModel.idCard ?? response.data?.idCard;
-    if(raw!=null&&raw.length>12){
-      raw = raw.replaceRange(6, 12, "*"*6);
+    if (raw != null && raw.length > 12) {
+      raw = raw.replaceRange(6, 12, "*" * 6);
     }
     return raw ?? "未设置";
   }
 
-  String getMaskedPhone(UserProfileModel profileModel, BaseResponse<UserDetail> response) {
+  String getMaskedPhone(
+      UserProfileModel profileModel, BaseResponse<UserDetail> response) {
     var raw = profileModel.mobile ?? response.data?.phone;
-    if(raw!=null&&raw.length>7){
-      raw = raw.replaceRange(3, 7, "*"*4);
+    if (raw != null && raw.length > 7) {
+      raw = raw.replaceRange(3, 7, "*" * 4);
     }
     return raw ?? "未设置";
   }
@@ -264,7 +265,7 @@ class UserProfilePage extends StatelessWidget {
       Api.uploadPic(file.path).then((resp) {
         if (resp.success) {
           Api.saveUserDetailByMap(
-            <String,String>{
+            <String, String>{
               "userId": response.data.userId,
               "avatar": resp.data.orginPicPath,
             },
@@ -335,7 +336,7 @@ class UserProfilePage extends StatelessWidget {
             ],
           );
         }).then((v) {
-      if(v!=null){
+      if (v != null) {
         model.getNewData(context);
       }
     });
@@ -391,7 +392,7 @@ class UserProfilePage extends StatelessWidget {
             ),
           );
         }).then((v) {
-      if(v!=null){
+      if (v != null) {
         model.getNewData(context);
       }
     });
