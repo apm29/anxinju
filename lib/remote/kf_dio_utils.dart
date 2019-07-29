@@ -515,6 +515,7 @@ class MediationApplyPageData {
   }
 }
 
+
 class MediationApply {
   int id;
   String applyUserName;
@@ -529,21 +530,33 @@ class MediationApply {
   String appId;
   String date;
   String address;
+  List<AppendContent> appendContent;
+  int chatroomId;
+  String chatroomTite;
+  String result;
+
+  String chatUser;
+  String startTime;
+  String endTime;
 
   MediationApply(
       {this.id,
-      this.applyUserName,
-      this.applyUserId,
-      this.acceptUserName,
-      this.acceptUserId,
-      this.title,
-      this.images,
-      this.description,
-      this.status,
-      this.districtId,
-      this.appId,
-      this.date,
-      this.address});
+        this.applyUserName,
+        this.applyUserId,
+        this.acceptUserName,
+        this.acceptUserId,
+        this.title,
+        this.images,
+        this.description,
+        this.status,
+        this.districtId,
+        this.appId,
+        this.date,
+        this.address,
+        this.appendContent,
+        this.chatroomId,
+        this.chatroomTite,
+        this.result});
 
   MediationApply.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -552,13 +565,32 @@ class MediationApply {
     acceptUserName = json['accept_user_name'];
     acceptUserId = json['accept_user_id'];
     title = json['title'];
-    images = json['images'].cast<String>();
+    if (json['images'] != null) {
+      images = new List<String>();
+      json['images'].forEach((v) {
+        images.add(v);
+      });
+    }
     description = json['description'];
     status = json['status'];
     districtId = json['district_id'];
     appId = json['app_id'];
     date = json['date'];
     address = json['address'];
+    if (json['append_content'] != null) {
+      appendContent = new List<AppendContent>();
+      json['append_content'].forEach((v) {
+        appendContent.add(new AppendContent.fromJson(v));
+      });
+    }  else{
+      appendContent = [];
+    }
+    chatroomId = json['chatroom_id'];
+    chatroomTite = json['chatroom_tite'];
+    result = json['result'];
+    chatUser = json['chat_user'];
+    startTime = json['start_time'];
+    endTime = json['end_time'];
   }
 
   static final List<Color> colorList = [
@@ -581,6 +613,7 @@ class MediationApply {
     }
   }
 
+  //1:未处理 2:无需调解 3:同意申请
   String get statusString {
     switch (status) {
       case "1":
@@ -602,18 +635,42 @@ class MediationApply {
     data['accept_user_name'] = this.acceptUserName;
     data['accept_user_id'] = this.acceptUserId;
     data['title'] = this.title;
-    data['images'] = this.images;
+    if (this.images != null) {
+      data['images'] = this.images.map((v) => v).toList();
+    }
     data['description'] = this.description;
     data['status'] = this.status;
     data['district_id'] = this.districtId;
     data['app_id'] = this.appId;
     data['date'] = this.date;
     data['address'] = this.address;
+    if (this.appendContent != null) {
+      data['append_content'] =
+          this.appendContent.map((v) => v.toJson()).toList();
+    }
+    data['chatroom_id'] = this.chatroomId;
+    data['chatroom_tite'] = this.chatroomTite;
+    data['result'] = this.result;
+    data['start_time'] = this.startTime;
+    data['end_time'] = this.endTime;
+    data['chat_user'] = this.chatUser;
     return data;
   }
+}
 
-  @override
-  String toString() {
-    return 'MediationApply{id: $id, applyUserName: $applyUserName, applyUserId: $applyUserId, acceptUserName: $acceptUserName, acceptUserId: $acceptUserId, title: $title, images: $images, description: $description, status: $status, districtId: $districtId, appId: $appId, date: $date, address: $address}';
+class AppendContent {
+  String appendContent;
+
+  AppendContent({this.appendContent});
+
+  AppendContent.fromJson(Map<String, dynamic> json) {
+    appendContent = json['append_content'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['append_content'] = this.appendContent;
+    return data;
   }
 }
+

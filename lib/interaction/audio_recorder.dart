@@ -18,7 +18,6 @@ import '../index.dart';
 class AudioRecorder {
   FlutterSound _flutterSound = FlutterSound();
 
-
   FlutterSound get flutterSound => _flutterSound;
   static AudioRecorder _instance;
 
@@ -216,8 +215,12 @@ class RecordDetail {
 
 class AudioInputWidget extends StatefulWidget {
   final ValueChanged<RecordDetail> onStopRecord;
+  final bool showBorder;
 
-  AudioInputWidget(this.onStopRecord);
+  AudioInputWidget(
+    this.onStopRecord, {
+    this.showBorder = true,
+  });
 
   @override
   _AudioInputWidgetState createState() => _AudioInputWidgetState();
@@ -237,49 +240,58 @@ class _AudioInputWidgetState extends State<AudioInputWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<RecordInfo>(
-        stream: AudioRecorder().recordInfoStream,
-        builder: (context, snapshot) {
-          var recording = snapshot.data?.recording ?? false;
-          if (recording) {
-            _duration = snapshot.data?.duration ?? 0;
-            if (_duration > _maxRecordDuration) {
-              stopRecord();
-            }
+      stream: AudioRecorder().recordInfoStream,
+      builder: (context, snapshot) {
+        var recording = snapshot.data?.recording ?? false;
+        if (recording) {
+          _duration = snapshot.data?.duration ?? 0;
+          if (_duration > _maxRecordDuration) {
+            stopRecord();
           }
-          return GestureDetector(
-            onTap: () {
-              Fluttertoast.showToast(msg: "长按按钮录音");
-            },
-            onLongPressUp: () async {
-              print('onLongPressUp');
-              await stopRecord();
-            },
-            onLongPressStart: (longPressDetail) {
-              print('onLongPressStart');
-              startRecord();
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                  color: recording ? Colors.blue : Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                  border: Border.all(color: Colors.lightBlue, width: 0.5)),
-              alignment: Alignment.center,
-              child: Text(
-                recording ? "松开结束" : "按住说话",
-                style:
-                    TextStyle(color: recording ? Colors.white : Colors.black),
-              ),
+        }
+        return GestureDetector(
+          onTap: () {
+            Fluttertoast.showToast(msg: "长按按钮录音");
+          },
+          onLongPressUp: () async {
+            print('onLongPressUp');
+            await stopRecord();
+          },
+          onLongPressStart: (longPressDetail) {
+            print('onLongPressStart');
+            startRecord();
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: recording ? Colors.blue : Colors.white,
+              borderRadius: BorderRadius.all(widget.showBorder
+                  ? Radius.circular(8)
+                  : Radius.circular(100)),
+              border: widget.showBorder
+                  ? Border.all(
+                      color: Colors.lightBlue,
+                      width: 0.5,
+                    )
+                  : null,
             ),
-          );
-        });
+            alignment: Alignment.center,
+            child: Text(
+              recording ? "松开结束" : "按住说话",
+              style: TextStyle(color: recording ? Colors.white : Colors.black),
+            ),
+          ),
+        );
+      },
+      initialData: null,
+    );
   }
 
   void startRecord() {
     if (!AudioRecorder().isRecording) AudioRecorder().startRecorder(null);
   }
 
-  Future<void> stopRecord() async{
+  Future<void> stopRecord() async {
     return AudioRecorder().stopRecorder().then((uri) {
       if (_duration < _minRecordDuration || uri == null) {
         Fluttertoast.showToast(msg: "录音时间过短");
@@ -331,6 +343,7 @@ class AudioHintWidget extends StatelessWidget {
         );
       },
       stream: AudioRecorder().recordInfoStream,
+      initialData: null,
     );
   }
 }
@@ -349,55 +362,57 @@ class _AudioMessageTileState extends State<AudioMessageTile> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<PlayInfo>(
-        stream: AudioRecorder().playInfoStream,
-        builder: (context, snapshot) {
-          var position = snapshot.data?.currentPosition ?? 0;
-          var duration = snapshot.data?.duration ?? 0;
-          var path = snapshot.data?.path;
-          var playing =
-              position > 0 && position <= duration && widget.path == path;
-          var messageLength = MediaQuery.of(context).size.width /
-              3.5 *
-              (widget.duration / 1000 / 30 + 0.8);
-          if (messageLength > MediaQuery.of(context).size.width / 1.5) {
-            messageLength = MediaQuery.of(context).size.width / 1.5;
-          }
-          bool noDuration = widget.duration == null || widget.duration  == 0;
-          return GestureDetector(
-            onTap: () {
-              if (playing) {
-                AudioRecorder().stopPlay();
-              } else {
-                AudioRecorder().startPlay(widget.path);
-              }
-            },
-            child: Container(
-              constraints: BoxConstraints.tight(
-                  Size(noDuration?double.infinity:messageLength, ScreenUtil().setHeight(130))),
-              decoration: BoxDecoration(
-                  color: playing
-                      ? Colors.lightBlueAccent
-                      : Colors.lightGreenAccent,
-                  border: Border.all(
-                    color: Colors.lightGreen,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(12))),
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              margin: EdgeInsets.only(right: 16, left: 16, top: 4, bottom: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(getTimeText(playing, position)),
-                  Expanded(child: Container()),
-                  Transform.rotate(
-                    child: Icon(Icons.wifi),
-                    angle: 3.14 / 2,
-                  )
-                ],
-              ),
+      stream: AudioRecorder().playInfoStream,
+      builder: (context, snapshot) {
+        var position = snapshot.data?.currentPosition ?? 0;
+        var duration = snapshot.data?.duration ?? 0;
+        var path = snapshot.data?.path;
+        var playing =
+            position > 0 && position <= duration && widget.path == path;
+        var messageLength = MediaQuery.of(context).size.width /
+            2.7 *
+            (widget.duration / 1000 / 30 + 0.8);
+        if (messageLength > MediaQuery.of(context).size.width / 1.5) {
+          messageLength = MediaQuery.of(context).size.width / 1.5;
+        }
+        bool noDuration = widget.duration == null || widget.duration == 0;
+        return GestureDetector(
+          onTap: () {
+            if (playing) {
+              AudioRecorder().stopPlay();
+            } else {
+              AudioRecorder().startPlay(widget.path);
+            }
+          },
+          child: Container(
+            constraints: BoxConstraints.tight(Size(
+                noDuration ? double.infinity : messageLength,
+                ScreenUtil().setHeight(130))),
+            decoration: BoxDecoration(
+                color:
+                    playing ? Colors.lightBlueAccent : Colors.lightGreenAccent,
+                border: Border.all(
+                  color: Colors.lightGreen,
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(12))),
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            margin: EdgeInsets.only(right: 16, left: 16, top: 4, bottom: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(getTimeText(playing, position)),
+                Expanded(child: Container()),
+                Transform.rotate(
+                  child: Icon(Icons.wifi),
+                  angle: 3.14 / 2,
+                )
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+      initialData: null,
+    );
   }
 
   String getTimeText(bool playing, position) {
@@ -406,7 +421,7 @@ class _AudioMessageTileState extends State<AudioMessageTile> {
               DateTime.fromMillisecondsSinceEpoch(position?.floor() ?? 0)) +
           '"';
     }
-    if(widget.duration == null || widget.duration == 0){
+    if (widget.duration == null || widget.duration == 0) {
       return "点击播放";
     }
     return DateFormat('ss').format(DateTime.fromMillisecondsSinceEpoch(

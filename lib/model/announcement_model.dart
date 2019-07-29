@@ -54,6 +54,7 @@ class AnnouncementModel extends ChangeNotifier {
         }
         return Api.getNewNotice(resp.data);
       }).then((resp) {
+        print('$resp');
         if (resp.success) {
           announcementList = resp.data;
         }

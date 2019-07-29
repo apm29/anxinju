@@ -45,6 +45,7 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                   : isVerified
                       ? showDistrictMenu(context)
                       : showFaceVerifyDialog(context);
+              SystemSound.play(SystemSoundType.click);
             },
             icon: Icon(
               Icons.location_on,
@@ -81,6 +82,7 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
                       subtitle: Text(model.getDistrictAddress(index)),
                       onTap: () {
                         model.selectCurrentDistrict(index, parentContext);
+                        SystemSound.play(SystemSoundType.click);
                         Navigator.of(context).pop();
                       },
                       selected: isSelected,

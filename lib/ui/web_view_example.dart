@@ -1,5 +1,6 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/district_model.dart';
+import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
@@ -294,7 +295,7 @@ const String kNavigationExamplePage = '''
 ''';
 
 class WebModel extends ChangeNotifier {
-  int _historyLength = 0;
+  int _historyLength = 10;
 
   int get historyLength => _historyLength;
 
@@ -334,6 +335,7 @@ class _WebViewExampleState extends State<WebViewExample> {
 
   @override
   void dispose() {
+    //controller?.clearCache();
     super.dispose();
     titleController.close();
     if (_streamSubscription != null) {
@@ -355,6 +357,16 @@ class _WebViewExampleState extends State<WebViewExample> {
         },
         child: Scaffold(
 //        resizeToAvoidBottomInset: true,
+          //floatingActionButton: FloatingActionButton(
+          //  onPressed: () {
+          //    controller
+          //        ?.evaluateJavascript("window.history.go(-1);")
+          //        ?.catchError((e) {
+          //      print(e.toString());
+          //    });
+          //  },
+          //  child: Icon(Icons.exposure_neg_1),
+          //),
           appBar: AppBar(
             title: StreamBuilder<Object>(
               stream: titleController.stream,
@@ -389,14 +401,13 @@ class _WebViewExampleState extends State<WebViewExample> {
 //          NavigationControls(_controller.future),
               DistrictInfoButton(),
               Consumer<WebModel>(
-                builder:
-                    (BuildContext context, WebModel value, Widget child) {
+                builder: (BuildContext context, WebModel value, Widget child) {
                   return value.hasCloseButton
                       ? IconButton(
-                      icon: Icon(Icons.close),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      })
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          })
                       : Container();
                 },
               ),
@@ -462,7 +473,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                             (WebViewController webViewController) {
                           _controller.complete(webViewController);
                           controller = webViewController;
-                          controller.clearCache();
+                          //controller.clearCache();
                         },
                         // ignore: prefer_collection_literals
                         javascriptChannels: <JavascriptChannel>[
@@ -479,32 +490,13 @@ class _WebViewExampleState extends State<WebViewExample> {
                         },
                         onPageFinished: (String url) {
                           print('Page finished loading: $url');
-                          controller
-                              .evaluateJavascript(
-                                  'document.getElementsByTagName("title")[0].innerText')
-                              .then((title) {
-                            title = title.replaceAll('"', "");
-                            if (title == "null" || title == "undefined") {
-                              title = null;
-                            }
-                            titleController.add(title);
-                          });
+                          _tryGetTitle();
 
-                          controller
-                              ?.evaluateJavascript('window.history.length;')
-                              ?.then((s) {
-                            var length = 0;
-                            try {
-                              length = int.parse(s);
-                            } catch (e) {
-                              print(e);
-                            }
-                            var webModel =
-                                Provider.of<WebModel>(context, listen: false);
-                            webModel.historyLength = length;
-                          });
+                          _tryGetHistoryLength(context);
+
+                          _tryClearCache(context);
+                          hideKeyBoardOnTap();
                           if (Platform.isAndroid) {
-                            hideKeyBoardOnTap();
                             //imeConfig();
                             //if (_streamSubscription != null)
                             //  _streamSubscription.cancel();
@@ -528,6 +520,60 @@ class _WebViewExampleState extends State<WebViewExample> {
         return WebModel();
       },
     );
+  }
+
+  void _tryGetHistoryLength(BuildContext context) {
+    controller?.evaluateJavascript('window.history.length;')?.then((s) {
+      var length = 0;
+      try {
+        length = int.parse(s);
+      } catch (e) {
+        print(e);
+      }
+      var webModel = Provider.of<WebModel>(context, listen: false);
+      webModel.historyLength = length;
+    })?.catchError((e) {
+      print(e.toString());
+    });
+  }
+
+  void _tryGetTitle() {
+    controller
+        ?.evaluateJavascript(
+            'document.getElementsByTagName("title")[0].innerText')
+        ?.then((title) {
+      title = title.replaceAll('"', "");
+      if (title == "null" || title == "undefined") {
+        title = null;
+      }
+      titleController.add(title);
+    })?.catchError((e) {
+      print(e.toString());
+    });
+  }
+
+  void _tryClearCache(BuildContext context) {
+    try {
+      var lastStamp = userSp.getInt(KEY_WEB_VIEW_CACHE_STAMP) ?? 0;
+      var list = MainIndexModel.of(context).index;
+      if (list == null || list.length == 0) {
+        return;
+      }
+      var updateStamp = (list.first.versionUpdateStamp) ?? 0;
+      if (updateStamp > lastStamp) {
+        controller?.clearCache()?.then((_) {
+          print("Cache Cleared");
+          userSp.setInt(
+            KEY_WEB_VIEW_CACHE_STAMP,
+            DateTime.now().millisecondsSinceEpoch,
+          );
+        })?.catchError((e) {
+          print(e.toString());
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   void hideKeyBoardOnTap() {
@@ -557,11 +603,14 @@ class _WebViewExampleState extends State<WebViewExample> {
          })
          }
        }
-    ''');
+    ''').catchError((e) {
+      print(e.toString());
+    });
   }
 
   void imeConfig() async {
-    if (controller != null) controller.evaluateJavascript('''
+    if (controller != null)
+      controller.evaluateJavascript('''
                           var inputs = document.getElementsByTagName('input');
                           var textArea = document.getElementsByTagName('textarea');
                           var current;
@@ -638,7 +687,9 @@ class _WebViewExampleState extends State<WebViewExample> {
                             //})
                           };
                           console.log('===JS CODE INJECTED INTO MY WEBVIEW===');
-                        ''');
+                        ''').catchError((e) {
+        print(e.toString());
+      });
   }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
@@ -742,6 +793,8 @@ class _WebViewExampleState extends State<WebViewExample> {
               break;
             case "requestFocusout":
               hideAndroidKeyboard();
+              setState(() {
+              });
               break;
             case "uploadFile":
               doUploadFile(jsonMap['data']['callbackName']);
@@ -940,7 +993,9 @@ class _WebViewExampleState extends State<WebViewExample> {
 
       print('$javascriptString');
 
-      controller.evaluateJavascript(javascriptString);
+      controller.evaluateJavascript(javascriptString).catchError((e) {
+        print(e.toString());
+      });
     } else {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return LoginPage(
@@ -954,7 +1009,9 @@ class _WebViewExampleState extends State<WebViewExample> {
         var javascriptString =
             '${data["callbackName"]}("${userModel.token}","$districtId","${data["backRoute"]}")';
 
-        controller.evaluateJavascript(javascriptString);
+        controller.evaluateJavascript(javascriptString).catchError((e) {
+          print(e.toString());
+        });
       });
     }
   }

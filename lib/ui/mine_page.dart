@@ -10,7 +10,6 @@ import 'package:oktoast/oktoast.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'notification_message_page.dart';
-import 'widget/gradient_button.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -77,17 +76,18 @@ class _MinePageState extends State<MinePage> {
     UserRoleModel roleModel,
     DistrictModel districtModel,
   ) {
-    bool isVerified = userVerifyStatusModel.isVerified() ||
-        roleModel.isOnPropertyDuty;
+    bool isVerified =
+        userVerifyStatusModel.isVerified() || roleModel.isOnPropertyDuty;
     String url = userModel.userDetail?.avatar;
     String userName =
-        userModel.userName ?? userModel.userDetail?.nickName ?? "";
+        userModel.userDetail?.nickName ?? userModel.userName ?? "";
     return Container(
       color: Colors.grey[100],
       child: DefaultTextStyle(
         style: TextStyle(color: Colors.blueGrey),
         child: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Stack(
                 alignment: Alignment.topCenter,
@@ -115,7 +115,8 @@ class _MinePageState extends State<MinePage> {
                         Radius.circular(8),
                       ),
                       child: Container(
-                        margin: EdgeInsets.only(top: ScreenUtil().setHeight(100)),
+                        margin:
+                            EdgeInsets.only(top: ScreenUtil().setHeight(100)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
@@ -132,8 +133,8 @@ class _MinePageState extends State<MinePage> {
                               2,
                               "我的消息",
                               () {
-                                Navigator.of(context)
-                                    .pushNamed(NotificationMessagePage.routeName);
+                                Navigator.of(context).pushNamed(
+                                    NotificationMessagePage.routeName);
                               },
                               Icons.message,
                             ),
@@ -152,31 +153,13 @@ class _MinePageState extends State<MinePage> {
                     ),
                   ),
                   Positioned(
-                    top: ScreenUtil().setHeight(210) - ScreenUtil().setHeight(90),
+                    top: ScreenUtil().setHeight(210) -
+                        ScreenUtil().setHeight(90),
                     left: 42,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
-                        Container(
-                          constraints: BoxConstraints.tight(Size(
-                            ScreenUtil().setHeight(180),
-                            ScreenUtil().setHeight(180),
-                          )),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[200],
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(width: 2, color: Colors.white),
-                          ),
-                          child: url != null
-                              ? Image.network(
-                                  url,
-                                  fit: BoxFit.cover,
-                                )
-                              : Icon(
-                                  Icons.person_outline,
-                                  color: Colors.white,
-                                ),
-                        ),
+                        _buildAvatar(url),
                         SizedBox(
                           width: 12,
                         ),
@@ -203,7 +186,8 @@ class _MinePageState extends State<MinePage> {
                           padding: EdgeInsets.symmetric(horizontal: 2),
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.blueGrey[400]),
-                              borderRadius: BorderRadius.all(Radius.circular(4))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4))),
                           margin: EdgeInsets.only(left: 2),
                         ),
                       ],
@@ -215,26 +199,29 @@ class _MinePageState extends State<MinePage> {
                 height: 24,
               ),
               EaseTile(
-                title: "巡更管理",
-                iconData: Icons.map,
-                onPressed: () {
-                  toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
-                      checkFaceVerified: false);
-                },
-                margin: EdgeInsets.symmetric(horizontal: 16),
-                padding: EdgeInsets.symmetric(vertical: 16,horizontal: 12),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-              ),
-              EaseTile(
                 title: "通知通告",
-                iconData: Icons.announcement,
+                iconData: Icons.mail_outline,
+                iconColor: Colors.green,
                 onPressed: () {
                   toWebPage(context, WebIndexID.TONG_ZHI_TONG_GAO,
                       checkFaceVerified: false);
                 },
                 margin: EdgeInsets.symmetric(horizontal: 16),
-                padding: EdgeInsets.symmetric(vertical: 16,horizontal: 12),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
               ),
+              EaseTile(
+                title: "巡更管理",
+                iconData: Icons.outlined_flag,
+                iconColor: Colors.purple,
+                onPressed: () {
+                  toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
+                      checkFaceVerified: false);
+                },
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+              ),
+
               EaseTile(
                 title: "检查更新",
                 iconData: Icons.cached,
@@ -242,28 +229,76 @@ class _MinePageState extends State<MinePage> {
                   _doCheckUpdate(context);
                 },
                 margin: EdgeInsets.symmetric(horizontal: 16),
-                padding: EdgeInsets.symmetric(vertical: 16,horizontal: 12),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+              ),
+              EaseTile(
+                title: "退出登录",
+                iconData: Icons.exit_to_app,
+                iconColor: Colors.deepOrange,
+                onPressed: () {
+                  doLogout(context);
+                },
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
               ),
               SizedBox(
                 height: ScreenUtil().setHeight(16),
               ),
-              _buildVersionInfo(),
+
               SizedBox(
                 height: ScreenUtil().setHeight(80),
               ),
-              GradientButton(
-                Text("登出"),
-                onPressed: () async {
-                  await doLogout(context);
-                },
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(700),
+//              GradientButton(
+//                Text("登出"),
+//                onPressed: () async {
+//                  await doLogout(context);
+//                },
+//              ),
+              _buildVersionInfo(),
+              Container(
+                constraints: BoxConstraints(
+                  minHeight: 200,
+                  maxHeight: 400,
+                ),
+                child: SizedBox(
+                  height: ScreenUtil().setHeight(40),
+                ),
               )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Container _buildAvatar(String url, {bool circleBorder = false}) {
+    return Container(
+      constraints: BoxConstraints.tight(Size(
+        ScreenUtil().setHeight(180),
+        ScreenUtil().setHeight(180),
+      )),
+      child: Material(
+        color: Colors.blueGrey[200],
+        borderRadius: circleBorder
+            ? null
+            : BorderRadius.all(
+                Radius.circular(5),
+              ),
+        elevation: 6,
+        shape: circleBorder ? CircleBorder() : null,
+        type: MaterialType.card,
+        clipBehavior: Clip.hardEdge,
+        child: url != null
+            ? Image.network(
+                url,
+                fit: BoxFit.cover,
+              )
+            : Icon(
+                Icons.person_outline,
+                size: 32,
+                color: Colors.white,
+              ),
       ),
     );
   }
@@ -283,7 +318,7 @@ class _MinePageState extends State<MinePage> {
     String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
     String url = userModel.userDetail?.avatar;
     String userName =
-        userModel.userName ?? userModel.userDetail?.nickName ?? "";
+        userModel.userDetail?.nickName ?? userModel.userName ?? "";
     return Consumer<MainIndexModel>(
       builder: (BuildContext context, MainIndexModel value, Widget child) {
         return DefaultTextStyle(
@@ -312,57 +347,68 @@ class _MinePageState extends State<MinePage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(18.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        child: Wrap(
                           children: <Widget>[
-                            Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: CircleAvatar(
-                                  backgroundImage: url != null
-                                      ? CachedNetworkImageProvider(url)
-                                      : null,
-                                )),
-                            Icon(
-                              isVerified ? Icons.verified_user : Icons.error,
-                              color: isVerified ? Colors.green : Colors.red,
-                              size: 12,
-                            ),
-                            Text(
-                              '$userName',
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                showReAuthDialog(context, notVerify);
-                              },
-                              child: Container(
-                                child: Text(
-                                  notVerify ? "未认证" : "重新认证",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: _buildAvatar(url, circleBorder: true),
                                 ),
-                                padding: EdgeInsets.symmetric(horizontal: 2),
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(4))),
-                                margin: EdgeInsets.only(left: 2),
-                              ),
+                                Icon(
+                                  isVerified
+                                      ? Icons.verified_user
+                                      : Icons.error,
+                                  color: isVerified ? Colors.green : Colors.red,
+                                  size: 12,
+                                ),
+                                Text(
+                                  '$userName',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    showReAuthDialog(context, notVerify);
+                                    SystemSound.play(SystemSoundType.click);
+                                  },
+                                  child: Container(
+                                    child: Text(
+                                      notVerify ? "未认证" : "重新认证",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12),
+                                    ),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.white),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(4))),
+                                    margin: EdgeInsets.only(left: 2),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              child: Container(),
-                            ),
-                            Icon(
-                              isVerified ? Icons.verified_user : Icons.error,
-                              color: Colors.grey[400],
-                              size: 12,
-                            ),
-                            Text(
-                              '$verifyStatusDesc',
-                              textAlign: TextAlign.end,
-                              style: TextStyle(fontSize: 11),
-                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(),
+                                ),
+                                Icon(
+                                  isVerified
+                                      ? Icons.verified_user
+                                      : Icons.error,
+                                  color: Colors.grey[400],
+                                  size: 12,
+                                ),
+                                Text(
+                                  '$verifyStatusDesc',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 11),
+                                ),
+                              ],
+                            )
                           ],
                         ),
                       ),
@@ -381,6 +427,7 @@ class _MinePageState extends State<MinePage> {
                               onTap: () {
                                 toWebPage(context, WebIndexID.WO_DE_FANG_WU,
                                     checkHasHouse: true);
+                                SystemSound.play(SystemSoundType.click);
                               },
                               child: Column(
                                 children: <Widget>[
@@ -395,7 +442,11 @@ class _MinePageState extends State<MinePage> {
                             GestureDetector(
                               onTap: () {
                                 toWebPage(
-                                    context, WebIndexID.ZHU_SUO_CHENG_YUAN);
+                                  context,
+                                  WebIndexID.ZHU_SUO_CHENG_YUAN,
+                                  checkHasHouse: true,
+                                );
+                                SystemSound.play(SystemSoundType.click);
                               },
                               child: Column(
                                 children: <Widget>[
@@ -411,6 +462,7 @@ class _MinePageState extends State<MinePage> {
                               onTap: () {
                                 toWebPage(context, WebIndexID.WO_DE_AI_CHE,
                                     checkFaceVerified: false);
+                                SystemSound.play(SystemSoundType.click);
                               },
                               child: Column(
                                 children: <Widget>[
@@ -675,6 +727,7 @@ class _MinePageState extends State<MinePage> {
                   ),
                   onPressed: () {
                     roleModel.switchRole();
+                    SystemSound.play(SystemSoundType.click);
                   },
                   label: Text("${roleModel.switchString}"),
                 )

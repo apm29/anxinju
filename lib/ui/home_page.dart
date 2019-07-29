@@ -2,9 +2,11 @@ import 'package:ease_life/index.dart';
 import 'package:ease_life/model/announcement_model.dart';
 import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/service_chat_model.dart';
+import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/ui/service_chat_page.dart';
+import 'package:ease_life/ui/video_nineoneone_page.dart';
 
 import 'dispute_mediation_list_page.dart';
 import 'dispute_mediation_page.dart';
@@ -16,7 +18,9 @@ class HomePage extends StatelessWidget {
       builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
         final isOnPropertyDuty = roleModel.isOnPropertyDuty;
         return Scaffold(
-          appBar: isOnPropertyDuty?null:AppBar(
+          appBar: isOnPropertyDuty
+              ? null
+              : AppBar(
             // Here we take the value from the MyHomePage object that was created by
             // the App.build method, and use it to set our appbar title.
             centerTitle: true,
@@ -26,10 +30,28 @@ class HomePage extends StatelessWidget {
             ),
             actions: <Widget>[
               DistrictInfoButton(),
+              Consumer<UserRoleModel>(
+                builder: (BuildContext context, UserRoleModel roleModel,
+                    Widget child) {
+                  return roleModel.hasSwitch
+                      ? FlatButton.icon(
+                    icon: Icon(
+                      Icons.repeat,
+                      color: Colors.blue,
+                    ),
+                    onPressed: () {
+                      roleModel.switchRole();
+                      SystemSound.play(SystemSoundType.click);
+                    },
+                    label: Text("${roleModel.switchString}"),
+                  )
+                      : Container();
+                },
+              ),
             ],
           ),
           body: AnimatedSwitcher(
-            child:  isOnPropertyDuty
+            child: isOnPropertyDuty
                 ? _buildPropertyUser()
                 : _buildCommonUserHome(context),
             duration: Duration(seconds: 1),
@@ -93,7 +115,9 @@ class HomePage extends StatelessWidget {
                                   builder: (BuildContext context,
                                       DistrictModel value, Widget child) {
                                     return Text(
-                                      "${value.getCurrentDistrictName(ifError: "")}${Strings.appName}服务平台\n共建共享我们的家园",
+                                      "${value.getCurrentDistrictName(
+                                          ifError: "")}${Strings
+                                          .appName}服务平台\n共建共享我们的家园",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 18),
@@ -149,6 +173,45 @@ class HomePage extends StatelessWidget {
             ),
           ),
           Container(
+            margin: EdgeInsets.only(top: 12),
+            child: Material(
+              elevation: 0,
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  EaseIconButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed(VideoNineOneOnePage.routeName);
+                    },
+                    iconData: Icons.video_call,
+                    buttonLabel: "视频报警",
+                  ),
+                  Consumer2<UserRoleModel, UserModel>(
+                    builder: (BuildContext context, UserRoleModel userRoleModel,
+                        UserModel userModel, Widget child) {
+                      return Offstage(
+                        offstage: !userModel.isLogin || userRoleModel.isOnPropertyDuty,
+                        child: EaseIconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              EmergencyCallPage.routeName,
+                              //arguments: {"group": "25", "title": "紧急呼叫"},
+                              arguments: {"group": "25", "title": "紧急呼叫"},
+                            );
+                          },
+                          iconData: Icons.call,
+                          buttonLabel: "紧急呼叫",
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
             decoration: BoxDecoration(color: Colors.white),
             margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
             child: Padding(
@@ -182,13 +245,16 @@ class HomePage extends StatelessWidget {
                           return Center(
                             child: Text(
                               "暂无消息",
-                              style: Theme.of(context).textTheme.caption,
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .caption,
                             ),
                           );
                         }
                         return Column(
                           children:
-                              announcementModel.announcements.map((detail) {
+                          announcementModel.announcements.map((detail) {
                             return _buildAnnouncementTile(
                                 context, detail, announcementModel);
                           }).toList(),
@@ -249,7 +315,7 @@ class HomePage extends StatelessWidget {
                     checkLogin: true,
                     onPressed: () {
                       var userVerifyStatusModel =
-                          UserVerifyStatusModel.of(context);
+                      UserVerifyStatusModel.of(context);
                       var districtModel = DistrictModel.of(context);
                       if (!userVerifyStatusModel.isVerified()) {
                         showFaceVerifyDialog(context);
@@ -349,6 +415,11 @@ class HomePage extends StatelessWidget {
                     indexId: WebIndexID.YE_ZHU_WEN_ZHENG,
                     checkHasHouse: false,
                   ),
+                  HomeChip(
+                    title: "邻里圈",
+                    indexId: WebIndexID.LIN_LI_QUAN,
+                    checkHasHouse: false,
+                  ),
                 ],
               ),
             ),
@@ -376,6 +447,7 @@ class HomePage extends StatelessWidget {
               },
             ),
           );
+          SystemSound.play(SystemSoundType.click);
         },
         child: Padding(
           padding: const EdgeInsets.all(7.0),
@@ -403,7 +475,10 @@ class HomePage extends StatelessWidget {
               Expanded(
                 child: Text(
                   detail.noticeTitle,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .caption,
                   textAlign: TextAlign.start,
                   overflow: TextOverflow.ellipsis,
                 ),

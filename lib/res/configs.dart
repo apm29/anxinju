@@ -10,7 +10,7 @@ class Strings {
 
 class Configs {
   ///debug开关,debug为true时运行测试环境
-  static const APP_DEBUG = true;
+  static const APP_DEBUG = false;
 
   ///iOS 定位key
   static const AMapKey = "d712d41f19e76ca74b673f9d5637af8a";
@@ -23,6 +23,10 @@ class Configs {
 
   static const KFBaseUrl =
       APP_DEBUG ? "http://axjkftest.ciih.net" : "http://axjkf.ciih.net";
+
+  static const AGORA_APP_ID = "c5ed80b0b3884fc488a2283ccce55017";
+
+  static const AGORA_CHANNEL_POLICE = "AGORA_CHANNEL_POLICE";
 }
 
 class WebIndexID {
@@ -66,6 +70,8 @@ class WebIndexID {
   static const BIAN_MIN_DI_TU = "bmdt";
 
   static const YE_ZHU_WEN_ZHENG = "yzwz";
+
+  static const LIN_LI_QUAN = "llq";
 }
 
 

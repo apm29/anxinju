@@ -64,6 +64,7 @@ class BottomBar extends StatelessWidget {
           ],
           onTap: (index) {
             MainIndexModel.of(context).currentIndex = index;
+            SystemSound.play(SystemSoundType.click);
           },
           currentIndex: currentPage,
           fixedColor: Colors.blue,

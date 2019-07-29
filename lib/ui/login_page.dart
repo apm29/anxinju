@@ -137,6 +137,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                                 suffixIcon: InkWell(
                                   onTap: () {
                                     controllerMobile.clear();
+                                    SystemSound.play(SystemSoundType.click);
                                   },
                                   child: Icon(Icons.clear),
                                 ),
@@ -171,6 +172,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                                     setState(() {
                                       _showPassword = !_showPassword;
                                     });
+                                    SystemSound.play(SystemSoundType.click);
                                   },
                                   child: Icon(_showPassword
                                       ? Icons.visibility_off
@@ -248,6 +250,7 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
                             setState(() {
                               _protocolChecked = !_protocolChecked;
                             });
+                            SystemSound.play(SystemSoundType.click);
                           },
                         ),
                       )

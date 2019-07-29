@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeTitleSliver extends StatelessWidget {
@@ -29,7 +30,10 @@ class HomeTitleSliver extends StatelessWidget {
       color: notTitle ? Colors.white : null,
       elevation: elevation??0,
       child: InkWell(
-        onTap: onPressed,
+        onTap: (){
+          onPressed?.call();
+          SystemSound.play(SystemSoundType.click);
+        },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[

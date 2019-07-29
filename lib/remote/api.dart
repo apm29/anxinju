@@ -547,4 +547,41 @@ class ApiKf {
       },
     );
   }
+
+  static Future<KFBaseResp> mediationAppend(
+    String mediationId,
+    String cAppId,
+    String description,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/Custroomapi/applyAppendContent",
+      processor: (s) {
+        return null;
+      },
+      formData: {
+        "id": mediationId,
+        "cAppId": cAppId,
+        "append_content": description,
+      },
+    );
+  }
+
+  static Future<KFBaseResp<MediationApply>> mediationApplyDetailQuery(
+    String mediationId,
+    String cAppId,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/Custroomapi/applyMediateCustSearch",
+      processor: (s) {
+        if (s is List && s.length > 0) {
+          return MediationApply.fromJson(s[0]);
+        }
+        return null;
+      },
+      formData: {
+        "id": mediationId,
+        "cAppId": cAppId,
+      },
+    );
+  }
 }

@@ -26,7 +26,8 @@ class DisputeMediationPage extends StatefulWidget {
   final bool isFinished;
   final String title;
 
-  const DisputeMediationPage({Key key, this.chatRoomId, this.isFinished, this.title})
+  const DisputeMediationPage(
+      {Key key, this.chatRoomId, this.isFinished, this.title})
       : super(key: key);
 
   @override
@@ -67,9 +68,14 @@ class ChatGroupRoomData {
     if (messages == null || messages.length == 0) {
       return "纠纷化解";
     } else {
-      return messages.firstWhere((message) {
-        return message.data.title != null && message.data.title.isNotEmpty;
-      }, orElse: () => null)?.data?.title??"纠纷化解";
+      return messages
+              .firstWhere((message) {
+                return message.data.title != null &&
+                    message.data.title.isNotEmpty;
+              }, orElse: () => null)
+              ?.data
+              ?.title ??
+          "纠纷化解";
     }
   }
 
@@ -324,6 +330,14 @@ class DisputeMediationModel extends ChangeNotifier {
 class ChatRoomPageStatusModel extends ChangeNotifier {
   bool _audioInput = false;
   bool _showEmoji = false;
+  bool _inputText = false;
+
+  bool get inputText => _inputText;
+
+  set inputText(bool value) {
+    _inputText = value;
+    notifyListeners();
+  }
 
   bool get audioInput => _audioInput;
   String _uploadingHint;
@@ -426,8 +440,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
                 resizeToAvoidBottomInset: true,
                 resizeToAvoidBottomPadding: true,
                 appBar: AppBar(
-                  title:
-                      Text( widget.title ?? dmModel.roomData.title),
+                  title: Text(widget.title ?? dmModel.roomData.title),
                 ),
                 body: Column(
                   children: <Widget>[
@@ -520,137 +533,8 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            AbsorbPointer(
-                              absorbing: disconnected || widget.isFinished,
-                              child: IntrinsicHeight(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: disconnected || widget.isFinished
-                                        ? Colors.grey
-                                        : Colors.white,
-                                  ),
-                                  padding: EdgeInsets.all(16),
-                                  child: Row(
-                                    children: <Widget>[
-                                      InkWell(
-                                        onTap: () {
-                                          _editFocusNode.unfocus();
-                                          value.switchAudio();
-                                        },
-                                        child: Column(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
-                                                  margin: EdgeInsets.all(6),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                      Radius.circular(8),
-                                                    ),
-                                                  ),
-                                                  child: Transform.rotate(
-                                                      angle:
-                                                          audio ? 0 : 3.14 / 2,
-                                                      child: Icon(!audio
-                                                          ? Icons.wifi
-                                                          : Icons.message))),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: audio
-                                            ? AudioInputWidget((recordDetail) {
-                                                _doSendAudio(
-                                                    context, recordDetail);
-                                              })
-                                            : SizedBox(
-                                                height:
-                                                    ScreenUtil().setHeight(120),
-                                                child: TextField(
-                                                  focusNode: _editFocusNode,
-                                                  enabled: !disconnected,
-                                                  controller: _inputController,
-                                                  maxLines: 100,
-                                                  textInputAction:
-                                                      TextInputAction.send,
-                                                  decoration: InputDecoration(
-                                                    contentPadding:
-                                                        EdgeInsets.all(3),
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    fillColor: Colors.red,
-                                                  ),
-                                                  onSubmitted: (content) {
-                                                    _doSendMessage(context);
-                                                  },
-                                                ),
-                                              ),
-                                      ),
-                                      IconButton(
-                                          onPressed: () {
-                                            _doSendImage(context);
-                                          },
-                                          icon: Icon(Icons.image)),
-                                      audio
-                                          ? Container()
-                                          : IconButton(
-                                              onPressed: () {
-                                                _editFocusNode.unfocus();
-                                                value.switchEmoji();
-                                              },
-                                              padding: EdgeInsets.all(0),
-                                              icon: Icon(
-                                                Icons.insert_emoticon,
-                                                color: emoji
-                                                    ? Colors.lightBlue
-                                                    : Colors.black,
-                                              ),
-                                            ),
-                                      audio
-                                          ? Container()
-                                          : IconButton(
-                                              onPressed: () {
-                                                _doSendMessage(context);
-                                              },
-                                              padding: EdgeInsets.all(0),
-                                              icon: Text(
-                                                "发送",
-                                                style: TextStyle(
-                                                  color: disconnected
-                                                      ? Colors.grey
-                                                      : Colors.black,
-                                                ),
-                                              )),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: emoji,
-                              child: Wrap(
-                                children: faces.map((name) {
-                                  return InkWell(
-                                    onTap: () {
-                                      _inputController.text =
-                                          _inputController.text + "face" + name;
-                                    },
-                                    child: Container(
-                                      margin: EdgeInsets.all(
-                                          ScreenUtil().setWidth(12)),
-                                      child: Image.asset(
-                                          "images/face/${faces.indexOf(name)}.gif"),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            )
+                            buildInputPart(
+                                disconnected, value, audio, context, emoji),
                           ],
                         );
                       },
@@ -662,6 +546,49 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget buildInputPart(bool disconnected, ChatRoomPageStatusModel value,
+      bool audio, BuildContext context, bool emoji) {
+    return buildChatInputPart(
+      disconnected: disconnected || widget.isFinished,
+      showAudio: audio,
+      showEmoji: emoji,
+      textInputMode: value.inputText,
+      onSwitchEmoji: () {
+        _editFocusNode.unfocus();
+        value.switchEmoji();
+      },
+      onSwitchAudio: () {
+        _editFocusNode.unfocus();
+        value.switchAudio();
+      },
+      onStopRecord: (detail) {
+        _doSendAudio(context, detail);
+      },
+      onSendText: () {
+        value.inputText = false;
+        _doSendMessage(context);
+      },
+      onSendImage: () {
+        _doSendImage(context);
+      },
+      onTextChange: (s) {
+        if (s != null && s.isNotEmpty) {
+          value.inputText = true;
+        } else {
+          value.inputText = false;
+        }
+      },
+      onSelectEmoji: (s) {
+        _inputController.value = TextEditingValue(
+          text: _inputController.text + s,
+        );
+        value.inputText = true;
+      },
+      textInputController: _inputController,
+      textFocusNode: _editFocusNode,
     );
   }
 
@@ -814,7 +741,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
     //if (isToday(time)) {
     //  return DateFormat("HH:mm:ss").format(time);
     //} else {
-      return DateFormat("yyyy-MM-dd HH:mm:ss").format(time);
+    return DateFormat("yyyy-MM-dd HH:mm:ss").format(time);
     //}
   }
 
@@ -852,7 +779,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
 
   Container _buildMessageUserName(ChatMessage chatMessage) {
     var name = chatMessage.data.userName;
-    if(name ==null || name.isEmpty){
+    if (name == null || name.isEmpty) {
       name = "未命名用户";
     }
     return Container(

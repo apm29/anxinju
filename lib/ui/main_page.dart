@@ -99,34 +99,35 @@ class MainPageState extends State<MainPage> {
               color: Colors.grey[200],
               child: buildContent(context),
             ),
-            floatingActionButton: Consumer2<UserModel,UserRoleModel>(
-              builder:
-                  (BuildContext context, UserModel userModel,UserRoleModel userRoleModel, Widget child) {
-                return Offstage(
-                  offstage: !userModel.isLogin || userRoleModel.isOnPropertyDuty,
-                  child: FloatingActionButton.extended(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(
-                        EmergencyCallPage.routeName,
-                        //arguments: {"group": "25", "title": "紧急呼叫"},
-                        arguments: {"group": "25", "title": "紧急呼叫"},
-                      );
-                    },
-                    isExtended: true,
-                    icon: Icon(Icons.chat,size: 12,),
-                    label: Text("紧急呼叫",style: TextStyle(fontSize: 12),),
-                  ),
-                );
-              },
-            ),
-            floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+//            floatingActionButton: Consumer2<UserModel,UserRoleModel>(
+//              builder:
+//                  (BuildContext context, UserModel userModel,UserRoleModel userRoleModel, Widget child) {
+//                return Offstage(
+//                  offstage: !userModel.isLogin || userRoleModel.isOnPropertyDuty,
+//                  child: FloatingActionButton.extended(
+//                    onPressed: () {
+//                      Navigator.of(context).pushNamed(
+//                        EmergencyCallPage.routeName,
+//                        //arguments: {"group": "25", "title": "紧急呼叫"},
+//                        arguments: {"group": "25", "title": "紧急呼叫"},
+//                      );
+//                    },
+//                    isExtended: true,
+//                    icon: Icon(Icons.chat,size: 12,),
+//                    label: Text("紧急呼叫",style: TextStyle(fontSize: 12),),
+//                  ),
+//                );
+//              },
+//            ),
+//            floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+//            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             bottomNavigationBar:
                 buildBottomNavigationBar(indexModel.currentIndex),
           ),
           onRefresh: () async {
             UserModel.of(context).tryLoginWithLocalToken();
             await UserModel.of(context).tryFetchUserInfoAndLogin();
+            await UserModel.of(context).tryFetchUserDetail();
             await AnnouncementModel.of(context).tryFetchAllAnnouncement();
             await DistrictModel.of(context).tryFetchCurrentDistricts();
             await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();

@@ -18,12 +18,21 @@ class ServiceChatModel extends ChangeNotifier {
   bool _audioInput = false;
 
   bool _showEmoji = false;
+  bool _inputText = false;
 
   String _uploadingHint;
 
   bool get showUpload {
     bool show = (_progress > 0 && _progress < 100);
     return show;
+  }
+
+
+  bool get inputText => _inputText;
+
+  set inputText(bool value) {
+    _inputText = value;
+    notifyListeners();
   }
 
   int _progress = 0;
@@ -100,7 +109,7 @@ class ServiceChatModel extends ChangeNotifier {
 
   ConnectStatus get connectionState => _connectionState;
 
-  List<ChatMessage> _messages = [];
+  List<ServiceChatMessage> _messages = [];
 
   IOWebSocketChannel get currentChannel => _currentChannel;
 
@@ -108,7 +117,7 @@ class ServiceChatModel extends ChangeNotifier {
 
   IChatUser get chatSelf => _chatSelf;
 
-  List<ChatMessage> messages(String userId) {
+  List<ServiceChatMessage> messages(String userId) {
     return _messages
         .where((message) =>
             message.senderId == userId || message.receiverId == userId)
@@ -134,6 +143,7 @@ class ServiceChatModel extends ChangeNotifier {
       var userName = respDetail.data.nickName ?? resp.data.userName;
       var userAvatar = respDetail.data.avatar;
       var userId = resp.data.userId;
+      print('${respDetail.data.avatar}');
       _chatSelf = ChatUser(
         userId,
         userAvatar,
@@ -211,10 +221,9 @@ class ServiceChatModel extends ChangeNotifier {
           print('add user:$add');
           var userId2 = currentChatUser?.userId;
           var message2 = message['id'];
-          print('${userId2 == message2}');
           _messages.insert(
             0,
-            ChatMessage(
+            ServiceChatMessage(
               senderId: message['id'],
               receiverId: _chatSelf.userId,
               userName: message['name'],
@@ -232,15 +241,16 @@ class ServiceChatModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool self(ChatMessage chatMessage) {
+  bool self(ServiceChatMessage chatMessage) {
     return chatMessage.senderId == _chatSelf.userId;
   }
 
-  void addMessage(ChatMessage message) {
+  void addMessage(ServiceChatMessage message) {
     _messages.insert(
       0,
       message,
     );
+    _inputText = false;
     notifyListeners();
   }
 
@@ -279,12 +289,13 @@ abstract class IChatUser {
     if (userAvatar?.startsWith("http") == true) {
       return userAvatar;
     } else {
-      return "${Configs.KFBaseUrl}$userAvatar";
+      return "${Configs.KFBaseUrl}${userAvatar??""}";
     }
   }
+
 }
 
-class ChatMessage {
+class ServiceChatMessage {
   final String userName;
   final String userAvatar;
   final String time;
@@ -293,7 +304,7 @@ class ChatMessage {
   final String receiverId;
   bool read;
 
-  ChatMessage({
+  ServiceChatMessage({
     this.userName,
     this.userAvatar,
     this.time,
@@ -302,6 +313,14 @@ class ChatMessage {
     this.receiverId,
     this.read = false,
   });
+
+  String get userAvatarUrl {
+    if (userAvatar?.startsWith("http") == true) {
+      return userAvatar;
+    } else {
+      return "${Configs.KFBaseUrl}${userAvatar??""}";
+    }
+  }
 
   @override
   String toString() {

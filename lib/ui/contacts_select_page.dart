@@ -140,6 +140,7 @@ class _ContactsSelectPageState extends State<ContactsSelectPage> {
 //                                            });
 //                                        androidIntent.launch();
                                         Navigator.of(context).pop(ContactInfo(contact.displayName, phone.value));
+                                        SystemSound.play(SystemSoundType.click);
                                       }
                                     },
                                     trailing: Icon(Icons.arrow_forward),

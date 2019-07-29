@@ -64,9 +64,10 @@ class DistrictModel extends ChangeNotifier {
       var index = userSp.getInt(KEY_CURRENT_DISTRICT_INDEX) ?? 0;
       if (_allDistrictList.length > index && index >= 0) {
         _mCurrentDistrict = _allDistrictList[index];
-      } else if (_allDistrictList.length > 1) {
+      } else if (_allDistrictList.length >= 1) {
         _mCurrentDistrict = _allDistrictList[0];
       }
+      notifyListeners();
       return;
     }).then((_){
       tryFetchHouseList(getCurrentDistrictId());

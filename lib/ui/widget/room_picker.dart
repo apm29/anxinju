@@ -59,6 +59,7 @@ class _BuildingPickerState extends State<BuildingPicker> {
                   })).then((address) {
                     Navigator.of(context).pop(address);
                   });
+                  SystemSound.play(SystemSoundType.click);
                 },
                 child: buildItem(list[index]),
               );
@@ -113,6 +114,7 @@ class _UnitPickerState extends State<UnitPicker> {
                   })).then((address) {
                     Navigator.of(context).pop(address);
                   });
+                  SystemSound.play(SystemSoundType.click);
                 },
                 child: buildItem(list[index]),
               );
@@ -162,6 +164,7 @@ class _RoomPickerState extends State<RoomPicker> {
                 onTap: () {
                   Navigator.of(context)
                       .pop("${widget.building}${widget.unit}${list[index]}");
+                  SystemSound.play(SystemSoundType.click);
                 },
                 child: buildItem(list[index]),
               );

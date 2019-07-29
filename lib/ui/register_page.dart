@@ -116,6 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         suffixIcon: InkWell(
                           onTap: () {
                             _userNameController.clear();
+                            SystemSound.play(SystemSoundType.click);
                           },
                           child: Icon(
                             Icons.close,
@@ -146,6 +147,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         suffixIcon: InkWell(
                           onTap: () {
                             _passwordController.clear();
+                            SystemSound.play(SystemSoundType.click);
                           },
                           child: Icon(
                             Icons.close,
@@ -176,6 +178,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         suffixIcon: InkWell(
                           onTap: () {
                             _confirmController.clear();
+                            SystemSound.play(SystemSoundType.click);
                           },
                           child: Icon(
                             Icons.close,

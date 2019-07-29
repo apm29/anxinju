@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:ease_life/interaction/audio_recorder.dart';
 import 'package:ease_life/model/service_chat_model.dart';
-import 'package:ease_life/model/user_model.dart';
+import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:ease_life/res/configs.dart';
 import 'package:ease_life/ui/picture_page.dart';
@@ -14,7 +14,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
-import 'package:web_socket_channel/io.dart';
 
 import '../utils.dart';
 
@@ -31,6 +30,16 @@ class _ServiceChatPageState extends State<ServiceChatPage>
   FocusNode _editFocusNode = FocusNode();
 
   @override
+  void initState() {
+    super.initState();
+    _editFocusNode.addListener(() {
+      if (_editFocusNode.hasFocus) {
+        ServiceChatModel.of(context).closeEmoji();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ServiceChatModel>(
       builder: (BuildContext context, ServiceChatModel serviceChatModel,
@@ -40,12 +49,23 @@ class _ServiceChatPageState extends State<ServiceChatPage>
           return SafeArea(
             child: Column(
               children: <Widget>[
+                AppBar(
+                  title: Text("物业客服"),
+                  actions: _buildActions(),
+                ),
+                Container(
+                  height: 0.1,
+                  color: Colors.grey,
+                ),
                 _buildConnectStatusBar(serviceChatModel.disconnected),
                 Expanded(
-                  child: Center(
+                  child: Container(
+                    alignment: Alignment.center,
+                    color: Colors.grey[300],
                     child: Text("暂无用户连接"),
                   ),
                 ),
+                buildChatInputPart(disconnected: true),
               ],
             ),
           );
@@ -63,7 +83,8 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                 "正在与${serviceChatModel.currentChatUser.userName}交流",
                 style: TextStyle(color: Colors.white),
               ),
-              brightness: Brightness.dark,
+              actions: _buildActions(white: true),
+              brightness: Brightness.light,
               iconTheme: IconThemeData(color: Colors.white),
               elevation: 3,
               centerTitle: false,
@@ -147,6 +168,32 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     );
   }
 
+  List<Widget> _buildActions({bool white = false}) {
+    return <Widget>[
+      Consumer<UserRoleModel>(
+        builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
+          return roleModel.hasSwitch
+              ? FlatButton.icon(
+                  icon: Icon(
+                    Icons.repeat,
+                    color: white ? Colors.white : Colors.blue,
+                  ),
+                  onPressed: () {
+                    roleModel.switchRole();
+                    SystemSound.play(SystemSoundType.click);
+                  },
+                  label: Text(
+                    "${roleModel.switchString}",
+                    style: TextStyle(
+                        color: white ? Colors.white : Colors.grey[700]),
+                  ),
+                )
+              : Container();
+        },
+      ),
+    ];
+  }
+
   Widget _buildContent(BuildContext context, ServiceChatModel serviceChatModel,
       TabController tabController) {
     final int userCount = ServiceChatModel.of(context).currentChatUsers.length;
@@ -165,6 +212,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     }
     return Column(
       children: <Widget>[
+        _buildConnectStatusBar(disconnected),
         Expanded(
           child: TabBarView(
             controller: tabController,
@@ -180,7 +228,8 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                             children: serviceChatModel
                                 .messages(user.userId)
                                 .map((message) {
-                              return buildMessage(serviceChatModel, message);
+                              return buildMessage(context,
+                                  serviceChatModel.self(message), message);
                             }).toList(),
                           ),
                         ),
@@ -191,18 +240,8 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                         Consumer<ServiceChatModel>(
                           builder: (BuildContext context,
                               ServiceChatModel value, Widget child) {
-                            return Offstage(
-                              offstage: !value.showUpload,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: AlertDialog(
-                                  title: Text(value.uploadingHint),
-                                  content: LinearProgressIndicator(
-                                    value: value.fraction,
-                                  ),
-                                ),
-                              ),
-                            );
+                            return buildUploadDialog(!value.showUpload,
+                                value.uploadingHint, value.fraction);
                           },
                         ),
                       ],
@@ -210,143 +249,45 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                 .toList(),
           ),
         ),
-        Container(
-          color: Colors.grey[400],
-          height: 0.3,
+        buildChatInputPart(
+          disconnected: disconnected,
+          showAudio: serviceChatModel.audioInput,
+          showEmoji: serviceChatModel.showEmoji,
+          textInputMode: serviceChatModel.inputText,
+          onSwitchEmoji: () {
+            _editFocusNode.unfocus();
+            serviceChatModel.switchEmoji();
+          },
+          onSwitchAudio: () {
+            _editFocusNode.unfocus();
+            serviceChatModel.switchAudio();
+          },
+          onStopRecord: (detail) {
+            _doSendAudio(context, detail);
+          },
+          onSendText: () {
+            _doSendMessage(context);
+          },
+          onSendImage: () {
+            _doSendImage(context);
+          },
+          onTextChange: (s) {
+            if (s != null && s.isNotEmpty) {
+              serviceChatModel.inputText = true;
+            } else {
+              serviceChatModel.inputText = false;
+            }
+          },
+          onSelectEmoji: (s) {
+            _inputController.value = TextEditingValue(
+              text: _inputController.text + s,
+            );
+            serviceChatModel.inputText = true;
+          },
+          textFocusNode: _editFocusNode,
+          textInputController: _inputController,
         ),
-        _buildConnectStatusBar(disconnected),
-        _buildInputPart(disconnected, tabController),
       ],
-    );
-  }
-
-  Consumer<ServiceChatModel> _buildInputPart(
-      bool disconnected, TabController tabController) {
-    return Consumer<ServiceChatModel>(
-      builder: (BuildContext context, ServiceChatModel value, Widget child) {
-        bool audio = value.audioInput;
-        bool emoji = value.showEmoji;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            AbsorbPointer(
-              absorbing: disconnected,
-              child: IntrinsicHeight(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: disconnected ? Colors.grey : Colors.white,
-                  ),
-                  padding: EdgeInsets.all(16),
-                  child: Row(
-                    children: <Widget>[
-                      audio
-                          ? Container()
-                          : IconButton(
-                        onPressed: () {
-                          _editFocusNode.unfocus();
-                          value.switchEmoji();
-                        },
-                        padding: EdgeInsets.all(0),
-                        icon: Icon(
-                          Icons.insert_emoticon,
-                          color: emoji ? Colors.lightBlue : Colors.black,
-                        ),
-                      ),
-                      Expanded(
-                        child: audio
-                            ? AudioInputWidget((recordDetail) {
-                                _doSendAudio(context, recordDetail);
-                              })
-                            : SizedBox(
-                                height: ScreenUtil().setHeight(80),
-                                child: TextField(
-
-                                  focusNode: _editFocusNode,
-                                  enabled: !disconnected,
-                                  controller: _inputController,
-                                  maxLines: 100,
-                                  textInputAction: TextInputAction.send,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    fillColor: Colors.red,
-                                    hintText: "说点什么",
-                                    hasFloatingPlaceholder: false,
-                                  ),
-                                  onSubmitted: (content) {
-                                    _doSendMessage(context);
-                                  },
-                                ),
-                              ),
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            _doSendImage(context);
-                          },
-                          icon: Icon(Icons.image)),
-
-                      audio
-                          ? Container()
-                          : IconButton(
-                              onPressed: () {
-                                _doSendMessage(context);
-                              },
-                              padding: EdgeInsets.all(0),
-                              icon: Text(
-                                "发送",
-                                style: TextStyle(
-                                  color:
-                                      disconnected ? Colors.grey : Colors.black,
-                                ),
-                              ),
-                            ),
-                      InkWell(
-                        onTap: () {
-                          _editFocusNode.unfocus();
-                          value.switchAudio();
-                        },
-                        child: Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
-                                margin: EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.blueAccent,
-                                ),
-                                child: Icon(!audio ? Icons.mic : Icons.message,color: Colors.white,),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Visibility(
-              visible: emoji,
-              child: Wrap(
-                children: faces.map((name) {
-                  return InkWell(
-                    onTap: () {
-                      _inputController.text =
-                          _inputController.text + "face" + name;
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(ScreenUtil().setWidth(12)),
-                      child:
-                          Image.asset("images/face/${faces.indexOf(name)}.gif"),
-                    ),
-                  );
-                }).toList(),
-              ),
-            )
-          ],
-        );
-      },
     );
   }
 
@@ -382,197 +323,18 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                   onPressed: () {
                     ServiceChatModel.of(context).reconnect(context);
                   },
-                  icon: Icon(Icons.cached),
-                  label: Text("重连"))
+                  icon: Icon(
+                    Icons.cached,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    "重连",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ))
               : Container(),
         ],
-      ),
-    );
-  }
-
-  Widget buildMessage(
-      ServiceChatModel serviceChatModel, ChatMessage chatMessage) {
-    var self = serviceChatModel.self(chatMessage);
-    var messageTile;
-    messageTile = <Widget>[
-      Flexible(
-        flex: 100,
-        child: Container(),
-      ),
-      _buildMessageBody(chatMessage),
-      _buildMessageUserName(chatMessage),
-    ];
-    //消息
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: self ? messageTile : messageTile.reversed.toList(),
-    );
-  }
-
-  Widget _buildMessageBody(ChatMessage chatMessage) {
-    var messageContent = chatMessage.content;
-    if (messageContent.startsWith("img[") && messageContent.endsWith("]")) {
-      ///图片
-      var imageUrl = _getRemoteUrl(messageContent);
-      return _buildMessageWrapper(
-        InkWell(
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return PicturePage(imageUrl);
-            }));
-          },
-          child: Container(
-            constraints: BoxConstraints(minWidth: 120),
-            child: Hero(
-              tag: imageUrl,
-              child: Image.network(
-                imageUrl,
-                loadingBuilder: (context, child, chunk) {
-                  if (chunk != null) {
-                    return Container(
-                      color: Colors.white,
-                      alignment: Alignment.center,
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  return child;
-                },
-              ),
-            ),
-          ),
-        ),
-        chatMessage,
-      );
-    } else if (messageContent.startsWith("audio[") &&
-        messageContent.endsWith("]")) {
-      ///音频
-      return _buildMessageWrapper(
-        AudioMessageTile(
-          _getAudioUrl(messageContent),
-          0,
-        ),
-        chatMessage,
-        noDecoration: true,
-      );
-    }
-    var allMatches = RegExp(r"face\[.*?\]").allMatches(messageContent);
-    List<Widget> children = [];
-    int lastStart = 0;
-    allMatches.toList().forEach((regMatcher) {
-      if (regMatcher.start > 0) {
-        children.add(Text(
-          messageContent.substring(lastStart, regMatcher.start),
-          style: TextStyle(fontFamily: "SoukouMincho"),
-        ));
-      }
-      var index = faces.indexOf(
-          messageContent.substring(regMatcher.start + 4, regMatcher.end));
-      children.add(Image.asset("images/face/$index.gif"));
-
-      lastStart = regMatcher.end;
-    });
-    if (lastStart < messageContent.length) {
-      children.add(Text(messageContent.substring(lastStart)));
-    }
-
-    return _buildMessageWrapper(
-      InkWell(
-        onLongPress: () {
-          Clipboard.setData(ClipboardData(text: messageContent)).then((_) {
-            showToast("文字已复制");
-          });
-        },
-        child: DefaultTextStyle(
-          style: TextStyle(color: Colors.white),
-          child: Wrap(
-            children: children,
-          ),
-        ),
-      ),
-      chatMessage,
-    );
-  }
-
-  String _getRemoteUrl(String messageContent) {
-    var raw = messageContent.substring(4, messageContent.length - 1);
-    if (!raw.startsWith("http")) {
-      raw = Configs.KFBaseUrl + raw;
-      return raw;
-    }
-    return raw;
-  }
-
-  String _getAudioUrl(String messageContent) {
-    var raw = messageContent.substring(6, messageContent.length - 1);
-    if (!raw.startsWith("http")) {
-      raw = Configs.KFBaseUrl + raw;
-      return raw;
-    }
-    return raw;
-  }
-
-  String _getMessageSendTime(String timeStr) {
-    var time;
-    try {
-      time = DateTime.parse(timeStr);
-    } catch (e) {
-      return timeStr;
-    }
-    if (isToday(time)) {
-      return DateFormat("HH:mm:ss").format(time);
-    } else {
-      return DateFormat("yyyy-MM-dd HH:mm:ss").format(time);
-    }
-  }
-
-  bool isToday(DateTime time) {
-    return time.difference(DateTime.now()).inDays < 1;
-  }
-
-  Widget _buildMessageWrapper(Widget messageContent, ChatMessage chatMessage,
-      {bool noDecoration = false}) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(_getMessageSendTime(chatMessage.time)),
-        Container(
-          margin: noDecoration
-              ? null
-              : EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-          padding: noDecoration
-              ? null
-              : EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-          decoration: noDecoration
-              ? null
-              : BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                  color: Colors.lightBlue),
-          child: messageContent,
-        ),
-      ],
-    );
-  }
-
-  Container _buildMessageUserName(ChatMessage chatMessage) {
-    var name = chatMessage.userName;
-    if (name == null || name.isEmpty) {
-      name = "未命名用户";
-    }
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.grey[200],
-      ),
-      padding: EdgeInsets.all(6),
-      child: Text(
-        name,
-        style: TextStyle(fontWeight: FontWeight.w600, shadows: [
-          Shadow(color: Colors.grey, offset: Offset(1, 1), blurRadius: 1)
-        ]),
       ),
     );
   }
@@ -581,13 +343,14 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     var resp = await ApiKf.uploadAudio(File(recordDetail.path));
     if (resp.success) {
       var model = ServiceChatModel.of(context);
-      ChatMessage chatMessage = ChatMessage(
+      ServiceChatMessage chatMessage = ServiceChatMessage(
         userName: model.chatSelf.userName,
         userAvatar: model.chatSelf.userAvatarUrl,
         time: DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
         content: "audio[${resp.data.url}]",
         senderId: model.chatSelf.userId,
         receiverId: model.currentChatUser.userId,
+        read: true,
       );
       _sendFutureMessage(
         context,
@@ -605,13 +368,14 @@ class _ServiceChatPageState extends State<ServiceChatPage>
       return;
     }
     var model = ServiceChatModel.of(context);
-    ChatMessage chatMessage = ChatMessage(
+    ServiceChatMessage chatMessage = ServiceChatMessage(
       userName: model.chatSelf.userName,
       userAvatar: model.chatSelf.userAvatarUrl,
       time: DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
       content: _inputController.text,
       senderId: model.chatSelf.userId,
       receiverId: model.currentChatUser.userId,
+      read: true,
     );
     _sendFutureMessage(context, chatMessage);
     _inputController.clear();
@@ -634,13 +398,14 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     });
     model.progress = 100;
     if (resp.success) {
-      ChatMessage chatMessage = ChatMessage(
+      ServiceChatMessage chatMessage = ServiceChatMessage(
         userName: model.chatSelf.userName,
         userAvatar: model.chatSelf.userAvatarUrl,
         time: DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
         content: "img[${resp.data.orginPicPath}]",
         senderId: model.chatSelf.userId,
         receiverId: model.currentChatUser.userId,
+        read: true,
       );
       _sendFutureMessage(context, chatMessage);
     } else {
@@ -648,7 +413,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     }
   }
 
-  void _sendFutureMessage(BuildContext context, ChatMessage message) {
+  void _sendFutureMessage(BuildContext context, ServiceChatMessage message) {
     var model = ServiceChatModel.of(context);
     var map = {
       "type": "chatMessage",

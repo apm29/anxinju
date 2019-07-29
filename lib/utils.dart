@@ -1,10 +1,13 @@
+import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:soundpool/soundpool.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'index.dart';
+import 'interaction/audio_recorder.dart';
 import 'model/district_model.dart';
 import 'model/main_index_model.dart';
+import 'model/service_chat_model.dart';
 import 'model/user_model.dart';
 import 'model/user_verify_status_model.dart';
 
@@ -49,6 +52,7 @@ Future<File> showImageSourceDialog(BuildContext context,
                             showPicker().then((f) {
                               Navigator.of(context).pop(f);
                             });
+                            SystemSound.play(SystemSoundType.click);
                           },
                           child: Container(
                             width: constraint.biggest.width,
@@ -62,6 +66,7 @@ Future<File> showImageSourceDialog(BuildContext context,
                               showCameraPicker().then((f) {
                                 Navigator.of(context).pop(f);
                               });
+                              SystemSound.play(SystemSoundType.click);
                             },
                             child: Container(
                               width: constraint.biggest.width,
@@ -137,6 +142,7 @@ Widget buildVisitor(BuildContext context) {
     child: InkWell(
       onTap: () {
         Navigator.of(context).pushNamed(LoginPage.routeName);
+        SystemSound.play(SystemSoundType.click);
       },
       child: Row(
         children: <Widget>[
@@ -170,7 +176,8 @@ Widget buildVisitor(BuildContext context) {
 }
 
 Future<Location> getLocation() async {
-  return AMapLocation().getLocation(LocationClientOptions());
+  return AMapLocation()
+      .getLocation(LocationClientOptions(isOnceLocation: true));
 }
 
 ///选择住房 幢-单元-房间号
@@ -257,6 +264,7 @@ Widget buildCertificationDialog(BuildContext context, VoidCallback onCancel,
               });
             });
           });
+          SystemSound.play(SystemSoundType.click);
         },
       ),
     ),
@@ -358,6 +366,7 @@ Future showApplyHouseDialog(BuildContext context) async {
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       routeDirectlyToWebPage(context, {}, "sqjl");
+                      SystemSound.play(SystemSoundType.click);
                     }),
               TextSpan(
                 text: "中查看已提交的申请",
@@ -368,6 +377,7 @@ Future showApplyHouseDialog(BuildContext context) async {
             FlatButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                SystemSound.play(SystemSoundType.click);
               },
               child: Text("取消"),
             ),
@@ -375,6 +385,7 @@ Future showApplyHouseDialog(BuildContext context) async {
               onPressed: () {
                 Navigator.of(context)
                     .pushReplacementNamed(MemberApplyPage.routeName);
+                SystemSound.play(SystemSoundType.click);
               },
               child: Text("前往申请"),
             ),
@@ -433,6 +444,7 @@ Future showFaceVerifyDialog(BuildContext context) async {
               onTap: () {
                 Navigator.of(context)
                     .pushReplacementNamed(UserDetailAuthPage.routeName);
+                SystemSound.play(SystemSoundType.click);
               },
             ),
           ),
@@ -449,7 +461,7 @@ Future makePhoneCall(String number) async {
 }
 
 Future playMessageSound() async {
-  if((userSp.getBool(KEY_MESSAGE_SOUND)??true)!=true){
+  if ((userSp.getBool(KEY_MESSAGE_SOUND) ?? true) != true) {
     return;
   }
   Soundpool pool = Soundpool(streamType: StreamType.notification);
@@ -457,7 +469,7 @@ Future playMessageSound() async {
       .load("images/message_arrive.mp3")
       .then((ByteData soundData) {
     return pool.load(soundData);
-  }).catchError((e){
+  }).catchError((e) {
     print(e.toString());
   });
   int streamId = await pool.play(soundId);
@@ -475,3 +487,393 @@ Function imagePlaceHolder =
     ),
   );
 };
+
+/// CHAT
+
+Offstage buildUploadDialog(bool offstage, String hint, double progress) {
+  return Offstage(
+    offstage: offstage,
+    child: Align(
+      alignment: Alignment.center,
+      child: AlertDialog(
+        title: Text(hint),
+        content: LinearProgressIndicator(
+          value: progress,
+        ),
+      ),
+    ),
+  );
+}
+
+Widget buildChatInputPart({
+  bool disconnected,
+  bool showAudio = false,
+  bool showEmoji = false,
+  bool textInputMode = true,
+  VoidCallback onSwitchEmoji,
+  VoidCallback onSwitchAudio,
+  ValueChanged<RecordDetail> onStopRecord,
+  VoidCallback onSendText,
+  VoidCallback onSendImage,
+  ValueChanged<String> onTextChange,
+  ValueChanged<String> onSelectEmoji,
+  TextEditingController textInputController,
+  FocusNode textFocusNode,
+}) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: <Widget>[
+      AbsorbPointer(
+        absorbing: disconnected,
+        child: IntrinsicHeight(
+          child: Container(
+            decoration: BoxDecoration(
+              color: disconnected ? Colors.grey[300] : Colors.grey[200],
+            ),
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Material(
+                    borderRadius: BorderRadius.all(Radius.circular(100)),
+                    color: disconnected ? Colors.white54 : Colors.white,
+                    elevation: 3,
+                    child: Row(
+                      children: <Widget>[
+                        showAudio
+                            ? Container()
+                            : IconButton(
+                                onPressed: () {
+                                  onSwitchEmoji?.call();
+                                },
+                                padding: EdgeInsets.all(0),
+                                icon: Icon(
+                                  Icons.insert_emoticon,
+                                  color: showEmoji
+                                      ? Colors.lightBlue
+                                      : disconnected
+                                          ? Colors.blueGrey
+                                          : Colors.grey[800],
+                                ),
+                              ),
+                        Expanded(
+                          child: showAudio
+                              ? AudioInputWidget(
+                                  (recordDetail) {
+                                    onStopRecord?.call(recordDetail);
+                                  },
+                                  showBorder: false,
+                                )
+                              : Container(
+                                  height: ScreenUtil().setHeight(105),
+                                  padding: EdgeInsets.only(top: ScreenUtil().setHeight(Platform.isAndroid?25:16)),
+                                  child: TextField(
+                                    focusNode: textFocusNode,
+                                    enabled: !disconnected,
+                                    controller: textInputController,
+                                    maxLines: 100,
+                                    textInputAction: TextInputAction.send,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.all(0),
+                                      hintText: "说点什么",
+                                      isDense: false,
+                                      alignLabelWithHint: true,
+
+                                    ),
+                                    onSubmitted: (content) {
+                                      onSendText?.call();
+                                    },
+                                    onChanged: (s) {
+                                      onTextChange?.call(s);
+                                    },
+                                  ),
+                                ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            textInputMode
+                                ? onSendText?.call()
+                                : onSendImage?.call();
+                          },
+                          icon: Icon(
+                            textInputMode ? Icons.send : Icons.camera_alt,
+                            color: disconnected
+                                ? Colors.blueGrey
+                                : Colors.lightBlue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(6),
+                  child: Material(
+                    elevation: 3,
+                    shape: CircleBorder(),
+                    color: disconnected ? Colors.blueGrey : Colors.lightBlue,
+                    child: InkWell(
+                      onTap: () {
+                        onSwitchAudio?.call();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          !showAudio ? Icons.mic : Icons.message,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      Visibility(
+        visible: showEmoji,
+        child: Wrap(
+          children: faces.map((name) {
+            return InkWell(
+              onTap: () {
+                onSelectEmoji?.call("face" + name);
+              },
+              child: Container(
+                margin: EdgeInsets.all(ScreenUtil().setWidth(12)),
+                child: Image.asset("images/face/${faces.indexOf(name)}.gif"),
+              ),
+            );
+          }).toList(),
+        ),
+      )
+    ],
+  );
+}
+
+Widget buildMessage(
+    BuildContext context, bool self, ServiceChatMessage chatMessage) {
+  var messageTile;
+  messageTile = <Widget>[
+    Flexible(
+      flex: 100,
+      child: Container(),
+    ),
+    _buildMessageBody(context, chatMessage, self: self),
+    _buildMessageUserName(chatMessage, self: self),
+  ];
+  //消息
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.end,
+    children: self ? messageTile : messageTile.reversed.toList(),
+  );
+}
+
+Widget _buildMessageBody(BuildContext context, ServiceChatMessage chatMessage,
+    {bool self = true}) {
+  var messageContent = chatMessage.content;
+  if (messageContent.startsWith("img[") && messageContent.endsWith("]")) {
+    ///图片
+    var imageUrl = _getRemoteUrl(messageContent);
+    return _buildMessageWrapper(
+      context,
+      InkWell(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return PicturePage(imageUrl);
+          }));
+        },
+        child: Container(
+          constraints: BoxConstraints(minWidth: 120),
+          child: Hero(
+            tag: imageUrl,
+            child: Image.network(
+              imageUrl,
+              loadingBuilder: (context, child, chunk) {
+                if (chunk != null) {
+                  return Container(
+                    color: Colors.white,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return child;
+              },
+            ),
+          ),
+        ),
+      ),
+      chatMessage,
+      self: self,
+    );
+  } else if (messageContent.startsWith("audio[") &&
+      messageContent.endsWith("]")) {
+    ///音频
+    return _buildMessageWrapper(
+      context,
+      AudioMessageTile(
+        _getAudioUrl(messageContent),
+        0,
+      ),
+      chatMessage,
+      noDecoration: true,
+    );
+  }
+  var allMatches = RegExp(r"face\[.*?\]").allMatches(messageContent);
+  List<Widget> children = [];
+  int lastStart = 0;
+  allMatches.toList().forEach((regMatcher) {
+    if (regMatcher.start > 0) {
+      children.add(Text(
+        messageContent.substring(lastStart, regMatcher.start),
+        style: TextStyle(fontFamily: "SoukouMincho"),
+      ));
+    }
+    var index = faces.indexOf(
+        messageContent.substring(regMatcher.start + 4, regMatcher.end));
+    children.add(Image.asset("images/face/$index.gif"));
+
+    lastStart = regMatcher.end;
+  });
+  if (lastStart < messageContent.length) {
+    children.add(Text(messageContent.substring(lastStart)));
+  }
+
+  return _buildMessageWrapper(
+    context,
+    InkWell(
+      onLongPress: () {
+        Clipboard.setData(ClipboardData(text: messageContent)).then((_) {
+          showToast("文字已复制");
+        });
+      },
+      child: DefaultTextStyle(
+        style: TextStyle(color: Colors.white),
+        child: Wrap(
+          children: children,
+        ),
+      ),
+    ),
+    chatMessage,
+  );
+}
+
+String _getRemoteUrl(String messageContent) {
+  var raw = messageContent.substring(4, messageContent.length - 1);
+  if (!raw.startsWith("http")) {
+    raw = Configs.KFBaseUrl + raw;
+    return raw;
+  }
+  return raw;
+}
+
+String _getAudioUrl(String messageContent) {
+  var raw = messageContent.substring(6, messageContent.length - 1);
+  if (!raw.startsWith("http")) {
+    raw = Configs.KFBaseUrl + raw;
+    return raw;
+  }
+  return raw;
+}
+
+String _getMessageSendTime(String timeStr) {
+  var time;
+  try {
+    time = DateTime.parse(timeStr);
+  } catch (e) {
+    return timeStr;
+  }
+  if (isToday(time)) {
+    return DateFormat("HH:mm:ss").format(time);
+  } else {
+    return DateFormat("yyyy-MM-dd HH:mm:ss").format(time);
+  }
+}
+
+bool isToday(DateTime time) {
+  return time.difference(DateTime.now()).inDays < 1;
+}
+
+Widget _buildMessageWrapper(
+  BuildContext context,
+  Widget messageContent,
+  ServiceChatMessage chatMessage, {
+  bool noDecoration = false,
+  bool self = true,
+}) {
+  var name = chatMessage.userName;
+  if (name == null || name.isEmpty) {
+    name = "未命名用户";
+  }
+  var nameTimeRow = <Widget>[
+    SizedBox(
+      width: 18,
+    ),
+    Text(
+      name,
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+        shadows: [
+          Shadow(color: Colors.grey, offset: Offset(1, 1), blurRadius: 1)
+        ],
+      ),
+    ),
+    SizedBox(
+      width: 3,
+    ),
+    Text(_getMessageSendTime(chatMessage.time)),
+  ];
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment:
+        self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+    children: <Widget>[
+      Row(
+        children: self ? nameTimeRow.reversed.toList() : nameTimeRow,
+      ),
+      Container(
+        margin: noDecoration
+            ? null
+            : EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        padding: noDecoration
+            ? null
+            : EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+        decoration: noDecoration
+            ? null
+            : BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+                color: Colors.lightBlue),
+        child: messageContent,
+      ),
+    ],
+  );
+}
+
+Widget _buildMessageUserName(ServiceChatMessage chatMessage, {self = true}) {
+  var avatar = chatMessage.userAvatarUrl;
+  var noAvatar = avatar == null || avatar.isEmpty;
+  return Container(
+    margin: EdgeInsets.only(
+      left: self ? 0 : 6,
+      bottom: 6,
+      right: self ? 6 : 0,
+    ),
+    decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.green,
+          width: 1,
+        ),
+        shape: BoxShape.circle),
+    child: CircleAvatar(
+      backgroundImage: NetworkImage(avatar),
+      child:
+          noAvatar ? Text(chatMessage.userName.substring(0, 1)) : Container(),
+    ),
+  );
+}

@@ -1,4 +1,8 @@
 PODS:
+  - agora_rtc_engine (2.4.1):
+    - AgoraRtcEngine_iOS_Crypto (= 2.8.0)
+    - Flutter
+  - AgoraRtcEngine_iOS_Crypto (2.8.0)
   - amap_base_location (0.1.8):
     - AMapLocation
     - Flutter
@@ -49,7 +53,7 @@ PODS:
     - Flutter
   - path_provider (0.0.1):
     - Flutter
-  - permission_handler (3.2.0):
+  - "permission_handler (3.2.1+1)":
     - Flutter
   - shared_preferences (0.0.1):
     - Flutter
@@ -64,6 +68,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
   - amap_base_location (from `.symlinks/plugins/amap_base_location/ios`)
   - camera (from `.symlinks/plugins/camera/ios`)
   - contacts_service (from `.symlinks/plugins/contacts_service/ios`)
@@ -90,6 +95,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - AgoraRtcEngine_iOS_Crypto
     - AMapFoundation
     - AMapLocation
     - Bugly
@@ -99,6 +105,8 @@ SPEC REPOS:
     - MJExtension
 
 EXTERNAL SOURCES:
+  agora_rtc_engine:
+    :path: ".symlinks/plugins/agora_rtc_engine/ios"
   amap_base_location:
     :path: ".symlinks/plugins/amap_base_location/ios"
   camera:
@@ -147,6 +155,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
+  agora_rtc_engine: 0e5f876b991c24d4410c3963868f28ad8ce1516a
+  AgoraRtcEngine_iOS_Crypto: 9da4653262ff4de1a4d2dbe840e7a43cffb971a5
   amap_base_location: 755c35d1f37174a33351720d7dfd8bbe56ddc34d
   AMapFoundation: 20fce2a12cd152e1092afdd04379cdac21932185
   AMapLocation: 89a7e4eb6040d32ba73c77a4966ecc66e46aa7c3
@@ -171,7 +181,7 @@ SPEC CHECKSUMS:
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
-  permission_handler: d4838243e7d0f4b18911a6422d81e7e6b71ad545
+  permission_handler: 6a1b2f94f866da8bd19fa67f3c8f4b9f38580efb
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
   soundpool: 2297d28eb1ed846db0343b4a363936e3f88e968f
   sqflite: ff1d9da63c06588cc8d1faf7256d741f16989d5a

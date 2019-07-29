@@ -4,7 +4,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:intl/intl.dart';
 
 class EmergencyCallPage extends StatefulWidget {
-  static String routeName = "/chat";
+  static String routeName = "/emergency_call";
 
   final String group;
   final String title;

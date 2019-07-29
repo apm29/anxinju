@@ -74,7 +74,6 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                     ),
                   ),
                 ),
-//                SliverT
                 SliverToBoxAdapter(
                   child: LoadingStateWidget(
                     key: submitButtonKey,
@@ -86,7 +85,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                               "idCard": _idCardController.text,
                               "isAgain": isReAuth
                             });
-                        //}
+                        SystemSound.play(SystemSoundType.click);
                       },
                       color: Colors.blue,
                       child: Text(

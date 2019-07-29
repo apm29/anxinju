@@ -3,6 +3,7 @@ import 'package:ease_life/model/main_index_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/ui/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ease_life/utils.dart';
@@ -56,6 +57,7 @@ class HomeChip extends StatelessWidget {
           } else {
             doOnPress(context);
           }
+          SystemSound.play(SystemSoundType.click);
         },
         child: Container(
             margin: EdgeInsets.all(ScreenUtil().setWidth(8)),

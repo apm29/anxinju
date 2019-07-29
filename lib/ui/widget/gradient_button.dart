@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 typedef PressCallback = Future<void> Function();
 
@@ -65,6 +66,7 @@ class GradientButtonState extends State<GradientButton> {
                         return null;
                       }
                       startLoading();
+                      SystemSound.play(SystemSoundType.click);
                       return widget.onPressed.call().then((_) {
                         delayCancelTimer =
                             Timer(Duration(milliseconds: _kDelayMilli), () {

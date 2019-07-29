@@ -1,5 +1,6 @@
 import 'package:ease_life/remote/api.dart';
 import 'package:ease_life/remote/kf_dio_utils.dart';
+import 'package:ease_life/res/configs.dart';
 import 'package:ease_life/ui/dispute_mediation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
@@ -152,16 +153,19 @@ class MediationApplyModel extends ChangeNotifier {
 
 class MediationApplicationAddModel extends ChangeNotifier {
   MediationApplicationAddModel(BuildContext context) {
-    getMediatorList();
-    getHouseList(context);
+      getMediatorList();
+      getHouseList(context);
   }
 
-  
   String desc;
   String title;
-  String address;
-  
+
   List<UserInfo> _mediatorList = [];
+  UserInfo _currentMediator;
+  List<AppendContent> appendContent = [];
+  String chatUser;
+  String startTime;
+  String endTime;
 
   List<UserInfo> get mediatorList => _mediatorList;
 
@@ -169,8 +173,6 @@ class MediationApplicationAddModel extends ChangeNotifier {
     _mediatorList = value;
     notifyListeners();
   }
-
-  UserInfo _currentMediator;
 
   UserInfo get currentMediator => _currentMediator;
 
@@ -182,12 +184,39 @@ class MediationApplicationAddModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  HouseDetail get currentHouse => _currentHouse;
+
+  set currentHouse(HouseDetail value) {
+    _currentHouse = value;
+    notifyListeners();
+  }
+
   Future getMediatorList() async {
     var resp = await Api.getMediatorUserList();
     if (resp.success) {
       mediatorList = resp.data;
-    }else{
+    } else {
       showToast(resp.text);
+    }
+  }
+
+  Future getMediationApplyDetail(int id) async {
+    var resp =
+        await ApiKf.mediationApplyDetailQuery(id.toString(), Configs.KF_APP_ID);
+    if (resp.success) {
+      _currentMediator = UserInfo(
+          userId: resp.data.acceptUserId, userName: resp.data.acceptUserName);
+      _currentHouse = HouseDetail(addr: resp.data.address);
+      _images = resp.data.images;
+      desc = resp.data.description;
+      title = resp.data.title;
+      desc = resp.data.description;
+      appendContent = resp.data.appendContent;
+      chatUser = resp.data.chatUser;
+      startTime = resp.data.startTime;
+      endTime = resp.data.endTime;
+    } else {
+      showToast("获取调解申请失败:${resp.text}");
     }
   }
 
@@ -195,13 +224,6 @@ class MediationApplicationAddModel extends ChangeNotifier {
   List<HouseDetail> _houseList = [];
 
   HouseDetail _currentHouse;
-
-
-  UserInfo get current => _currentMediator;
-
-  set current(UserInfo value) {
-    _currentMediator = value;
-  }
 
   List<HouseDetail> get houseList => _houseList;
 
@@ -242,15 +264,14 @@ class MediationApplicationAddModel extends ChangeNotifier {
   void reset() {
     _images = [];
     _currentMediator = null;
-    address =null;
-    title =null;
-    desc =null;
+    title = null;
+    desc = null;
   }
 
-  void getHouseList(BuildContext context) async{
+  void getHouseList(BuildContext context) async {
     var districtId = DistrictModel.of(context).getCurrentDistrictId();
     var resp = await Api.getMyHouse(districtId);
-    if(resp.success){
+    if (resp.success) {
       houseList.clear();
       houseList.addAll(resp.data);
       notifyListeners();
@@ -258,14 +279,6 @@ class MediationApplicationAddModel extends ChangeNotifier {
   }
 
   static MediationApplicationAddModel of(BuildContext context) {
-    return Provider.of<MediationApplicationAddModel>(context,listen: false);
+    return Provider.of<MediationApplicationAddModel>(context, listen: false);
   }
-
-  HouseDetail get currentHouse => _currentHouse;
-
-  set currentHouse(HouseDetail value) {
-    _currentHouse = value;
-    notifyListeners();
-  }
-
 }

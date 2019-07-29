@@ -152,14 +152,17 @@ class DistrictDetail {
 class Index {
   String area;
   List<MenuItem> menu;
+  int versionUpdateStamp;
+
 
   @override
   String toString() {
-    return '{"area":"$area","menu":[${menu.join(",")}]}';
+    return 'Index{area: $area, menu: $menu, versionUpdateStamp: $versionUpdateStamp}';
   }
 
   Index.fromJson(Map<String, dynamic> json) {
     this.area = json['area'];
+    this.versionUpdateStamp = json['versionUpdateStamp'];
     if (json['menu'] != null) {
       menu = new List<MenuItem>();
       json['menu'].forEach((v) {
@@ -171,6 +174,7 @@ class Index {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['area'] = this.area;
+    data['versionUpdateStamp'] = this.versionUpdateStamp;
     if (this.menu != null) {
       data['menu'] = this.menu.map((v) => v.toJson()).toList();
     }

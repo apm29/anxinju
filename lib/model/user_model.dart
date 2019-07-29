@@ -117,11 +117,15 @@ class UserModel extends ChangeNotifier {
   }
 
   Future _requestPermission(PermissionGroup group) async{
-    var status = await PermissionHandler().checkPermissionStatus(group);
-    if(status == PermissionStatus.granted){
-      return null;
+    try {
+      var status = await PermissionHandler().checkPermissionStatus(group);
+      if(status == PermissionStatus.granted){
+            return null;
+          }
+      return PermissionHandler().requestPermissions([group]);
+    } catch (e) {
+      print(e);
     }
-    return PermissionHandler().requestPermissions([group]);
   }
 
   void requestPermission() async{

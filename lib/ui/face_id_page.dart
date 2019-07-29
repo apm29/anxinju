@@ -90,25 +90,27 @@ class _FaceIdPageState extends State<FaceIdPage> {
                         child: AspectRatio(
                           aspectRatio: controller.value.aspectRatio,
                           child: StreamBuilder<CAMERA_STATUS>(
-                              stream: BlocProviders.of<CameraBloc>(context)
-                                  .statusStream,
-                              builder: (context, snapshot) {
-                                if (snapshot.data == null ||
-                                    snapshot.data == CAMERA_STATUS.PREVIEW) {
-                                  return CameraPreview(controller);
-                                } else {
-                                  //翻转照片
-                                  return Transform(
-                                    origin:
-                                        Offset(constraint.biggest.width / 2, 0),
-                                    transform: Matrix4.rotationY(3.14),
-                                    child: Image.file(
-                                      currentPic,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  );
-                                }
-                              }),
+                            stream: BlocProviders.of<CameraBloc>(context)
+                                .statusStream,
+                            builder: (context, snapshot) {
+                              if (snapshot.data == null ||
+                                  snapshot.data == CAMERA_STATUS.PREVIEW) {
+                                return CameraPreview(controller);
+                              } else {
+                                //镜像照片
+                                return Transform(
+                                  origin:
+                                      Offset(constraint.biggest.width / 2, 0),
+                                  transform: Matrix4.rotationY(3.14),
+                                  child: Image.file(
+                                    currentPic,
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              }
+                            },
+                            initialData: CAMERA_STATUS.PREVIEW,
+                          ),
                         ),
                       ),
                     );
@@ -165,30 +167,17 @@ class _FaceIdPageState extends State<FaceIdPage> {
         var file = File(directory.path +
             "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
         await controller.takePicture(file.path);
+        file = await rotateWithExifAndCompress(file);
         currentPic = file;
         BlocProviders.of<CameraBloc>(context)
             .changeStatus(CAMERA_STATUS.PICTURE_STILL);
         await verify(file, argument);
         refreshUserState();
-      } else if (argument['takePic'] == true) {
-        faceRecognizeKey.currentState.startLoading();
-        Directory directory = await getTemporaryDirectory();
-        var file = File(directory.path +
-            "/faceId${DateTime.now().millisecondsSinceEpoch}.jpg");
-        await controller.takePicture(file.path);
-        currentPic = file;
-        BlocProviders.of<CameraBloc>(context)
-            .changeStatus(CAMERA_STATUS.PICTURE_STILL);
-        file = await rotateWithExifAndCompress(file);
-        BaseResponse<ImageDetail> resp = await Api.uploadPic(file.path);
-        faceRecognizeKey.currentState.stopLoading();
-        Navigator.of(context).pop(resp.data);
       }
     }
   }
 
   Future verify(File file, Map argument) async {
-    file = await rotateWithExifAndCompress(file);
     var fileResp = await Api.uploadPic(file.path);
     //var base64 = await getImageBase64(file);
     BaseResponse<UserVerifyInfo> baseResponse = await Api.verify(
@@ -234,7 +223,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
             builder: (context) {
               return AlertDialog(
                 title: Text("没有数据"),
-                content: Text("您的名下没有${Strings.roomClass}"),
+                content: Text(baseResponse.text),
                 actions: <Widget>[
                   FlatButton(
                     onPressed: () {

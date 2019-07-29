@@ -81,6 +81,8 @@ dependencies:
 
   url_launcher: ^ 5.1.0
   soundpool: ^0.5.3
+  agora_rtc_engine: ^0.9.8
+  tutorial_coach_mark: ^0.2.0
 
 dev_dependencies:
   flutter_test:

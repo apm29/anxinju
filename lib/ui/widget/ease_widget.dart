@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 
@@ -26,7 +27,10 @@ class EaseIconGradientButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onPressed??(){},
+      onTap: (){
+        onPressed?.call();
+        SystemSound.play(SystemSoundType.click);
+      },
       splashColor: GradientColorList[index + 1],
       borderRadius: BorderRadius.horizontal(left: Radius.circular(100),right: Radius.circular(100)),
       child: Container(
@@ -91,7 +95,10 @@ class EaseIconButton extends StatelessWidget {
     return Material(
       color: Colors.white,
       child: InkWell(
-        onTap: onPressed,
+        onTap: (){
+          onPressed?.call();
+          SystemSound.play(SystemSoundType.click);
+        },
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -125,17 +132,17 @@ class EaseTile extends StatelessWidget {
   final VoidCallback onPressed;
   final int badge;
   final EdgeInsetsGeometry margin;
+  final Color iconColor;
   final EdgeInsetsGeometry padding;
   final BorderRadiusGeometry borderRadius;
   final double iconSize;
   const EaseTile(
-      {Key key, this.title, this.iconData, this.onPressed, this.badge = 0, this.margin, this.borderRadius, this.padding, this.iconSize = 30})
+      {Key key, this.title, this.iconData, this.onPressed, this.badge = 0, this.margin, this.borderRadius, this.padding, this.iconSize = 30, this.iconColor})
       : super(key: key);
 
   static  double kBadgeSize = ScreenUtil().setWidth(0);
   @override
   Widget build(BuildContext context) {
-
     return Container(
       margin: margin??EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       child: Material(
@@ -143,14 +150,17 @@ class EaseTile extends StatelessWidget {
         borderRadius: borderRadius,
         color: Colors.white,
         child: InkWell(
-          onTap: onPressed ?? () {},
+          onTap: (){
+            onPressed?.call();
+            SystemSound.play(SystemSoundType.click);
+          },
           child: Stack(
             children: <Widget>[
               Container(
                 padding: padding??EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
                   children: <Widget>[
-                    Icon(iconData,size: iconSize,),
+                    Icon(iconData,size: iconSize,color: iconColor,),
                     SizedBox(
                       width: 16,
                     ),
@@ -210,7 +220,10 @@ class EaseGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onPressed ?? () {},
+      onTap: (){
+        onPressed?.call();
+        SystemSound.play(SystemSoundType.click);
+      },
       child: Container(
         margin: EdgeInsets.only(
             left: start ? 16 : 3, right: end ? 16 : 3, top: 4, bottom: 4),
@@ -341,7 +354,10 @@ class EaseChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onPressed ?? () {},
+      onTap: (){
+        onPressed?.call();
+        SystemSound.play(SystemSoundType.click);
+      },
       child: Container(
         constraints:
             BoxConstraints(minWidth: MediaQuery.of(context).size.width / 4),
