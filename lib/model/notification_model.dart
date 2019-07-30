@@ -17,11 +17,11 @@ class NotificationModel extends ChangeNotifier {
   bool get messageSound => _messageSound;
 
   set messageSound(bool value) {
-    if(value == _messageSound){
+    if (value == _messageSound) {
       return;
     }
     _messageSound = value;
-    userSp.setBool(KEY_MESSAGE_SOUND,_messageSound);
+    userSp.setBool(KEY_MESSAGE_SOUND, _messageSound);
     notifyListeners();
   }
 
@@ -43,7 +43,7 @@ class NotificationModel extends ChangeNotifier {
 
   NotificationModel(BuildContext context) {
     startListen(context);
-    messageSound = userSp.getBool(KEY_MESSAGE_SOUND)??true;
+    messageSound = userSp.getBool(KEY_MESSAGE_SOUND) ?? true;
   }
 
   static NotificationModel of(BuildContext context) {
@@ -68,9 +68,13 @@ class NotificationModel extends ChangeNotifier {
     });
     _launchNotification = _push.launchNotification().listen((String msg) {
       print('launchNotification:$msg');
+      var map = jsonDecode(msg);
+      Navigator.of(context).pushNamed('/${map['route']}');
     });
     _resumeNotification = _push.resumeNotification().listen((String msg) {
       print('resumeNotification:$msg');
+      var map = jsonDecode(msg);
+      Navigator.of(context).pushNamed('/${map['route']}');
     });
     _push.startWork();
     bool notificationEnabled = await _push.areNotificationsEnabled();

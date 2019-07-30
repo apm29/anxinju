@@ -2,6 +2,7 @@ import 'package:ease_life/index.dart';
 import 'package:ease_life/model/announcement_model.dart';
 import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/main_index_model.dart';
+import 'package:ease_life/model/notification_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
@@ -93,12 +94,19 @@ class MainPageState extends State<MainPage> {
       return true;
     }, child: Consumer<MainIndexModel>(
       builder: (context, indexModel, child) {
-        return RefreshIndicator(
-          child: Scaffold(
-            body: Container(
-              color: Colors.grey[200],
-              child: buildContent(context),
-            ),
+        return ListenableProvider(
+          builder: (BuildContext context) {
+            return NotificationModel(context);
+          },
+          dispose: (context, value) {
+            value.dispose();
+          },
+          child: RefreshIndicator(
+            child: Scaffold(
+              body: Container(
+                color: Colors.grey[200],
+                child: buildContent(context),
+              ),
 //            floatingActionButton: Consumer2<UserModel,UserRoleModel>(
 //              builder:
 //                  (BuildContext context, UserModel userModel,UserRoleModel userRoleModel, Widget child) {
@@ -121,21 +129,23 @@ class MainPageState extends State<MainPage> {
 //            ),
 //            floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
 //            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            bottomNavigationBar:
-                buildBottomNavigationBar(indexModel.currentIndex),
+              bottomNavigationBar:
+                  buildBottomNavigationBar(indexModel.currentIndex),
+            ),
+            onRefresh: () async {
+              UserModel.of(context).tryLoginWithLocalToken();
+              await UserModel.of(context).tryFetchUserInfoAndLogin();
+              await UserModel.of(context).tryFetchUserDetail();
+              await AnnouncementModel.of(context).tryFetchAllAnnouncement();
+              await DistrictModel.of(context).tryFetchCurrentDistricts();
+              await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+              await MainIndexModel.of(context).tryFetchIndexJson(evict: true);
+              await MainIndexModel.of(context).tryGetCurrentLocation();
+              await UserRoleModel.of(context)
+                  .tryFetchUserRoleTypes(context, dispatchUser: false);
+              return;
+            },
           ),
-          onRefresh: () async {
-            UserModel.of(context).tryLoginWithLocalToken();
-            await UserModel.of(context).tryFetchUserInfoAndLogin();
-            await UserModel.of(context).tryFetchUserDetail();
-            await AnnouncementModel.of(context).tryFetchAllAnnouncement();
-            await DistrictModel.of(context).tryFetchCurrentDistricts();
-            await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
-            await MainIndexModel.of(context).tryFetchIndexJson(evict: true);
-            await MainIndexModel.of(context).tryGetCurrentLocation();
-            await UserRoleModel.of(context).tryFetchUserRoleTypes(context,dispatchUser: false);
-            return;
-          },
         );
       },
     ));
@@ -155,7 +165,6 @@ class MainPageState extends State<MainPage> {
             MinePage(),
             buildTestPage(),
             MessagePage(),
-
           ],
           index: indexModel.currentIndex,
         );

@@ -76,7 +76,7 @@ android {
 
                     XG_ACCESS_ID    : '2100338246',
                     XG_ACCESS_KEY   : 'AK4VLU28Z35H',
-                    XG_ACCESS_SCHEME: '信鸽统一打开APP行为SCHEME',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
+                    XG_ACCESS_SCHEME: 'axj_push',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
                     HW_APPID        : '100923553',
                     XIAOMI_APPID    : '2882303761518057536',
                     XIAOMI_APPKEY   : '5551805774536',
@@ -103,7 +103,7 @@ android {
 
                     XG_ACCESS_ID    : '2100338440',
                     XG_ACCESS_KEY   : 'A848BSWXD64I',
-                    XG_ACCESS_SCHEME: '信鸽统一打开APP行为SCHEME',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
+                    XG_ACCESS_SCHEME: 'axj_push',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
                     HW_APPID        : '100923807',
                     XIAOMI_APPID    : '2882303761518057630',
                     XIAOMI_APPKEY   : '5811805785630',
@@ -129,7 +129,7 @@ android {
 
                     XG_ACCESS_ID    : '2100338440',
                     XG_ACCESS_KEY   : 'A848BSWXD64I',
-                    XG_ACCESS_SCHEME: '信鸽统一打开APP行为SCHEME',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
+                    XG_ACCESS_SCHEME: 'axj_push',// 非官方参数，可自定义(例如：fake_push)，统一打开方式为 intent
                     HW_APPID        : '100923807',
                     XIAOMI_APPID    : '2882303761518057630',
                     XIAOMI_APPKEY   : '5811805785630',
