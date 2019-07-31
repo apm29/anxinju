@@ -177,7 +177,10 @@ class _MediationListPageState extends State<MediationListPage>
                 isFinished: data.mediationFinished,
                 title: title,
               );
-            }));
+            })).then((_){
+              MediationHistoryModel.of(context).getHistoryMediation(context, true);
+              MediationRunningModel.of(context).getRunningMediation(context, true);
+            });
           },
           child: ListTile(
             title: Text.rich(

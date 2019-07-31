@@ -71,6 +71,11 @@ class UserModel extends ChangeNotifier {
     userSp.setString(KEY_USER_INFO, null);
     userSp.setString(KEY_TOKEN, null);
     DistrictModel.of(context).tryFetchCurrentDistricts();
+    try {
+      ServiceChatModel.of(context).disconnect();
+    } catch (e) {
+      print(e);
+    }
     notifyListeners();
   }
 

@@ -54,6 +54,10 @@ class MediationRunningModel extends ChangeNotifier {
     print('$running');
     notifyListeners();
   }
+
+  static MediationRunningModel of(BuildContext context) {
+    return Provider.of(context, listen: false);
+  }
 }
 
 class MediationHistoryModel extends ChangeNotifier {
@@ -99,6 +103,10 @@ class MediationHistoryModel extends ChangeNotifier {
     loading = false;
 
     notifyListeners();
+  }
+
+  static MediationHistoryModel of(BuildContext context) {
+    return Provider.of(context, listen: false);
   }
 }
 

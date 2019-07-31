@@ -1,5 +1,6 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/user_model.dart';
+import 'package:oktoast/oktoast.dart';
 
 class UserDetailAuthPage extends StatefulWidget {
   static String routeName = "/preVerify";
@@ -10,7 +11,7 @@ class UserDetailAuthPage extends StatefulWidget {
 
 class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
   TextEditingController _idCardController = TextEditingController();
-  GlobalKey _keyEdit =GlobalKey();
+  GlobalKey _keyEdit = GlobalKey();
   GlobalKey<LoadingStateWidgetState> submitButtonKey =
       GlobalKey(debugLabel: "sumbitUserDetail");
 
@@ -33,7 +34,7 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
       body: Consumer<UserModel>(
         builder: (BuildContext context, UserModel userModel, Widget child) {
           bool isReAuth = (userModel.userDetail?.idCard ?? "").isNotEmpty;
-          if(isReAuth) {
+          if (isReAuth) {
             _idCardController.text = userModel.userDetail?.idCard;
           }
           return Container(
@@ -66,7 +67,6 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                       ),
                       controller: _idCardController,
                       autocorrect: false,
-
                     ),
                   ),
                 ),
@@ -75,6 +75,10 @@ class _UserDetailAuthPageState extends State<UserDetailAuthPage> {
                     key: submitButtonKey,
                     child: RaisedButton(
                       onPressed: () async {
+                        if (_idCardController.text?.isEmpty ?? true) {
+                          showToast("身份证不可为空");
+                          return;
+                        }
                         Navigator.of(context).pushReplacementNamed(
                             FaceIdPage.routeName,
                             arguments: {

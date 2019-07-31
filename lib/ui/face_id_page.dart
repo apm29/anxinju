@@ -3,6 +3,9 @@ import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
+import 'package:ease_life/ui/face_verify_hint_page.dart';
+import 'package:ease_life/ui/widget/gradient_button.dart';
+import 'package:oktoast/oktoast.dart';
 
 class FaceIdPage extends StatefulWidget {
   static String routeName = "/faceId";
@@ -63,6 +66,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
         centerTitle: true,
         title: Text("人脸录入"),
       ),
+      backgroundColor: Colors.blueGrey[200],
       body: fullScreen
           ? Stack(
               children: <Widget>[
@@ -117,34 +121,43 @@ class _FaceIdPageState extends State<FaceIdPage> {
                   }),
                 ),
                 Align(
-                  alignment: Alignment(0, 0.5),
-                  child: Text(
-                    "注意:匹配人脸时请将脸部对准圆形采集框",
-                    style: TextStyle(color: Colors.blueAccent),
-                  ),
-                ),
-                Align(
                   alignment: Alignment(0, 0.9),
                   child: LayoutBuilder(
                     builder: (_, constraint) {
                       return LoadingStateWidget(
                         key: faceRecognizeKey,
-                        child: SizedBox(
-                          width: constraint.biggest.width * 0.6,
-                          child: OutlineButton(
-                            color: Colors.white,
-                            shape: Border.all(color: Colors.greenAccent),
-                            borderSide: BorderSide(color: Colors.green),
-                            splashColor: Colors.greenAccent,
-                            child: Text(
-                              "匹配",
-                              style: TextStyle(color: Colors.green),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.warning,
+                                  color: Colors.yellow[600],
+                                ),
+                                Text(
+                                  "注意:匹配人脸时请将脸部对准圆形采集框",
+                                  style: TextStyle(color: Colors.deepOrange),
+                                ),
+                              ],
                             ),
-                            highlightedBorderColor: Colors.greenAccent,
-                            onPressed: () {
-                              takePicture();
-                            },
-                          ),
+                            SizedBox(
+                              height: 12,
+                            ),
+                            SizedBox(
+                              width: constraint.biggest.width * 0.6,
+                              child: GradientButton(
+                                Text(
+                                  "匹配",
+                                ),
+                                unconstrained: false,
+                                onPressed: () async {
+                                  takePicture();
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -156,6 +169,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
   }
 
   File currentPic;
+  bool inVerify = false;
 
   void takePicture() async {
     var argument = ModalRoute.of(context).settings.arguments;
@@ -171,8 +185,18 @@ class _FaceIdPageState extends State<FaceIdPage> {
         currentPic = file;
         BlocProviders.of<CameraBloc>(context)
             .changeStatus(CAMERA_STATUS.PICTURE_STILL);
-        await verify(file, argument);
-        refreshUserState();
+        faceRecognizeKey.currentState.stopLoading();
+        BlocProviders.of<CameraBloc>(context)
+            .changeStatus(CAMERA_STATUS.PREVIEW);
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          return ChangeNotifierProvider<FaceVerifyHintModel>(
+            child: FaceVerifyHintPage(),
+            builder: (context) {
+              return FaceVerifyHintModel(
+                  file, argument['isAgain'], argument['idCard']);
+            },
+          );
+        }));
       }
     }
   }
@@ -209,12 +233,12 @@ class _FaceIdPageState extends State<FaceIdPage> {
                     padding: EdgeInsets.all(2),
                     child: FlatButton(
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(true);
                         },
                         child: Text("返回主页")),
                   )),
               );
-            });
+            }).then((v) => v);
       } else {
         ///无房用户,导向成员申请
         return showDialog(
@@ -227,7 +251,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
                 actions: <Widget>[
                   FlatButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(true);
                     },
                     child: Text("返回主页"),
                   ),
@@ -239,7 +263,7 @@ class _FaceIdPageState extends State<FaceIdPage> {
                       child: Text("申请成为成员")),
                 ],
               );
-            });
+            }).then((v) => v);
       }
     } else {
       ///认证出错
@@ -253,16 +277,44 @@ class _FaceIdPageState extends State<FaceIdPage> {
               actions: <Widget>[
                 FlatButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(false);
                     },
                     child: Text("好的"))
               ],
             );
-          });
+          }).then((v) => v);
     }
   }
 
   void refreshUserState() async {
+    var toastFuture = showToastWidget(
+      AlertDialog(
+        title: Text("正在获取新的人脸认证状态.."),
+        content: LinearProgressIndicator(),
+      ),
+      context: context,
+      duration: Duration(
+        seconds: 150,
+      ),
+      dismissOtherToast: true,
+    );
+
+    int count = 5;
+    while (count >= 0) {
+      try {
+        count--;
+        var response = await Api.getUserVerify();
+        if (response.success && !response.data.isInVerify()) {
+          continue;
+        }
+        Future.delayed(Duration(milliseconds: 1200));
+      } catch (e) {
+        print(e);
+        continue;
+      }
+    }
+    UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
+
     ///认证之后不管是否成功都更新userInfo 和 房屋列表
     var baseResp = await Api.getUserInfo();
 
@@ -271,10 +323,40 @@ class _FaceIdPageState extends State<FaceIdPage> {
       await UserRoleModel.of(context).tryFetchUserRoleTypes(context);
       await DistrictModel.of(context).tryFetchCurrentDistricts();
     }
-    await UserVerifyStatusModel.of(context)
-        .tryFetchVerifyStatusPeriodically(context);
+    toastFuture?.dismiss(showAnim: true);
+    //await UserVerifyStatusModel.of(context)
+    //    .tryFetchVerifyStatusPeriodically(context);
     Navigator.of(context)
         .popUntil((r) => r.settings.name == MainPage.routeName);
+  }
+
+  Future showHint(BuildContext context) async {
+    return showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(
+                  Icons.message,
+                  color: Colors.blue,
+                ),
+                Text("提醒"),
+              ],
+            ),
+            content: Text("人脸比对耗时较长,请等待几分钟后刷新页面"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("确定"),
+              )
+            ],
+          );
+        });
   }
 }
 

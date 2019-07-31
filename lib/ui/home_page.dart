@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
                 ),
           body: AnimatedSwitcher(
             child: isOnPropertyDuty
-                ? _buildPropertyUser()
+                ? _buildPropertyUser(context)
                 : _buildCommonUserHome(context),
             duration: Duration(seconds: 1),
             switchInCurve: Curves.fastOutSlowIn,
@@ -70,13 +70,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildPropertyUser() {
-    return ChangeNotifierProvider(
-      child: ServiceChatPage(),
-      builder: (context) {
-        return ServiceChatModel(context);
-      },
-    );
+  Widget _buildPropertyUser(BuildContext context) {
+    return ServiceChatPage();
   }
 
   Widget _buildCommonUserHome(BuildContext context) {
@@ -378,7 +373,7 @@ class HomePage extends StatelessWidget {
                 children: <Widget>[
                   const HomeChip(
                     color: const Color(0xFFCD0004),
-                    title: "功德栏",
+                    title: "公德栏",
                     indexId: WebIndexID.GONG_DE_LAN,
                     checkIsFaceVerified: false,
                   ),

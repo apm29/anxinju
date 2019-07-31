@@ -131,7 +131,8 @@ class KfDioUtil {
         (count, total) {
           ///默认发送进度
         };
-    print('${Configs.KFBaseUrl}$path');
+
+    print('${Configs.KFBaseUrl}$path $formData');
     ToastFuture toastFuture;
     if (showProgress) {
       toastFuture = showLoadingWidget(loadingText);
@@ -673,4 +674,63 @@ class AppendContent {
     return data;
   }
 }
+
+
+class MediationRunningStatus {
+  int id;
+  String kfId;
+  String districtId;
+  String appId;
+  String title;
+  String result;
+  String description;
+  String applyId;
+  String startTime;
+  String endTime;
+  String isfinish;
+
+  MediationRunningStatus(
+      {this.id,
+        this.kfId,
+        this.districtId,
+        this.appId,
+        this.title,
+        this.result,
+        this.description,
+        this.applyId,
+        this.startTime,
+        this.endTime,
+        this.isfinish});
+
+  MediationRunningStatus.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    kfId = json['kf_id'];
+    districtId = json['district_id'];
+    appId = json['app_id'];
+    title = json['title'];
+    result = json['result'];
+    description = json['description'];
+    applyId = json['apply_id'];
+    startTime = json['start_time'];
+    endTime = json['end_time'];
+    isfinish = json['isfinish'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['kf_id'] = this.kfId;
+    data['district_id'] = this.districtId;
+    data['app_id'] = this.appId;
+    data['title'] = this.title;
+    data['result'] = this.result;
+    data['description'] = this.description;
+    data['apply_id'] = this.applyId;
+    data['start_time'] = this.startTime;
+    data['end_time'] = this.endTime;
+    data['isfinish'] = this.isfinish;
+    return data;
+  }
+}
+
 

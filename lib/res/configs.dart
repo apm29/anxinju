@@ -72,6 +72,8 @@ class WebIndexID {
   static const YE_ZHU_WEN_ZHENG = "yzwz";
 
   static const LIN_LI_QUAN = "llq";
+
+  static const TIAO_JIE_DANG_AN = "tjda";
 }
 
 

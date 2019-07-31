@@ -179,8 +179,7 @@ class Api {
     );
   }
 
-  static Future<BaseResponse> saveUserDetailByMap(
-      Map dataMap) async {
+  static Future<BaseResponse> saveUserDetailByMap(Map dataMap) async {
     return await DioUtil().postAsync(
       path: "/permission/userDetail/saveUserDetail",
       data: dataMap,
@@ -601,6 +600,22 @@ class ApiKf {
       },
       formData: {
         "id": mediationId,
+        "cAppId": cAppId,
+      },
+    );
+  }
+
+  static Future<KFBaseResp<MediationRunningStatus>> mediationChatRoomQuery(
+    String chatRoomId,
+    String cAppId,
+  ) async {
+    return KfDioUtil().post<MediationRunningStatus>(
+      "/admin/custRoomApi/roomChatSingleSearch",
+      processor: (s) {
+        return MediationRunningStatus.fromJson(s);
+      },
+      formData: {
+        "chatroom_id": chatRoomId,
         "cAppId": cAppId,
       },
     );

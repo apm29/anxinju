@@ -205,7 +205,7 @@ class _MemberApplyPageState extends State<MemberApplyPage> {
                                                 TextStyle(color: Colors.blue),
                                             recognizer: TapGestureRecognizer()
                                               ..onTap = () {
-                                                Navigator.of(context).pop();
+                                                toWebPage(context, WebIndexID.SHEN_QING_JI_LU,checkFaceVerified: false,checkHasHouse: false);
                                               }),
                                         TextSpan(text: " 页面查看申请进度"),
                                       ])),

@@ -469,6 +469,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                       WebView(
                         initialUrl: widget.initUrl ?? 'https://flutter.dev',
                         javascriptMode: JavascriptMode.unrestricted,
+                        debuggingEnabled: true,
                         onWebViewCreated:
                             (WebViewController webViewController) {
                           _controller.complete(webViewController);

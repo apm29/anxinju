@@ -14,6 +14,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert';
 import 'package:ease_life/utils.dart';
@@ -389,6 +390,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
   FocusNode _editFocusNode = FocusNode();
   TextEditingController _inputController = TextEditingController();
   ScrollController _messageScrollController = ScrollController();
+  StreamSubscription _subject;
 
   @override
   void initState() {
@@ -398,6 +400,21 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
         ChatRoomPageStatusModel.of(context).closeEmoji();
       }
     });
+
+    _subject = Observable.periodic(Duration(seconds: 5)).listen((_) {
+      ApiKf.mediationChatRoomQuery(widget.chatRoomId, Configs.KF_APP_ID)
+          .then((resp) {
+        if (resp.success && resp.data.isfinish == "1") {
+          Navigator.of(context).pop();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _subject?.cancel();
   }
 
   @override

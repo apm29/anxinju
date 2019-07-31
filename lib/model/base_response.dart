@@ -595,9 +595,9 @@ class UserVerifyStatus {
       case 4:
         return "名下无房,\n人脸认证成功";
       case 5:
-        return "名下有房,\n人脸认证失败";
+        return "人脸认证失败";
       case 6:
-        return "名下无房,\n人脸认证失败";
+        return "人脸认证失败";
       default:
         return null;
     }
@@ -621,6 +621,10 @@ class UserVerifyStatus {
 
   bool isVerified() {
     return code == 3 || code == 4;
+  }
+
+  bool isInVerify() {
+    return code == 1 || code == 2;
   }
 
   String getVerifyText() {

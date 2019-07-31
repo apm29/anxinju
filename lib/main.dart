@@ -5,6 +5,7 @@ import 'package:ease_life/ui/notification_message_page.dart';
 import 'package:ease_life/ui/service_chat_page.dart';
 import 'package:ease_life/ui/setting_page.dart';
 import 'package:ease_life/ui/video_nineoneone_page.dart';
+import 'package:ease_life/ui/face_verify_hint_page.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'index.dart';
@@ -67,6 +68,11 @@ class MyApp extends StatelessWidget {
             ChangeNotifierProvider(
                 builder: (context) => ChatRoomPageStatusModel()),
             ChangeNotifierProvider(builder: (context) => AppInfoModel()),
+            ChangeNotifierProvider(
+              builder: (context) {
+                return ServiceChatModel(context);
+              },
+            )
           ],
           child: MaterialApp(
             theme: defaultThemeData,
@@ -128,15 +134,11 @@ class MyApp extends StatelessWidget {
                     ],
                     child: MediationListPage(),
                   ),
-              ServiceChatPage.routeName: (context) => ChangeNotifierProvider(
-                    child: ServiceChatPage(),
-                    builder: (context) {
-                      return ServiceChatModel(context);
-                    },
-                  ),
               VideoNineOneOnePage.routeName: (context) =>
                   ChangeNotifierProvider(
-                    child: VideoNineOneOnePage(channelName: Configs.AGORA_CHANNEL_POLICE,),
+                    child: VideoNineOneOnePage(
+                      channelName: Configs.AGORA_CHANNEL_POLICE,
+                    ),
                     builder: (context) {
                       return VideoNineOneOneModel();
                     },

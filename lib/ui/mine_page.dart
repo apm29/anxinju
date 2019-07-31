@@ -554,6 +554,40 @@ class _MinePageState extends State<MinePage> {
                 SizedBox(
                   height: 10,
                 ),
+                HomeTitleSliver(
+                  leadingIcon: Container(
+                    height: ScreenUtil().setHeight(70),
+                    width: ScreenUtil().setWidth(10),
+                    color: Color(0xFF16A702),
+                  ),
+                  mainTitle: "我的记录",
+                  subTitle: "My Records",
+                  tailText: "",
+                ),
+                Material(
+                  type: MaterialType.card,
+                  elevation: 1,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: ScreenUtil().setHeight(42),
+                      horizontal: ScreenUtil().setWidth(42),
+                    ),
+                    color: Colors.white,
+                    child: Wrap(
+                      alignment: WrapAlignment.start,
+                      children: <Widget>[
+                        const HomeChip(
+                          color: const Color(0xFF16A702),
+                          title: "调解档案",
+                          indexId: WebIndexID.TIAO_JIE_DANG_AN,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
                 Row(
                   children: <Widget>[
                     Platform.isAndroid
