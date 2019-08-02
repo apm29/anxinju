@@ -7,10 +7,7 @@ import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/ui/service_chat_page.dart';
 import 'package:ease_life/ui/video_nineoneone_page.dart';
-import 'package:oktoast/oktoast.dart';
-
 import 'dispute_mediation_list_page.dart';
-import 'dispute_mediation_page.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -19,41 +16,31 @@ class HomePage extends StatelessWidget {
       builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
         final isOnPropertyDuty = roleModel.isOnPropertyDuty;
         return Scaffold(
-          appBar: isOnPropertyDuty
-              ? null
-              : AppBar(
-                  // Here we take the value from the MyHomePage object that was created by
-                  // the App.build method, and use it to set our appbar title.
-                  centerTitle: true,
-                  automaticallyImplyLeading: false,
-                  title: Text(
-                    Strings.appName,
-                  ),
-                  actions: <Widget>[
-                    DistrictInfoButton(),
-                    Consumer<UserRoleModel>(
-                      builder: (BuildContext context, UserRoleModel roleModel,
-                          Widget child) {
-                        return roleModel.hasSwitch
-                            ? FlatButton.icon(
-                                icon: Icon(
-                                  Icons.repeat,
-                                  color: Colors.blue,
-                                ),
-                                onPressed: () {
-                                  roleModel.switchRole();
-                                  SystemSound.play(SystemSoundType.click);
-                                },
-                                label: Text("${roleModel.switchString}"),
-                              )
-                            : Container();
-                      },
-                    ),
-                  ],
-                ),
+          appBar: AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            centerTitle: false,
+            elevation: 0,
+            automaticallyImplyLeading: false,
+            title: Consumer<ServiceChatModel>(
+              builder:
+                  (BuildContext context, ServiceChatModel value, Widget child) {
+                return Text(
+                  isOnPropertyDuty
+                      ? value.currentChatUser != null
+                          ? "正在与${value.currentChatUser.userName}交谈"
+                          : "当前无人连接客服"
+                      : Strings.appName,
+                );
+              },
+            ),
+            actions: <Widget>[
+              buildRoleSwitchButton(),
+            ],
+          ),
           body: AnimatedSwitcher(
             child: isOnPropertyDuty
-                ? _buildPropertyUser(context)
+                ? _buildPropertyUser()
                 : _buildCommonUserHome(context),
             duration: Duration(seconds: 1),
             switchInCurve: Curves.fastOutSlowIn,
@@ -70,13 +57,14 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildPropertyUser(BuildContext context) {
+  Widget _buildPropertyUser() {
     return ServiceChatPage();
   }
 
   Widget _buildCommonUserHome(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(17)),
+      color: Colors.grey[200],
       child: ListView(
         key: PageStorageKey("HOME_PAGE"),
         children: <Widget>[
@@ -86,7 +74,7 @@ class HomePage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Container(
+                Material(
                   color: Colors.white,
                   child: Column(
                     children: <Widget>[

@@ -724,23 +724,7 @@ class _MinePageState extends State<MinePage> {
   buildActions(BuildContext context) {
     return <Widget>[
       DistrictInfoButton(),
-      Consumer<UserRoleModel>(
-        builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
-          return roleModel.hasSwitch
-              ? FlatButton.icon(
-                  icon: Icon(
-                    Icons.repeat,
-                    color: Colors.blue,
-                  ),
-                  onPressed: () {
-                    roleModel.switchRole();
-                    SystemSound.play(SystemSoundType.click);
-                  },
-                  label: Text("${roleModel.switchString}"),
-                )
-              : Container();
-        },
-      ),
+      buildRoleSwitchButton(),
     ];
   }
 }

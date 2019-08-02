@@ -620,4 +620,50 @@ class ApiKf {
       },
     );
   }
+
+  static Future<KFBaseResp<List<OnlineChatUser>>> onlineChatUserQuery(
+    String districtId,
+    String cAppId,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/custRoomApi/onLineUserInfo",
+      processor: (s) {
+        if (s is List) {
+          return s.map((json) => OnlineChatUser.fromJson(json)).toList();
+        } else {
+          return [];
+        }
+      },
+      formData: {
+        "district_id": districtId,
+        "cAppId": cAppId,
+      },
+    );
+  }
+
+
+  static Future<KFBaseResp<List<PropertyEmergencyHistoryMessage>>> propertyEmergencyHistoryMessagesQuery(
+    int districtId,
+    String cAppId,
+    String userId,
+      int page, int pageNum,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/custRoomApi/getChatLog",
+      processor: (s) {
+        if (s is List) {
+          return s.map((json) => PropertyEmergencyHistoryMessage.fromJson(json)).toList();
+        } else {
+          return [];
+        }
+      },
+      formData: {
+        "district_id": districtId,
+        "cAppId": cAppId,
+        "user_id": userId,
+        "page": page,
+        "pagenum": pageNum,
+      },
+    );
+  }
 }

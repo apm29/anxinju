@@ -4,9 +4,11 @@ import 'dart:convert';
 import 'package:ease_life/interaction/websocket_manager.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/remote/api.dart';
+import 'package:ease_life/remote/kf_dio_utils.dart';
 import 'package:ease_life/res/configs.dart';
 import 'package:ease_life/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -26,7 +28,6 @@ class ServiceChatModel extends ChangeNotifier {
     bool show = (_progress > 0 && _progress < 100);
     return show;
   }
-
 
   bool get inputText => _inputText;
 
@@ -128,8 +129,12 @@ class ServiceChatModel extends ChangeNotifier {
     reconnect(context);
   }
 
+  int districtId;
+
   void reconnect(BuildContext context) async {
     disconnect();
+    await DistrictModel.of(context).tryFetchCurrentDistricts();
+    districtId = DistrictModel.of(context).getCurrentDistrictId();
     try {
       _currentChannel = IOWebSocketChannel.connect(
         Configs.KF_EMERGENCY_WS_URL,
@@ -140,7 +145,8 @@ class ServiceChatModel extends ChangeNotifier {
     var resp = await Api.getUserInfo();
     var respDetail = await Api.getUserDetail();
     if (respDetail.success && resp.success) {
-      var userName = respDetail.data.nickName ?? resp.data.userName;
+      var userName = resp.data.userName;
+      var nickName = respDetail.data.nickName;
       var userAvatar = respDetail.data.avatar;
       var userId = resp.data.userId;
       print('${respDetail.data.avatar}');
@@ -156,15 +162,15 @@ class ServiceChatModel extends ChangeNotifier {
         print('<<<<< RECV <---- ${data.toString()}');
         _processRawData(data);
       });
-      var districtId = DistrictModel.of(context).getCurrentDistrictId();
-
       var map = {
         "type": "init",
         "uid": "KF$userId",
         "cAppId": "${Configs.KF_APP_ID}",
         "name": "$userName",
+        "nick_name": "$nickName",
         "avatar": "$userAvatar",
-        "group": "3",
+        //"group": "3",//客服
+        "group": "25", //紧急呼叫
         "district_id": "$districtId"
       };
 
@@ -174,10 +180,46 @@ class ServiceChatModel extends ChangeNotifier {
     }
   }
 
+  void getOnlineUsers(int districtId) async {
+    var resp = await ApiKf.onlineChatUserQuery(
+        districtId.toString(), Configs.KF_APP_ID);
+    if (resp.success) {
+      var userList = resp.data
+          .map(
+            (onlineChatUser) => ChatUser(
+              onlineChatUser.userId,
+              onlineChatUser.userAvatar,
+              onlineChatUser.chatName,
+            ),
+          )
+          .toList();
+      userList.forEach((chatUser) {
+        _historyConfigMap[chatUser.userId] = HistoryConfig();
+      });
+      currentChatUsers.addAll(userList);
+      refresh(districtId);
+    } else {
+      showToast("获取在线用户失败");
+    }
+  }
+
+  void refresh(int districtId) {
+    _historyConfigMap.forEach((userId, config) {
+      config.reset();
+    });
+    currentChatUsers.forEach((user) {
+      loadHistory(user.userId, districtId);
+    });
+  }
+
   void disconnect() {
     streamSubscription?.cancel();
     _currentChannel?.sink?.close();
     _connectionState = ConnectStatus.DISCONNECTED;
+
+    _messages = [];
+    _currentChatUsers.clear();
+    _historyConfigMap.clear();
     notifyListeners();
   }
 
@@ -191,6 +233,7 @@ class ServiceChatModel extends ChangeNotifier {
     if (dataMap['code'] == 200) {
       switch (dataMap['message_type']) {
         case "isConnect":
+          getOnlineUsers(districtId);
           break;
         case "connect":
           var userInfo = dataMap['data']['user_info'];
@@ -198,14 +241,20 @@ class ServiceChatModel extends ChangeNotifier {
             ChatUser(
               userInfo['id'],
               userInfo['avatar'],
-              userInfo['name'],
+              userInfo['data']['user']['nickname'],
             ),
           );
-          print('add user:$add');
+          _historyConfigMap[userInfo['id']] = HistoryConfig();
+          if (add) {
+            loadHistory(userInfo['id'], districtId);
+          }
+          print('add user - $add:$userInfo');
           break;
         case "delUser":
-          _currentChatUsers
-              .removeWhere((user) => user.userId == dataMap['data']['id']);
+          _currentChatUsers.removeWhere((user) {
+            return user.userId == dataMap['data']['id'];
+          });
+
           if (_currentChatUsers.length > 0)
             currentChatUser = _currentChatUsers.first;
           break;
@@ -226,7 +275,7 @@ class ServiceChatModel extends ChangeNotifier {
             ServiceChatMessage(
               senderId: message['id'],
               receiverId: _chatSelf.userId,
-              userName: message['name'],
+              nickName: message['name'],
               userAvatar: message['avatar'],
               time: message['time'],
               content: message['content'],
@@ -266,6 +315,47 @@ class ServiceChatModel extends ChangeNotifier {
       msg.read = true;
     });
   }
+
+  Map<String, HistoryConfig> _historyConfigMap = {};
+
+  Future loadHistory(String userId, var districtId) async {
+    var noMoreHistory = _historyConfigMap[userId].noMoreHistory;
+    var page = _historyConfigMap[userId].page;
+    var pageNum = _historyConfigMap[userId].pageNum;
+    if (_historyConfigMap[userId].loadingHistory || noMoreHistory) {
+      return null;
+    }
+    _historyConfigMap[userId].loadingHistory = true;
+    var kfBaseResp = await ApiKf.propertyEmergencyHistoryMessagesQuery(
+      districtId,
+      Configs.KF_APP_ID,
+      userId,
+      page,
+      pageNum,
+    );
+    if (kfBaseResp.success) {
+      var list = kfBaseResp.data.map((PropertyEmergencyHistoryMessage message) {
+        return ServiceChatMessage(
+          nickName: message.senderNickName,
+          userAvatar: message.fromAvatar,
+          time: message.timeLine,
+          content: message.content,
+          receiverId: message.toId.replaceAll("KF", ""),
+          senderId: message.fromId.replaceAll("KF", ""),
+          read: true,
+        );
+      }).toList();
+      _messages.addAll(list.reversed);
+      if (list.length < pageNum) {
+        noMoreHistory = true;
+      }
+      _historyConfigMap[userId].increase();
+    } else {
+      showToast("获取历史消息失败:${kfBaseResp.text}");
+    }
+    _historyConfigMap[userId].loadingHistory = false;
+    return notifyListeners();
+  }
 }
 
 abstract class IChatUser {
@@ -289,14 +379,13 @@ abstract class IChatUser {
     if (userAvatar?.startsWith("http") == true) {
       return userAvatar;
     } else {
-      return "${Configs.KFBaseUrl}${userAvatar??""}";
+      return "${Configs.KFBaseUrl}${userAvatar ?? ""}";
     }
   }
-
 }
 
 class ServiceChatMessage {
-  final String userName;
+  final String nickName;
   final String userAvatar;
   final String time;
   final String content;
@@ -305,7 +394,7 @@ class ServiceChatMessage {
   bool read;
 
   ServiceChatMessage({
-    this.userName,
+    this.nickName,
     this.userAvatar,
     this.time,
     this.content,
@@ -318,13 +407,13 @@ class ServiceChatMessage {
     if (userAvatar?.startsWith("http") == true) {
       return userAvatar;
     } else {
-      return "${Configs.KFBaseUrl}${userAvatar??""}";
+      return "${Configs.KFBaseUrl}${userAvatar ?? ""}";
     }
   }
 
   @override
   String toString() {
-    return 'ChatMessage{userName: $userName, userAvatar: $userAvatar, time: $time, content: $content, senderId: $senderId, receiverId: $receiverId, read: $read}';
+    return 'ChatMessage{userName: $nickName, userAvatar: $userAvatar, time: $time, content: $content, senderId: $senderId, receiverId: $receiverId, read: $read}';
   }
 }
 
@@ -338,4 +427,21 @@ class ChatUser extends IChatUser {
           userAvatar,
           userName,
         );
+}
+
+class HistoryConfig {
+  int page = 1;
+  final int pageNum = 20;
+  bool loadingHistory = false;
+  bool noMoreHistory = false;
+
+  void increase() {
+    page += 1;
+  }
+
+  void reset() {
+    page = 1;
+    loadingHistory = false;
+    noMoreHistory = false;
+  }
 }

@@ -55,7 +55,9 @@ class UserModel extends ChangeNotifier {
     await UserRoleModel.of(context).tryFetchUserRoleTypes(context);
     await MessageModel.of(context).refresh();
     try {
-      ServiceChatModel.of(context).reconnect(context);
+      if( UserRoleModel.of(context).hasPropertyPermission()) {
+        ServiceChatModel.of(context).reconnect(context);
+      }
     } catch (e) {
       print(e);
     }

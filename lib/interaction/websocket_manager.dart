@@ -243,7 +243,7 @@ class WebSocketManager {
           config.kfId = response.data.kfId;
           config.kfName = response.data.kfName;
           connectStatus = ConnectStatus.CONNECTED;
-
+          print(' ---config--- $config');
           _commandController.add(WSMessage("${response.toString()}",
               type: MessageType.COMMAND,
               status: ConnectStatus.CONNECTED,
@@ -268,15 +268,17 @@ class WebSocketManager {
               rawContent.endsWith("]")) {
             messageType = MessageType.IMAGE;
           }
-          var message = WSMessage("${response.data.msg.content}",
-              type: messageType,
-              status: ConnectStatus.CONNECTED,
-              fromName: response.data.kfName,
-              fromAvatar: response.data.msg.avatar ?? "",
-              fromId: config.kfId,
-              group: config.group,
-              toId: config.userId,
-              sendTime: DateTime.now().millisecondsSinceEpoch);
+          var message = WSMessage(
+            "${response.data.msg.content}",
+            type: messageType,
+            status: ConnectStatus.CONNECTED,
+            fromName: response.data.kfName,
+            fromAvatar: response.data.msg.avatar ?? "",
+            fromId: config.kfId,
+            group: config.group,
+            toId: config.userId,
+            sendTime: DateTime.now().millisecondsSinceEpoch,
+          );
           _messageController.add(message);
           ChatMessageProvider().add(ChatMessage.fromMessage(message)).then((c) {
             print('数据库插入:$c');
@@ -291,7 +293,6 @@ class WebSocketManager {
         break;
     }
   }
-
 
   ///发送一个消息
   Future<bool> sendMessage(WSMessage message) async {

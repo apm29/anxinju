@@ -505,6 +505,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                             //    Duration(seconds: 5), (i) => i).listen((i) {
                             //  imeConfig();
                             //});
+                            //pasteSupport();
                           }
                         },
                       ),
@@ -607,6 +608,54 @@ class _WebViewExampleState extends State<WebViewExample> {
     ''').catchError((e) {
       print(e.toString());
     });
+  }
+
+  void pasteSupport() {
+    print('----------------> paste');
+    controller.evaluateJavascript('''
+                          var inputs = document.getElementsByTagName('input');
+                          var textArea = document.getElementsByTagName('textarea');
+                          var current;
+                          var lastFocusElement = current;
+                          for (var i = 0; i < inputs.length; i++) {
+                            console.log(i);
+                            inputs[i].addEventListener('long-press', (e) => {
+                              var json = {
+                                "funcName": "showPaste",
+                                "data": {
+                                  "initText": e.target.value,
+                                  "selectionStart":e.target.selectionStart,
+                                  "selectionEnd":e.target.selectionEnd
+                                }
+                              };
+                              lastFocusElement = current;
+                              current = e.target;
+                              var param = JSON.stringify(json);
+                              console.log(param);
+                              UserState.postMessage(param);
+                            })
+                          }
+                          for (var i = 0; i < textArea.length; i++) {
+                            console.log(i);
+                            textArea[i].addEventListener('long-press', (e) => {
+                              var json = {
+                                "funcName": "showPaste",
+                                "data": {
+                                  "initText": e.target.value,
+                                  "selectionStart":e.target.selectionStart,
+                                  "selectionEnd":e.target.selectionEnd
+                                }
+                              };
+                              json.data.refocus = (document.activeElement == current);
+                              lastFocusElement = current;
+                              current = e.target;
+                              var param = JSON.stringify(json);
+                              console.log(param);
+                              UserState.postMessage(param);
+                            })
+                          };
+                          console.log('===JS CODE INJECTED INTO MY WEBVIEW===');      
+    ''');
   }
 
   void imeConfig() async {
@@ -789,6 +838,9 @@ class _WebViewExampleState extends State<WebViewExample> {
               Navigator.of(context)
                   .pushReplacementNamed("${jsonMap['data']['routeName']}");
               break;
+            case "showPaste":
+              doOnCallPaste(context, jsonMap['data']);
+              break;
             case "requestFocus":
               doOnTextEdit(context, jsonMap['data']);
               break;
@@ -875,6 +927,38 @@ class _WebViewExampleState extends State<WebViewExample> {
           }
           return Container();
         });
+  }
+
+  void doOnCallPaste(BuildContext context, Map<String, dynamic> data) async {
+    bool refocus = data['refocus'] as bool;
+    String initText = data['initText'];
+    var selectionStart = data['selectionStart'];
+    var selectionEnd = data['selectionEnd'];
+    var clipData = await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipData != null && clipData.text != null && clipData.text.isNotEmpty) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("粘贴"),
+              content: Text(clipData.text),
+              actions: <Widget>[
+                FlatButton(onPressed: (){
+                  Navigator.of(context).pop();
+                }, child: Text("取消")),
+                FlatButton(onPressed: (){
+                  var text = initText.substring(0,selectionStart)+clipData.text + initText.substring(selectionEnd);
+                  controller?.evaluateJavascript('''
+                  if(document.activeElement.tagName == "textarea" ||document.activeElement.tagName == "input" ){
+                    document.activeElement.innerText = '$text';
+                  }
+                  ''');
+                  Navigator.of(context).pop();
+                }, child: Text("粘贴内容")),
+              ],
+            );
+          });
+    }
   }
 
   void doOnTextEdit(BuildContext context, Map<String, dynamic> data) {

@@ -34,7 +34,8 @@ class FaceVerifyHintPage extends StatelessWidget {
                     Material(
                       elevation: 5,
                       color: Colors.white,
-                      borderRadius: BorderRadius.vertical(top:Radius.circular(8)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(8)),
                       child: Container(
                         padding:
                             EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -47,7 +48,6 @@ class FaceVerifyHintPage extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-
                                 Image.asset(
                                   'images/ic_face_id.png',
                                   height: 32,
@@ -122,71 +122,79 @@ class FaceVerifyHintPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Material(
-                      elevation: 5,
-                      borderRadius: BorderRadius.vertical(bottom:Radius.circular(8)),
-                      color: Colors.white,
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              color: Colors.transparent,
-                            ),
-                            SizedBox(
-                              height: 12,
-                            ),
-                            Text(
-                              model.houseTitle,
-                              style: Theme.of(context).textTheme.title,
-                            ),
-                            SizedBox(
-                              height: 12,
-                            ),
-                            model.loading
-                                ? LinearProgressIndicator()
-                                : Text(
-                                    model.resultText,
-                                    style: Theme.of(context).textTheme.body1,
+                    (model.faceVerifyStatus != null &&
+                                (model.faceVerifyStatus.isInVerify())) ||
+                            model.faceVerifyStatus == null
+                        ? Container()
+                        : Material(
+                            elevation: 5,
+                            borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(8)),
+                            color: Colors.white,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 24, horizontal: 16),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    color: Colors.transparent,
                                   ),
-                            SizedBox(
-                              height: 12,
+                                  SizedBox(
+                                    height: 12,
+                                  ),
+                                  Text(
+                                    model.houseTitle,
+                                    style: Theme.of(context).textTheme.title,
+                                  ),
+                                  SizedBox(
+                                    height: 12,
+                                  ),
+                                  model.loading
+                                      ? LinearProgressIndicator()
+                                      : Text(
+                                          model.resultText,
+                                          style:
+                                              Theme.of(context).textTheme.body1,
+                                        ),
+                                  SizedBox(
+                                    height: 12,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        width: 12,
+                                      ),
+                                      model.failed || model.verifyFinished
+                                          ? GradientButton(
+                                              Text("返回主页"),
+                                              onPressed: () async {
+                                                await UserModel.of(context)
+                                                    .refreshUserData(context);
+                                                model.goHome(context);
+                                              },
+                                            )
+                                          : Container(),
+                                      SizedBox(
+                                        width: 12,
+                                      ),
+                                      model.needApply && model.verifyFinished
+                                          ? GradientButton(
+                                              Text("申请成为家庭成员"),
+                                              onPressed: () async {
+                                                await UserModel.of(context)
+                                                    .refreshUserData(context);
+                                                Navigator.of(context).pushNamed(
+                                                    MemberApplyPage.routeName);
+                                              },
+                                            )
+                                          : Container(),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                SizedBox(
-                                  width: 12,
-                                ),
-                                model.failed || model.verifyFinished
-                                    ? GradientButton(
-                                        Text("返回主页"),
-                                        onPressed: () async {
-                                          await UserModel.of(context).refreshUserData(context);
-                                          model.goHome(context);
-                                        },
-                                      )
-                                    : Container(),
-                                SizedBox(
-                                  width: 12,
-                                ),
-                                model.needApply && model.verifyFinished
-                                    ? GradientButton(
-                                        Text("申请成为家庭成员"),
-                                        onPressed: () async {
-                                          await UserModel.of(context).refreshUserData(context);
-                                          Navigator.of(context).pushNamed(
-                                              MemberApplyPage.routeName);
-                                        },
-                                      )
-                                    : Container(),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    )
+                          )
                   ],
                 ),
               ),

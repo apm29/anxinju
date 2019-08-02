@@ -94,7 +94,7 @@ class MainPageState extends State<MainPage> {
       return true;
     }, child: Consumer<MainIndexModel>(
       builder: (context, indexModel, child) {
-        return ListenableProvider(
+        return ListenableProvider<NotificationModel>(
           builder: (BuildContext context) {
             return NotificationModel(context);
           },
@@ -107,28 +107,6 @@ class MainPageState extends State<MainPage> {
                 color: Colors.grey[200],
                 child: buildContent(context),
               ),
-//            floatingActionButton: Consumer2<UserModel,UserRoleModel>(
-//              builder:
-//                  (BuildContext context, UserModel userModel,UserRoleModel userRoleModel, Widget child) {
-//                return Offstage(
-//                  offstage: !userModel.isLogin || userRoleModel.isOnPropertyDuty,
-//                  child: FloatingActionButton.extended(
-//                    onPressed: () {
-//                      Navigator.of(context).pushNamed(
-//                        EmergencyCallPage.routeName,
-//                        //arguments: {"group": "25", "title": "紧急呼叫"},
-//                        arguments: {"group": "25", "title": "紧急呼叫"},
-//                      );
-//                    },
-//                    isExtended: true,
-//                    icon: Icon(Icons.chat,size: 12,),
-//                    label: Text("紧急呼叫",style: TextStyle(fontSize: 12),),
-//                  ),
-//                );
-//              },
-//            ),
-//            floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-//            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
               bottomNavigationBar:
                   buildBottomNavigationBar(indexModel.currentIndex),
             ),

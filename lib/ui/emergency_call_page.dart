@@ -72,18 +72,6 @@ class _EmergencyCallPageState extends State<EmergencyCallPage> {
         _listViewController.animateTo(0,
             duration: Duration(seconds: 1), curve: Curves.ease);
       });
-      switch (message.type) {
-        case MessageType.TEXT:
-          break;
-        case MessageType.IMAGE:
-          break;
-        case MessageType.AUDIO:
-          break;
-        case MessageType.VIDEO:
-          break;
-        case MessageType.COMMAND:
-          break;
-      }
     });
     Api.getUserInfo().then((resp) {
       if (resp.success) {
@@ -655,3 +643,21 @@ class _EmergencyCallPageState extends State<EmergencyCallPage> {
     });
   }
 }
+
+
+
+class EmergencyCallPage2 extends StatefulWidget {
+  @override
+  _EmergencyCallPage2State createState() => _EmergencyCallPage2State();
+}
+
+class _EmergencyCallPage2State extends State<EmergencyCallPage2> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("紧急呼叫"),),
+
+    );
+  }
+}
+

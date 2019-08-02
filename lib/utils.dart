@@ -10,6 +10,7 @@ import 'model/district_model.dart';
 import 'model/main_index_model.dart';
 import 'model/service_chat_model.dart';
 import 'model/user_model.dart';
+import 'model/user_role_model.dart';
 import 'model/user_verify_status_model.dart';
 
 //List<Color> colors = [
@@ -530,7 +531,7 @@ Widget buildChatInputPart({
         child: IntrinsicHeight(
           child: Container(
             decoration: BoxDecoration(
-              color: disconnected ? Colors.grey[300] : Colors.grey[200],
+              color: disconnected ? Colors.grey[300] : Colors.transparent,
             ),
             padding: EdgeInsets.all(16),
             child: Row(
@@ -580,7 +581,8 @@ Widget buildChatInputPart({
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.all(0),
-                                      hintText: "说点什么",
+                                      hintText:
+                                          disconnected ? "等待用户中.." : "说点什么",
                                       isDense: false,
                                       alignLabelWithHint: true,
                                     ),
@@ -637,18 +639,21 @@ Widget buildChatInputPart({
       ),
       Visibility(
         visible: showEmoji,
-        child: Wrap(
-          children: faces.map((name) {
-            return InkWell(
-              onTap: () {
-                onSelectEmoji?.call("face" + name);
-              },
-              child: Container(
-                margin: EdgeInsets.all(ScreenUtil().setWidth(12)),
-                child: Image.asset("images/face/${faces.indexOf(name)}.gif"),
-              ),
-            );
-          }).toList(),
+        child: Container(
+          color: Colors.white,
+          child: Wrap(
+            children: faces.map((name) {
+              return InkWell(
+                onTap: () {
+                  onSelectEmoji?.call("face" + name);
+                },
+                child: Container(
+                  margin: EdgeInsets.all(ScreenUtil().setWidth(12)),
+                  child: Image.asset("images/face/${faces.indexOf(name)}.gif"),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       )
     ],
@@ -714,14 +719,14 @@ Widget _buildMessageBody(BuildContext context, ServiceChatMessage chatMessage,
       messageContent.endsWith("]")) {
     ///音频
     return _buildMessageWrapper(
-      context,
-      AudioMessageTile(
-        _getAudioUrl(messageContent),
-        0,
-      ),
-      chatMessage,
-      noDecoration: true,
-    );
+        context,
+        AudioMessageTile(
+          _getAudioUrl(messageContent),
+          0,
+        ),
+        chatMessage,
+        noDecoration: true,
+        self: self);
   }
   var allMatches = RegExp(r"face\[.*?\]").allMatches(messageContent);
   List<Widget> children = [];
@@ -759,6 +764,7 @@ Widget _buildMessageBody(BuildContext context, ServiceChatMessage chatMessage,
       ),
     ),
     chatMessage,
+    self: self,
   );
 }
 
@@ -805,13 +811,13 @@ Widget _buildMessageWrapper(
   bool noDecoration = false,
   bool self = true,
 }) {
-  var name = chatMessage.userName;
+  var name = chatMessage.nickName;
   if (name == null || name.isEmpty) {
     name = "未命名用户";
   }
   var nameTimeRow = <Widget>[
     SizedBox(
-      width: 18,
+      width: 10,
     ),
     Text(
       name,
@@ -823,25 +829,26 @@ Widget _buildMessageWrapper(
       ),
     ),
     SizedBox(
-      width: 3,
+      width: 2,
     ),
     Text(_getMessageSendTime(chatMessage.time)),
   ];
   return Column(
     mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: self ? MainAxisAlignment.end : MainAxisAlignment.start,
     crossAxisAlignment:
         self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
     children: <Widget>[
       Row(
-        children: self ? nameTimeRow.reversed.toList() : nameTimeRow,
+        children: self ? (nameTimeRow.reversed.toList()) : nameTimeRow,
       ),
       Container(
         margin: noDecoration
             ? null
-            : EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+            : EdgeInsets.symmetric(vertical: 4, horizontal: 6),
         padding: noDecoration
             ? null
-            : EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            : EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         constraints:
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
         decoration: noDecoration
@@ -875,7 +882,7 @@ Widget _buildMessageUserName(ServiceChatMessage chatMessage, {self = true}) {
     child: CircleAvatar(
       backgroundImage: NetworkImage(avatar),
       child:
-          noAvatar ? Text(chatMessage.userName.substring(0, 1)) : Container(),
+          noAvatar ? Text(chatMessage.nickName.substring(0, 1)) : Container(),
     ),
   );
 }
@@ -949,5 +956,25 @@ Container buildAvatar(
         ),
       ),
     ),
+  );
+}
+
+Consumer<UserRoleModel> buildRoleSwitchButton() {
+  return Consumer<UserRoleModel>(
+    builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
+      return roleModel.hasSwitch
+          ? FlatButton.icon(
+              icon: Icon(
+                Icons.repeat,
+                color: Colors.blue,
+              ),
+              onPressed: () {
+                roleModel.switchRole();
+                SystemSound.play(SystemSoundType.click);
+              },
+              label: Text("${roleModel.switchString}"),
+            )
+          : Container();
+    },
   );
 }

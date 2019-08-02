@@ -7,11 +7,12 @@ import 'package:ease_life/ui/setting_page.dart';
 import 'package:ease_life/ui/video_nineoneone_page.dart';
 import 'package:ease_life/ui/face_verify_hint_page.dart';
 import 'package:oktoast/oktoast.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'index.dart';
 import 'model/announcement_model.dart';
 import 'model/app_info_model.dart';
 import 'model/district_model.dart';
+import 'model/emergency_call_model.dart';
 import 'model/home_end_scroll_model.dart';
 import 'model/main_index_model.dart';
 import 'model/mediation_model.dart';
@@ -76,14 +77,31 @@ class MyApp extends StatelessWidget {
           ],
           child: MaterialApp(
             theme: defaultThemeData,
-//            supportedLocales: [
-//              const Locale.fromSubtags(languageCode: 'zh'), // generic Chinese 'zh'
-//              const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'), // generic simplified Chinese 'zh_Hans'
-//              const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'), // generic traditional Chinese 'zh_Hant'
-//              const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans', countryCode: 'CN'), // 'zh_Hans_CN'
-//              const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant', countryCode: 'TW'), // 'zh_Hant_TW'
-//              const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant', countryCode: 'HK'), // 'zh_Hant_HK'
-//            ],
+            supportedLocales: [
+              const Locale.fromSubtags(languageCode: 'zh'),
+              // generic Chinese 'zh'
+              const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+              // generic simplified Chinese 'zh_Hans'
+              const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+              // generic traditional Chinese 'zh_Hant'
+              const Locale.fromSubtags(
+                  languageCode: 'zh', scriptCode: 'Hans', countryCode: 'CN'),
+              // 'zh_Hans_CN'
+              const Locale.fromSubtags(
+                  languageCode: 'zh', scriptCode: 'Hant', countryCode: 'TW'),
+              // 'zh_Hant_TW'
+              const Locale.fromSubtags(
+                  languageCode: 'zh', scriptCode: 'Hant', countryCode: 'HK'),
+              // 'zh_Hant_HK'
+            ],
+            localizationsDelegates: [
+              // ... app-specific localization delegate[s] here
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            locale: const Locale.fromSubtags(languageCode: 'zh'),
             debugShowCheckedModeBanner: Configs.APP_DEBUG,
             onUnknownRoute: (settings) {
               return MaterialPageRoute(builder: (context) {
@@ -112,7 +130,17 @@ class MyApp extends StatelessWidget {
                   bloc: CameraBloc(),
                 );
               },
-              EmergencyCallPage.routeName: (_) => EmergencyCallPage(),
+              EmergencyCallPage.routeName: (_) =>
+                  ProxyProvider<UserModel, EmergencyCallModel>(
+                    child: EmergencyCallPage(),
+                    builder: (BuildContext context, UserModel value,
+                        EmergencyCallModel previous) {
+                      return previous..onUserModelReady();
+                    },
+                    initialBuilder: (context){
+                      return EmergencyCallModel();
+                    },
+                  ),
               SettingPage.routeName: (_) => SettingPage(),
               NotificationMessagePage.routeName: (_) =>
                   NotificationMessagePage(),

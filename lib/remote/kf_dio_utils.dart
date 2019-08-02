@@ -153,6 +153,9 @@ class KfDioUtil {
         .then((resp) {
       return resp.data;
     }).then((map) {
+      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+      String prettyprint = encoder.convert(map);
+      debugPrint(prettyprint);
       String status = map["status"];
       String text = map["text"];
       String token = map["token"];
@@ -733,4 +736,154 @@ class MediationRunningStatus {
   }
 }
 
+class OnlineChatUser {
+  int id;
+  String userId;
+  String clientId;
+  String userName;
+  String nickName;
+  String userAvatar;
+  String data;
+  String userIp;
+  String kfId;
+  int startTime;
+  int endTime;
+  String startDate;
+  String endDate;
+  int groupId;
+  String appId;
+  String districtId;
 
+  OnlineChatUser(
+      {this.id,
+        this.userId,
+        this.clientId,
+        this.userName,
+        this.nickName,
+        this.userAvatar,
+        this.data,
+        this.userIp,
+        this.kfId,
+        this.startTime,
+        this.endTime,
+        this.startDate,
+        this.endDate,
+        this.groupId,
+        this.appId,
+        this.districtId});
+
+  String get chatName{
+    if(nickName!=null && nickName.isNotEmpty){
+      return nickName;
+    }else{
+      return userName;
+    }
+  }
+
+
+  OnlineChatUser.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['user_id'];
+    clientId = json['client_id'];
+    userName = json['user_name'];
+    nickName = json['nick_name'];
+    userAvatar = json['user_avatar'];
+    data = json['data'];
+    userIp = json['user_ip'];
+    kfId = json['kf_id'];
+    startTime = json['start_time'];
+    endTime = json['end_time'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+    groupId = json['group_id'];
+    appId = json['app_id'];
+    districtId = json['district_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['user_id'] = this.userId;
+    data['client_id'] = this.clientId;
+    data['user_name'] = this.userName;
+    data['nick_name'] = this.nickName;
+    data['user_avatar'] = this.userAvatar;
+    data['data'] = this.data;
+    data['user_ip'] = this.userIp;
+    data['kf_id'] = this.kfId;
+    data['start_time'] = this.startTime;
+    data['end_time'] = this.endTime;
+    data['start_date'] = this.startDate;
+    data['end_date'] = this.endDate;
+    data['group_id'] = this.groupId;
+    data['app_id'] = this.appId;
+    data['district_id'] = this.districtId;
+    return data;
+  }
+}
+
+class PropertyEmergencyHistoryMessage {
+  int id;
+  String fromId;
+  String fromName;
+  String fromNickName;
+  String fromAvatar;
+  String toId;
+  String toName;
+  String toNickName;
+  String content;
+  String appId;
+  String districtId;
+  String timeLine;
+
+  String get senderNickName {
+    bool empty = fromNickName==null||fromNickName.isEmpty;
+    return empty?fromName:fromNickName;
+  }
+
+  PropertyEmergencyHistoryMessage(
+      {this.id,
+        this.fromId,
+        this.fromName,
+        this.fromNickName,
+        this.fromAvatar,
+        this.toId,
+        this.toName,
+        this.toNickName,
+        this.content,
+        this.appId,
+        this.districtId,
+        this.timeLine});
+
+  PropertyEmergencyHistoryMessage.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    fromId = json['from_id'];
+    fromName = json['from_name'];
+    fromNickName = json['from_nick_name'];
+    fromAvatar = json['from_avatar'];
+    toId = json['to_id'];
+    toName = json['to_name'];
+    toNickName = json['to_nick_name'];
+    content = json['content'];
+    appId = json['app_id'];
+    districtId = json['district_id'];
+    timeLine = json['time_line'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['from_id'] = this.fromId;
+    data['from_name'] = this.fromName;
+    data['from_nick_name'] = this.fromNickName;
+    data['from_avatar'] = this.fromAvatar;
+    data['to_id'] = this.toId;
+    data['to_name'] = this.toName;
+    data['to_nick_name'] = this.toNickName;
+    data['content'] = this.content;
+    data['app_id'] = this.appId;
+    data['district_id'] = this.districtId;
+    data['time_line'] = this.timeLine;
+    return data;
+  }
+}
