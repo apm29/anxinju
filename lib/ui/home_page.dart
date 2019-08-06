@@ -475,10 +475,17 @@ class HomePage extends StatelessWidget {
               ),
               FlatButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed(
-                    EmergencyCallPage.routeName,
-                    //arguments: {"group": "25", "title": "紧急呼叫"},
-                    arguments: {"group": "25", "title": "紧急呼叫"},
+//                  Navigator.of(context).pushReplacementNamed(
+//                    EmergencyCallPage.routeName,
+//                    //arguments: {"group": "25", "title": "紧急呼叫"},
+//                    arguments: {"group": "25", "title": "紧急呼叫"},
+//                  );
+                  Navigator.of(context).pushReplacement(
+                    new MaterialPageRoute(
+                      builder: (context) {
+                        return EmergencyCallPage2("25", "紧急呼叫");
+                      },
+                    ),
                   );
                 },
                 child: Text("确认使用"),

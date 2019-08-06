@@ -399,7 +399,11 @@ class _WebViewExampleState extends State<WebViewExample> {
                 }),
             actions: <Widget>[
 //          NavigationControls(_controller.future),
-              DistrictInfoButton(),
+              DistrictInfoButton(
+                onDistrictSelected: (){
+                  controller.reload();
+                },
+              ),
               Consumer<WebModel>(
                 builder: (BuildContext context, WebModel value, Widget child) {
                   return value.hasCloseButton

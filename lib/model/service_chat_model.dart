@@ -153,7 +153,7 @@ class ServiceChatModel extends ChangeNotifier {
       _chatSelf = ChatUser(
         userId,
         userAvatar,
-        userName,
+        nickName,
       );
 
       print('Connected to ${Configs.KF_EMERGENCY_WS_URL}');
@@ -189,7 +189,7 @@ class ServiceChatModel extends ChangeNotifier {
             (onlineChatUser) => ChatUser(
               onlineChatUser.userId,
               onlineChatUser.userAvatar,
-              onlineChatUser.chatName,
+              onlineChatUser.nickName,
             ),
           )
           .toList();
@@ -255,6 +255,11 @@ class ServiceChatModel extends ChangeNotifier {
             return user.userId == dataMap['data']['id'];
           });
 
+          _messages.removeWhere((message) {
+            return message.receiverId == dataMap['data']['id'] ||
+                message.senderId == dataMap['data']['id'];
+          });
+
           if (_currentChatUsers.length > 0)
             currentChatUser = _currentChatUsers.first;
           break;
@@ -264,18 +269,19 @@ class ServiceChatModel extends ChangeNotifier {
             ChatUser(
               message['id'],
               message['avatar'],
-              message['name'],
+              message['nick_name'],
             ),
           );
           print('add user:$add');
           var userId2 = currentChatUser?.userId;
           var message2 = message['id'];
+          print('${message['nick_name']}');
           _messages.insert(
             0,
             ServiceChatMessage(
               senderId: message['id'],
               receiverId: _chatSelf.userId,
-              nickName: message['name'],
+              nickName: message['nick_name'],
               userAvatar: message['avatar'],
               time: message['time'],
               content: message['content'],
@@ -319,11 +325,11 @@ class ServiceChatModel extends ChangeNotifier {
   Map<String, HistoryConfig> _historyConfigMap = {};
 
   Future loadHistory(String userId, var districtId) async {
-    var noMoreHistory = _historyConfigMap[userId].noMoreHistory;
     var page = _historyConfigMap[userId].page;
     var pageNum = _historyConfigMap[userId].pageNum;
-    if (_historyConfigMap[userId].loadingHistory || noMoreHistory) {
-      return null;
+    if (_historyConfigMap[userId].loadingHistory ||
+        _historyConfigMap[userId].noMoreHistory) {
+      return;
     }
     _historyConfigMap[userId].loadingHistory = true;
     var kfBaseResp = await ApiKf.propertyEmergencyHistoryMessagesQuery(
@@ -334,7 +340,7 @@ class ServiceChatModel extends ChangeNotifier {
       pageNum,
     );
     if (kfBaseResp.success) {
-      var list = kfBaseResp.data.map((PropertyEmergencyHistoryMessage message) {
+      var list = kfBaseResp.data.map((EmergencyHistoryMessage message) {
         return ServiceChatMessage(
           nickName: message.senderNickName,
           userAvatar: message.fromAvatar,
@@ -346,15 +352,18 @@ class ServiceChatModel extends ChangeNotifier {
         );
       }).toList();
       _messages.addAll(list.reversed);
+      print(
+          'http://axjkftest.ciih.net/admin/custRoomApi/getChatLog ====> \n count : ${_messages.length}');
       if (list.length < pageNum) {
-        noMoreHistory = true;
+        _historyConfigMap[userId].noMoreHistory = true;
       }
       _historyConfigMap[userId].increase();
     } else {
       showToast("获取历史消息失败:${kfBaseResp.text}");
     }
     _historyConfigMap[userId].loadingHistory = false;
-    return notifyListeners();
+    notifyListeners();
+    return;
   }
 }
 

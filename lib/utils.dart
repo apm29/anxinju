@@ -801,7 +801,8 @@ String _getMessageSendTime(String timeStr) {
 }
 
 bool isToday(DateTime time) {
-  return time.difference(DateTime.now()).inDays < 1;
+  //return time.difference(DateTime.now()).inDays < 1;
+  return false;
 }
 
 Widget _buildMessageWrapper(

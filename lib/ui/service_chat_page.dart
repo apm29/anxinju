@@ -349,6 +349,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     };
     model.sendData(json.encode(map));
     model.addMessage(message);
+    model.inputText = false;
   }
 
   _buildConnectedChatUsers(ServiceChatModel serviceChatModel) {

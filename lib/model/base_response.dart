@@ -74,19 +74,26 @@ class UserInfoWrapper {
 class UserInfo {
   String userId;
   String userName;
+  String nickName;
   String mobile;
   int isCertification;
 
-  UserInfo({this.userId, this.userName, this.mobile, this.isCertification});
+  UserInfo(
+      {this.userId,
+      this.userName,
+      this.nickName,
+      this.mobile,
+      this.isCertification});
 
   @override
   String toString() {
-    return '{"userId": "$userId", "userName": "$userName", "mobile": "$mobile", "isCertification": $isCertification}';
+    return '{"userId": "$userId", "userName": "$userName", "mobile": "$mobile", "isCertification": $isCertification,"nickName":"$nickName"}';
   }
 
   UserInfo.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     userName = json['userName'];
+    nickName = json['nickName'];
     mobile = json['mobile'];
     isCertification = json['isCertification'];
   }
@@ -95,6 +102,7 @@ class UserInfo {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['userId'] = this.userId;
     data['userName'] = this.userName;
+    data['nickName'] = this.nickName;
     data['mobile'] = this.mobile;
     data['isCertification'] = this.isCertification;
     return data;
@@ -167,7 +175,6 @@ class Index {
   String area;
   List<MenuItem> menu;
   int versionUpdateStamp;
-
 
   @override
   String toString() {

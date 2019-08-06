@@ -13,7 +13,10 @@ import '../../utils.dart';
 typedef DistrictCallback = void Function(DistrictDetail);
 
 class DistrictInfoButton extends StatefulWidget {
-  const DistrictInfoButton({Key key}) : super(key: key);
+  final VoidCallback onDistrictSelected;
+
+  const DistrictInfoButton({Key key, this.onDistrictSelected})
+      : super(key: key);
 
   @override
   _DistrictInfoButtonState createState() => _DistrictInfoButtonState();
@@ -30,10 +33,11 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
     return Consumer<DistrictModel>(
       builder: (BuildContext context, DistrictModel value, Widget child) {
         final bool isLogin = UserModel.of(context).isLogin;
-        final UserRoleModel roleModel = UserRoleModel.of(context,listen: true);
-        final UserVerifyStatusModel verifyStatusModel = UserVerifyStatusModel.of(context);
-        final bool isVerified = verifyStatusModel.isVerified() ||
-            (roleModel.isOnPropertyDuty);
+        final UserRoleModel roleModel = UserRoleModel.of(context, listen: true);
+        final UserVerifyStatusModel verifyStatusModel =
+            UserVerifyStatusModel.of(context);
+        final bool isVerified =
+            verifyStatusModel.isVerified() || (roleModel.isOnPropertyDuty);
         final String verifyText = verifyStatusModel.getVerifyText();
         final String textString = isLogin
             ? isVerified ? value.getCurrentDistrictName() : verifyText
@@ -43,7 +47,11 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
               !isLogin
                   ? toLogin()
                   : isVerified
-                      ? showDistrictMenu(context)
+                      ? showDistrictMenu(context).then((_) {
+                          if (widget.onDistrictSelected != null) {
+                            widget.onDistrictSelected();
+                          }
+                        })
                       : showFaceVerifyDialog(context);
               SystemSound.play(SystemSoundType.click);
             },
@@ -56,8 +64,8 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
     );
   }
 
-  void showDistrictMenu(BuildContext parentContext) {
-    showModalBottomSheet(
+  Future showDistrictMenu(BuildContext parentContext) async {
+    return showModalBottomSheet(
       context: parentContext,
       isScrollControlled: true,
       builder: (context) {

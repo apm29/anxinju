@@ -545,6 +545,7 @@ class ApiKf {
     String cAppId,
     String acceptUserName,
     String acceptUserId,
+    String nickName,
     String title,
     String description,
     String address,
@@ -559,8 +560,10 @@ class ApiKf {
         "district_id": districtId,
         "accept_user_name": acceptUserName,
         "accept_user_id": acceptUserId,
+        "accept_nick_name": nickName,
         "cAppId": cAppId,
         "title": title,
+
         "description": description,
         "address": address,
         "images": images,
@@ -641,18 +644,21 @@ class ApiKf {
     );
   }
 
-
-  static Future<KFBaseResp<List<PropertyEmergencyHistoryMessage>>> propertyEmergencyHistoryMessagesQuery(
+  static Future<KFBaseResp<List<EmergencyHistoryMessage>>>
+      propertyEmergencyHistoryMessagesQuery(
     int districtId,
     String cAppId,
     String userId,
-      int page, int pageNum,
+    int page,
+    int pageNum,
   ) async {
     return KfDioUtil().post(
       "/admin/custRoomApi/getChatLog",
       processor: (s) {
         if (s is List) {
-          return s.map((json) => PropertyEmergencyHistoryMessage.fromJson(json)).toList();
+          return s
+              .map((json) => EmergencyHistoryMessage.fromJson(json))
+              .toList();
         } else {
           return [];
         }
@@ -661,6 +667,36 @@ class ApiKf {
         "district_id": districtId,
         "cAppId": cAppId,
         "user_id": userId,
+        "page": page,
+        "pagenum": pageNum,
+      },
+    );
+  }
+
+  static Future<KFBaseResp<List<EmergencyHistoryMessage>>>
+      userEmergencyCallHistoryMessage(
+    int districtId,
+    String cAppId,
+    String kfUserId,
+    int page,
+    int pageNum,
+  ) async {
+    return KfDioUtil().post(
+      "/admin/custRoomApi/getChatLogCust",
+      processor: (s) {
+        print(s);
+        if (s is List) {
+          return s
+              .map((json) => EmergencyHistoryMessage.fromJson(json))
+              .toList();
+        } else {
+          return [];
+        }
+      },
+      formData: {
+        "district_id": districtId,
+        "cAppId": cAppId,
+        "user_id": kfUserId,
         "page": page,
         "pagenum": pageNum,
       },

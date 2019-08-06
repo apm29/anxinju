@@ -153,9 +153,9 @@ class KfDioUtil {
         .then((resp) {
       return resp.data;
     }).then((map) {
-      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
-      String prettyprint = encoder.convert(map);
-      debugPrint(prettyprint);
+//      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+//      String prettyprint = encoder.convert(map);
+//      debugPrint(prettyprint);
       String status = map["status"];
       String text = map["text"];
       String token = map["token"];
@@ -425,6 +425,7 @@ class MediationMessage {
   int id;
   String userId;
   String userName;
+  String nickName;
   String districtId;
   String appId;
   String content;
@@ -447,6 +448,7 @@ class MediationMessage {
     id = json['id'];
     userId = json['user_id'];
     userName = json['user_name'];
+    nickName = json['nick_name'];
     districtId = json['district_id'];
     appId = json['app_id'];
     content = json['content'];
@@ -460,6 +462,7 @@ class MediationMessage {
     data['id'] = this.id;
     data['user_id'] = this.userId;
     data['user_name'] = this.userName;
+    data['nick_name'] = this.nickName;
     data['district_id'] = this.districtId;
     data['app_id'] = this.appId;
     data['content'] = this.content;
@@ -477,6 +480,7 @@ class MediationMessage {
       data: Data(
         userId: userId,
         userName: userName,
+        nickName: nickName,
         chatroomId: chatRoomId,
         content: content,
         avatar: avatar,
@@ -523,8 +527,10 @@ class MediationApplyPageData {
 class MediationApply {
   int id;
   String applyUserName;
+  String applyNickName;
   String applyUserId;
   String acceptUserName;
+  String acceptNickName;
   String acceptUserId;
   String title;
   List<String> images;
@@ -546,8 +552,10 @@ class MediationApply {
   MediationApply(
       {this.id,
         this.applyUserName,
+        this.applyNickName,
         this.applyUserId,
         this.acceptUserName,
+        this.acceptNickName,
         this.acceptUserId,
         this.title,
         this.images,
@@ -565,8 +573,10 @@ class MediationApply {
   MediationApply.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     applyUserName = json['apply_user_name'];
+    applyNickName = json['apply_nick_name'];
     applyUserId = json['apply_user_id'];
     acceptUserName = json['accept_user_name'];
+    acceptNickName = json['accept_nick_name'];
     acceptUserId = json['accept_user_id'];
     title = json['title'];
     if (json['images'] != null) {
@@ -635,8 +645,10 @@ class MediationApply {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['apply_user_name'] = this.applyUserName;
+    data['apply_nick_name'] = this.applyNickName;
     data['apply_user_id'] = this.applyUserId;
     data['accept_user_name'] = this.acceptUserName;
+    data['accept_nick_name'] = this.acceptNickName;
     data['accept_user_id'] = this.acceptUserId;
     data['title'] = this.title;
     if (this.images != null) {
@@ -822,7 +834,7 @@ class OnlineChatUser {
   }
 }
 
-class PropertyEmergencyHistoryMessage {
+class EmergencyHistoryMessage {
   int id;
   String fromId;
   String fromName;
@@ -841,7 +853,7 @@ class PropertyEmergencyHistoryMessage {
     return empty?fromName:fromNickName;
   }
 
-  PropertyEmergencyHistoryMessage(
+  EmergencyHistoryMessage(
       {this.id,
         this.fromId,
         this.fromName,
@@ -855,7 +867,7 @@ class PropertyEmergencyHistoryMessage {
         this.districtId,
         this.timeLine});
 
-  PropertyEmergencyHistoryMessage.fromJson(Map<String, dynamic> json) {
+  EmergencyHistoryMessage.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     fromId = json['from_id'];
     fromName = json['from_name'];

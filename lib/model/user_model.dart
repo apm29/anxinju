@@ -21,7 +21,7 @@ class UserModel extends ChangeNotifier {
   String get userId => _userInfo?.userId;
 
   String get userName => _userInfo?.userName;
-
+  String get userAvatar => _userDetail?.avatar;
   UserDetail _userDetail;
 
   UserDetail get userDetail => _userDetail;
@@ -90,10 +90,14 @@ class UserModel extends ChangeNotifier {
   void tryLoginWithLocalToken() {
     var userInfoStr = userSp.getString(KEY_USER_INFO);
     var token = userSp.getString(KEY_TOKEN);
-    Map<String, dynamic> map =
-        userInfoStr == null ? null : json.decode(userInfoStr);
-    UserInfo userInfo = map == null ? null : UserInfo.fromJson(map);
-    login(userInfo, token, null);
+    try {
+      Map<String, dynamic> map =
+              userInfoStr == null ? null : json.decode(userInfoStr);
+      UserInfo userInfo = map == null ? null : UserInfo.fromJson(map);
+      login(userInfo, token, null);
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override

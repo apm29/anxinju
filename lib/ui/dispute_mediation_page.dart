@@ -38,9 +38,10 @@ class DisputeMediationPage extends StatefulWidget {
 class ChatUser {
   String userId;
   String userName;
+  String nickName;
   String userAvatar;
 
-  ChatUser({@required this.userId, @required this.userName, this.userAvatar});
+  ChatUser({@required this.userId, @required this.userName, this.userAvatar,@required this.nickName});
 
   @override
   bool operator ==(Object other) =>
@@ -212,6 +213,7 @@ class DisputeMediationModel extends ChangeNotifier {
             ChatUser(
               userId: chatMessage.data.userId,
               userName: chatMessage.data.userName,
+              nickName: chatMessage.data.nickName,
             ),
           );
           break;
@@ -221,6 +223,7 @@ class DisputeMediationModel extends ChangeNotifier {
             ChatUser(
               userId: chatMessage.data.userId,
               userName: chatMessage.data.userName,
+              nickName: chatMessage.data.nickName,
             ),
           );
 
@@ -400,15 +403,15 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
         ChatRoomPageStatusModel.of(context).closeEmoji();
       }
     });
-
-    _subject = Observable.periodic(Duration(seconds: 5)).listen((_) {
-      ApiKf.mediationChatRoomQuery(widget.chatRoomId, Configs.KF_APP_ID)
-          .then((resp) {
-        if (resp.success && resp.data.isfinish == "1") {
-          Navigator.of(context).pop();
-        }
+    if (!widget.isFinished)
+      _subject = Observable.periodic(Duration(seconds: 5)).listen((_) {
+        ApiKf.mediationChatRoomQuery(widget.chatRoomId, Configs.KF_APP_ID)
+            .then((resp) {
+          if (resp.success && resp.data.isfinish == "1") {
+            Navigator.of(context).pop();
+          }
+        });
       });
-    });
   }
 
   @override
@@ -438,6 +441,8 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
                   currentUser: ChatUser(
                     userId: userModel.userId,
                     userName: userModel.userName,
+                    userAvatar: userModel.userAvatar,
+                    nickName: userModel.userDetail.nickName,
                   ),
                 );
               },
@@ -630,7 +635,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
             flex: 100,
             child: Container(),
           ),
-          _buildMessageBody(chatMessage),
+          _buildMessageBody(chatMessage, self),
           _buildMessageUserName(chatMessage),
         ];
         //消息
@@ -651,7 +656,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
     return Text("$chatMessage");
   }
 
-  Widget _buildMessageBody(ChatMessage chatMessage) {
+  Widget _buildMessageBody(ChatMessage chatMessage, bool self) {
     var messageContent = chatMessage.data.content;
     if (messageContent.startsWith("img[") && messageContent.endsWith("]")) {
       ///图片
@@ -684,6 +689,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
           ),
         ),
         chatMessage,
+        self,
       );
     } else if (messageContent.startsWith("audio[") &&
         messageContent.endsWith("]")) {
@@ -694,6 +700,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
           chatMessage.data.duration,
         ),
         chatMessage,
+        self,
         noDecoration: true,
       );
     }
@@ -732,6 +739,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
         ),
       ),
       chatMessage,
+      self,
     );
   }
 
@@ -766,19 +774,38 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
     return time.difference(DateTime.now()).inDays < 1;
   }
 
-  Widget _buildMessageWrapper(Widget messageContent, ChatMessage chatMessage,
+  Widget _buildMessageWrapper(
+      Widget messageContent, ChatMessage chatMessage, bool self,
       {bool noDecoration = false}) {
+    var timeAndName = <Widget>[
+      Text(_getMessageSendTime(chatMessage.data.time)),
+      SizedBox(
+        width: 16,
+      ),
+      Text('${chatMessage.data.nickName}'),
+    ];
+    if (!self) {
+      timeAndName = timeAndName.reversed.toList();
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
+      //mainAxisAlignment: self ? MainAxisAlignment.end : MainAxisAlignment.start,
+      crossAxisAlignment:
+          self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: <Widget>[
-        Text(_getMessageSendTime(chatMessage.data.time)),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: timeAndName,
+          ),
+        ),
         Container(
           margin: noDecoration
               ? null
-              : EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              : EdgeInsets.symmetric(vertical: 3, horizontal: 12),
           padding: noDecoration
               ? null
-              : EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              : EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           constraints:
               BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
           decoration: noDecoration
@@ -795,22 +822,18 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
   }
 
   Container _buildMessageUserName(ChatMessage chatMessage) {
-    var name = chatMessage.data.userName;
-    if (name == null || name.isEmpty) {
-      name = "未命名用户";
-    }
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.grey[200],
       ),
-      padding: EdgeInsets.all(6),
-      child: Text(
-        name,
-        style: TextStyle(fontWeight: FontWeight.w600, shadows: [
-          Shadow(color: Colors.grey, offset: Offset(1, 1), blurRadius: 1)
-        ]),
-      ),
+      constraints: BoxConstraints(minWidth: 36),
+      padding: EdgeInsets.all(2),
+      child: chatMessage.data.avatar == null
+          ? Container()
+          : CircleAvatar(
+              backgroundImage: NetworkImage(chatMessage.data.avatar),
+            ),
     );
   }
 
@@ -841,6 +864,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
     var mediationModel = DisputeMediationModel.of(context);
     ChatMessage chatMessage = ChatMessage.text(_inputController.text,
         mediationModel.currentUser, mediationModel.config);
+    print('$chatMessage');
     _sendFutureMessage(context, chatMessage);
     _inputController.clear();
   }
@@ -935,6 +959,8 @@ class ChatMessage {
     this.data = Data(
       userId: user.userId,
       userName: user.userName,
+      nickName: user.nickName,
+      avatar: user.userAvatar,
       chatroomId: config.chatRoomId,
       content: content,
       time: DateTime.now().toIso8601String(),
@@ -948,7 +974,9 @@ class ChatMessage {
     this.data = Data(
       userId: user.userId,
       userName: user.userName,
+      nickName: user.nickName,
       chatroomId: config.chatRoomId,
+      avatar: user.userAvatar,
       content: "img[$content]",
       time: DateTime.now().toIso8601String(),
     );
@@ -962,7 +990,9 @@ class ChatMessage {
     this.data = Data(
         userId: user.userId,
         userName: user.userName,
+        nickName: user.nickName,
         chatroomId: config.chatRoomId,
+        avatar: user.userAvatar,
         content: "audio[$content]",
         time: DateTime.now().toIso8601String(),
         duration: duration);
@@ -973,6 +1003,7 @@ class Data {
   ///command
   String userId;
   String userName;
+  String nickName;
   String title;
   String chatroomId;
 
@@ -991,11 +1022,13 @@ class Data {
     this.avatar,
     this.time,
     this.duration,
+    this.nickName
   });
 
   Data.fromJson(Map<String, dynamic> json) {
     userId = json['user_id'] ?? json['id'].toString();
     userName = json['user_name'] ?? json['name'].toString();
+    nickName = json['nick_name'];
     title = json['title'].toString();
     chatroomId = json['chatroom_id'].toString();
 
@@ -1012,6 +1045,7 @@ class Data {
     data['id'] = this.userId;
     data['name'] = this.userName;
     data['user_name'] = this.userName;
+    data['nick_name'] = this.nickName;
     data['title'] = this.title;
     data['chatroom_id'] = this.chatroomId;
 
@@ -1024,6 +1058,8 @@ class Data {
 
   @override
   String toString() {
-    return 'Data{userId: $userId, userName: $userName, title: $title, chatroomId: $chatroomId, avatar: $avatar, content: $content, time: $time, duration: $duration}';
+    return 'Data{userId: $userId, userName: $userName, nickName: $nickName, title: $title, chatroomId: $chatroomId, avatar: $avatar, content: $content, time: $time, duration: $duration}';
   }
+
+
 }

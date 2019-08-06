@@ -113,7 +113,7 @@ class Msg {
 
 enum MessageType { TEXT, IMAGE, AUDIO, VIDEO, COMMAND }
 
-class WSMessage {
+class EmergencyCallMessage {
   String content;
   MessageType type;
   ConnectStatus status;
@@ -129,7 +129,7 @@ class WSMessage {
   String group;
   int sendTime;
 
-  WSMessage(this.content,
+  EmergencyCallMessage(this.content,
       {this.type = MessageType.TEXT,
       this.status,
       this.duration,
@@ -154,7 +154,7 @@ class WebSocketManager {
   StreamSubscription beatStreamSubscription;
 
   WebSocketManager(dynamic group, BuildContext context) {
-    _commandController.add(WSMessage("初始化聊天室",
+    _commandController.add(EmergencyCallMessage("初始化聊天室",
         type: MessageType.COMMAND, status: ConnectStatus.WAIT));
     //连接websocket
     try {
@@ -214,12 +214,12 @@ class WebSocketManager {
 
   ///发送连接失败信息
   void _sendDisconnectedCommand(String message) {
-    return _commandController.add(WSMessage(message,
+    return _commandController.add(EmergencyCallMessage(message,
         type: MessageType.COMMAND, status: ConnectStatus.DISCONNECTED));
   }
 
   void _sendReconnectedCommand(String message) {
-    return _commandController.add(WSMessage(message,
+    return _commandController.add(EmergencyCallMessage(message,
         type: MessageType.COMMAND, status: ConnectStatus.WAIT));
   }
 
@@ -244,7 +244,7 @@ class WebSocketManager {
           config.kfName = response.data.kfName;
           connectStatus = ConnectStatus.CONNECTED;
           print(' ---config--- $config');
-          _commandController.add(WSMessage("${response.toString()}",
+          _commandController.add(EmergencyCallMessage("${response.toString()}",
               type: MessageType.COMMAND,
               status: ConnectStatus.CONNECTED,
               fromName: response.data.kfName,
@@ -268,7 +268,7 @@ class WebSocketManager {
               rawContent.endsWith("]")) {
             messageType = MessageType.IMAGE;
           }
-          var message = WSMessage(
+          var message = EmergencyCallMessage(
             "${response.data.msg.content}",
             type: messageType,
             status: ConnectStatus.CONNECTED,
@@ -295,7 +295,7 @@ class WebSocketManager {
   }
 
   ///发送一个消息
-  Future<bool> sendMessage(WSMessage message) async {
+  Future<bool> sendMessage(EmergencyCallMessage message) async {
     String data = "";
     bool success = false;
     if (message.type == MessageType.TEXT) {
@@ -329,12 +329,14 @@ class WebSocketManager {
     return success;
   }
 
-  BehaviorSubject<WSMessage> _commandController = BehaviorSubject();
-  BehaviorSubject<WSMessage> _messageController = BehaviorSubject();
+  BehaviorSubject<EmergencyCallMessage> _commandController = BehaviorSubject();
+  BehaviorSubject<EmergencyCallMessage> _messageController = BehaviorSubject();
 
-  Observable<WSMessage> get commandMessageStream => _commandController.stream;
+  Observable<EmergencyCallMessage> get commandMessageStream =>
+      _commandController.stream;
 
-  Observable<WSMessage> get messageStream => _messageController.stream;
+  Observable<EmergencyCallMessage> get messageStream =>
+      _messageController.stream;
 
   ///登出
   void dispose() {

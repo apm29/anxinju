@@ -31,6 +31,8 @@ void main() async {
   await AMap.init(Configs.AMapKey);
   //相机初始化
   cameras = await availableCameras();
+  if(Platform.isAndroid)
+  await FlutterBugly.init( androidAppId: "89b908154e",);
   FlutterBugly.postCatchedException(() {
     runApp(MyApp());
   });
@@ -130,17 +132,17 @@ class MyApp extends StatelessWidget {
                   bloc: CameraBloc(),
                 );
               },
-              EmergencyCallPage.routeName: (_) =>
-                  ProxyProvider<UserModel, EmergencyCallModel>(
-                    child: EmergencyCallPage(),
-                    builder: (BuildContext context, UserModel value,
-                        EmergencyCallModel previous) {
-                      return previous..onUserModelReady();
-                    },
-                    initialBuilder: (context){
-                      return EmergencyCallModel();
-                    },
-                  ),
+//              EmergencyCallPage.routeName: (_) =>
+//                  ProxyProvider<UserModel, EmergencyCallModel>(
+//                    child: EmergencyCallPage(),
+//                    builder: (BuildContext context, UserModel value,
+//                        EmergencyCallModel previous) {
+//                      return previous..onUserModelReady();
+//                    },
+//                    initialBuilder: (context){
+//                      return EmergencyCallModel();
+//                    },
+//                  ),
               SettingPage.routeName: (_) => SettingPage(),
               NotificationMessagePage.routeName: (_) =>
                   NotificationMessagePage(),

@@ -59,7 +59,8 @@ class _MediationListPageState extends State<MediationListPage>
             ],
             elevation: 4,
             forceElevated: true,
-            floating: true,
+            floating: false,
+            pinned: true,
             bottom: TabBar(
               controller: _tabController,
               indicatorColor: Colors.deepOrangeAccent,
@@ -161,7 +162,7 @@ class _MediationListPageState extends State<MediationListPage>
         ? "未提交描述信息"
         : data.description;
 
-    var time = dateFormat.format(
+    var startTime = dateFormat.format(
         DateTime.fromMillisecondsSinceEpoch(int.parse(data.startTime) * 1000));
     return Container(
       margin: EdgeInsets.all(4),
@@ -177,9 +178,11 @@ class _MediationListPageState extends State<MediationListPage>
                 isFinished: data.mediationFinished,
                 title: title,
               );
-            })).then((_){
-              MediationHistoryModel.of(context).getHistoryMediation(context, true);
-              MediationRunningModel.of(context).getRunningMediation(context, true);
+            })).then((_) {
+              MediationHistoryModel.of(context)
+                  .getHistoryMediation(context, true);
+              MediationRunningModel.of(context)
+                  .getRunningMediation(context, true);
             });
           },
           child: ListTile(
@@ -198,7 +201,9 @@ class _MediationListPageState extends State<MediationListPage>
               ),
             ),
             subtitle: Text(
-              "开始时间:$time",
+              data.mediationFinished
+                  ? "结束时间:${dateFormat.format(DateTime.fromMillisecondsSinceEpoch(int.parse(data.endTime) * 1000))}"
+                  : "开始时间:$startTime",
               style: Theme.of(context).textTheme.caption,
             ),
             contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
@@ -335,7 +340,7 @@ class _MediationListPageState extends State<MediationListPage>
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Text("申请人: "),
-                          Text(data.applyUserName),
+                          Text("${data.applyNickName}"),
                           Expanded(child: Container()),
                         ],
                       ),
@@ -359,7 +364,7 @@ class _MediationListPageState extends State<MediationListPage>
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Text("受理人: "),
-                          Text(data.acceptUserName),
+                          Text("${data.acceptNickName}"),
                           Expanded(child: Container()),
                         ],
                       ),
@@ -1162,6 +1167,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                         ChatGroupConfig.APP_ID,
                         value.currentMediator.userName,
                         value.currentMediator.userId,
+                        value.currentMediator.nickName,
                         _titleController.text,
                         _descController.text,
                         value.currentHouse.addr,
@@ -1235,7 +1241,7 @@ class ApplyStepperWidget extends StatelessWidget {
         isActive: true,
       ),
       Step(
-        title: Text(userCurrentStep <= 2?"申请通过,开始调解":"调解纠纷"),
+        title: Text(userCurrentStep <= 2 ? "申请通过,开始调解" : "调解纠纷"),
         subtitle: Text("申请通过后,\n调解各方将在调解聊天室开始调解"),
         content: Icon(Icons.check),
         state: StepState.indexed,
@@ -1253,8 +1259,7 @@ class ApplyStepperWidget extends StatelessWidget {
             children: <Widget>[
               Container(
                 constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.5
-                ),
+                    maxWidth: MediaQuery.of(context).size.width * 0.5),
                 child: Text(
                   "调解人员:   ${model.chatUser}",
                   maxLines: 100,
