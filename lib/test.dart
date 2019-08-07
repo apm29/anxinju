@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:intl/intl.dart';
+
 void main() async {
 //  File file = File("yjw.jpg");
 //  if(! await file.exists()){
@@ -19,9 +21,14 @@ void main() async {
 //  //  print('${resp.data.toString()}');
 //  //});
 
-  getRange(1, 2).forEach(print);
-  print('---');
-  getStreamInt(1, 10).listen(print);
+  var str = "2019-07-28 11:28:08";
+  var dateTime = DateTime.parse(str);
+  var now = DateTime.now();
+  var inDays = dateTime.difference(now).inDays;
+  print(inDays.abs());
+//  getRange(1, 2).forEach(print);
+//  print('---');
+//  getStreamInt(1, 10).listen(print);
 }
 
 Future<String> getImageBase64(File file) async {

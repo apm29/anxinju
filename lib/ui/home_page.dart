@@ -162,13 +162,15 @@ class HomePage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  EaseIconButton(
-                    onPressed: () {
-                      _go911(context);
-                    },
-                    iconData: Icons.video_call,
-                    buttonLabel: "视频报警",
-                  ),
+                  Platform.isIOS
+                      ? Container()
+                      : EaseIconButton(
+                          onPressed: () {
+                            _go911(context);
+                          },
+                          iconData: Icons.video_call,
+                          buttonLabel: "视频报警",
+                        ),
                   Consumer2<UserRoleModel, UserModel>(
                     builder: (BuildContext context, UserRoleModel userRoleModel,
                         UserModel userModel, Widget child) {
@@ -332,6 +334,8 @@ class HomePage extends StatelessWidget {
                     indexId: WebIndexID.JING_WU_CHA_XUN,
                     checkIsFaceVerified: false,
                   ),
+                  Platform.isIOS
+                      ? Container():
                   const HomeChip(
                     title: "巡更管理",
                     indexId: WebIndexID.XUN_GENG_GUAN_LI,

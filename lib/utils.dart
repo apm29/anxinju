@@ -10,6 +10,7 @@ import 'model/district_model.dart';
 import 'model/main_index_model.dart';
 import 'model/service_chat_model.dart';
 import 'model/user_model.dart';
+import 'dart:math';
 import 'model/user_role_model.dart';
 import 'model/user_verify_status_model.dart';
 
@@ -581,8 +582,7 @@ Widget buildChatInputPart({
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.all(0),
-                                      hintText:
-                                          disconnected ? "等待用户中.." : "说点什么",
+                                      hintText: disconnected ? "等待中.." : "说点什么",
                                       isDense: false,
                                       alignLabelWithHint: true,
                                     ),
@@ -801,8 +801,8 @@ String _getMessageSendTime(String timeStr) {
 }
 
 bool isToday(DateTime time) {
-  //return time.difference(DateTime.now()).inDays < 1;
-  return false;
+  return (time.difference(DateTime.now()).inDays.abs()) < 1;
+  //return false;
 }
 
 Widget _buildMessageWrapper(
@@ -840,8 +840,11 @@ Widget _buildMessageWrapper(
     crossAxisAlignment:
         self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
     children: <Widget>[
-      Row(
-        children: self ? (nameTimeRow.reversed.toList()) : nameTimeRow,
+      DefaultTextStyle(
+        style: Theme.of(context).textTheme.caption,
+        child: Row(
+          children: self ? (nameTimeRow.reversed.toList()) : nameTimeRow,
+        ),
       ),
       Container(
         margin: noDecoration

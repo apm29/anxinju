@@ -523,7 +523,7 @@ class _MediationListPageState extends State<MediationListPage>
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             GradientButton(
-              Text("追加描述"),
+              Text("追加描述",style: TextStyle(fontSize: 12),),
               onPressed: () async {
                 _doAddApply(context, id: data.id, showDetail: false)
                     .then((back) {
@@ -537,7 +537,7 @@ class _MediationListPageState extends State<MediationListPage>
               width: 12,
             ),
             GradientButton(
-              Text("查看详情"),
+              Text("查看详情",style: TextStyle(fontSize: 12),),
               onPressed: () async {
                 _doAddApply(context, id: data.id).then((back) {
                   if (back != null)
@@ -545,6 +545,7 @@ class _MediationListPageState extends State<MediationListPage>
                         .getApplyMediation(context, true);
                 });
               },
+              unconstrained: false,
             ),
           ],
         ),

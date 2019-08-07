@@ -127,7 +127,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                       physics: AlwaysScrollableScrollPhysics(),
                       reverse: true,
                       padding: EdgeInsets.symmetric(
-                          vertical: ScreenUtil().setHeight(200)),
+                          vertical: ScreenUtil().setHeight(220)),
                       children: serviceChatModel
                           .messages(serviceChatModel.currentChatUser.userId)
                           .map((message) {
@@ -341,8 +341,10 @@ class _ServiceChatPageState extends State<ServiceChatPage>
       "data": {
         "to_id": "${model.currentChatUser.userId}",
         "to_name": "${model.currentChatUser.userName}",
+        "to_nick_name": "${model.currentChatUser.userName}",
         "content": "${message.content}",
         "from_name": "${model.chatSelf.userName}",
+        "from_nick_name": "${model.chatSelf.userName}",
         "from_id": "${model.chatSelf.userId}",
         "from_avatar": "${model.chatSelf.userAvatarUrl}"
       }
@@ -364,11 +366,11 @@ class _ServiceChatPageState extends State<ServiceChatPage>
           serviceChatModel.currentChatUser = user;
         },
         child: Container(
-          height: ScreenUtil().setHeight(120),
-          width: ScreenUtil().setHeight(120),
+          height: ScreenUtil().setHeight(160),
+          width: ScreenUtil().setHeight(160),
           decoration: BoxDecoration(
               color: serviceChatModel.currentChatUser == user
-                  ? Colors.lightGreen
+                  ? Colors.greenAccent
                   : Colors.lightGreen.withAlpha(88),
               borderRadius: BorderRadius.vertical(
                   top: Radius.circular(6), bottom: Radius.circular(6))),
@@ -403,21 +405,27 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                         ),
                       ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
+              Positioned.fill(
                 child: Container(
+                  margin: EdgeInsets.only(top: ScreenUtil().setHeight(70)),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius:
                         BorderRadius.vertical(bottom: Radius.circular(6)),
-                    color: Colors.black.withAlpha(100),
+                    color: Colors.black.withAlpha(0x56),
                   ),
-                  height: ScreenUtil().setHeight(70),
-                  child: Text(
-                    "${user.userName}",
-                    style: TextStyle(color: Colors.white, fontSize: 11),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          "${user.userName}",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 11),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               )

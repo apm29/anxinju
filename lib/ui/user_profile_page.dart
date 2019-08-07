@@ -298,7 +298,9 @@ class UserProfilePage extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("$title"),
+            title: Text("$title",style: Theme.of(context).textTheme.title.copyWith(
+              fontSize: 16
+            ),),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[

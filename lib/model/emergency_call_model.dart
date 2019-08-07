@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:ease_life/interaction/websocket_manager.dart';
 import 'package:ease_life/model/district_model.dart';
@@ -10,6 +12,7 @@ import 'package:ease_life/res/configs.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:web_socket_channel/io.dart';
 
 import '../utils.dart';
@@ -90,6 +93,8 @@ class EmergencyCallModel extends ChangeNotifier {
     disconnect();
   }
 
+  StreamSubscription streamSubscription;
+
   Future connect() async {
     final token = config.token;
     final group = config.group;
@@ -101,6 +106,12 @@ class EmergencyCallModel extends ChangeNotifier {
       "userinfo_param": "$token",
     };
     sendData(json.encode(data).toString());
+
+    streamSubscription = Observable.periodic(Duration(seconds: 5)).listen((_) {
+      if (!isConnected) {
+        connect();
+      }
+    });
   }
 
   void sendData(String data) {
@@ -110,6 +121,7 @@ class EmergencyCallModel extends ChangeNotifier {
 
   Future disconnect() async {
     _channel.sink?.close();
+    streamSubscription?.cancel();
   }
 
   ///接收WS信息
@@ -194,13 +206,14 @@ class EmergencyCallModel extends ChangeNotifier {
       }
       page++;
     } else {
+      if(Platform.isAndroid)
       showToast("获取历史消息失败:${kfBaseResp.text}");
     }
     loadingHistory = false;
     notifyListeners();
     return;
   }
-  
+
   ///输入框相关
   bool _audioInput = false;
 
@@ -260,7 +273,6 @@ class EmergencyCallModel extends ChangeNotifier {
   static EmergencyCallModel of(BuildContext context) {
     return Provider.of<EmergencyCallModel>(context, listen: false);
   }
-
 }
 
 class EmergencyRoomConfig {

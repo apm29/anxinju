@@ -763,15 +763,15 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
 
   String _getMessageSendTime(String timeStr) {
     var time = DateTime.parse(timeStr);
-    //if (isToday(time)) {
-    //  return DateFormat("HH:mm:ss").format(time);
-    //} else {
+    if (isToday(time)) {
+      return DateFormat("HH:mm:ss").format(time);
+    } else {
     return DateFormat("yyyy-MM-dd HH:mm:ss").format(time);
-    //}
+    }
   }
 
   bool isToday(DateTime time) {
-    return time.difference(DateTime.now()).inDays < 1;
+    return time.difference(DateTime.now()).inDays.abs() < 1;
   }
 
   Widget _buildMessageWrapper(
@@ -794,9 +794,12 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
           self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            children: timeAndName,
+          margin: EdgeInsets.symmetric(horizontal: 1),
+          child: DefaultTextStyle(
+            style: Theme.of(context).textTheme.caption,
+            child: Row(
+              children: timeAndName,
+            ),
           ),
         ),
         Container(

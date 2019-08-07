@@ -165,7 +165,7 @@ class KfDioUtil {
     }).catchError((e, StackTrace s) {
       debugPrint(e.toString());
       debugPrint(s.toString());
-      if (e is DioError) {
+      if (e is DioError && toastMsg) {
         showToast(e.message);
       }
       return KFBaseResp.error(message: e.toString(), data: null as T);

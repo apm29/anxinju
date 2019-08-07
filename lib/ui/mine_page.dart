@@ -210,27 +210,33 @@ class _MinePageState extends State<MinePage> {
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
               ),
-              EaseTile(
-                title: "巡更管理",
-                iconData: Icons.outlined_flag,
-                iconColor: Colors.purple,
-                onPressed: () {
-                  toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
-                      checkFaceVerified: false);
-                },
-                margin: EdgeInsets.symmetric(horizontal: 16),
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-              ),
+              Platform.isIOS
+                  ? Container()
+                  : EaseTile(
+                      title: "巡更管理",
+                      iconData: Icons.outlined_flag,
+                      iconColor: Colors.purple,
+                      onPressed: () {
+                        toWebPage(context, WebIndexID.XUN_GENG_GUAN_LI,
+                            checkFaceVerified: false);
+                      },
+                      margin: EdgeInsets.symmetric(horizontal: 16),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    ),
 
-              EaseTile(
-                title: "检查更新",
-                iconData: Icons.cached,
-                onPressed: () {
-                  _doCheckUpdate(context);
-                },
-                margin: EdgeInsets.symmetric(horizontal: 16),
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-              ),
+              Platform.isIOS
+                  ? Container()
+                  : EaseTile(
+                      title: "检查更新",
+                      iconData: Icons.cached,
+                      onPressed: () {
+                        _doCheckUpdate(context);
+                      },
+                      margin: EdgeInsets.symmetric(horizontal: 16),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    ),
               EaseTile(
                 title: "退出登录",
                 iconData: Icons.exit_to_app,
@@ -283,7 +289,8 @@ class _MinePageState extends State<MinePage> {
     bool notVerify = userVerifyStatusModel.isNotVerified();
     bool hasHouse = districtModel.hasHouse();
     bool hasCommonPermission = roleModel.hasCommonUserPermission();
-    bool hasRecordPermission = roleModel.hasSocietyRecordPermission();
+    bool hasRecordPermission =
+        roleModel.hasSocietyRecordPermission() && !Platform.isIOS;
     String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
     String url = userModel.userDetail?.avatar;
     String userName =

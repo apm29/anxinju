@@ -400,7 +400,7 @@ class _WebViewExampleState extends State<WebViewExample> {
             actions: <Widget>[
 //          NavigationControls(_controller.future),
               DistrictInfoButton(
-                onDistrictSelected: (){
+                onDistrictSelected: () {
                   controller.reload();
                 },
               ),
@@ -947,18 +947,24 @@ class _WebViewExampleState extends State<WebViewExample> {
               title: Text("粘贴"),
               content: Text(clipData.text),
               actions: <Widget>[
-                FlatButton(onPressed: (){
-                  Navigator.of(context).pop();
-                }, child: Text("取消")),
-                FlatButton(onPressed: (){
-                  var text = initText.substring(0,selectionStart)+clipData.text + initText.substring(selectionEnd);
-                  controller?.evaluateJavascript('''
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("取消")),
+                FlatButton(
+                    onPressed: () {
+                      var text = initText.substring(0, selectionStart) +
+                          clipData.text +
+                          initText.substring(selectionEnd);
+                      controller?.evaluateJavascript('''
                   if(document.activeElement.tagName == "textarea" ||document.activeElement.tagName == "input" ){
                     document.activeElement.innerText = '$text';
                   }
                   ''');
-                  Navigator.of(context).pop();
-                }, child: Text("粘贴内容")),
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("粘贴内容")),
               ],
             );
           });
@@ -1059,7 +1065,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     //
     //});
     rotateWithExifAndCompress(sourceFile).then((file) {
-      showToast("开始上传 ${file.path}");
+      if (Platform.isAndroid) showToast("开始上传 ${file.path}");
       Api.uploadPic(file.absolute.path).then((BaseResponse<ImageDetail> resp) {
         if (resp.success) {
           controller.evaluateJavascript(

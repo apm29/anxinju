@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:ease_life/interaction/websocket_manager.dart';
 import 'package:ease_life/model/user_model.dart';
@@ -197,6 +198,8 @@ class ServiceChatModel extends ChangeNotifier {
         _historyConfigMap[chatUser.userId] = HistoryConfig();
       });
       currentChatUsers.addAll(userList);
+      if (_currentChatUsers.length > 0)
+        currentChatUser = _currentChatUsers.first;
       refresh(districtId);
     } else {
       showToast("获取在线用户失败");
@@ -241,13 +244,19 @@ class ServiceChatModel extends ChangeNotifier {
             ChatUser(
               userInfo['id'],
               userInfo['avatar'],
-              userInfo['data']['user']['nickname'],
+              userInfo['nick_name'],
             ),
           );
           _historyConfigMap[userInfo['id']] = HistoryConfig();
+          _messages.removeWhere((message) {
+            return message.receiverId ==userInfo['id'] ||
+                message.senderId == userInfo['id'];
+          });
           if (add) {
             loadHistory(userInfo['id'], districtId);
           }
+          if (_currentChatUsers.length > 0)
+            currentChatUser = _currentChatUsers.first;
           print('add user - $add:$userInfo');
           break;
         case "delUser":
@@ -275,7 +284,6 @@ class ServiceChatModel extends ChangeNotifier {
           print('add user:$add');
           var userId2 = currentChatUser?.userId;
           var message2 = message['id'];
-          print('${message['nick_name']}');
           _messages.insert(
             0,
             ServiceChatMessage(
@@ -352,13 +360,12 @@ class ServiceChatModel extends ChangeNotifier {
         );
       }).toList();
       _messages.addAll(list.reversed);
-      print(
-          'http://axjkftest.ciih.net/admin/custRoomApi/getChatLog ====> \n count : ${_messages.length}');
       if (list.length < pageNum) {
         _historyConfigMap[userId].noMoreHistory = true;
       }
       _historyConfigMap[userId].increase();
     } else {
+      if(Platform.isAndroid)
       showToast("获取历史消息失败:${kfBaseResp.text}");
     }
     _historyConfigMap[userId].loadingHistory = false;
@@ -391,6 +398,13 @@ abstract class IChatUser {
       return "${Configs.KFBaseUrl}${userAvatar ?? ""}";
     }
   }
+
+  @override
+  String toString() {
+    return 'IChatUser{userId: $userId, userAvatar: $userAvatar, userName: $userName}';
+  }
+
+
 }
 
 class ServiceChatMessage {
@@ -435,7 +449,9 @@ class ChatUser extends IChatUser {
           userId,
           userAvatar,
           userName,
-        );
+        ){
+    print('==========> userName: $userName');
+  }
 }
 
 class HistoryConfig {
