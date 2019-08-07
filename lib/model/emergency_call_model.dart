@@ -83,7 +83,7 @@ class EmergencyCallModel extends ChangeNotifier {
     _channel.stream.listen((data) {
       _processRawData(json.decode(data));
     });
-
+    reconnectOnDisconnect();
     connect();
   }
 
@@ -106,8 +106,10 @@ class EmergencyCallModel extends ChangeNotifier {
       "userinfo_param": "$token",
     };
     sendData(json.encode(data).toString());
+  }
 
-    streamSubscription = Observable.periodic(Duration(seconds: 5)).listen((_) {
+  void reconnectOnDisconnect(){
+    streamSubscription = Observable.periodic(Duration(seconds: 10)).listen((_) {
       if (!isConnected) {
         connect();
       }
