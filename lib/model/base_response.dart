@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 ///
 /// {
 /// "status": "1",
@@ -72,42 +74,113 @@ class UserInfoWrapper {
 }
 
 class UserInfo {
+  ///用户唯一标识
   String userId;
+
+  ///用户名
   String userName;
-  String nickName;
+
+  ///用户手机号
   String mobile;
+
+  ///是否认证,已废弃
+  @deprecated
   int isCertification;
 
-  UserInfo(
-      {this.userId,
-      this.userName,
-      this.nickName,
-      this.mobile,
-      this.isCertification});
+  ///新引入字段,来自userDetail
+  ///昵称
+  String nickName;
+
+  ///头像
+  String avatar;
+
+  ///真实姓名
+  String myName;
+
+  ///性别
+  String sex;
+
+  ///身份证
+  String idCard;
+
+  ///以下迁移自getUserRole
+  ///用户角色列表
+  List<UserType> roles;
+
+  ///所有房子的列表
+  List<HouseDetail> houses;
+
+  UserInfo({
+    this.userId,
+    this.userName,
+    this.mobile,
+    this.isCertification,
+    this.nickName,
+    this.avatar,
+    this.myName,
+    this.sex,
+    this.idCard,
+    this.roles,
+    this.houses,
+  });
 
   @override
   String toString() {
-    return '{"userId": "$userId", "userName": "$userName", "mobile": "$mobile", "isCertification": $isCertification,"nickName":"$nickName"}';
+    return jsonEncode(toJson());
   }
 
-  UserInfo.fromJson(Map<String, dynamic> json) {
-    userId = json['userId'];
-    userName = json['userName'];
-    nickName = json['nickName'];
-    mobile = json['mobile'];
-    isCertification = json['isCertification'];
+  UserInfo.fromJson(Map<String, dynamic> map) {
+    userId = map['userId'];
+    userName = map['userName'];
+    mobile = map['mobile'];
+    isCertification = map['isCertification'];
+    nickName = map['nickName'];
+    avatar = map['avatar'];
+    myName = map['myName'];
+    sex = map['sex'];
+    idCard = map['idCard'];
+
+    ///角色
+    if (map['roles'] != null) {
+      roles = List<UserType>();
+      map['roles'].forEach((v) {
+        roles.add(UserType.fromJson(v));
+      });
+    } else {
+      roles = [];
+    }
+
+    ///房屋
+    if (map['houses'] != null) {
+      houses = List<HouseDetail>();
+      map['houses'].forEach((v) {
+        houses.add(HouseDetail.fromJson(v));
+      });
+    } else {
+      houses = [];
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['userId'] = this.userId;
     data['userName'] = this.userName;
-    data['nickName'] = this.nickName;
     data['mobile'] = this.mobile;
-    data['isCertification'] = this.isCertification;
+    data['nickName'] = this.nickName;
+    data['avatar'] = this.avatar;
+    data['myName'] = this.myName;
+    data['sex'] = this.sex;
+    data['idCard'] = this.idCard;
+    if (this.roles != null) {
+      data['roles'] = this.roles.map((v) => v.toJson()).toList();
+    }
+    if (this.houses != null) {
+      data['houses'] = this.houses.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 
+  ///用于比较两个user是否为同一个,以userId为准
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -230,51 +303,51 @@ class MenuItem {
   }
 }
 
-class UserDetail {
-  String userId;
-  String myName;
-  String sex;
-  String phone;
-  String nickName;
-  String avatar;
-  String idCard;
-
-  UserDetail(
-      {this.userId,
-      this.myName,
-      this.sex,
-      this.phone,
-      this.nickName,
-      this.avatar,
-      this.idCard});
-
-  UserDetail.fromJson(Map<String, dynamic> json) {
-    userId = json['userId'];
-    myName = json['myName'];
-    sex = json['sex'];
-    phone = json['phone'];
-    nickName = json['nickName'];
-    avatar = json['avatar'];
-    idCard = json['idCard'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['userId'] = this.userId;
-    data['myName'] = this.myName;
-    data['sex'] = this.sex;
-    data['phone'] = this.phone;
-    data['nickName'] = this.nickName;
-    data['avatar'] = this.avatar;
-    data['idCard'] = this.idCard;
-    return data;
-  }
-
-  @override
-  String toString() {
-    return '{"userId":"$userId","myName":"$myName","sex":"$sex","phone":"$phone","nickName":"$nickName","avatar":"$avatar","idCard":"$idCard"}';
-  }
-}
+//class UserDetail {
+//  String userId;
+//  String myName;
+//  String sex;
+//  String phone;
+//  String nickName;
+//  String avatar;
+//  String idCard;
+//
+//  UserDetail(
+//      {this.userId,
+//      this.myName,
+//      this.sex,
+//      this.phone,
+//      this.nickName,
+//      this.avatar,
+//      this.idCard});
+//
+//  UserDetail.fromJson(Map<String, dynamic> json) {
+//    userId = json['userId'];
+//    myName = json['myName'];
+//    sex = json['sex'];
+//    phone = json['phone'];
+//    nickName = json['nickName'];
+//    avatar = json['avatar'];
+//    idCard = json['idCard'];
+//  }
+//
+//  Map<String, dynamic> toJson() {
+//    final Map<String, dynamic> data = new Map<String, dynamic>();
+//    data['userId'] = this.userId;
+//    data['myName'] = this.myName;
+//    data['sex'] = this.sex;
+//    data['phone'] = this.phone;
+//    data['nickName'] = this.nickName;
+//    data['avatar'] = this.avatar;
+//    data['idCard'] = this.idCard;
+//    return data;
+//  }
+//
+//  @override
+//  String toString() {
+//    return '{"userId":"$userId","myName":"$myName","sex":"$sex","phone":"$phone","nickName":"$nickName","avatar":"$avatar","idCard":"$idCard"}';
+//  }
+//}
 
 class ImageDetail {
   String orginPicPath;
@@ -500,20 +573,23 @@ class HouseDetail {
   String name;
   String userId;
   String passCode;
+  int isOwner;
 
-  HouseDetail(
-      {this.id,
-      this.houseId,
-      this.districtId,
-      this.building,
-      this.unit,
-      this.house,
-      this.addr,
-      this.phone,
-      this.idcard,
-      this.name,
-      this.userId,
-      this.passCode});
+  HouseDetail({
+    this.id,
+    this.houseId,
+    this.districtId,
+    this.building,
+    this.unit,
+    this.house,
+    this.addr,
+    this.phone,
+    this.idcard,
+    this.name,
+    this.userId,
+    this.passCode,
+    this.isOwner,
+  });
 
   HouseDetail.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -528,6 +604,7 @@ class HouseDetail {
     name = json['name'];
     userId = json['userId'];
     passCode = json['passCode'];
+    isOwner = json['isOwner'];
   }
 
   Map<String, dynamic> toJson() {
@@ -544,8 +621,11 @@ class HouseDetail {
     data['name'] = this.name;
     data['userId'] = this.userId;
     data['passCode'] = this.passCode;
+    data['isOwner'] = this.isOwner;
     return data;
   }
+
+  bool get isHouseOwner => (isOwner ?? 0) == 1;
 
   @override
   bool operator ==(Object other) =>

@@ -320,7 +320,6 @@ class _FaceIdPageState extends State<FaceIdPage> {
 
     if (baseResp.success) {
       await UserModel.of(context).login(baseResp.data, baseResp.token, context);
-      await UserRoleModel.of(context).tryFetchUserRoleTypes(context);
       await DistrictModel.of(context).tryFetchCurrentDistricts();
     }
     toastFuture?.dismiss(showAnim: true);

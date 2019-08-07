@@ -12,8 +12,8 @@ import 'dispute_mediation_list_page.dart';
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserRoleModel>(
-      builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
+    return Consumer<UserModel>(
+      builder: (BuildContext context, UserModel roleModel, Widget child) {
         final isOnPropertyDuty = roleModel.isOnPropertyDuty;
         return Scaffold(
           appBar: AppBar(
@@ -28,7 +28,7 @@ class HomePage extends StatelessWidget {
                 return Text(
                   isOnPropertyDuty
                       ? value.currentChatUser != null
-                          ? "正在与${value.currentChatUser.userName}交谈"
+                          ? "正在与${value.currentChatUser.userNickName}交谈"
                           : "当前无人连接客服"
                       : Strings.appName,
                 );
@@ -171,12 +171,12 @@ class HomePage extends StatelessWidget {
                           iconData: Icons.video_call,
                           buttonLabel: "视频报警",
                         ),
-                  Consumer2<UserRoleModel, UserModel>(
-                    builder: (BuildContext context, UserRoleModel userRoleModel,
-                        UserModel userModel, Widget child) {
+                  Consumer<UserModel>(
+                    builder: (BuildContext context, UserModel userModel,
+                        Widget child) {
                       return Offstage(
                         offstage: !userModel.isLogin ||
-                            userRoleModel.isOnPropertyDuty,
+                            userModel.isOnPropertyDuty,
                         child: EaseIconButton(
                           onPressed: () {
                             _goEmergencyCall(context);
@@ -335,13 +335,13 @@ class HomePage extends StatelessWidget {
                     checkIsFaceVerified: false,
                   ),
                   Platform.isIOS
-                      ? Container():
-                  const HomeChip(
-                    title: "巡更管理",
-                    indexId: WebIndexID.XUN_GENG_GUAN_LI,
-                    checkHasHouse: true,
-                    checkIsFaceVerified: false,
-                  ),
+                      ? Container()
+                      : const HomeChip(
+                          title: "巡更管理",
+                          indexId: WebIndexID.XUN_GENG_GUAN_LI,
+                          checkHasHouse: true,
+                          checkIsFaceVerified: false,
+                        ),
                 ],
               ),
             ),

@@ -124,19 +124,6 @@ class Api {
   }
 
   /*
-   * 获取用户详情
-   */
-  static Future<BaseResponse<UserDetail>> getUserDetail() async {
-    return await DioUtil().postAsync<UserDetail>(
-      path: "/permission/userDetail/getUserDetail",
-      jsonProcessor: (jsonMap) {
-        return UserDetail.fromJson(jsonMap);
-      },
-      desc: "获取用户详情",
-    );
-  }
-
-  /*
    * 保存用户详情
    * userId,用户id:带上id为修改,不带id为新增详情
    * myName

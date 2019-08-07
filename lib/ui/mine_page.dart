@@ -35,26 +35,33 @@ class _MinePageState extends State<MinePage> {
         automaticallyImplyLeading: false,
         actions: buildActions(context),
       ),
-      body: Consumer4<UserModel, UserVerifyStatusModel, UserRoleModel,
+      body: Consumer3<UserModel, UserVerifyStatusModel,
           DistrictModel>(
         builder: (BuildContext context,
             UserModel userModel,
             UserVerifyStatusModel userVerifyStatus,
-            UserRoleModel roleModel,
             DistrictModel districtModel,
             Widget child) {
           var isLogin = userModel.isLogin;
           if (!isLogin) {
             return buildVisitor(context);
           }
-          var isOnPropertyDuty = roleModel.isOnPropertyDuty;
+          var isOnPropertyDuty = userModel.isOnPropertyDuty;
           return AnimatedSwitcher(
             duration: Duration(seconds: 1),
             child: isOnPropertyDuty
-                ? _buildPropertyMine(context, userModel, userVerifyStatus,
-                    roleModel, districtModel)
-                : _buildCommonMine(context, userModel, userVerifyStatus,
-                    roleModel, districtModel),
+                ? _buildPropertyMine(
+                    context,
+                    userModel,
+                    userVerifyStatus,
+                    districtModel,
+                  )
+                : _buildCommonMine(
+                    context,
+                    userModel,
+                    userVerifyStatus,
+                    districtModel,
+                  ),
             switchInCurve: Curves.fastOutSlowIn,
             switchOutCurve: Curves.fastOutSlowIn,
             transitionBuilder: (Widget child, Animation<double> animation) {
@@ -73,14 +80,12 @@ class _MinePageState extends State<MinePage> {
     BuildContext context,
     UserModel userModel,
     UserVerifyStatusModel userVerifyStatusModel,
-    UserRoleModel roleModel,
     DistrictModel districtModel,
   ) {
     bool isVerified =
-        userVerifyStatusModel.isVerified() || roleModel.isOnPropertyDuty;
-    String url = userModel.userDetail?.avatar;
-    String userName =
-        userModel.userDetail?.nickName ?? userModel.userName ?? "";
+        userVerifyStatusModel.isVerified() || userModel.isOnPropertyDuty;
+    String url = userModel.userAvatar;
+    String userName = userModel.userNickname ?? userModel.userName ?? "";
     return Container(
       color: Colors.grey[100],
       child: DefaultTextStyle(
@@ -282,19 +287,17 @@ class _MinePageState extends State<MinePage> {
     BuildContext context,
     UserModel userModel,
     UserVerifyStatusModel userVerifyStatusModel,
-    UserRoleModel roleModel,
     DistrictModel districtModel,
   ) {
     bool isVerified = userVerifyStatusModel.isVerified();
     bool notVerify = userVerifyStatusModel.isNotVerified();
     bool hasHouse = districtModel.hasHouse();
-    bool hasCommonPermission = roleModel.hasCommonUserPermission();
+    bool hasCommonPermission = userModel.hasCommonUserPermission();
     bool hasRecordPermission =
-        roleModel.hasSocietyRecordPermission() && !Platform.isIOS;
+        userModel.hasSocietyRecordPermission() && !Platform.isIOS;
     String verifyStatusDesc = userVerifyStatusModel.verifyStatusDesc;
-    String url = userModel.userDetail?.avatar;
-    String userName =
-        userModel.userDetail?.nickName ?? userModel.userName ?? "";
+    String url = userModel.userAvatar;
+    String userName = userModel.userNickname ?? userModel.userName ?? "";
     return Consumer<MainIndexModel>(
       builder: (BuildContext context, MainIndexModel value, Widget child) {
         return DefaultTextStyle(

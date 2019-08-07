@@ -128,16 +128,27 @@ class ServiceChatModel extends ChangeNotifier {
         .toList();
   }
 
-  ServiceChatModel(BuildContext context) {
-    reconnect(context);
-  }
-
   int districtId;
 
-  void reconnect(BuildContext context) async {
+  void reconnect(UserModel userModel, DistrictModel districtModel) async {
     disconnect();
-    await DistrictModel.of(context).tryFetchCurrentDistricts();
-    districtId = DistrictModel.of(context).getCurrentDistrictId();
+    districtId = districtModel.getCurrentDistrictId();
+    districtModel.addListener(() {
+      districtId = districtModel.getCurrentDistrictId();
+      getOnlineUsers(districtId);
+    });
+    userModel.addListener(() {
+      var userName = userModel.userName;
+      var nickName = userModel.userNickname;
+      var userAvatar = userModel.userAvatar;
+      var userId = userModel.userId;
+      _chatSelf = ChatUser(
+        userId,
+        userAvatar,
+        userName,
+        nickName,
+      );
+    });
     try {
       _currentChannel = IOWebSocketChannel.connect(
         Configs.KF_EMERGENCY_WS_URL,
@@ -145,42 +156,36 @@ class ServiceChatModel extends ChangeNotifier {
     } catch (e) {
       print(e);
     }
-    var resp = await Api.getUserInfo();
-    var respDetail = await Api.getUserDetail();
-    if (respDetail.success && resp.success) {
-      var userName = resp.data.userName;
-      var nickName = respDetail.data.nickName;
-      var userAvatar = respDetail.data.avatar;
-      var userId = resp.data.userId;
-      print('${respDetail.data.avatar}');
-      _chatSelf = ChatUser(
-        userId,
-        userAvatar,
-        nickName,
-      );
+    var userName = userModel.userName;
+    var nickName = userModel.userNickname;
+    var userAvatar = userModel.userAvatar;
+    var userId = userModel.userId;
+    _chatSelf = ChatUser(
+      userId,
+      userAvatar,
+      userName,
+      nickName,
+    );
 
-      print('Connected to ${Configs.KF_EMERGENCY_WS_URL}');
+    print('Connected to ${Configs.KF_EMERGENCY_WS_URL}');
 
-      streamSubscription = _currentChannel.stream.listen((data) {
-        print('<<<<< RECV <---- ${data.toString()}');
-        _processRawData(data);
-      });
-      var map = {
-        "type": "init",
-        "uid": "KF$userId",
-        "cAppId": "${Configs.KF_APP_ID}",
-        "name": "$userName",
-        "nick_name": "$nickName",
-        "avatar": "$userAvatar",
-        //"group": "3",//客服
-        "group": "25", //紧急呼叫
-        "district_id": "$districtId"
-      };
+    streamSubscription = _currentChannel.stream.listen((data) {
+      print('<<<<< RECV <---- ${data.toString()}');
+      _processRawData(data);
+    });
+    var map = {
+      "type": "init",
+      "uid": "KF$userId",
+      "cAppId": "${Configs.KF_APP_ID}",
+      "name": "$userName",
+      "nick_name": "$nickName",
+      "avatar": "$userAvatar",
+      //"group": "3",//客服
+      "group": "25", //紧急呼叫
+      "district_id": "$districtId"
+    };
 
-      sendData(json.encode(map));
-    } else {
-      return;
-    }
+    sendData(json.encode(map));
   }
 
   void getOnlineUsers(int districtId) async {
@@ -192,6 +197,7 @@ class ServiceChatModel extends ChangeNotifier {
             (onlineChatUser) => ChatUser(
               onlineChatUser.userId,
               onlineChatUser.userAvatar,
+              onlineChatUser.userName,
               onlineChatUser.nickName,
             ),
           )
@@ -211,6 +217,9 @@ class ServiceChatModel extends ChangeNotifier {
   void refresh(int districtId) {
     _historyConfigMap.forEach((userId, config) {
       config.reset();
+      _messages.removeWhere((message) {
+        return message.receiverId == userId || message.senderId == userId;
+      });
     });
     currentChatUsers.forEach((user) {
       loadHistory(user.userId, districtId);
@@ -246,6 +255,7 @@ class ServiceChatModel extends ChangeNotifier {
             ChatUser(
               userInfo['id'],
               userInfo['avatar'],
+              userInfo['name'],
               userInfo['nick_name'],
             ),
           );
@@ -280,6 +290,7 @@ class ServiceChatModel extends ChangeNotifier {
             ChatUser(
               message['id'],
               message['avatar'],
+              message['name'],
               message['nick_name'],
             ),
           );
@@ -385,8 +396,9 @@ abstract class IChatUser {
   String userId;
   String userAvatar;
   String userName;
+  String userNickName;
 
-  IChatUser(this.userId, this.userAvatar, this.userName);
+  IChatUser(this.userId, this.userAvatar, this.userName, this.userNickName);
 
   @override
   bool operator ==(Object other) =>
@@ -450,13 +462,13 @@ class ChatUser extends IChatUser {
     String userId,
     String userAvatar,
     String userName,
+    String userNickName,
   ) : super(
           userId,
           userAvatar,
           userName,
-        ) {
-    print('==========> userName: $userName');
-  }
+          userNickName,
+        );
 }
 
 class HistoryConfig {

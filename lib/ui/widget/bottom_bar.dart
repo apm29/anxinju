@@ -1,5 +1,6 @@
 import 'package:ease_life/index.dart';
 import 'package:ease_life/model/main_index_model.dart';
+import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 
 import '../main_page.dart';
@@ -16,8 +17,8 @@ class BottomBar extends StatelessWidget {
         return BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
-              icon: Consumer<UserRoleModel>(
-                builder: (BuildContext context, UserRoleModel roleModel,
+              icon: Consumer<UserModel>(
+                builder: (BuildContext context, UserModel roleModel,
                     Widget child) {
                   return Icon(
                     roleModel.isOnPropertyDuty ? Icons.call : Icons.home,
@@ -28,8 +29,8 @@ class BottomBar extends StatelessWidget {
                   );
                 },
               ),
-              title: Consumer<UserRoleModel>(
-                builder: (BuildContext context, UserRoleModel roleModel,
+              title: Consumer<UserModel>(
+                builder: (BuildContext context, UserModel roleModel,
                     Widget child) {
                   return roleModel.isOnPropertyDuty ? Text("紧急呼叫") : Text("主页");
                 },

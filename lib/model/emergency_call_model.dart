@@ -76,7 +76,7 @@ class EmergencyCallModel extends ChangeNotifier {
         group: group,
         fromUserId: userModel.userId,
         fromAvatar: userModel.userAvatar,
-        fromNickName: userModel.userDetail.nickName,
+        fromNickName: userModel.userNickname,
         fromUserName: userModel.userName,
         token: userModel.token);
     _channel = IOWebSocketChannel.connect(Configs.KF_EMERGENCY_WS_URL);

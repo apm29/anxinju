@@ -2,17 +2,14 @@ import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:ease_life/ui/dispute_mediation_list_page.dart';
 import 'package:ease_life/ui/notification_message_page.dart';
-import 'package:ease_life/ui/service_chat_page.dart';
 import 'package:ease_life/ui/setting_page.dart';
 import 'package:ease_life/ui/video_nineoneone_page.dart';
-import 'package:ease_life/ui/face_verify_hint_page.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'index.dart';
 import 'model/announcement_model.dart';
 import 'model/app_info_model.dart';
 import 'model/district_model.dart';
-import 'model/emergency_call_model.dart';
 import 'model/home_end_scroll_model.dart';
 import 'model/main_index_model.dart';
 import 'model/mediation_model.dart';
@@ -65,15 +62,13 @@ class MyApp extends StatelessWidget {
             ),
             ChangeNotifierProvider(
                 builder: (context) => UserVerifyStatusModel()),
-            ChangeNotifierProvider(
-                builder: (context) => UserRoleModel(context)),
             ChangeNotifierProvider(builder: (context) => MessageModel()),
             ChangeNotifierProvider(
                 builder: (context) => ChatRoomPageStatusModel()),
             ChangeNotifierProvider(builder: (context) => AppInfoModel()),
             ChangeNotifierProvider(
               builder: (context) {
-                return ServiceChatModel(context);
+                return ServiceChatModel();
               },
             )
           ],

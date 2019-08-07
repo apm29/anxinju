@@ -113,14 +113,11 @@ class MainPageState extends State<MainPage> {
             onRefresh: () async {
               UserModel.of(context).tryLoginWithLocalToken();
               await UserModel.of(context).tryFetchUserInfoAndLogin();
-              await UserModel.of(context).tryFetchUserDetail();
               await AnnouncementModel.of(context).tryFetchAllAnnouncement();
               await DistrictModel.of(context).tryFetchCurrentDistricts();
               await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
               await MainIndexModel.of(context).tryFetchIndexJson(evict: true);
               await MainIndexModel.of(context).tryGetCurrentLocation();
-              await UserRoleModel.of(context)
-                  .tryFetchUserRoleTypes(context, dispatchUser: false);
               return;
             },
           ),

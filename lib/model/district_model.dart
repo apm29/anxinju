@@ -114,7 +114,6 @@ class DistrictModel extends ChangeNotifier {
     await UserModel.of(context).tryFetchUserInfoAndLogin();
     await UserVerifyStatusModel.of(context).tryFetchVerifyStatus();
     await MainIndexModel.of(context).tryGetCurrentLocation();
-    await UserRoleModel.of(context).tryFetchUserRoleTypes(context,dispatchUser: false);
   }
 
   int getCurrentDistrictId() {

@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:ease_life/interaction/audio_recorder.dart';
 import 'package:ease_life/model/district_model.dart';
 import 'package:ease_life/model/service_chat_model.dart';
+import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/model/user_role_model.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:ease_life/res/configs.dart';
@@ -239,10 +240,12 @@ class _ServiceChatPageState extends State<ServiceChatPage>
               color: disconnected ? Colors.white : Colors.green,
             ),
           ),
-          disconnected
-              ? FlatButton.icon(
+          Consumer2<UserModel,DistrictModel>(
+            builder: (context,userModel,districtModel,child){
+              return  disconnected
+                  ? FlatButton.icon(
                   onPressed: () {
-                    ServiceChatModel.of(context).reconnect(context);
+                    ServiceChatModel.of(context).reconnect(userModel,districtModel);
                   },
                   icon: Icon(
                     Icons.cached,
@@ -254,7 +257,9 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                       color: Colors.white,
                     ),
                   ))
-              : Container(),
+                  : Container();
+            },
+          ),
         ],
       ),
     );
@@ -265,7 +270,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     if (resp.success) {
       var model = ServiceChatModel.of(context);
       ServiceChatMessage chatMessage = ServiceChatMessage(
-        nickName: model.chatSelf.userName,
+        nickName: model.chatSelf.userNickName,
         userAvatar: model.chatSelf.userAvatarUrl,
         time: DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
         content: "audio[${resp.data.url}]",
@@ -290,7 +295,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     }
     var model = ServiceChatModel.of(context);
     ServiceChatMessage chatMessage = ServiceChatMessage(
-      nickName: model.chatSelf.userName,
+      nickName: model.chatSelf.userNickName,
       userAvatar: model.chatSelf.userAvatarUrl,
       time: DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
       content: _inputController.text,
@@ -320,7 +325,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
     model.progress = 100;
     if (resp.success) {
       ServiceChatMessage chatMessage = ServiceChatMessage(
-        nickName: model.chatSelf.userName,
+        nickName: model.chatSelf.userNickName,
         userAvatar: model.chatSelf.userAvatarUrl,
         time: DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
         content: "img[${resp.data.orginPicPath}]",
@@ -341,10 +346,10 @@ class _ServiceChatPageState extends State<ServiceChatPage>
       "data": {
         "to_id": "${model.currentChatUser.userId}",
         "to_name": "${model.currentChatUser.userName}",
-        "to_nick_name": "${model.currentChatUser.userName}",
+        "to_nick_name": "${model.currentChatUser.userNickName}",
         "content": "${message.content}",
         "from_name": "${model.chatSelf.userName}",
-        "from_nick_name": "${model.chatSelf.userName}",
+        "from_nick_name": "${model.chatSelf.userNickName}",
         "from_id": "${model.chatSelf.userId}",
         "from_avatar": "${model.chatSelf.userAvatarUrl}"
       }
@@ -420,7 +425,7 @@ class _ServiceChatPageState extends State<ServiceChatPage>
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          "${user.userName}",
+                          "${user.userNickName}",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white, fontSize: 11),
                         ),

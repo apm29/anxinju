@@ -33,7 +33,7 @@ class _DistrictInfoButtonState extends State<DistrictInfoButton> {
     return Consumer<DistrictModel>(
       builder: (BuildContext context, DistrictModel value, Widget child) {
         final bool isLogin = UserModel.of(context).isLogin;
-        final UserRoleModel roleModel = UserRoleModel.of(context, listen: true);
+        final UserModel roleModel = UserModel.of(context, listen: true);
         final UserVerifyStatusModel verifyStatusModel =
             UserVerifyStatusModel.of(context);
         final bool isVerified =

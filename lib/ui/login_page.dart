@@ -351,11 +351,16 @@ class _LoginPageState extends LifecycleWidgetState<LoginPage> {
             cancelToken: cancelToken)
         : await Api.login(controllerMobile.text, controllerPassword.text,
             cancelToken: cancelToken);
-
-    if (baseResp.success) {
-      await UserModel.of(context)
-          .login(baseResp.data.userInfo, baseResp.token, context);
-      Navigator.of(context).pop(baseResp.token);
+    userSp.setString(KEY_TOKEN, baseResp.token);
+    BaseResponse<UserInfo> userInfoResp = await Api.getUserInfo();
+    if (baseResp.success ) {
+      if(userInfoResp.success) {
+        await UserModel.of(context)
+            .login(userInfoResp.data, userInfoResp.token, context,dispatchRole: true);
+        Navigator.of(context).pop(baseResp.token);
+      }else{
+        showToast(userInfoResp.text);
+      }
     } else {
       showToast(baseResp.text);
     }

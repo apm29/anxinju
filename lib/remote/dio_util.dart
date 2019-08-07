@@ -130,7 +130,6 @@ class DioUtil {
       bool addAuthorization = true,
       String desc = "",
       ProgressCallback onSendProgress}) async {
-    print('post $BASE_URL$path $data');
     return _dioInstance
         .post<Map<String, dynamic>>(path,
             onSendProgress: onSendProgress,
@@ -157,11 +156,10 @@ class DioUtil {
                       }),
             cancelToken: cancelToken)
         .then((Response<Map<String, dynamic>> response) {
-      if (response.statusCode != HttpStatus.ok) {
-        print('---------RESP-ERR----------');
-        print(response.data);
-        print('---------RESP-END----------');
-      }
+      debugPrint("$BASE_URL$path");
+      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+      String prettyStr = encoder.convert(response.data);
+      debugPrint(prettyStr);
       String _status, _text, _token;
       dynamic _data;
       if (response.statusCode == HttpStatus.ok ||

@@ -442,7 +442,7 @@ class _DisputeMediationPageState extends State<DisputeMediationPage> {
                     userId: userModel.userId,
                     userName: userModel.userName,
                     userAvatar: userModel.userAvatar,
-                    nickName: userModel.userDetail.nickName,
+                    nickName: userModel.userNickname,
                   ),
                 );
               },

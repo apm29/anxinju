@@ -153,9 +153,10 @@ class KfDioUtil {
         .then((resp) {
       return resp.data;
     }).then((map) {
-//      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
-//      String prettyprint = encoder.convert(map);
-//      debugPrint(prettyprint);
+      debugPrint("${Configs.KFBaseUrl}$path");
+      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+      String prettyStr = encoder.convert(map);
+      debugPrint(prettyStr);
       String status = map["status"];
       String text = map["text"];
       String token = map["token"];

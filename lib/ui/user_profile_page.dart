@@ -9,74 +9,19 @@ import 'package:provider/provider.dart';
 
 import '../utils.dart';
 
-class UserProfileModel extends ChangeNotifier {
-  String nickName;
-  String gender;
-
-  String myName;
-
-  String mobile;
-  String idCard;
-  String avatar;
-
-  void getNewData(BuildContext context) {
-    Api.getUserDetail().then((resp) {
-      if (resp.success) {
-        nickName = resp.data.nickName;
-        gender = resp.data.sex;
-        myName = resp.data.myName;
-        mobile = resp.data.phone;
-        idCard = resp.data.idCard;
-        avatar = resp.data.avatar;
-
-        UserModel.of(context).updateUserDetail(resp.data);
-
-        notifyListeners();
-      }
-      showToast("${resp.text}");
-    });
-  }
-
-  static UserProfileModel of(BuildContext context) {
-    return Provider.of<UserProfileModel>(context,listen: false);
-  }
-}
-
 class UserProfilePage extends StatelessWidget {
   static Future go(BuildContext context) {
     return Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            builder: (BuildContext context) {
-              return UserProfileModel();
-            },
-          ),
-          FutureProvider<BaseResponse<UserDetail>>(
-            builder: (context) {
-              return Api.getUserDetail();
-            },
-            initialData: BaseResponse.error(),
-            catchError: (context, error) {
-              return BaseResponse.error(message: error.toString());
-            },
-            updateShouldNotify: (old, newValue) {
-              return old.data != newValue.data;
-            },
-          )
-        ],
-        child: UserProfilePage(),
-      );
+      return UserProfilePage();
     }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<UserProfileModel, BaseResponse<UserDetail>>(
+    return Consumer<UserModel>(
       builder: (
         BuildContext context,
-        UserProfileModel profileModel,
-        BaseResponse<UserDetail> response,
+        UserModel userModel,
         Widget child,
       ) {
         return Theme(
@@ -123,11 +68,10 @@ class UserProfilePage extends StatelessWidget {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          buildAvatar(context,
-                              profileModel.avatar ?? response.data?.avatar,
+                          buildAvatar(context, userModel.userAvatar,
                               circleBorder: true,
                               showEditBanner: true, onPressed: () {
-                            _doEditAvatar(context, response, profileModel);
+                            _doEditAvatar(context, userModel);
                           }),
                           SizedBox(
                             height: 12,
@@ -174,30 +118,25 @@ class UserProfilePage extends StatelessWidget {
                   ),
                   ProfileTile(
                     title: "昵称",
-                    desc: profileModel.nickName ??
-                        response.data?.nickName ??
-                        "未设置",
+                    desc: userModel.userNickname ?? "未设置",
                     onPressed: () {
-                      showEditDialog(
-                          response, profileModel, context, "nickName",
+                      showEditDialog(userModel, context, "nickName",
                           title: "昵称",
                           desc: "填写新的昵称",
-                          originText:
-                              profileModel.nickName ?? response.data?.nickName);
+                          originText: userModel.userNickname);
                     },
                   ),
                   ProfileTile(
                     title: "性别",
-                    desc: profileModel.gender ?? response.data?.sex ?? "未设置",
+                    desc: userModel.gender ?? "未设置",
                     onPressed: () {
                       showPickerDialog(
-                        response,
-                        profileModel,
+                        userModel,
                         context,
                         "sex",
                         values: ["男", "女", "保密"],
                         title: "性别",
-                        originText: profileModel.gender ?? response.data?.sex,
+                        originText: userModel.gender,
                         desc: "选择性别",
                       );
                     },
@@ -208,26 +147,26 @@ class UserProfilePage extends StatelessWidget {
                   ),
                   ProfileTile(
                     title: "姓名",
-                    desc: profileModel.myName ?? response.data?.myName ?? "未设置",
+                    desc: userModel.myName ?? "未设置",
                     onPressed: () {
                       showToast("姓名不可修改");
-//                      showEditDialog(response, profileModel, context, "myName",
+//                      showEditDialog(response, userModel, context, "myName",
 //                          title: "真实姓名",
 //                          desc: "填写新的姓名",
 //                          originText:
-//                          profileModel.myName ?? response.data?.myName);
+//                          userModel.myName ?? response.data?.myName);
                     },
                   ),
                   ProfileTile(
                     title: "手机",
-                    desc: getMaskedPhone(profileModel, response),
+                    desc: getMaskedPhone(userModel),
                     onPressed: () {
                       showToast("手机号码不可修改");
                     },
                   ),
                   ProfileTile(
                     title: "身份证",
-                    desc: getMaskedIdCard(profileModel, response),
+                    desc: getMaskedIdCard(userModel),
                     onPressed: () {
                       showToast("身份证不可修改");
                     },
@@ -245,41 +184,27 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
-  String getMaskedIdCard(
-      UserProfileModel profileModel, BaseResponse<UserDetail> response) {
-    var raw = profileModel.idCard ?? response.data?.idCard;
+  String getMaskedIdCard(UserModel userModel) {
+    var raw = userModel.idCard;
     if (raw != null && raw.length > 12) {
       raw = raw.replaceRange(6, 12, "*" * 6);
     }
     return raw ?? "未设置";
   }
 
-  String getMaskedPhone(
-      UserProfileModel profileModel, BaseResponse<UserDetail> response) {
-    var raw = profileModel.mobile ?? response.data?.phone;
+  String getMaskedPhone(UserModel userModel) {
+    var raw = userModel.mobile;
     if (raw != null && raw.length > 7) {
       raw = raw.replaceRange(3, 7, "*" * 4);
     }
     return raw ?? "未设置";
   }
 
-  void _doEditAvatar(BuildContext context, BaseResponse<UserDetail> response,
-      UserProfileModel profileModel) {
+  void _doEditAvatar(BuildContext context, UserModel model) {
     showImageSourceDialog(context).then((file) {
       Api.uploadPic(file.path).then((resp) {
         if (resp.success) {
-          Api.saveUserDetailByMap(
-            <String, String>{
-              "userId": response.data.userId,
-              "avatar": resp.data.orginPicPath,
-            },
-          ).then((respSave) {
-            if (respSave.success) {
-              profileModel.getNewData(context);
-            } else {
-              showToast("保存图片失败");
-            }
-          });
+          model.changeUserDetailByKey(resp.data.orginPicPath, "avatar");
         } else {
           showToast("图片上传失败");
         }
@@ -288,8 +213,7 @@ class UserProfilePage extends StatelessWidget {
   }
 
   Future showEditDialog(
-    BaseResponse<UserDetail> response,
-    UserProfileModel model,
+    UserModel model,
     BuildContext context,
     String dataKey, {
     String originText,
@@ -302,9 +226,10 @@ class UserProfilePage extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("$title",style: Theme.of(context).textTheme.title.copyWith(
-              fontSize: 16
-            ),),
+            title: Text(
+              "$title",
+              style: Theme.of(context).textTheme.title.copyWith(fontSize: 16),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -326,31 +251,18 @@ class UserProfilePage extends StatelessWidget {
                     showToast("不可为空");
                     return;
                   }
-                  var dataMap = {
-                    "userId": response.data?.userId,
-                    dataKey: _controller.text,
-                  };
-                  Api.saveUserDetailByMap(dataMap).then((resp) {
-                    if (resp.success) {
-                      Navigator.of(context).pop(resp);
-                    }
-                    showToast(resp.text);
-                  });
+                  model.changeUserDetailByKey(_controller.text, dataKey);
+                  Navigator.of(context).pop();
                 },
                 child: Text("修改"),
               )
             ],
           );
-        }).then((v) {
-      if (v != null) {
-        model.getNewData(context);
-      }
-    });
+        });
   }
 
   Future showPickerDialog(
-    BaseResponse<UserDetail> response,
-    UserProfileModel model,
+    UserModel model,
     BuildContext context,
     String dataKey, {
     String title,
@@ -368,28 +280,21 @@ class UserProfilePage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 DropdownButton<String>(
-                    value: value,
-                    items: values
-                        .map(
-                          (s) => DropdownMenuItem<String>(
-                            child: Text(s),
-                            value: s,
-                          ),
-                        )
-                        .toList(),
-                    isExpanded: true,
-                    onChanged: (String value) {
-                      var dataMap = {
-                        "userId": response.data?.userId,
-                        dataKey: value,
-                      };
-                      Api.saveUserDetailByMap(dataMap).then((resp) {
-                        if (resp.success) {
-                          Navigator.of(context).pop(resp);
-                        }
-                        showToast(resp.text);
-                      });
-                    }),
+                  value: value,
+                  items: values
+                      .map(
+                        (s) => DropdownMenuItem<String>(
+                          child: Text(s),
+                          value: s,
+                        ),
+                      )
+                      .toList(),
+                  isExpanded: true,
+                  onChanged: (String value) {
+                    model.changeUserDetailByKey(value, dataKey);
+                    Navigator.of(context).pop();
+                  },
+                ),
                 Text(
                   '$desc',
                   style: Theme.of(context).textTheme.caption,
@@ -397,11 +302,7 @@ class UserProfilePage extends StatelessWidget {
               ],
             ),
           );
-        }).then((v) {
-      if (v != null) {
-        model.getNewData(context);
-      }
-    });
+        });
   }
 }
 

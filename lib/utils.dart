@@ -963,20 +963,20 @@ Container buildAvatar(
   );
 }
 
-Consumer<UserRoleModel> buildRoleSwitchButton() {
-  return Consumer<UserRoleModel>(
-    builder: (BuildContext context, UserRoleModel roleModel, Widget child) {
-      return roleModel.hasSwitch
+Consumer<UserModel> buildRoleSwitchButton() {
+  return Consumer<UserModel>(
+    builder: (BuildContext context, UserModel userModel, Widget child) {
+      return userModel.hasSwitch
           ? FlatButton.icon(
               icon: Icon(
                 Icons.repeat,
                 color: Colors.blue,
               ),
               onPressed: () {
-                roleModel.switchRole();
+                userModel.switchRole();
                 SystemSound.play(SystemSoundType.click);
               },
-              label: Text("${roleModel.switchString}"),
+              label: Text("${userModel.switchString}"),
             )
           : Container();
     },
