@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ease_life/interaction/audio_recorder.dart';
 import 'package:ease_life/interaction/websocket_manager.dart';
 import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/remote/api.dart';
@@ -249,7 +250,7 @@ class ServiceChatModel extends ChangeNotifier {
           );
           _historyConfigMap[userInfo['id']] = HistoryConfig();
           _messages.removeWhere((message) {
-            return message.receiverId ==userInfo['id'] ||
+            return message.receiverId == userInfo['id'] ||
                 message.senderId == userInfo['id'];
           });
           if (add) {
@@ -284,19 +285,25 @@ class ServiceChatModel extends ChangeNotifier {
           print('add user:$add');
           var userId2 = currentChatUser?.userId;
           var message2 = message['id'];
+          var serviceChatMessage = ServiceChatMessage(
+            senderId: message['id'],
+            receiverId: _chatSelf.userId,
+            nickName: message['nick_name'],
+            userAvatar: message['avatar'],
+            time: message['time'],
+            content: message['content'],
+            read: userId2 == message2,
+          );
           _messages.insert(
             0,
-            ServiceChatMessage(
-              senderId: message['id'],
-              receiverId: _chatSelf.userId,
-              nickName: message['nick_name'],
-              userAvatar: message['avatar'],
-              time: message['time'],
-              content: message['content'],
-              read: userId2 == message2,
-            ),
+            serviceChatMessage,
           );
           playMessageSound();
+          if (serviceChatMessage.content.startsWith("audio[") &&
+              serviceChatMessage.content.endsWith("]")) {
+            AudioRecorder.getInstance().startPlay(serviceChatMessage.content
+                .substring(6, serviceChatMessage.content.length - 1));
+          }
           break;
       }
       _connectionState = ConnectStatus.CONNECTED;
@@ -365,8 +372,7 @@ class ServiceChatModel extends ChangeNotifier {
       }
       _historyConfigMap[userId].increase();
     } else {
-      if(Platform.isAndroid)
-      showToast("获取历史消息失败:${kfBaseResp.text}");
+      if (Platform.isAndroid) showToast("获取历史消息失败:${kfBaseResp.text}");
     }
     _historyConfigMap[userId].loadingHistory = false;
     notifyListeners();
@@ -403,8 +409,6 @@ abstract class IChatUser {
   String toString() {
     return 'IChatUser{userId: $userId, userAvatar: $userAvatar, userName: $userName}';
   }
-
-
 }
 
 class ServiceChatMessage {
@@ -449,7 +453,7 @@ class ChatUser extends IChatUser {
           userId,
           userAvatar,
           userName,
-        ){
+        ) {
     print('==========> userName: $userName');
   }
 }
