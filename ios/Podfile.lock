@@ -75,7 +75,7 @@ DEPENDENCIES:
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - fake_push (from `.symlinks/plugins/fake_push/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `.symlinks/flutter/ios-release`)
   - flutter_bugly (from `.symlinks/plugins/flutter_bugly/ios`)
   - flutter_exif_rotation (from `.symlinks/plugins/flutter_exif_rotation/ios`)
   - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
@@ -120,7 +120,7 @@ EXTERNAL SOURCES:
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: ".symlinks/flutter/ios-release"
   flutter_bugly:
     :path: ".symlinks/plugins/flutter_bugly/ios"
   flutter_exif_rotation:

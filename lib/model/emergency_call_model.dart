@@ -109,6 +109,7 @@ class EmergencyCallModel extends ChangeNotifier {
   }
 
   void reconnectOnDisconnect(){
+    streamSubscription?.cancel();
     streamSubscription = Observable.periodic(Duration(seconds: 10)).listen((_) {
       if (!isConnected) {
         connect();

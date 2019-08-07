@@ -36,6 +36,10 @@ class UserProfileModel extends ChangeNotifier {
       showToast("${resp.text}");
     });
   }
+
+  static UserProfileModel of(BuildContext context) {
+    return Provider.of<UserProfileModel>(context,listen: false);
+  }
 }
 
 class UserProfilePage extends StatelessWidget {

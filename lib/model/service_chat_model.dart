@@ -8,6 +8,7 @@ import 'package:ease_life/model/user_model.dart';
 import 'package:ease_life/remote/api.dart';
 import 'package:ease_life/remote/kf_dio_utils.dart';
 import 'package:ease_life/res/configs.dart';
+import 'package:ease_life/ui/user_profile_page.dart';
 import 'package:ease_life/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
