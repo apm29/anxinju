@@ -891,7 +891,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                                           padding:
                                               const EdgeInsets.only(left: 8.0),
                                           child: Text(
-                                            user.userName,
+                                            "${user.nickName}",
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .body1
@@ -920,7 +920,7 @@ class _MediationApplyPageState extends State<MediationApplyPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      model.currentMediator?.userName ?? "",
+                                      model.currentMediator?.nickName ?? "",
                                       style: Theme.of(context)
                                           .textTheme
                                           .body1

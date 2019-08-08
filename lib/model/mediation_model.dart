@@ -161,8 +161,8 @@ class MediationApplyModel extends ChangeNotifier {
 
 class MediationApplicationAddModel extends ChangeNotifier {
   MediationApplicationAddModel(BuildContext context) {
-      getMediatorList();
-      getHouseList(context);
+    getMediatorList();
+    getHouseList(context);
   }
 
   String desc;
@@ -213,7 +213,10 @@ class MediationApplicationAddModel extends ChangeNotifier {
         await ApiKf.mediationApplyDetailQuery(id.toString(), Configs.KF_APP_ID);
     if (resp.success) {
       _currentMediator = UserInfo(
-          userId: resp.data.acceptUserId, userName: resp.data.acceptUserName);
+        userId: resp.data.acceptUserId,
+        userName: resp.data.acceptUserName,
+        nickName: resp.data.acceptNickName,
+      );
       _currentHouse = HouseDetail(addr: resp.data.address);
       _images = resp.data.images;
       desc = resp.data.description;

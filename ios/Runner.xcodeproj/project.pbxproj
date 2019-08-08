@@ -455,7 +455,7 @@
 				CURRENT_PROJECT_VERSION = "${FLUTTER_BUILD_NUMBER}";
 				DEVELOPMENT_TEAM = 2745U5HFJE;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NUMBER = 12;
+				FLUTTER_BUILD_NUMBER = 13;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
@@ -467,9 +467,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.spark.ease.life;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axj.anxinju;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = AnXinJuProfile;
+				PROVISIONING_PROFILE_SPECIFIER = com.axj.anxinju;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -598,7 +598,7 @@
 				CURRENT_PROJECT_VERSION = "${FLUTTER_BUILD_NUMBER}";
 				DEVELOPMENT_TEAM = 2745U5HFJE;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NUMBER = 12;
+				FLUTTER_BUILD_NUMBER = 13;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
@@ -610,9 +610,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.spark.ease.life;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axj.anxinju;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = AnXinJuProfile;
+				PROVISIONING_PROFILE_SPECIFIER = com.axj.anxinju;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -636,7 +636,7 @@
 				CURRENT_PROJECT_VERSION = "${FLUTTER_BUILD_NUMBER}";
 				DEVELOPMENT_TEAM = 2745U5HFJE;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NUMBER = 12;
+				FLUTTER_BUILD_NUMBER = 13;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
@@ -648,9 +648,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.spark.ease.life;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axj.anxinju;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = AnXinJuProfile;
+				PROVISIONING_PROFILE_SPECIFIER = com.axj.anxinju;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
