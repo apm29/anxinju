@@ -9,8 +9,6 @@ import 'package:ease_life/model/user_verify_status_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const int PAGE_HOME = 0;
-const int PAGE_SEARCH = 11;
-const int PAGE_MESSAGE = 21;
 const int PAGE_MINE = 1;
 
 class MainPage extends StatefulWidget {
@@ -102,11 +100,9 @@ class MainPageState extends State<MainPage> {
             value.dispose();
           },
           child: RefreshIndicator(
+            key: ValueKey(1),
             child: Scaffold(
-              body: Container(
-                color: Colors.grey[200],
-                child: buildContent(context),
-              ),
+              body: buildContent(context),
               bottomNavigationBar:
                   buildBottomNavigationBar(indexModel.currentIndex),
             ),
@@ -138,8 +134,6 @@ class MainPageState extends State<MainPage> {
           children: <Widget>[
             HomePage(),
             MinePage(),
-            buildTestPage(),
-            MessagePage(),
           ],
           index: indexModel.currentIndex,
         );

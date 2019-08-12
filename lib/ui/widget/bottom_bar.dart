@@ -23,9 +23,6 @@ class BottomBar extends StatelessWidget {
                   return Icon(
                     roleModel.isOnPropertyDuty ? Icons.call : Icons.home,
                     size: 24,
-                    color: currentPage == PAGE_HOME
-                        ? Colors.blueAccent
-                        : Colors.grey,
                   );
                 },
               ),
@@ -36,30 +33,10 @@ class BottomBar extends StatelessWidget {
                 },
               ),
             ),
-//            BottomNavigationBarItem(
-//                icon: Image.asset(
-//                  "images/search.png",
-//                  width: 24,
-//                  height: 24,
-//                  color: currentPage == PAGE_SEARCH
-//                      ? Colors.blueAccent
-//                      : Colors.grey,
-//                ),
-//                title: Text("搜索")),
-//        BottomNavigationBarItem(
-//            icon: Icon(
-//              Icons.message,
-//              size: 24,
-//              color: _currentIndex == PAGE_MESSAGE ? Colors.blueAccent : Colors.grey,
-//            ),
-//            title: Text("消息")),
             BottomNavigationBarItem(
                 icon: Icon(
                   Icons.person,
                   size: 24,
-                  color: currentPage == PAGE_MINE
-                      ? Colors.blueAccent
-                      : Colors.grey,
                 ),
                 title: Text("我的")),
           ],
